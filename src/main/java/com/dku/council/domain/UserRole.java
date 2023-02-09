@@ -1,0 +1,23 @@
+package com.dku.council.domain;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Getter
+@AllArgsConstructor
+public enum UserRole {
+    USER("USER"), GUEST("GUEST"), ADMIN("ADMIN,USER");
+    private final String role;
+
+    private static final Map<String, UserRole> BY_LABEL =
+            Stream.of(values()).collect(Collectors.toMap(UserRole::getRole, e -> e));
+
+    public static UserRole valueOfName(String name) {
+        return BY_LABEL.get(name);
+    }
+
+}
