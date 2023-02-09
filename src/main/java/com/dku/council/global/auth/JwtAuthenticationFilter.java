@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,10 +25,14 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtAuthenticationTokenProvider jwtAuthenticationTokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
+            ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
+            ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
+
             AuthenticationToken tokenFromHeader = jwtAuthenticationTokenProvider.getTokenFromHeader(request);
             //인증 시작
             if (tokenFromHeader.getAccessToken() != null) {
@@ -34,14 +40,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 JwtAuthentication authentication = jwtAuthenticationTokenProvider.getAuthentication(tokenFromHeader.getAccessToken());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            filterChain.doFilter(request, response);
+
+            filterChain.doFilter(requestWrapper, responseWrapper);
+            responseWrapper.copyBodyToResponse();
+
         } catch (CustomException e) {
             response.setStatus(e.getErrorCode().getStatus().value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
 
             ExceptionDto exceptionDto = new ExceptionDto(e);
-            ObjectMapper objectMapper = new ObjectMapper();
 
             String exceptionMessage = objectMapper.writeValueAsString(exceptionDto);
 
