@@ -17,10 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @SecurityScheme(
         name = SwaggerConfig.AUTHENTICATION,
         type = SecuritySchemeType.HTTP,
+        scheme = "Bearer",
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {
-    public static final String AUTHENTICATION = "DKU-AUTH-TOKEN";
+    public static final String AUTHENTICATION = "Authorization";
     public static final String API_VERSION = "v1.0.0";
 }

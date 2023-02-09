@@ -5,7 +5,8 @@ import org.springframework.security.core.Authentication;
 import javax.servlet.http.HttpServletRequest;
 
 public interface AuthenticationTokenProvider {
-    AuthenticationToken getTokenFromHeader(HttpServletRequest request);
+    String getAccessTokenFromHeader(HttpServletRequest request);
+
     Authentication getAuthentication(String accessToken);
 
 }
