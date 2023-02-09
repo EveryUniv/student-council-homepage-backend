@@ -11,13 +11,13 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public enum UserRole {
     USER("ROLE_USER"), GUEST("ROLE_GUEST"), ADMIN("ROLE_ADMIN,ROLE_USER");
+
     private final String role;
 
     private static final Map<String, UserRole> BY_LABEL =
             Stream.of(values()).collect(Collectors.toMap(UserRole::getRole, e -> e));
 
-    public static UserRole valueOfName(String name) {
+    public static UserRole of(String name) {
         return BY_LABEL.get(name);
     }
-
 }

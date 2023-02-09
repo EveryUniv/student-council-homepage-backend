@@ -1,13 +1,15 @@
 package com.dku.council.domain.user;
 
 import com.dku.council.domain.UserRole;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.websocket.server.ServerEndpoint;
 
 @Entity
-@Table(name = "DKUSER")
+@Table(name = "DKU_USER")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
