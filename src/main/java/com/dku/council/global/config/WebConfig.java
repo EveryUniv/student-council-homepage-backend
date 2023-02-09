@@ -1,4 +1,4 @@
-package com.dku.council.global;
+package com.dku.council.global.config;
 
 import com.dku.council.global.interceptor.SuccessResponseInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +9,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
-public class Config implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer {
     private final SuccessResponseInterceptor successResponseInterceptor;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -29,5 +30,4 @@ public class Config implements WebMvcConfigurer {
                 .excludePathPatterns("/v3/api-docs/**")
                 .addPathPatterns("/**");
     }
-
 }

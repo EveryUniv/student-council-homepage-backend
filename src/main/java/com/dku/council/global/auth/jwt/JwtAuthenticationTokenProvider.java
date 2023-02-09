@@ -4,6 +4,7 @@ import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
 import com.dku.council.global.exception.CustomException;
 import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -15,16 +16,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dku.council.global.exception.ErrorCode.*;
+import static com.dku.council.global.exception.ErrorCode.EXPIRED_TOKEN;
+import static com.dku.council.global.exception.ErrorCode.INVALID_TOKEN;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvider {
+
     @Value("${jwt.access-expiration}")
-    private long accessExpiration;
+    private final long accessExpiration;
+
     @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration;
+    private final long refreshExpiration;
+
     @Value("${jwt.secretKey}")
-    private String secretKey;
+    private final String secretKey;
+
 
     @Override
     public AuthenticationToken getTokenFromHeader(HttpServletRequest request) {
@@ -45,7 +52,6 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
         return new JwtAuthentication(userId, userRole);
     }
 
-
     public AuthenticationToken issue(User user) {
         return JwtAuthenticationToken.builder()
                 .accessToken(createAccessToken(user.getId().toString(), user.getUserRole()))
@@ -53,7 +59,7 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
                 .build();
     }
 
-    public AuthenticationToken reIssue(AuthenticationToken authenticationToken){
+    public AuthenticationToken reIssue(AuthenticationToken authenticationToken) {
         String refreshToken = authenticationToken.getRefreshToken();
         //만료되면 새로운 refreshToken 반환.
         String validateRefreshToken = validateRefreshToken(refreshToken);
@@ -69,14 +75,14 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
     private String refreshAccessToken(String accessToken) {
         String userId;
         UserRole role;
-        try{
+        try {
             Jws<Claims> claimsJws = validateAccessToken(accessToken);
             Claims body = claimsJws.getBody();
             userId = (String) body.get("userId");
-            role = UserRole.valueOfName((String) body.get("Role"));
-        }catch (ExpiredJwtException e){
+            role = UserRole.of((String) body.get("Role"));
+        } catch (ExpiredJwtException e) {
             userId = (String) e.getClaims().get("userId");
-            role = UserRole.valueOfName((String) e.getClaims().get("Role"));
+            role = UserRole.of((String) e.getClaims().get("Role"));
         }
         return createAccessToken(userId, role);
     }
@@ -105,6 +111,7 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
                 .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
                 .compact();
     }
+
     private Jws<Claims> validateAccessToken(String accessToken) {
         try {
             return Jwts.parser()
@@ -116,7 +123,6 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
             throw new CustomException(INVALID_TOKEN);
         }
     }
-
 
     private String validateRefreshToken(String refreshToken) {
         try {
@@ -130,6 +136,4 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
             throw new CustomException(INVALID_TOKEN);
         }
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.dku.council.global.security;
+package com.dku.council.global.config;
 
 import com.dku.council.global.auth.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;

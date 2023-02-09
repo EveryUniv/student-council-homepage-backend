@@ -1,4 +1,4 @@
-package com.dku.council;
+package com.dku.council.debug;
 
 import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
@@ -13,15 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/test")
-public class test {
+public class TestController {
 
     private final JwtAuthenticationTokenProvider jwtAuthenticationTokenProvider;
 
     @GetMapping
     public AuthenticationToken test(){
         User user = new User(12L, UserRole.ADMIN);
-        AuthenticationToken issue = jwtAuthenticationTokenProvider.issue(user);
-        return issue;
+        return jwtAuthenticationTokenProvider.issue(user);
     }
 
     @GetMapping("/auth")
