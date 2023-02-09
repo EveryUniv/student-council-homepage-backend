@@ -24,6 +24,9 @@ public class Config implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(successResponseInterceptor)
+                .excludePathPatterns("/swagger-ui/**")
+                .excludePathPatterns("/api-docs/**")
                 .addPathPatterns("/**");
     }
+
 }

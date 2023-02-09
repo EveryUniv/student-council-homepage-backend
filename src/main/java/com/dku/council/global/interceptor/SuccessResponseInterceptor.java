@@ -24,8 +24,6 @@ public class SuccessResponseInterceptor implements HandlerInterceptor {
 
         if(!String.valueOf(response.getStatus()).startsWith("2")) return;
 
-        if(request.getRequestURI().startsWith("/v3/api-docs")) return;
-
         if(cachingResponse.getContentType() != null && cachingResponse.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)){
             if(cachingResponse.getContentAsByteArray().length != 0){
                 String jsonBody = StreamUtils.copyToString(cachingResponse.getContentInputStream(), StandardCharsets.UTF_8);
