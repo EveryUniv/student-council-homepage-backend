@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 @Getter
 @AllArgsConstructor
 public enum UserRole {
-    USER("USER"), GUEST("GUEST"), ADMIN("ADMIN,USER");
+    USER("ROLE_USER"), GUEST("ROLE_GUEST"), ADMIN("ROLE_ADMIN,ROLE_USER");
     private final String role;
 
     private static final Map<String, UserRole> BY_LABEL =

@@ -1,7 +1,6 @@
 package com.dku.council.global.security;
 
 import com.dku.council.global.auth.JwtAuthenticationFilter;
-import com.dku.council.global.auth.jwt.JwtAuthenticationTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +18,13 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private static final String[] PUBLIC_URI = {
-            "/swagger-ui/**", "/v3/**",
+            "/swagger-ui/**", "/v3/**","/test"
     };
 
     private static final String[] ADMIN_URI = {
             "/admin/**",
     };
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(PUBLIC_URI).permitAll()
-                .antMatchers(ADMIN_URI).hasRole("ADMIN")
+                .antMatchers(ADMIN_URI).access("hasRole('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

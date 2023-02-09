@@ -9,7 +9,7 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class JwtAuthentication implements Authentication {
-    Long userId;
+    String userId;
     String userRole;
 
     @Override
@@ -23,17 +23,17 @@ public class JwtAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return userId;
+        return Long.parseLong(userId);
     }
 
     @Override
     public Object getDetails() {
-        return userId;
+        return Long.parseLong(userId);
     }
 
     @Override
     public Object getPrincipal() {
-        return userId;
+        return Long.parseLong(userId);
     }
 
     @Override

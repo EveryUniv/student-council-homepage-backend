@@ -3,11 +3,9 @@ package com.dku.council.global.auth.jwt;
 import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
 import io.jsonwebtoken.*;
-import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.management.relation.Role;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,7 +36,7 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
         Jws<Claims> claimsJws = validateAccessToken(accessToken);
 
         Claims body = claimsJws.getBody();
-        Long userId = (Long) body.get("userId");
+        String userId = (String) body.get("userId");
         String userRole = (String) body.get("Role");
 
         return new JwtAuthentication(userId, userRole);
