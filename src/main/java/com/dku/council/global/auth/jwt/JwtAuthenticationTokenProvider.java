@@ -2,6 +2,7 @@ package com.dku.council.global.auth.jwt;
 
 import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
+import com.dku.council.global.exception.CustomException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.dku.council.global.exception.ErrorCode.*;
 
 @Component
 public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvider {
@@ -108,9 +111,9 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
                     .setSigningKey(secretKey.getBytes())
                     .parseClaimsJws(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("만료된 토큰입니다.");
+            throw new CustomException(EXPIRED_TOKEN);
         } catch (JwtException e) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
+            throw new CustomException(INVALID_TOKEN);
         }
     }
 
@@ -124,7 +127,7 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
         } catch (ExpiredJwtException e) {
             return createRefreshToken();
         } catch (JwtException e) {
-            throw new RuntimeException("유효하지 않은 토큰입니다. 로그인을 다시 해주세요:)");
+            throw new CustomException(INVALID_TOKEN);
         }
     }
 
