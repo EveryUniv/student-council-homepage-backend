@@ -24,13 +24,13 @@ import static com.dku.council.global.exception.ErrorCode.*;
 public class JwtProvider implements AuthenticationTokenProvider {
 
     @Value("${jwt.access-expiration}")
-    private long accessExpiration;
+    private final long accessExpiration;
 
     @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration;
+    private final long refreshExpiration;
 
     @Value("${jwt.secretKey}")
-    private String secretKey;
+    private final String secretKey;
 
 
     @Override
