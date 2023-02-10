@@ -9,8 +9,8 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class JwtAuthentication implements Authentication {
-    String userId;
-    String userRole;
+    private String userId;
+    private String userRole;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

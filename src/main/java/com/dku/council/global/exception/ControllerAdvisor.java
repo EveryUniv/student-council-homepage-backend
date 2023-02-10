@@ -6,12 +6,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ControllerAdvisor {
-    @ExceptionHandler(value = {CustomException.class})
+    @ExceptionHandler
     protected ResponseEntity<ExceptionDto> exceptionHandler(CustomException e) {
         return ResponseEntity.status(e.errorCode.getStatus()).body(new ExceptionDto(e));
     }
 
-    @ExceptionHandler(value = {Exception.class})
+    @ExceptionHandler
     protected ResponseEntity<ExceptionDto> exception(Exception e) {
         return ResponseEntity.internalServerError().body(new ExceptionDto(e));
     }

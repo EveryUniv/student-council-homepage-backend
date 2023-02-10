@@ -10,7 +10,9 @@ import java.util.stream.Stream;
 @Getter
 @AllArgsConstructor
 public enum UserRole {
-    USER("ROLE_USER"), GUEST("ROLE_GUEST"), ADMIN("ROLE_ADMIN,ROLE_USER");
+    USER("ROLE_USER"),
+    GUEST("ROLE_GUEST"),
+    ADMIN("ROLE_ADMIN,ROLE_USER");
 
     private final String role;
 
