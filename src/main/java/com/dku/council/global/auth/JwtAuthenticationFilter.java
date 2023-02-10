@@ -1,13 +1,13 @@
 package com.dku.council.global.auth;
 
 import com.dku.council.global.auth.jwt.AuthenticationToken;
-import com.dku.council.global.auth.jwt.JwtAuthentication;
-import com.dku.council.global.auth.jwt.JwtAuthenticationTokenProvider;
+import com.dku.council.global.auth.jwt.AuthenticationTokenProvider;
 import com.dku.council.global.exception.CustomException;
 import com.dku.council.global.exception.ExceptionDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,8 +24,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtAuthenticationTokenProvider jwtAuthenticationTokenProvider;
-    private final ObjectMapper objectMapper;
+    private final AuthenticationTokenProvider authenticationTokenProvider;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -33,11 +33,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
             ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
-            AuthenticationToken tokenFromHeader = jwtAuthenticationTokenProvider.getTokenFromHeader(request);
+            String accessToken = authenticationTokenProvider.getAccessTokenFromHeader(request);
             //인증 시작
-            if (tokenFromHeader.getAccessToken() != null) {
+            if (accessToken != null) {
                 //Authentication 등록
-                JwtAuthentication authentication = jwtAuthenticationTokenProvider.getAuthentication(tokenFromHeader.getAccessToken());
+                Authentication authentication = authenticationTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
@@ -45,16 +45,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             responseWrapper.copyBodyToResponse();
 
         } catch (CustomException e) {
-            response.setStatus(e.getErrorCode().getStatus().value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("UTF-8");
-
-            ExceptionDto exceptionDto = new ExceptionDto(e);
-
-            String exceptionMessage = objectMapper.writeValueAsString(exceptionDto);
-
-            response.getWriter().write(exceptionMessage);
+            makeExceptionResponse(response, e);
         }
 
+    }
+
+    static void makeExceptionResponse(HttpServletResponse response, CustomException e) throws IOException {
+        response.setStatus(e.getErrorCode().getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        ExceptionDto exceptionDto = new ExceptionDto(e);
+
+        String exceptionMessage = objectMapper.writeValueAsString(exceptionDto);
+
+        response.getWriter().write(exceptionMessage);
     }
 }

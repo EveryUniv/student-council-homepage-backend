@@ -7,6 +7,7 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -16,29 +17,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dku.council.global.exception.ErrorCode.EXPIRED_TOKEN;
-import static com.dku.council.global.exception.ErrorCode.INVALID_TOKEN;
+import static com.dku.council.global.exception.ErrorCode.*;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvider {
+public class JwtProvider implements AuthenticationTokenProvider {
 
     @Value("${jwt.access-expiration}")
-    private final long accessExpiration;
+    private long accessExpiration;
 
     @Value("${jwt.refresh-expiration}")
-    private final long refreshExpiration;
+    private long refreshExpiration;
 
     @Value("${jwt.secretKey}")
-    private final String secretKey;
+    private String secretKey;
 
 
     @Override
-    public AuthenticationToken getTokenFromHeader(HttpServletRequest request) {
-        return JwtAuthenticationToken.builder()
-                .accessToken(request.getHeader("DKU-AUTH-TOKEN"))
-                .refreshToken(request.getHeader("DKU-REFRESH-TOKEN"))
-                .build();
+    public String getAccessTokenFromHeader(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (!StringUtils.hasText(header)) return null;
+        if (!header.startsWith("Bearer ")) throw new CustomException(INVALID_TYPE);
+        return header.substring(7);
     }
 
     @Override
@@ -69,7 +69,6 @@ public class JwtAuthenticationTokenProvider implements AuthenticationTokenProvid
                 .accessToken(accessToken)
                 .refreshToken(validateRefreshToken)
                 .build();
-
     }
 
     private String refreshAccessToken(String accessToken) {

@@ -1,6 +1,10 @@
 package com.dku.council.global.config;
 
+import com.dku.council.global.auth.CustomAccessDeniedHandler;
+import com.dku.council.global.auth.CustomAuthenticationEntryPoint;
 import com.dku.council.global.auth.JwtAuthenticationFilter;
+import com.dku.council.global.exception.CustomException;
+import com.dku.council.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +21,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
 
     private static final String[] PUBLIC_URI = {
             "/swagger-ui/**", "/v3/**","/test"
     };
 
     private static final String[] ADMIN_URI = {
-            "/admin/**",
+            "/admin/**", "/test/auth"
     };
 
 
@@ -41,6 +48,10 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .accessDeniedHandler(customAccessDeniedHandler)
+                .authenticationEntryPoint(customAuthenticationEntryPoint)
+                .and()
                 .build();
     }
 

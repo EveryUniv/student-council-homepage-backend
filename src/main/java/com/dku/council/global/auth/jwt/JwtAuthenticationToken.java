@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Builder
 @Getter
-public class JwtAuthenticationToken implements AuthenticationToken{
+public class JwtAuthenticationToken implements AuthenticationToken {
     private String accessToken;
     private String refreshToken;
 }
