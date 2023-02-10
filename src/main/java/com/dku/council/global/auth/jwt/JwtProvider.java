@@ -2,7 +2,9 @@ package com.dku.council.global.auth.jwt;
 
 import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
-import com.dku.council.global.exception.CustomException;
+import com.dku.council.global.error.exception.ExpiredTokenException;
+import com.dku.council.global.error.exception.IllegalTypeException;
+import com.dku.council.global.error.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.dku.council.global.exception.ErrorCode.*;
 
 @Component
 @RequiredArgsConstructor
@@ -37,7 +37,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (!StringUtils.hasText(header)) return null;
-        if (!header.startsWith("Bearer ")) throw new CustomException(INVALID_TYPE);
+        if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
         return header.substring(7);
     }
 
@@ -119,9 +119,9 @@ public class JwtProvider implements AuthenticationTokenProvider {
                     .setSigningKey(secretKey.getBytes())
                     .parseClaimsJws(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(EXPIRED_TOKEN);
+            throw new ExpiredTokenException();
         } catch (JwtException e) {
-            throw new CustomException(INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
     }
 
@@ -134,7 +134,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
         } catch (ExpiredJwtException e) {
             return createRefreshToken();
         } catch (JwtException e) {
-            throw new CustomException(INVALID_TOKEN);
+            throw new InvalidTokenException();
         }
     }
 }

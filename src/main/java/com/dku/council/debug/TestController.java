@@ -4,6 +4,7 @@ import com.dku.council.domain.UserRole;
 import com.dku.council.domain.user.User;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.global.error.exception.IllegalTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,14 +18,19 @@ public class TestController {
 
     private final JwtProvider jwtProvider;
 
+    @GetMapping("/ex")
+    public void throwException() {
+        throw new IllegalTypeException();
+    }
+
     @GetMapping
-    public AuthenticationToken test(){
+    public AuthenticationToken test() {
         User user = new User(12L, UserRole.USER);
         return jwtProvider.issue(user);
     }
 
     @GetMapping("/auth")
-    public String auth(Authentication authentication){
+    public String auth(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         System.out.println("principal = " + principal);
 
@@ -32,7 +38,7 @@ public class TestController {
     }
 
     @GetMapping("/user")
-    public String user(Authentication authentication){
+    public String user(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         System.out.println("principal = " + principal);
 
