@@ -1,6 +1,5 @@
 package com.dku.council.global.auth;
 
-import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.AuthenticationTokenProvider;
 import com.dku.council.global.exception.CustomException;
 import com.dku.council.global.exception.ExceptionDto;
