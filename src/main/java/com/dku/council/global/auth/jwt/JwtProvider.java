@@ -24,13 +24,13 @@ import static com.dku.council.global.exception.ErrorCode.*;
 public class JwtProvider implements AuthenticationTokenProvider {
 
     @Value("${jwt.access-expiration}")
-    private long accessExpiration;
+    private final long accessExpiration;
 
     @Value("${jwt.refresh-expiration}")
-    private long refreshExpiration;
+    private final long refreshExpiration;
 
     @Value("${jwt.secretKey}")
-    private String secretKey;
+    private final String secretKey;
 
 
     @Override
@@ -89,9 +89,11 @@ public class JwtProvider implements AuthenticationTokenProvider {
     private String createAccessToken(String userId, UserRole role) {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime validity = now.plus(accessExpiration, ChronoUnit.HOURS);
+
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("userId", userId);
         payloads.put("Role", role.getRole());
+
         return Jwts.builder()
                 .setSubject("UserInfo") //"sub":"userId"
                 .setClaims(payloads)

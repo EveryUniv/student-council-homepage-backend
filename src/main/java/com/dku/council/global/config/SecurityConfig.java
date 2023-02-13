@@ -3,8 +3,6 @@ package com.dku.council.global.config;
 import com.dku.council.global.auth.CustomAccessDeniedHandler;
 import com.dku.council.global.auth.CustomAuthenticationEntryPoint;
 import com.dku.council.global.auth.JwtAuthenticationFilter;
-import com.dku.council.global.exception.CustomException;
-import com.dku.council.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
