@@ -29,7 +29,7 @@ jobs:
 
       - name: make test properties
         run: |
-          mkdir ./src/test/resources && cd "$_"
+          mkdir -p ./src/test/resources && cd "$_"
           touch ./application.yml
           echo "${{ secrets.PROPERTIES_TEST }}" > ./application.yml
         shell: bash
