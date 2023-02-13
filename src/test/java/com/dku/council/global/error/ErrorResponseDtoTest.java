@@ -27,7 +27,7 @@ class ErrorResponseDtoTest {
     public void create_properly_localized() {
         // given
         LocalizedMessageException e = new LocalizedMessageException(HttpStatus.OK, "messageId");
-        when(messageSource.getMessage(any(), any(), any(), any())).thenReturn("localizedMessage");
+        when(messageSource.getMessage(any(), any(), any())).thenReturn("localizedMessage");
 
         // when
         ErrorResponseDto dto = new ErrorResponseDto(messageSource, Locale.KOREA, e);
