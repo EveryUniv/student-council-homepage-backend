@@ -1,3 +1,6 @@
+spring:
+  messages.basename: messages,errors
+
 jwt:
   access-expiration: 72
   refresh-expiration: 15
