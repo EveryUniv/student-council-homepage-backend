@@ -1,62 +1,66 @@
 package com.dku.council.domain.user;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Locale;
+
 public enum Major {
-    KOREAN_LITERATURE(Department.LIBERAL, "국어국문학과"),
-    HISTORY(Department.LIBERAL, "사학과"),
-    PHILOSOPHY(Department.LIBERAL, "철학과"),
-    ENGLISH_HUMANITIES(Department.LIBERAL, "영미인문학과"),
-    LAW(Department.LAW, "법학과"),
-    POLITICAL(Department.SOCIAL, "정치외교학과"),
-    ADMINISTRATION(Department.SOCIAL, "행정학과"),
-    SOCIETY(Department.SOCIAL, "도시계획부동산학부"),
-    COMMUNICATION(Department.SOCIAL, "커뮤니케이션학부"),
-    COUNSELING(Department.SOCIAL, "상담학과"),
-    ECONOMICS(Department.BUSINESS_ECONOMICS, "경제학과"),
-    COMMERCE(Department.BUSINESS_ECONOMICS, "무역학과"),
-    BUSINESS(Department.BUSINESS_ECONOMICS, "경영학부"),
-    INDUSTRY(Department.BUSINESS_ECONOMICS, "산업경영학과"),
-    INTERNATIONAL(Department.BUSINESS_ECONOMICS, "국제학부"),
-    ELECTRON(Department.ENGINEERING, "전자전기공학부"),
-    POLYMER(Department.ENGINEERING, "고분자시스템공학부"),
-    CIVIL(Department.ENGINEERING, "토목환경공학과"),
-    MECHANICAL(Department.ENGINEERING, "기계공학과"),
-    CHEMISTRY(Department.ENGINEERING, "화학공학과"),
-    ARCHITECTURE(Department.ENGINEERING, "건축학부"),
-    SOFTWARE(Department.SOFTWARE, "소프트웨어학과"),
-    COMPUTER_SCIENCE(Department.SOFTWARE, "컴퓨터공학과"),
-    MOBILE_SYSTEM(Department.SOFTWARE, "모바일시스템공학과"),
-    STATISTICS(Department.SOFTWARE, "정보통계학과"),
-    SECURITY(Department.SOFTWARE, "산업보안학과"),
-    SOFTWARE_CONVERGENCE(Department.SOFTWARE, "SW융합학부"),
-    EDU_CHINESE(Department.EDUCATION, "한문교육과"),
-    EDU_SPECIAL(Department.EDUCATION, "특수교육과"),
-    EDU_MATHEMATICS(Department.EDUCATION, "수학교육과"),
-    EDU_SCIENCE(Department.EDUCATION, "과학교육과"),
-    EDU_PHYSICAL(Department.EDUCATION, "체육교육과"),
-    EDU_TEACHING(Department.EDUCATION, "교직교육과"),
-    POTTERY(Department.MUSIC_ART, "도예과"),
-    DESIGN(Department.MUSIC_ART, "디자인학부"),
-    FILM(Department.MUSIC_ART, "공연영화학부"),
-    DANCE(Department.MUSIC_ART, "무용과"),
-    MUSIC(Department.MUSIC_ART, "음악학부"),
-    LIBERAL_ARTS(Department.LIBERAL_ARTS, "자유교양대학"),
-    GRADUATE(Department.GRADUATE, "대학원"),
-    ADMIN(Department.ADMIN, "총학생회"),
+    KOREAN_LITERATURE(Department.LIBERAL),
+    HISTORY(Department.LIBERAL),
+    PHILOSOPHY(Department.LIBERAL),
+    ENGLISH_HUMANITIES(Department.LIBERAL),
+    LAW(Department.LAW),
+    POLITICAL(Department.SOCIAL),
+    ADMINISTRATION(Department.SOCIAL),
+    SOCIETY(Department.SOCIAL),
+    COMMUNICATION(Department.SOCIAL),
+    COUNSELING(Department.SOCIAL),
+    ECONOMICS(Department.BUSINESS_ECONOMICS),
+    COMMERCE(Department.BUSINESS_ECONOMICS),
+    BUSINESS(Department.BUSINESS_ECONOMICS),
+    INDUSTRY(Department.BUSINESS_ECONOMICS),
+    INTERNATIONAL(Department.BUSINESS_ECONOMICS),
+    ELECTRON(Department.ENGINEERING),
+    POLYMER(Department.ENGINEERING),
+    CIVIL(Department.ENGINEERING),
+    MECHANICAL(Department.ENGINEERING),
+    CHEMISTRY(Department.ENGINEERING),
+    ARCHITECTURE(Department.ENGINEERING),
+    SOFTWARE(Department.SOFTWARE),
+    COMPUTER_SCIENCE(Department.SOFTWARE),
+    MOBILE_SYSTEM(Department.SOFTWARE),
+    STATISTICS(Department.SOFTWARE),
+    SECURITY(Department.SOFTWARE),
+    SOFTWARE_CONVERGENCE(Department.SOFTWARE),
+    EDU_CHINESE(Department.EDUCATION),
+    EDU_SPECIAL(Department.EDUCATION),
+    EDU_MATHEMATICS(Department.EDUCATION),
+    EDU_SCIENCE(Department.EDUCATION),
+    EDU_PHYSICAL(Department.EDUCATION),
+    EDU_TEACHING(Department.EDUCATION),
+    POTTERY(Department.MUSIC_ART),
+    DESIGN(Department.MUSIC_ART),
+    FILM(Department.MUSIC_ART),
+    DANCE(Department.MUSIC_ART),
+    MUSIC(Department.MUSIC_ART),
+    LIBERAL_ARTS(Department.LIBERAL_ARTS),
+    GRADUATE(Department.GRADUATE),
+    ADMIN(Department.ADMIN),
     ;
 
     private final Department department;
-    private final String name;
 
-    Major(Department department, String name) {
+    Major(Department department) {
         this.department = department;
-        this.name = name;
     }
 
     public Department getDepartment() {
         return department;
     }
 
-    public String getName() {
-        return name;
+    public String getName(MessageSource source) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return source.getMessage("Major." + name(), null, locale);
     }
 }

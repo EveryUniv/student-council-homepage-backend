@@ -1,27 +1,26 @@
 package com.dku.council.domain.user;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Locale;
+
 public enum Department {
 
-    LIBERAL("문과대학"),
-    LAW("법과대학"),
-    SOCIAL("사회과학대학"),
-    BUSINESS_ECONOMICS("경영경제대학"),
-    ENGINEERING("공과대학"),
-    SOFTWARE("SW융합대학"),
-    EDUCATION("사범대학"),
-    MUSIC_ART("음악예술대학"),
-    LIBERAL_ARTS("자유교양대학"),
-    GRADUATE("대학원"),
-    ADMIN("총학생회")
-    ;
+    LIBERAL,
+    LAW,
+    SOCIAL,
+    BUSINESS_ECONOMICS,
+    ENGINEERING,
+    SOFTWARE,
+    EDUCATION,
+    MUSIC_ART,
+    LIBERAL_ARTS,
+    GRADUATE,
+    ADMIN;
 
-    private final String name;
-
-    Department(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public String getName(MessageSource source) {
+        Locale locale = LocaleContextHolder.getLocale();
+        return source.getMessage("Department." + name(), null, locale);
     }
 }
