@@ -3,6 +3,7 @@ package com.dku.council.global.config;
 import com.dku.council.global.auth.CustomAccessDeniedHandler;
 import com.dku.council.global.auth.CustomAuthenticationEntryPoint;
 import com.dku.council.global.auth.JwtAuthenticationFilter;
+import com.dku.council.global.error.ExceptionHandlerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,12 +20,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ExceptionHandlerFilter exceptionHandlerFilter;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
 
     private static final String[] PUBLIC_URI = {
-            "/swagger-ui/**", "/v3/**","/test"
+            "/swagger-ui/**", "/v3/**", "/test"
     };
 
     private static final String[] ADMIN_URI = {
@@ -33,7 +35,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .httpBasic().disable()
                 .formLogin().disable()
@@ -46,6 +48,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(customAccessDeniedHandler)
                 .authenticationEntryPoint(customAuthenticationEntryPoint)
@@ -54,7 +57,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
