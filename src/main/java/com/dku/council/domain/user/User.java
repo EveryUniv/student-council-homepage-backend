@@ -1,10 +1,8 @@
 package com.dku.council.domain.user;
 
 import com.dku.council.domain.UserRole;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.dku.council.global.base.BaseEntity;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -12,8 +10,8 @@ import javax.persistence.*;
 @Table(name = "DKU_USER")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-public class User {
+public class User extends BaseEntity {
+
     @Id
     @GeneratedValue
     @Column(name = "user_id")
@@ -22,4 +20,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    @Builder
+    private User(UserRole role) {
+        this.userRole = role;
+    }
 }

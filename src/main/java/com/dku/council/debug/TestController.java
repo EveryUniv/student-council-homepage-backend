@@ -18,13 +18,13 @@ public class TestController {
     private final JwtProvider jwtProvider;
 
     @GetMapping
-    public AuthenticationToken test(){
-        User user = new User(12L, UserRole.USER);
+    public AuthenticationToken test() {
+        User user = User.builder().role(UserRole.USER).build();
         return jwtProvider.issue(user);
     }
 
     @GetMapping("/auth")
-    public String auth(Authentication authentication){
+    public String auth(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         System.out.println("principal = " + principal);
 
@@ -32,7 +32,7 @@ public class TestController {
     }
 
     @GetMapping("/user")
-    public String user(Authentication authentication){
+    public String user(Authentication authentication) {
         Object principal = authentication.getPrincipal();
         System.out.println("principal = " + principal);
 
