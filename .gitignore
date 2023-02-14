@@ -39,5 +39,6 @@ out/
 
 ### private ###
 application.properties
+application.yml
 api.pdf
 
