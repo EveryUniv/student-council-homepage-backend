@@ -10,6 +10,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +36,7 @@ class ErrorResponseDtoTest {
         // then
         DateTimeFormatter.ISO_DATE_TIME.parse(dto.getTimestamp());
         assertThat(dto.getCode()).isEqualTo("LocalizedMessageException");
-        assertThat(dto.getMessage()).isEqualTo("localizedMessage");
+        assertThat(dto.getMessage()).isEqualTo(List.of("localizedMessage"));
         assertThat(dto.getStatus()).isEqualTo(HttpStatus.OK);
     }
 
@@ -51,7 +52,7 @@ class ErrorResponseDtoTest {
         // then
         DateTimeFormatter.ISO_DATE_TIME.parse(dto.getTimestamp());
         assertThat(dto.getCode()).isEqualTo("RuntimeException");
-        assertThat(dto.getMessage()).isEqualTo("message");
+        assertThat(dto.getMessage()).isEqualTo(List.of("message"));
         assertThat(dto.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
