@@ -20,12 +20,15 @@ public class ControllerAdvisor {
 
     @ExceptionHandler
     protected ResponseEntity<ErrorResponseDto> localizedException(LocalizedMessageException e, Locale locale) {
-        return ResponseEntity.status(e.getStatus()).body(new ErrorResponseDto(messageSource, locale, e));
+        ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, e);
+        log.error("A problem has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
+        return ResponseEntity.status(e.getStatus()).body(dto);
     }
 
     @ExceptionHandler
     protected ResponseEntity<ErrorResponseDto> exception(Exception e) {
-        log.error("Unexpected exception:", e);
-        return ResponseEntity.internalServerError().body(new ErrorResponseDto(e));
+        ErrorResponseDto dto = new ErrorResponseDto(e);
+        log.error("Unexpected exception has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
+        return ResponseEntity.internalServerError().body(dto);
     }
 }

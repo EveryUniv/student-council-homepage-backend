@@ -30,18 +30,19 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (LocalizedMessageException ex) {
-            log.error("runtime exception exception handler filter", ex);
-            makeExceptionResponse(response, request.getLocale(), ex);
+            writeErrorResponse(response, response.getLocale(), ex);
         }
     }
 
-    private void makeExceptionResponse(HttpServletResponse response, Locale locale, LocalizedMessageException e) throws IOException {
-        response.setStatus(e.getStatus().value());
+    private void writeErrorResponse(HttpServletResponse response, Locale locale, LocalizedMessageException ex) throws IOException {
+        response.setStatus(ex.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ErrorResponseDto exceptionDto = new ErrorResponseDto(messageSource, locale, e);
-        String exceptionMessage = objectMapper.writeValueAsString(exceptionDto);
+        ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, ex);
+        log.error("A problem has occurred in filter: [id={}]", dto.getTrackingId(), ex);
+
+        String exceptionMessage = objectMapper.writeValueAsString(dto);
         response.getWriter().write(exceptionMessage);
     }
 }
