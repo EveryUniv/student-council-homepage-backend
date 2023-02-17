@@ -1,10 +1,11 @@
 package com.dku.council.debug;
 
 import com.dku.council.domain.UserRole;
+import com.dku.council.domain.user.Major;
 import com.dku.council.domain.user.User;
+import com.dku.council.domain.user.UserStatus;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
-import com.dku.council.global.error.exception.IllegalTypeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +19,16 @@ public class TestController {
 
     private final JwtProvider jwtProvider;
 
-    @GetMapping("/ex")
-    public void throwException() {
-        throw new IllegalTypeException();
-    }
-
     @GetMapping
     public AuthenticationToken test() {
-        User user = new User(12L, UserRole.USER);
+        User user = User.builder()
+                .name("테스트")
+                .classId("32171111")
+                .phone("010-1234-5678")
+                .status(UserStatus.ACTIVE)
+                .major(Major.COMPUTER_SCIENCE)
+                .password("TestPwd")
+                .role(UserRole.USER).build();
         return jwtProvider.issue(user);
     }
 
