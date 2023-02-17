@@ -1,4 +1,0 @@
-jwt:
-  access-expiration: 0
-  refresh-expiration: 0
-  secretKey: key

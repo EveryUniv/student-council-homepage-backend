@@ -1,4 +1,0 @@
-jwt:
-  access-expiration: 72
-  refresh-expiration: 15
-  secretKey: asldfkjaasnasdklfjalekjfslakcnvlaskejlfisajdkfalseifn
