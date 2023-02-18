@@ -1,7 +1,10 @@
 package com.dku.council.domain.user;
 
 import com.dku.council.global.base.BaseEntity;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -22,7 +25,7 @@ public class User extends BaseEntity {
 
     private String password;
 
-    @Column(length = 10)
+    @Column(length = 20)
     private String name;
 
     @Enumerated(STRING)

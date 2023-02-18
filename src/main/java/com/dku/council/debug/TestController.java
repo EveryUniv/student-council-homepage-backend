@@ -1,8 +1,8 @@
 package com.dku.council.debug;
 
-import com.dku.council.domain.user.UserRole;
 import com.dku.council.domain.user.Major;
 import com.dku.council.domain.user.User;
+import com.dku.council.domain.user.UserRole;
 import com.dku.council.domain.user.UserStatus;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
