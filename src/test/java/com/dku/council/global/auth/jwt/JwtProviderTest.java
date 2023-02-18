@@ -1,6 +1,6 @@
 package com.dku.council.global.auth.jwt;
 
-import com.dku.council.domain.UserRole;
+import com.dku.council.domain.user.UserRole;
 import com.dku.council.domain.user.Major;
 import com.dku.council.domain.user.User;
 import com.dku.council.domain.user.UserStatus;
