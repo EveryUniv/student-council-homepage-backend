@@ -23,15 +23,7 @@ public class ErrorResponseDto {
         this.timestamp = LocalDateTime.now().toString();
         this.trackingId = UUID.randomUUID().toString();
         this.status = e.getStatus();
-        this.code = e.getClass().getSimpleName();
+        this.code = e.getCode();
         this.message = e.getMessages(messageSource, locale);
-    }
-
-    public ErrorResponseDto(Exception e) {
-        this.timestamp = LocalDateTime.now().toString();
-        this.trackingId = UUID.randomUUID().toString();
-        this.status = HttpStatus.INTERNAL_SERVER_ERROR;
-        this.code = e.getClass().getSimpleName();
-        this.message = List.of(e.getMessage());
     }
 }

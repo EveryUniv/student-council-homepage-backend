@@ -12,6 +12,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Locale;
 
@@ -40,8 +41,13 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponseDto> exception(Exception e) {
-        ErrorResponseDto dto = new ErrorResponseDto(e);
+    protected ResponseEntity<ErrorResponseDto> badRequest(MethodArgumentTypeMismatchException e, Locale locale) {
+        return localizedException(new BadRequestException(e), locale);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponseDto> unexpectedException(Exception e, Locale locale) {
+        ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, LocalizedMessageException.of(e));
         log.error("Unexpected exception has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
         return ResponseEntity.internalServerError().body(dto);
     }

@@ -17,10 +17,10 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Suggestion extends Post {
+public class GeneralForum extends Post {
 
     @Builder
-    private Suggestion(User user, String title, String body, Category category, int views) {
+    private GeneralForum(User user, String title, String body, Category category, int views) {
         super(user, title, body, category, views);
     }
 }
