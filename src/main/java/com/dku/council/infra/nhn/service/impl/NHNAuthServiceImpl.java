@@ -1,6 +1,7 @@
 package com.dku.council.infra.nhn.service.impl;
 
 import com.dku.council.infra.ExternalAPIPath;
+import com.dku.council.infra.nhn.exception.NotInitializedException;
 import com.dku.council.infra.nhn.model.dto.request.RequestToken;
 import com.dku.council.infra.nhn.model.dto.response.ResponseToken;
 import com.dku.council.infra.nhn.service.NHNAuthService;
@@ -17,7 +18,7 @@ import javax.annotation.PostConstruct;
 @RequiredArgsConstructor
 public class NHNAuthServiceImpl implements NHNAuthService {
 
-    private final RequestToken tokenRequest = new RequestToken();
+    private RequestToken tokenRequest;
 
     // TODO RestTemplate대신 WebClient로 교체하기.
     private final RestTemplate restTemplate;
@@ -33,12 +34,16 @@ public class NHNAuthServiceImpl implements NHNAuthService {
 
     @PostConstruct
     private void initialize() {
-        this.tokenRequest.getAuth().setTenantId(tenantId);
-        this.tokenRequest.getAuth().getPasswordCredentials().setUsername(username);
-        this.tokenRequest.getAuth().getPasswordCredentials().setPassword(password);
+        RequestToken.PasswordCredentials pwdCred = new RequestToken.PasswordCredentials(username, password);
+        RequestToken.Auth auth = new RequestToken.Auth(tenantId, pwdCred);
+        tokenRequest = new RequestToken(auth);
     }
 
     public String requestToken() {
+        if (tokenRequest == null) {
+            throw new NotInitializedException();
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/json");
 

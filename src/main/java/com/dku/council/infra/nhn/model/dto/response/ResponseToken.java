@@ -1,22 +1,34 @@
 package com.dku.council.infra.nhn.model.dto.response;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class ResponseToken {
-    private Access access = new Access();
+    private final Access access;
+
+    public ResponseToken(Access access) {
+        this.access = access;
+    }
 
     public String getTokenId() {
         return access.token.id;
     }
 
-    @Data
+    @Getter
     public static class Access {
-        private Token token = new Token();
+        private final Token token;
+
+        public Access(Token token) {
+            this.token = token;
+        }
     }
 
-    @Data
+    @Getter
     public static class Token {
-        private String id;
+        private final String id;
+
+        public Token(String id) {
+            this.id = id;
+        }
     }
 }

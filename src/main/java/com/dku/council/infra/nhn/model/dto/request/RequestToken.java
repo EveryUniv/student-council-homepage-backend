@@ -1,20 +1,34 @@
 package com.dku.council.infra.nhn.model.dto.request;
 
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 public class RequestToken {
-    private Auth auth = new Auth();
+    private final Auth auth;
 
-    @Data
-    public static class Auth {
-        private String tenantId;
-        private PasswordCredentials passwordCredentials = new PasswordCredentials();
+    public RequestToken(Auth auth) {
+        this.auth = auth;
     }
 
-    @Data
+    @Getter
+    public static class Auth {
+        private final String tenantId;
+        private final PasswordCredentials passwordCredentials;
+
+        public Auth(String tenantId, PasswordCredentials passwordCredentials) {
+            this.tenantId = tenantId;
+            this.passwordCredentials = passwordCredentials;
+        }
+    }
+
+    @Getter
     public static class PasswordCredentials {
-        private String username;
-        private String password;
+        private final String username;
+        private final String password;
+
+        public PasswordCredentials(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
     }
 }
