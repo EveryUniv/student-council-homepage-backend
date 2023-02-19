@@ -1,18 +1,10 @@
 package com.dku.council.infra.nhn.service.impl;
 
-import com.dku.council.infra.ExternalAPIPath;
 import com.dku.council.infra.nhn.service.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpMessageConverterExtractor;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -23,17 +15,14 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class ObjectStorageServiceImpl implements ObjectStorageService {
 
-    @Value("${nhn.os.storage-account}")
-    private final String storageAccount;
-
-    @Value("${nhn.os.storage-name}")
-    private final String storageName;
+    @Value("${nhn.os.api-path}")
+    private final String apiPath;
 
     private final WebClient webClient;
 
 
     public String getObjectURL(String objectName) {
-        return ExternalAPIPath.NHNObjectStorage(storageAccount, storageName, objectName);
+        return String.format(apiPath, objectName);
     }
 
     public void uploadObject(String tokenId, String objectName, final InputStream inputStream) {

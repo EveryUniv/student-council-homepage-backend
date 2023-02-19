@@ -1,6 +1,5 @@
 package com.dku.council.infra.nhn.service.impl;
 
-import com.dku.council.infra.ExternalAPIPath;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
 import com.dku.council.infra.nhn.model.dto.request.RequestToken;
 import com.dku.council.infra.nhn.model.dto.response.ResponseToken;
@@ -21,10 +20,12 @@ public class NHNAuthServiceImpl implements NHNAuthService {
 
     private RequestToken tokenRequest;
 
-    // TODO RestTemplate대신 WebClient로 교체하기.
     private final WebClient webClient;
 
-    @Value("${nhn.os.tenantId}")
+    @Value("${nhn.auth.api-path}")
+    private final String apiPath;
+
+    @Value("${nhn.os.tenant-id}")
     private final String tenantId;
 
     @Value("${nhn.os.username}")
@@ -46,7 +47,7 @@ public class NHNAuthServiceImpl implements NHNAuthService {
         }
 
         ResponseToken token = webClient.post()
-                .uri(ExternalAPIPath.NHNAuth)
+                .uri(apiPath)
                 .header("Content-Type", "application/json")
                 .retrieve()
                 .bodyToMono(ResponseToken.class)

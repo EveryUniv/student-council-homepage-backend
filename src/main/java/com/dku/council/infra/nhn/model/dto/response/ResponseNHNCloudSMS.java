@@ -1,30 +1,24 @@
 package com.dku.council.infra.nhn.model.dto.response;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Getter
-public class ResponseNHNCloudSMS {
-    private final Header header;
-    private final Body body;
+import static lombok.AccessLevel.PROTECTED;
 
-    public ResponseNHNCloudSMS(Header header, Body body) {
-        this.header = header;
-        this.body = body;
-    }
+@Getter
+@NoArgsConstructor(access = PROTECTED)
+public class ResponseNHNCloudSMS {
+    private Header header;
+    private Body body;
 
     @Getter
+    @NoArgsConstructor(access = PROTECTED)
     public static class Header {
-        private final boolean isSuccessful;
-        private final int resultCode;
-        private final String resultMessage;
-
-        public Header(boolean isSuccessful, int resultCode, String resultMessage) {
-            this.isSuccessful = isSuccessful;
-            this.resultCode = resultCode;
-            this.resultMessage = resultMessage;
-        }
+        private boolean isSuccessful;
+        private int resultCode;
+        private String resultMessage;
 
         // isSuccessful은 @Getter tag로 인해 isSuccessful() getter가 만들어진다.
         // 그래서 파싱할 때 제대로 파싱이 안된다.
@@ -35,36 +29,23 @@ public class ResponseNHNCloudSMS {
     }
 
     @Getter
+    @NoArgsConstructor(access = PROTECTED)
     public static class Body {
-        private final Data data;
-
-        public Body(Data data) {
-            this.data = data;
-        }
+        private Data data;
 
         @Getter
+        @NoArgsConstructor(access = PROTECTED)
         public static class Data {
-            private final String requestId;
-            private final String statusCode;
-            private final List<SendResult> sendResultList;
-
-            public Data(String requestId, String statusCode, List<SendResult> sendResultList) {
-                this.requestId = requestId;
-                this.statusCode = statusCode;
-                this.sendResultList = sendResultList;
-            }
+            private String requestId;
+            private String statusCode;
+            private List<SendResult> sendResultList;
 
             @Getter
+            @NoArgsConstructor(access = PROTECTED)
             public static class SendResult {
-                private final String recipientNo;
-                private final String resultCode;
-                private final String resultMessage;
-
-                public SendResult(String recipientNo, String resultCode, String resultMessage) {
-                    this.recipientNo = recipientNo;
-                    this.resultCode = resultCode;
-                    this.resultMessage = resultMessage;
-                }
+                private String recipientNo;
+                private int resultCode;
+                private String resultMessage;
             }
         }
     }
