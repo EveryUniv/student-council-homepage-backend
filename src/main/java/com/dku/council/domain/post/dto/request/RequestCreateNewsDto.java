@@ -1,13 +1,13 @@
 package com.dku.council.domain.post.dto.request;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestCreateNewsDto {
 
     @NotBlank

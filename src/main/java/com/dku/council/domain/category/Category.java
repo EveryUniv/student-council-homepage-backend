@@ -22,7 +22,6 @@ public class Category extends BaseEntity {
 
     private String name;
 
-    @Builder
     public Category(String name) {
         this.name = name;
     }

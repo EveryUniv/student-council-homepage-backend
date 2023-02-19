@@ -6,6 +6,7 @@ import com.dku.council.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 
@@ -20,7 +21,10 @@ import static lombok.AccessLevel.PROTECTED;
 public class Rule extends Post {
 
     @Builder
-    private Rule(User user, String title, String body, Category category, int views) {
+    private Rule(@NonNull User user,
+                 @NonNull String title,
+                 @NonNull String body,
+                 Category category, int views) {
         super(user, title, body, category, views);
     }
 }

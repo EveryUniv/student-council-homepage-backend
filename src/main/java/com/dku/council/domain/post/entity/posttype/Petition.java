@@ -8,6 +8,7 @@ import com.dku.council.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -32,9 +33,16 @@ public class Petition extends Post {
     private String answer;
 
     @Builder
-    private Petition(User user, String title, String body, Category category, int views, PetitionStatus petitionStatus, String answer) {
+    private Petition(@NonNull User user,
+                     @NonNull String title,
+                     @NonNull String body,
+                     Category category, int views, PetitionStatus petitionStatus, String answer) {
         super(user, title, body, category, views);
         this.petitionStatus = petitionStatus;
         this.answer = answer;
+    }
+
+    public static PetitionBuilder builder() {
+        return new PetitionBuilder().petitionStatus(PetitionStatus.ACTIVE);
     }
 }

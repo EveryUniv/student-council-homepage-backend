@@ -6,6 +6,7 @@ import com.dku.council.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 import javax.persistence.Entity;
 import java.time.LocalDate;
@@ -28,7 +29,12 @@ public class Conference extends Post {
     private LocalDate date;
 
     @Builder
-    private Conference(User user, String title, String body, Category category, int views, int round, LocalDate date) {
+    private Conference(@NonNull User user,
+                       @NonNull String title,
+                       @NonNull String body,
+                       @NonNull LocalDate date,
+                       Category category, int views, int round) {
+
         super(user, title, body, category, views);
         this.round = round;
         this.date = date;

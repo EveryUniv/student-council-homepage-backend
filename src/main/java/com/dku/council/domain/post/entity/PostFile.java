@@ -26,4 +26,11 @@ public class PostFile extends BaseEntity {
     private String fileUrl;
 
     private String fileName;
+
+
+    public PostFile(Post post, String fileUrl, String fileName) {
+        this.post = post;
+        this.fileUrl = fileUrl;
+        this.fileName = fileName;
+    }
 }

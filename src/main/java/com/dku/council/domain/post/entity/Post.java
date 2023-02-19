@@ -6,6 +6,7 @@ import com.dku.council.domain.user.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -61,5 +62,6 @@ public class Post extends BaseEntity {
         this.body = body;
         this.category = category;
         this.views = views;
+        this.status = PostStatus.ACTIVE;
     }
 }

@@ -35,8 +35,7 @@ public class CommentLog extends BaseEntity {
     private String text;
 
 
-    @Builder
-    private CommentLog(Post post, User user, String text) {
+    public CommentLog(Post post, User user, String text) {
         this.post = post;
         this.user = user;
         this.text = text;

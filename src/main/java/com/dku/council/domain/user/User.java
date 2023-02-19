@@ -1,12 +1,10 @@
 package com.dku.council.domain.user;
 
 import com.dku.council.global.base.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -21,16 +19,21 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @NotNull
     private String classId;
 
+    @NotNull
     private String password;
 
+    @NotNull
     @Column(length = 20)
     private String name;
 
+    @NotNull
     @Enumerated(STRING)
     private Major major;
 
+    @NotNull
     private String phone;
 
     @Enumerated(STRING)
@@ -41,7 +44,13 @@ public class User extends BaseEntity {
 
 
     @Builder
-    public User(String classId, String password, String name, Major major, String phone, UserStatus status, UserRole role) {
+    private User(@NonNull String classId,
+                 @NonNull String password,
+                 @NonNull String name,
+                 @NonNull Major major,
+                 @NonNull String phone,
+                 UserStatus status,
+                 UserRole role) {
         this.classId = classId;
         this.password = password;
         this.name = name;
