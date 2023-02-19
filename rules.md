@@ -6,11 +6,6 @@
  - 클래스 이름: `Camel case`
  - 등... 틀리면 IntelliJ가 Weak warning을 띄워준다.
  - `@Setter`와 `@Data`는 사용 금지. **필요한 경우 직접 생성 권장**
- - 패키지는 미리 만들어두지 말 것.
-   - 예를 들어 user도메인 아래 controller, service, dto, entity등 미리 패키지를 만들지 말고 필요한 경우에 추가할 것.
-   - 기준은 패키지안에 파일이 항상 2개이상 존재하도록 유지.
-   - 즉, controller 패키지를 만들어두고 그 안에 controller가 1개뿐이거나 없으면 안된다.
-   - 도메인 패키지는 예외. user 도메인 패키지안에는 파일이 1개만 있어도 된다.
 
 
 ## DB
