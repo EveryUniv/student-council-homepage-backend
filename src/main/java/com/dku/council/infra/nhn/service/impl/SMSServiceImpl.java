@@ -8,17 +8,17 @@ import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+// TODO Test it
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class SMSServiceImpl implements SMSService {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
     @Value("${nhn.sms.app-key}")
     private final String appKey;
@@ -36,16 +36,17 @@ public class SMSServiceImpl implements SMSService {
      * @param body  전송 내용
      */
     public void sendSMS(String phone, String body) {
-        final HttpHeaders headers = new HttpHeaders(); // 헤더에 key들을 담아준다.
-        headers.set("X-Secret-Key", secretKey);
-        headers.set("Content-Type", "application/json");
-
-        // request api
-        // TODO RestTemplate대신 WebClient로 교체하기.
         RequestNHNCloudSMS request = new RequestNHNCloudSMS(senderPhone, phone, body);
-        HttpEntity<RequestNHNCloudSMS> entity = new HttpEntity<>(request, headers);
         String url = ExternalAPIPath.NHNCloudSMS(appKey);
-        ResponseNHNCloudSMS response = restTemplate.postForObject(url, entity, ResponseNHNCloudSMS.class);
+
+        ResponseNHNCloudSMS response = webClient.post()
+                .uri(url)
+                .header("X-Secret-Key", secretKey)
+                .header("Content-Type", "application/json")
+                .body(Mono.just(request), RequestNHNCloudSMS.class)
+                .retrieve()
+                .bodyToMono(ResponseNHNCloudSMS.class)
+                .block();
 
         log.info(String.format("Result of sending SMS to %s: %s", phone, response));
 

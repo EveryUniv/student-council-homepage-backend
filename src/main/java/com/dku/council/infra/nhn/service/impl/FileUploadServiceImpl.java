@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+// TODO Test it
 @Service
 @RequiredArgsConstructor
 class FileUploadServiceImpl implements FileUploadService {
+
     private final NHNAuthServiceImpl nhnAuthService;
     private final ObjectStorageServiceImpl s3service;
-
 
     public ArrayList<UploadedFile> uploadFiles(List<MultipartFile> files, String post) {
         String token = nhnAuthService.requestToken();

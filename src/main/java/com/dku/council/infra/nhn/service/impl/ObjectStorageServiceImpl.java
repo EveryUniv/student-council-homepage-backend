@@ -5,6 +5,7 @@ import com.dku.council.infra.nhn.service.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,9 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpMessageConverterExtractor;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.InputStream;
 
+// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class ObjectStorageServiceImpl implements ObjectStorageService {
@@ -25,8 +29,7 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     @Value("${nhn.os.storage-name}")
     private final String storageName;
 
-    // TODO RestTemplate대신 WebClient로 교체하기.
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
 
     public String getObjectURL(String objectName) {
@@ -34,24 +37,22 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     }
 
     public void uploadObject(String tokenId, String objectName, final InputStream inputStream) {
-        // InputStream을 요청 본문에 추가할 수 있도록 RequestCallback 오버라이드
-        final RequestCallback requestCallback = request -> {
-            request.getHeaders().add("X-Auth-Token", tokenId);
-            IOUtils.copy(inputStream, request.getBody());
-        };
-
-        HttpMessageConverterExtractor<String> responseExtractor
-                = new HttpMessageConverterExtractor<>(String.class, restTemplate.getMessageConverters());
-
-        restTemplate.execute(getObjectURL(objectName), HttpMethod.PUT, requestCallback, responseExtractor);
+        webClient.put()
+                .uri(getObjectURL(objectName))
+                .header("X-Auth-Token", tokenId)
+                .body(BodyInserters.fromResource(new InputStreamResource(inputStream)))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
     public void deleteObject(String tokenId, String objectName) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("X-Auth-Token", tokenId);
-        HttpEntity<String> requestHttpEntity = new HttpEntity<>(null, headers);
-
-        this.restTemplate.exchange(getObjectURL(objectName), HttpMethod.DELETE, requestHttpEntity, String.class);
+        webClient.delete()
+                .uri(getObjectURL(objectName))
+                .header("X-Auth-Token", tokenId)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
 }
