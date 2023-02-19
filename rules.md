@@ -6,6 +6,8 @@
  - 클래스 이름: `Camel case`
  - 등... 틀리면 IntelliJ가 Weak warning을 띄워준다.
  - `@Setter`와 `@Data`는 사용 금지. **필요한 경우 직접 생성 권장**
+ - `@AllArgsConstructor`는 필드 순서가 뒤바뀌면 알아차리기 힘든 버그가 발생할 수 있으므로 직접 constructor를 생성하는 방식을 권장.
+   - 또한 필드에 final을 붙일 수 있으면 붙이기. 누락된 필드 초기화를 발견할 수 있다.
 
 
 ## DB
