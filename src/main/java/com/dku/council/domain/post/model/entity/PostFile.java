@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.global.base.BaseEntity;
+import com.dku.council.infra.nhn.model.UploadedFile;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,15 +24,18 @@ public class PostFile extends BaseEntity {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    private String fileUrl;
+    private String fileId;
 
     private String fileName;
 
 
-    public PostFile(Post post, String fileUrl, String fileName) {
-        this.post = post;
-        this.fileUrl = fileUrl;
+    public PostFile(String fileId, String fileName) {
+        this.fileId = fileId;
         this.fileName = fileName;
+    }
+
+    public PostFile(UploadedFile file) {
+        this(file.getFileId(), file.getOriginalName());
     }
 
     public void changePost(Post post) {
@@ -41,5 +45,9 @@ public class PostFile extends BaseEntity {
 
         this.post = post;
         this.post.getFiles().add(this);
+    }
+
+    public UploadedFile toUploadedFile() {
+        return new UploadedFile(fileId, fileName);
     }
 }

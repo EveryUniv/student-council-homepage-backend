@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.dto.request;
+package com.dku.council.domain.post.model.dto.request;
 
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;

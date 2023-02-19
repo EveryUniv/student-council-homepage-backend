@@ -23,13 +23,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtProvider implements AuthenticationTokenProvider {
 
-    @Value("${jwt.access-expiration}")
+    @Value("${auth.jwt.access-expiration}")
     private final long accessExpiration;
 
-    @Value("${jwt.refresh-expiration}")
+    @Value("${auth.jwt.refresh-expiration}")
     private final long refreshExpiration;
 
-    @Value("${jwt.secretKey}")
+    @Value("${auth.jwt.secret-key}")
     private final String secretKey;
 
 

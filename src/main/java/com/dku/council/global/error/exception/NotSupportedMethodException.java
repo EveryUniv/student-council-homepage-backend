@@ -4,6 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class NotSupportedMethodException extends LocalizedMessageException {
     public NotSupportedMethodException(Throwable t) {
-        super(t, HttpStatus.BAD_REQUEST, "notsupport.http-method");
+        super(t, HttpStatus.METHOD_NOT_ALLOWED, "notsupport.http-method");
     }
 }

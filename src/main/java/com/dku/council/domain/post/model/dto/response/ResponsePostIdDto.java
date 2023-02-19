@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.dto.response;
+package com.dku.council.domain.post.model.dto.response;
 
 import lombok.Getter;
 

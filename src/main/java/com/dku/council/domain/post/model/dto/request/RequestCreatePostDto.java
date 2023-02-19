@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.dto.request;
+package com.dku.council.domain.post.model.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;

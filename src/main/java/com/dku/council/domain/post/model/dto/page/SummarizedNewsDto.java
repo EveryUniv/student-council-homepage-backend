@@ -1,6 +1,6 @@
-package com.dku.council.domain.post.dto.page;
+package com.dku.council.domain.post.model.dto.page;
 
-import com.dku.council.domain.post.dto.PostFileDto;
+import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

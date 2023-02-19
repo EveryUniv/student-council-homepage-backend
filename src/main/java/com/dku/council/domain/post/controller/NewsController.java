@@ -1,10 +1,10 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.post.dto.page.SummarizedNewsDto;
-import com.dku.council.domain.post.dto.request.RequestCreateNewsDto;
-import com.dku.council.domain.post.dto.response.ResponsePage;
-import com.dku.council.domain.post.dto.response.ResponsePostIdDto;
-import com.dku.council.domain.post.dto.response.ResponseSingleNewsDto;
+import com.dku.council.domain.post.model.dto.page.SummarizedNewsDto;
+import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
+import com.dku.council.domain.post.model.dto.response.ResponsePage;
+import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
+import com.dku.council.domain.post.model.dto.response.ResponseSingleNewsDto;
 import com.dku.council.domain.post.service.NewsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

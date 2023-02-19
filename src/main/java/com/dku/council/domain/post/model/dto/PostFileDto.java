@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.dto;
+package com.dku.council.domain.post.model.dto;
 
 import com.dku.council.domain.post.model.entity.PostFile;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +21,7 @@ public class PostFileDto {
 
     public PostFileDto(String baseUrl, PostFile file) {
         this.id = file.getId();
-        this.url = baseUrl + file.getFileUrl();
+        this.url = baseUrl + file.getFileId();
         this.originalName = file.getFileName();
     }
 

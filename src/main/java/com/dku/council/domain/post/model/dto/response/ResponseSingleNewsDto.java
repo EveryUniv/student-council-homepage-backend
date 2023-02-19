@@ -1,7 +1,7 @@
-package com.dku.council.domain.post.dto.response;
+package com.dku.council.domain.post.model.dto.response;
 
-import com.dku.council.domain.post.dto.CommentDto;
-import com.dku.council.domain.post.dto.PostFileDto;
+import com.dku.council.domain.post.model.dto.CommentDto;
+import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import lombok.Getter;
 
