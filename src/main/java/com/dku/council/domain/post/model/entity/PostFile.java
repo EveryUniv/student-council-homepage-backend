@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.entity;
+package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -32,5 +32,14 @@ public class PostFile extends BaseEntity {
         this.post = post;
         this.fileUrl = fileUrl;
         this.fileName = fileName;
+    }
+
+    public void changePost(Post post) {
+        if (this.post != null) {
+            this.post.getFiles().remove(this);
+        }
+
+        this.post = post;
+        this.post.getFiles().add(this);
     }
 }

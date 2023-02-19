@@ -1,8 +1,8 @@
-package com.dku.council.domain.post.entity.posttype;
+package com.dku.council.domain.post.model.entity.posttype;
 
 import com.dku.council.domain.category.Category;
-import com.dku.council.domain.post.entity.Post;
-import com.dku.council.domain.user.User;
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

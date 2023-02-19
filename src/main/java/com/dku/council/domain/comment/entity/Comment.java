@@ -1,8 +1,8 @@
 package com.dku.council.domain.comment.entity;
 
 import com.dku.council.domain.comment.CommentStatus;
-import com.dku.council.domain.post.entity.Post;
-import com.dku.council.domain.user.User;
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,14 +42,10 @@ public class Comment extends BaseEntity {
 
 
     @Builder
-    private Comment(@NonNull CommentStatus status, @NonNull Post post, User user, String text) {
-        this.status = status;
+    private Comment(@NonNull Post post, User user, String text) {
+        this.status = CommentStatus.ACTIVE;
         this.post = post;
         this.user = user;
         this.text = text;
-    }
-
-    public static CommentBuilder builder() {
-        return new CommentBuilder().status(CommentStatus.ACTIVE);
     }
 }

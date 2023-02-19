@@ -1,5 +1,6 @@
 package com.dku.council.domain.user;
 
+import com.dku.council.domain.user.model.Major;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

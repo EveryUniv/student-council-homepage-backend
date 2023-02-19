@@ -1,4 +1,4 @@
-package com.dku.council.domain.user;
+package com.dku.council.domain.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

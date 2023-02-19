@@ -1,9 +1,8 @@
 package com.dku.council.domain.like;
 
-import com.dku.council.domain.post.entity.Post;
-import com.dku.council.domain.user.User;
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

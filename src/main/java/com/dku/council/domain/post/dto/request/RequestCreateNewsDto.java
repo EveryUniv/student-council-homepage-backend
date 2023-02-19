@@ -1,18 +1,25 @@
 package com.dku.council.domain.post.dto.request;
 
-import lombok.AccessLevel;
+import com.dku.council.domain.post.model.entity.posttype.News;
+import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestCreateNewsDto {
+public class RequestCreateNewsDto extends RequestCreatePostDto {
 
-    @NotBlank
-    private final String title;
+    public RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, List<MultipartFile> files) {
+        super(title, body, files);
+    }
 
-    @NotBlank
-    private final String body;
+    public News toEntity(User user) {
+        return News.builder()
+                .body(getBody())
+                .title(getTitle())
+                .user(user)
+                .build();
+    }
 }

@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
@@ -21,4 +22,9 @@ public class BaseEntity {
 
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
+
+
+    public String getCreatedDateText() {
+        return createdAt.format(DateTimeFormatter.ISO_DATE);
+    }
 }

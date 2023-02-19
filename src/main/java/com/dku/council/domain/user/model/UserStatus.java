@@ -1,4 +1,4 @@
-package com.dku.council.domain.user;
+package com.dku.council.domain.user.model;
 
 public enum UserStatus {
     /**

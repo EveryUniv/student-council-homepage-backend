@@ -1,4 +1,4 @@
-package com.dku.council.domain.user;
+package com.dku.council.domain.user.model;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;

@@ -1,4 +1,4 @@
-package com.dku.council.domain.post;
+package com.dku.council.domain.post.model;
 
 public enum PetitionStatus {
     /**

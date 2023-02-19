@@ -1,5 +1,8 @@
-package com.dku.council.domain.user;
+package com.dku.council.domain.user.model.entity;
 
+import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.UserRole;
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;
 

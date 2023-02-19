@@ -1,15 +1,17 @@
-package com.dku.council.domain.post.entity;
+package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.category.Category;
-import com.dku.council.domain.post.PostStatus;
-import com.dku.council.domain.user.User;
+import com.dku.council.domain.comment.entity.Comment;
+import com.dku.council.domain.post.model.PostStatus;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -49,6 +51,12 @@ public class Post extends BaseEntity {
 
     @Enumerated(STRING)
     private PostStatus status;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostFile> files = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     /**
      * 조회수
