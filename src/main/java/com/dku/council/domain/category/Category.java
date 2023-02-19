@@ -1,7 +1,6 @@
 package com.dku.council.domain.category;
 
 import com.dku.council.global.base.BaseEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
