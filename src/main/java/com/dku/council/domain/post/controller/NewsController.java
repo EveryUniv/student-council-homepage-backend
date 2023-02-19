@@ -1,6 +1,10 @@
 package com.dku.council.domain.post.controller;
 
+import com.dku.council.domain.post.dto.request.RequestCreateNewsDto;
+import com.dku.council.global.dto.SuccessResponseDto;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/post/news")
@@ -12,7 +16,7 @@ public class NewsController {
     }
 
     @PostMapping
-    public void post() {
+    public void create(@Valid @RequestBody RequestCreateNewsDto request) {
 
     }
 
