@@ -1,5 +1,7 @@
 package com.dku.council.domain.user;
 
+import com.dku.council.global.error.exception.MajorNotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,5 +30,36 @@ class MajorTest {
 
         // then
         assertThat(majorName).isEqualTo("컴퓨터공학과");
+    }
+
+    @Test
+    @DisplayName("of로 잘 변환 되는지?")
+    public void successfulOf() {
+        // given
+        when(messageSource.getMessage(Mockito.startsWith("Major."), any(), any())).thenAnswer((invo) -> {
+            if (invo.getArgument(0).equals("Major.KOREAN_LITERATURE")) {
+                return "국어국문학과";
+            } else {
+                return "모르는 학과";
+            }
+        });
+
+        // when
+        // 띄어쓰기나 tab 해도 모두 삭제
+        Major major = Major.of(messageSource, "  국어국 문학과 ");
+
+        // then
+        assertThat(major).isEqualTo(Major.KOREAN_LITERATURE);
+    }
+
+    @Test
+    @DisplayName("of로 없는 Major 조회시 오류")
+    public void failedOfByNotFound() {
+        // given
+        when(messageSource.getMessage(Mockito.startsWith("Major."), any(), any())).thenReturn("모르는 학과");
+
+        // when & then
+        Assertions.assertThrows(MajorNotFoundException.class, () ->
+                Major.of(messageSource, "국어국문학과"));
     }
 }

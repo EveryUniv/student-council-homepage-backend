@@ -1,5 +1,6 @@
 package com.dku.council.domain.user;
 
+import com.dku.council.global.error.exception.MajorNotFoundException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -62,5 +63,27 @@ public enum Major {
     public String getName(MessageSource source) {
         Locale locale = LocaleContextHolder.getLocale();
         return source.getMessage("Major." + name(), null, locale);
+    }
+
+    /**
+     * 학과 이름으로 Major를 찾습니다. 학과명은 소속대학을 포함하지 않는 이름을 의미합니다.
+     * 예를 들면 컴퓨터공학과, 국어국문학과 등...
+     *
+     * @param source MessageSource
+     * @param major  학과 명
+     * @return 매칭되는 Major. 없으면 null
+     */
+    public static Major of(MessageSource source, String major) {
+        major = major.replace(" ", "")
+                .replace("\t", "");
+
+        Major[] values = values();
+        for (Major majorEnum : values) {
+            if (majorEnum.getName(source).equals(major)) {
+                return majorEnum;
+            }
+        }
+
+        throw new MajorNotFoundException();
     }
 }
