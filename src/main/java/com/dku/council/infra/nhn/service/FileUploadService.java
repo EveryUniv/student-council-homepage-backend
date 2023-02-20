@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface FileUploadService {
-    ArrayList<UploadedFile> uploadFiles(List<MultipartFile> files, String post);
+    ArrayList<UploadedFile> uploadFiles(List<MultipartFile> files, String prefix);
 
     void deletePostFiles(List<UploadedFile> files);
 

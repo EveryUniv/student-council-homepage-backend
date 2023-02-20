@@ -1,6 +1,7 @@
 package com.dku.council.global.base;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,6 +12,7 @@ import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+@Slf4j
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
 @Getter
@@ -26,6 +28,11 @@ public class BaseEntity {
 
 
     public String getCreatedDateText() {
-        return createdAt.format(DateTimeFormatter.ISO_DATE);
+        LocalDateTime dateTime = createdAt;
+        if (dateTime == null) {
+            dateTime = LocalDateTime.MIN;
+            log.error("Created date is empty. (null) This is bug!");
+        }
+        return dateTime.format(DateTimeFormatter.ISO_DATE);
     }
 }

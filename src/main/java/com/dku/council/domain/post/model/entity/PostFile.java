@@ -46,8 +46,4 @@ public class PostFile extends BaseEntity {
         this.post = post;
         this.post.getFiles().add(this);
     }
-
-    public UploadedFile toUploadedFile() {
-        return new UploadedFile(fileId, fileName);
-    }
 }

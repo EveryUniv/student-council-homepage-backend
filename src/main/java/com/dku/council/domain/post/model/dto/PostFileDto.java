@@ -4,6 +4,7 @@ import com.dku.council.domain.post.model.entity.PostFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class PostFileDto {
 
     public PostFileDto(String baseUrl, PostFile file) {
         this.id = file.getId();
-        this.url = baseUrl + file.getFileId();
+        this.url = URI.create(baseUrl + "/").resolve(file.getFileId()).toString();
         this.originalName = file.getFileName();
     }
 

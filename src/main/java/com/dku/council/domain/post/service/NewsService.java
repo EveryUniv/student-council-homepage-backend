@@ -33,6 +33,12 @@ public class NewsService {
     private final PostService postService;
     private final FileUploadService fileUploadService;
 
+    /**
+     * 게시글 목록으로 조회
+     * @param keyword 검색 키워드
+     * @param pageable 페이징 size, sort, page
+     * @return 페이징된 총학 소식 목록
+     */
     public Page<SummarizedNewsDto> list(String keyword, Pageable pageable) {
         Page<News> page;
 
@@ -45,6 +51,12 @@ public class NewsService {
         return page.map(news -> new SummarizedNewsDto(fileUploadService.getBaseURL(), news));
     }
 
+    /**
+     * 게시글 등록
+     *
+     * @param userId 등록한 사용자 id
+     * @param dto 게시글 dto
+     */
     @Transactional
     public Long create(Long userId, RequestCreateNewsDto dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -57,17 +69,29 @@ public class NewsService {
         return save.getId();
     }
 
+    /**
+     * 게시글 단건 조회
+     *
+     * @param postId 조회할 게시글 id
+     * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
+     * @return 총학소식 게시글 정보
+     */
     public ResponseSingleNewsDto findOne(Long postId, String remoteAddress) {
         News news = newsRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         postService.increasePostViews(news, remoteAddress);
         return new ResponseSingleNewsDto(fileUploadService.getBaseURL(), news);
     }
 
+    /**
+     * 게시글 삭제
+     *
+     * @param postId 삭제할 게시글 id
+     */
     @Transactional
     public void delete(Long postId) {
         News news = newsRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         List<UploadedFile> uploadedFiles = news.getFiles().stream()
-                .map(PostFile::toUploadedFile)
+                .map(UploadedFile::of)
                 .collect(Collectors.toList());
         fileUploadService.deletePostFiles(uploadedFiles);
         newsRepository.delete(news);
