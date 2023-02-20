@@ -31,9 +31,9 @@
 ## Test
  - Unit 테스트로 구성
  - given / when / then으로 구성
- - Controller 테스트는 `@WebMvcTest` 사용
- - Service 테스트는 Mockito 사용
- - Repository 테스트는 `@DataJpaTest` 사용
+ - Service 테스트는 Mockito 사용. 왠만하면 Service는 반드시 테스트.
+ - Controller 테스트는 `@WebMvcTest` 사용. Service의 로직과 거의 유사하다면 굳이 하지않아도 될 것 같다.
+ - Repository 테스트는 `@DataJpaTest` 사용. JpaRepository만 쓰는 경우에는, 굳이 하지 말고 새로운 메서드를 추가했을 때만 테스트 작성
  - `@Value` 는 생성자 주입 활용
 
 ## Git
