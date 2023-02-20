@@ -1,19 +1,25 @@
 package com.dku.council.infra.nhn.service.impl;
 
+import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
+import com.dku.council.infra.nhn.model.dto.request.RequestNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.request.RequestToken;
 import com.dku.council.infra.nhn.model.dto.response.ResponseToken;
 import com.dku.council.infra.nhn.service.NHNAuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
+import java.util.Optional;
 
-// TODO Test it
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NHNAuthServiceImpl implements NHNAuthService {
@@ -25,13 +31,13 @@ public class NHNAuthServiceImpl implements NHNAuthService {
     @Value("${nhn.auth.api-path}")
     private final String apiPath;
 
-    @Value("${nhn.os.tenant-id}")
+    @Value("${nhn.auth.tenant-id}")
     private final String tenantId;
 
-    @Value("${nhn.os.username}")
+    @Value("${nhn.auth.username}")
     private final String username;
 
-    @Value("${nhn.os.password}")
+    @Value("${nhn.auth.password}")
     private final String password;
 
     @PostConstruct
@@ -46,18 +52,31 @@ public class NHNAuthServiceImpl implements NHNAuthService {
             throw new NotInitializedException();
         }
 
-        ResponseToken token = webClient.post()
-                .uri(apiPath)
-                .header("Content-Type", "application/json")
-                .retrieve()
-                .bodyToMono(ResponseToken.class)
-                .block();
-
-        if (token == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        ResponseToken response;
+        try {
+            // TODO 비동기 방식으로 처리해보기
+            response = webClient.post()
+                    .uri(apiPath)
+                    .header("Content-Type", "application/json")
+                    .body(Mono.just(tokenRequest), RequestToken.class)
+                    .retrieve()
+                    .bodyToMono(ResponseToken.class)
+                    .block();
+        } catch (Throwable e) {
+            throw new CannotGetTokenException(e);
         }
 
-        return token.getTokenId();
+        String token = Optional.ofNullable(response)
+                .map(ResponseToken::getAccess)
+                .map(ResponseToken.Access::getToken)
+                .map(ResponseToken.Token::getId)
+                .orElse(null);
+
+        if (token == null) {
+            throw new CannotGetTokenException();
+        }
+
+        return token;
     }
 
 }

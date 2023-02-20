@@ -10,15 +10,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.InputStream;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class ObjectStorageServiceImpl implements ObjectStorageService {
 
+    private final WebClient webClient;
+
     @Value("${nhn.os.api-path}")
     private final String apiPath;
-
-    private final WebClient webClient;
 
 
     public String getObjectURL(String objectName) {

@@ -3,6 +3,7 @@ package com.dku.council.util;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.slf4j.Logger;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,9 +18,13 @@ public class MockServerUtil {
     private static final Logger log = getLogger(MockServerUtil.class);
 
     public static void jsonBody(MockWebServer server, String bodyDataFileName) {
+        jsonBody(server, HttpStatus.OK, bodyDataFileName);
+    }
+
+    public static void jsonBody(MockWebServer server, HttpStatus responseCode, String bodyDataFileName) {
         String path = String.format("%s.json", bodyDataFileName);
         String body = readMockData(path);
-        server.enqueue(new MockResponse().setBody(body)
+        server.enqueue(new MockResponse().setResponseCode(responseCode.value()).setBody(body)
                 .addHeader("Content-Type", "application/json"));
     }
 

@@ -1,6 +1,7 @@
 package com.dku.council.infra.nhn.service.impl;
 
 import com.dku.council.infra.nhn.exception.CannotSendSMSException;
+import com.dku.council.infra.nhn.exception.UnexpectedResponseException;
 import com.dku.council.infra.nhn.model.dto.request.RequestNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.response.ResponseNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.response.ResponseNHNCloudSMS.Body.Data.SendResult;
@@ -10,11 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Optional;
 
-// TODO Test it
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -40,42 +42,53 @@ public class SMSServiceImpl implements SMSService {
     public void sendSMS(String phone, String body) {
         RequestNHNCloudSMS request = new RequestNHNCloudSMS(senderPhone, phone, body);
 
-        ResponseNHNCloudSMS response = webClient.post()
-                .uri(apiPath)
-                .header("X-Secret-Key", secretKey)
-                .header("Content-Type", "application/json")
-                .body(Mono.just(request), RequestNHNCloudSMS.class)
-                .retrieve()
-                .bodyToMono(ResponseNHNCloudSMS.class)
-                .block();
+        ResponseNHNCloudSMS response = null;
+        try {
+            response = webClient.post()
+                    .uri(apiPath)
+                    .header("X-Secret-Key", secretKey)
+                    .header("Content-Type", "application/json")
+                    .body(Mono.just(request), RequestNHNCloudSMS.class)
+                    .retrieve()
+                    .bodyToMono(ResponseNHNCloudSMS.class)
+                    .block();
 
-        log.info(String.format("Result of sending SMS to %s: %s", phone, response));
+            validateResponse(response);
+        } catch (WebClientResponseException e) {
+            throw new CannotSendSMSException(e);
+        } catch (Throwable e) {
+            if (response != null) {
+                log.debug(String.format("Error while sending SMS to %s: %s", phone, response));
+                log.debug(response.toString());
+            }
+            throw new CannotSendSMSException(e);
+        }
+    }
 
-        // handle response
-        String failReason = null;
+    private static void validateResponse(ResponseNHNCloudSMS response) {
         if (response == null || response.getHeader() == null || response.getBody() == null) {
-            failReason = "response is incorrect";
+            throw new UnexpectedResponseException("response is incorrect");
         } else {
             ResponseNHNCloudSMS.Header header = response.getHeader();
             if (!header.getIsSuccessful()) {
-                failReason = header.getResultMessage();
+                throw new UnexpectedResponseException(header.getResultMessage());
             }
 
-            List<SendResult> results = response.getBody().getData().getSendResultList();
-            for (SendResult result : results) {
-                if (result.getResultCode() != 0) {
-                    failReason = result.getResultMessage();
-                    break;
+            List<SendResult> results = Optional.of(response)
+                    .map(ResponseNHNCloudSMS::getBody)
+                    .map(ResponseNHNCloudSMS.Body::getData)
+                    .map(ResponseNHNCloudSMS.Body.Data::getSendResultList)
+                    .orElse(null);
+
+            if (results == null) {
+                throw new UnexpectedResponseException("Invalid body");
+            } else {
+                for (SendResult result : results) {
+                    if (result.getResultCode() != 0) {
+                        throw new UnexpectedResponseException(result.getResultMessage());
+                    }
                 }
             }
-        }
-
-        if (failReason != null) {
-            log.error("Can't send sms message: {}", failReason);
-            if (response != null) {
-                log.debug(response.toString());
-            }
-            throw new CannotSendSMSException();
         }
     }
 }

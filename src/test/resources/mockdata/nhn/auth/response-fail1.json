@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": 400,
+    "message": "Malformed request body - the server could not comply with the request since it is either malformed or otherwise incorrect. The client is assumed to be in error.",
+    "title": "Bad Request"
+  }
+}

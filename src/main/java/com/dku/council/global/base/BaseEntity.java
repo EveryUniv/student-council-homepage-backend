@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 @Getter
 public class BaseEntity {
 
+    // TODO LocalDateTime을 쓰는게 맞나? 특정 시점이므로 Instant?
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
