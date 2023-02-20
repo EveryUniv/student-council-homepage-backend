@@ -28,6 +28,10 @@ public class MockServerUtil {
                 .addHeader("Content-Type", "application/json"));
     }
 
+    public static void status(MockWebServer server, HttpStatus responseCode) {
+        server.enqueue(new MockResponse().setResponseCode(responseCode.value()));
+    }
+
     public static String readMockData(String path) {
         String name = "/mockdata/" + path;
         log.debug("Load mocking data: {}", name);

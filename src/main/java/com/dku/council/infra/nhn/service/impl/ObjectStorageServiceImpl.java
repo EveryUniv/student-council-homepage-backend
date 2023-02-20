@@ -1,5 +1,6 @@
 package com.dku.council.infra.nhn.service.impl;
 
+import com.dku.council.infra.nhn.exception.InvalidAccessObjectStorageException;
 import com.dku.council.infra.nhn.service.ObjectStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,22 +26,30 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
     }
 
     public void uploadObject(String tokenId, String objectName, final InputStream inputStream) {
-        webClient.put()
-                .uri(getObjectURL(objectName))
-                .header("X-Auth-Token", tokenId)
-                .body(BodyInserters.fromResource(new InputStreamResource(inputStream)))
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+        try {
+            webClient.put()
+                    .uri(getObjectURL(objectName))
+                    .header("X-Auth-Token", tokenId)
+                    .body(BodyInserters.fromResource(new InputStreamResource(inputStream)))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
+        } catch (Throwable e) {
+            throw new InvalidAccessObjectStorageException(e);
+        }
     }
 
     public void deleteObject(String tokenId, String objectName) {
-        webClient.delete()
-                .uri(getObjectURL(objectName))
-                .header("X-Auth-Token", tokenId)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+        try {
+            webClient.delete()
+                    .uri(getObjectURL(objectName))
+                    .header("X-Auth-Token", tokenId)
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .block();
+        } catch (Throwable e) {
+            throw new InvalidAccessObjectStorageException(e);
+        }
     }
 
 }
