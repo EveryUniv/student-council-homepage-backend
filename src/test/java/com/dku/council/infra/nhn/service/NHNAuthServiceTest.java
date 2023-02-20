@@ -1,14 +1,11 @@
 package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
-import com.dku.council.infra.nhn.exception.CannotSendSMSException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.util.MockServerUtil;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -16,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-@ExtendWith(MockitoExtension.class)
 class NHNAuthServiceTest {
 
     private static MockWebServer mockServer;

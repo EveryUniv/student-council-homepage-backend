@@ -11,15 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
-class FileUploadServiceImpl implements FileUploadService {
+public class FileUploadServiceImpl implements FileUploadService {
 
     private final NHNAuthServiceImpl nhnAuthService;
     private final ObjectStorageServiceImpl s3service;
 
-    public ArrayList<UploadedFile> uploadFiles(List<MultipartFile> files, String post) {
+    public ArrayList<UploadedFile> uploadFiles(List<MultipartFile> files, String prefix) {
         String token = nhnAuthService.requestToken();
         ArrayList<UploadedFile> postFiles = new ArrayList<>();
         files.forEach(file -> {
@@ -29,7 +28,10 @@ class FileUploadServiceImpl implements FileUploadService {
             }
 
             String ext = originName.substring(originName.lastIndexOf(".") + 1);
-            String fileId = post + "-" + UUID.randomUUID() + "." + ext;
+            String fileId;
+            do {
+                fileId = prefix + "-" + UUID.randomUUID() + "." + ext;
+            } while (s3service.isInObject(fileId));
 
             try {
                 s3service.uploadObject(token, fileId, file.getInputStream());

@@ -1,13 +1,10 @@
 package com.dku.council.infra.nhn.service.actual;
 
 import com.dku.council.infra.nhn.service.NHNAuthService;
-import com.dku.council.infra.nhn.service.SMSService;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
-import com.dku.council.infra.nhn.service.impl.SMSServiceImpl;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;

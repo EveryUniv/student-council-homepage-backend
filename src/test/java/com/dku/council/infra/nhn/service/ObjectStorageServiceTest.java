@@ -5,19 +5,19 @@ import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
 import com.dku.council.util.MockServerUtil;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-@ExtendWith(MockitoExtension.class)
+import static org.assertj.core.api.Assertions.assertThat;
+
 class ObjectStorageServiceTest {
 
     private static MockWebServer mockServer;
     private ObjectStorageService service;
+    private String apiPath;
 
 
     @BeforeAll
@@ -29,7 +29,7 @@ class ObjectStorageServiceTest {
     @BeforeEach
     public void beforeEach() {
         WebClient webClient = WebClient.create();
-        String apiPath = "http://localhost:" + mockServer.getPort();
+        this.apiPath = "http://localhost:" + mockServer.getPort();
         this.service = new ObjectStorageServiceImpl(webClient, apiPath);
     }
 
@@ -39,9 +39,46 @@ class ObjectStorageServiceTest {
     }
 
     @Test
+    @DisplayName("이미있는 파일인 경우 잘 catch하는지")
+    public void checkIfIsInStorage() {
+        // given
+        MockServerUtil.status(mockServer, HttpStatus.OK);
+
+        // when
+        boolean isIn = service.isInObject("object");
+
+        // then
+        assertThat(isIn).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("존재하지않는 파일인 경우 false반환")
+    public void checkIfIsNotInStorage() {
+        // given
+        MockServerUtil.status(mockServer, HttpStatus.NOT_FOUND);
+
+        // when
+        boolean isIn = service.isInObject("object");
+
+        // then
+        assertThat(isIn).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("object url을 잘 생성하는지?")
+    public void getObjectUrl() {
+        // when
+        String url = service.getObjectURL("object");
+
+        // then
+        assertThat(url).isEqualTo(String.format(apiPath, "object"));
+    }
+
+    @Test
     @DisplayName("성공 응답 - Upload")
     public void uploadingSuccessResponse() {
         // given
+        MockServerUtil.status(mockServer, HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
         MockServerUtil.status(mockServer, HttpStatus.OK);
 
         // when & then(no error)
@@ -62,6 +99,7 @@ class ObjectStorageServiceTest {
     @DisplayName("실패 응답 - Upload 실패 status code")
     public void failedUploadByFailedStatusCode() {
         // given
+        MockServerUtil.status(mockServer, HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
         MockServerUtil.status(mockServer, HttpStatus.BAD_REQUEST);
 
         // when & then(no error)

@@ -5,14 +5,11 @@ import com.dku.council.infra.nhn.service.impl.SMSServiceImpl;
 import com.dku.council.util.MockServerUtil;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 
-@ExtendWith(MockitoExtension.class)
 class SMSServiceTest {
 
     private static MockWebServer mockServer;
