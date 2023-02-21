@@ -71,7 +71,8 @@ public enum Major {
      *
      * @param source MessageSource
      * @param major  학과 명
-     * @return 매칭되는 Major. 없으면 null
+     * @return 매칭되는 Major.
+     * @throws MajorNotFoundException 존재하지 않는 학과일 경우
      */
     public static Major of(MessageSource source, String major) {
         major = major.replace(" ", "")

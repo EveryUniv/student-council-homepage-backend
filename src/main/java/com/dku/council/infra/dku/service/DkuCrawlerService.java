@@ -66,7 +66,7 @@ public class DkuCrawlerService {
         try {
             String pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
             pstnOrgzNm = pstnOrgzNm.trim().split(" ")[1];
-            major = Major.of(messageSource, pstnOrgzNm);
+            major = Major.of(messageSource, pstnOrgzNm); // TODO 존재하지 않는 학과일 경우는 어떻게 handling할 것인가?
 
             String etrsYy = getElementValueOrNull(doc, "etrsYy");
             yearOfAdmission = Integer.parseInt(etrsYy);
