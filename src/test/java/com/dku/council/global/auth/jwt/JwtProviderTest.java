@@ -1,9 +1,9 @@
 package com.dku.council.global.auth.jwt;
 
-import com.dku.council.domain.UserRole;
-import com.dku.council.domain.user.Major;
-import com.dku.council.domain.user.User;
-import com.dku.council.domain.user.UserStatus;
+import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.UserRole;
+import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.domain.user.model.entity.User;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 

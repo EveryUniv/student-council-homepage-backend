@@ -1,6 +1,6 @@
 package com.dku.council.infra.dku.service;
 
-import com.dku.council.domain.user.Major;
+import com.dku.council.domain.user.model.Major;
 import com.dku.council.global.config.qualifier.ChromeAgentWebClient;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;

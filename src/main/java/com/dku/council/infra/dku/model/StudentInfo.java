@@ -1,6 +1,6 @@
 package com.dku.council.infra.dku.model;
 
-import com.dku.council.domain.user.Major;
+import com.dku.council.domain.user.model.Major;
 import lombok.Getter;
 import lombok.ToString;
 

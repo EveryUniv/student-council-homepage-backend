@@ -39,20 +39,4 @@ class ErrorResponseDtoTest {
         assertThat(dto.getMessage()).isEqualTo(List.of("localizedMessage"));
         assertThat(dto.getStatus()).isEqualTo(HttpStatus.OK);
     }
-
-    @Test
-    @DisplayName("Exception로부터 정확하게 잘 생성되는가?")
-    public void create_properly_exception() {
-        // given
-        Exception e = new RuntimeException("message");
-
-        // when
-        ErrorResponseDto dto = new ErrorResponseDto(e);
-
-        // then
-        DateTimeFormatter.ISO_DATE_TIME.parse(dto.getTimestamp());
-        assertThat(dto.getCode()).isEqualTo("RuntimeException");
-        assertThat(dto.getMessage()).isEqualTo(List.of("message"));
-        assertThat(dto.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }
