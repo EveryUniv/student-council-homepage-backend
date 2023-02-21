@@ -17,21 +17,59 @@ public class MockServerUtil {
 
     private static final Logger log = getLogger(MockServerUtil.class);
 
-    public static void jsonBody(MockWebServer server, String bodyDataFileName) {
-        jsonBody(server, HttpStatus.OK, bodyDataFileName);
+    /**
+     * MockWebServer에 json타입의 body 응답을 추가합니다.
+     *
+     * @param server           서버
+     * @param bodyDataFileName json body 파일 위치. /test/resources/mockdata/부터 시작합니다. 확장자 .json은 생략합니다.
+     */
+    public static void json(MockWebServer server, String bodyDataFileName) {
+        enqueueResponse(server, HttpStatus.OK, bodyDataFileName + ".json");
     }
 
-    public static void jsonBody(MockWebServer server, HttpStatus responseCode, String bodyDataFileName) {
-        String path = String.format("%s.json", bodyDataFileName);
-        String body = readMockData(path);
+    /**
+     * MockWebServer에 json타입의 body 응답을 추가합니다.
+     *
+     * @param server           서버
+     * @param responseCode     응답 코드
+     * @param bodyDataFileName json body 파일 위치. /test/resources/mockdata/부터 시작합니다. 확장자 .json은 생략합니다.
+     */
+    public static void json(MockWebServer server, HttpStatus responseCode, String bodyDataFileName) {
+        enqueueResponse(server, responseCode, bodyDataFileName + ".json");
+    }
+
+    /**
+     * MockWebServer에 html타입의 body 응답을 추가합니다.
+     *
+     * @param server           서버
+     * @param bodyDataFileName html 파일 위치. /test/resources/mockdata/부터 시작합니다. 확장자 .html은 생략합니다.
+     */
+    public static void html(MockWebServer server, String bodyDataFileName) {
+        enqueueResponse(server, HttpStatus.OK, bodyDataFileName + ".html");
+    }
+
+    private static void enqueueResponse(MockWebServer server, HttpStatus responseCode, String bodyDataFileName) {
+        String body = readMockData(bodyDataFileName);
         server.enqueue(new MockResponse().setResponseCode(responseCode.value()).setBody(body)
                 .addHeader("Content-Type", "application/json"));
     }
 
+    /**
+     * MockWebServer에 statusCode만 있는 빈 응답을 추가합니다.
+     *
+     * @param server       서버
+     * @param responseCode 응답 코드
+     */
     public static void status(MockWebServer server, HttpStatus responseCode) {
         server.enqueue(new MockResponse().setResponseCode(responseCode.value()));
     }
 
+    /**
+     * /test/resources/mockdata/에 존재하는 파일을 읽습니다.
+     *
+     * @param path 파일 위치. /test/resources/mockdata/부터 시작합니다.
+     * @return 파일 내용
+     */
     public static String readMockData(String path) {
         String name = "/mockdata/" + path;
         log.debug("Load mocking data: {}", name);

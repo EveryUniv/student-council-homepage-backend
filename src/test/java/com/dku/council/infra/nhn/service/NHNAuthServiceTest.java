@@ -54,7 +54,7 @@ class NHNAuthServiceTest {
     @DisplayName("성공 응답 - 정상 처리 여부")
     public void sendSmsSuccess() {
         // given
-        MockServerUtil.jsonBody(mockServer, "nhn/auth/response-success");
+        MockServerUtil.json(mockServer, "nhn/auth/response-success");
 
         // when & then(no error)
         service.requestToken();
@@ -64,7 +64,7 @@ class NHNAuthServiceTest {
     @DisplayName("실패 응답 - 실패 status code")
     public void failedByBadRequest() {
         // given
-        MockServerUtil.jsonBody(mockServer, HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
+        MockServerUtil.json(mockServer, HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
 
         // when & then(no error)
         Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
@@ -74,7 +74,7 @@ class NHNAuthServiceTest {
     @DisplayName("실패 응답 - body가 잘못된 경우")
     public void failedByInvalidBody() {
         // given
-        MockServerUtil.jsonBody(mockServer, "nhn/auth/response-fail1");
+        MockServerUtil.json(mockServer, "nhn/auth/response-fail1");
 
         // when & then
         Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
