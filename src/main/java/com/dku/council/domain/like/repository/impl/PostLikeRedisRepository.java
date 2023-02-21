@@ -4,9 +4,7 @@ import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.Cursor;
-import org.springframework.data.redis.core.ScanOptions;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -17,11 +15,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostLikeRedisRepository implements PostLikeMemoryRepository {
 
-    private static final String POST_LIKE_KEY = "PostLike";
-    private static final String POST_LIKE_COUNT_KEY = "PostLikeCount";
-    private static final String KEY_DELIMITER = ":";
+    public static final String POST_LIKE_KEY = "PostLike";
+    public static final String POST_LIKE_COUNT_KEY = "PostLikeCount";
+    public static final String KEY_DELIMITER = ":";
 
-    private final StringRedisTemplate redisTemplate;
+    private final RedisTemplate<String, Integer> redisTemplate;
 
     @Override
     public void addPostLike(Long postId, Long userId) {
@@ -42,7 +40,7 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
         if (value == null) {
             return null;
         }
-        return (int) value == LikeState.LIKED.ordinal(); // TODO Int로 막 바꿔도 됨?
+        return (int) value == LikeState.LIKED.ordinal();
     }
 
     @Override
@@ -71,24 +69,39 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
 
     @Override
     public List<LikeEntry> getAllPostLikes() {
+        return getAllPostLikes(false);
+    }
+
+    @Override
+    public List<LikeEntry> getAllPostLikesAndClear() {
+        return getAllPostLikes(true);
+    }
+
+    private List<LikeEntry> getAllPostLikes(boolean clear) {
         List<LikeEntry> result = new ArrayList<>();
-        try (Cursor<Map.Entry<Object, Object>> cursor =
-                     redisTemplate.opsForHash().scan(POST_LIKE_KEY, ScanOptions.NONE)) {
+        HashOperations<String, Object, Object> op = redisTemplate.opsForHash();
+
+        try (Cursor<Map.Entry<Object, Object>> cursor = op.scan(POST_LIKE_KEY, ScanOptions.NONE)) {
             while (cursor.hasNext()) {
                 Map.Entry<Object, Object> entry = cursor.next();
 
-                String[] keyValue = ((String) entry.getKey()).split(KEY_DELIMITER);
+                String key = (String) entry.getKey();
+                String[] keyValue = key.split(KEY_DELIMITER);
                 Long postId = Long.valueOf(keyValue[0]);
                 Long userId = Long.valueOf(keyValue[1]);
                 LikeState state = LikeState.values()[(int) entry.getValue()];
 
                 result.add(new LikeEntry(postId, userId, state));
+                if (clear) {
+                    op.delete(POST_LIKE_KEY, key);
+                }
             }
         }
+
         return result;
     }
 
-    private String makeEntryKey(Long postId, Long userId) {
+    public String makeEntryKey(Long postId, Long userId) {
         return postId.toString() + KEY_DELIMITER + userId;
     }
 }

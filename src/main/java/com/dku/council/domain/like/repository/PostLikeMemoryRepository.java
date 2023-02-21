@@ -72,4 +72,11 @@ public interface PostLikeMemoryRepository {
      * @return '좋아요' entities
      */
     List<LikeEntry> getAllPostLikes();
+
+    /**
+     * 메모리에 저장된 모든 '좋아요' 데이터를 가져오고, 모두 삭제한다.
+     *
+     * @return '좋아요' entities
+     */
+    List<LikeEntry> getAllPostLikesAndClear();
 }
