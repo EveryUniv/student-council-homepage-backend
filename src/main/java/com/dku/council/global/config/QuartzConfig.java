@@ -4,9 +4,6 @@ import com.dku.council.domain.like.PostLikeDumpTask;
 import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-
-import javax.sql.DataSource;
 
 @Configuration
 public class QuartzConfig {

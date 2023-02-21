@@ -2,6 +2,7 @@ package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.category.Category;
 import com.dku.council.domain.comment.entity.Comment;
+import com.dku.council.domain.like.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
@@ -57,6 +58,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> likes = new ArrayList<>();
 
     /**
      * 조회수
