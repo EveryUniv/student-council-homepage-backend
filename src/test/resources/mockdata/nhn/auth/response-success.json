@@ -1,0 +1,77 @@
+{
+  "access": {
+    "token": {
+      "id": "idididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididididid",
+      "expires": "2023-02-20T13:42:09Z",
+      "tenant": {
+        "id": "zdrhxhzsezseghzseghezsghzsehhzsezseh",
+        "name": "QZhsn4i7",
+        "groupId": "drxhdrhxxdrhxdrhxdrhzeghsehzg",
+        "description": "",
+        "enabled": true,
+        "project_domain": "NORMAL",
+        "swift": true
+      },
+      "issued_at": "2023-02-20T01:57:06.000491"
+    },
+    "serviceCatalog": [
+      {
+        "endpoints": [
+          {
+            "region": "KR2",
+            "publicURL": "https://api-identity.infrastructure.cloud.toast.com/v2.0"
+          },
+          {
+            "region": "JP1",
+            "publicURL": "https://api-identity.infrastructure.cloud.toast.com/v2.0"
+          },
+          {
+            "region": "KR1",
+            "publicURL": "https://api-identity.infrastructure.cloud.toast.com/v2.0"
+          }
+        ],
+        "type": "identity",
+        "name": "keystone"
+      },
+      {
+        "endpoints": [
+          {
+            "region": "US1",
+            "publicURL": "https://us1-api-storage.cloud.toast.com/v1/"
+          },
+          {
+            "region": "KR2",
+            "publicURL": "https://kr2-api-storage.cloud.toast.com/v1/"
+          },
+          {
+            "region": "JP1",
+            "publicURL": "https://jp1-api-storage.cloud.toast.com/v1/"
+          },
+          {
+            "region": "KR1",
+            "publicURL": "https://api-storage.cloud.toast.com/v1/"
+          }
+        ],
+        "type": "object-store",
+        "name": "swift"
+      }
+    ],
+    "user": {
+      "id": "cftjmcftytnxddrhdrhzrhzsdrbdsebzrzdrh",
+      "username": "tbrtbcrbdftjcrxftgjfjxtgmfxtgnjftj",
+      "name": "tbrtbcrbdftjcrxftgjfjxtgmfxtgnjftj",
+      "roles": [
+        {
+          "name": "project_admin"
+        }
+      ],
+      "roles_links": []
+    },
+    "metadata": {
+      "roles": [
+        "drtyndrtbhxggbxdrbxrgxrbgxdrvgb"
+      ],
+      "is_admin": 0
+    }
+  }
+}

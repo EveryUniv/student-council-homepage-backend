@@ -1,0 +1,23 @@
+{
+  "header": {
+    "resultCode": -8000,
+    "resultMessage": "Failed Response",
+    "isSuccessful": false
+  },
+  "body": {
+    "data": {
+      "requestId": "20230220045202fvYD7GLyVX3",
+      "statusCode": "2",
+      "senderGroupingKey": null,
+      "sendResultList": [
+        {
+          "recipientNo": "01011111111",
+          "resultCode": 0,
+          "resultMessage": "SUCCESS",
+          "recipientSeq": 1,
+          "recipientGroupingKey": null
+        }
+      ]
+    }
+  }
+}

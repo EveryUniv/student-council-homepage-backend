@@ -1,7 +1,7 @@
 package com.dku.council.global.auth.jwt;
 
-import com.dku.council.domain.UserRole;
-import com.dku.council.domain.user.User;
+import com.dku.council.domain.user.model.UserRole;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.error.exception.ExpiredTokenException;
 import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.global.error.exception.InvalidTokenException;
@@ -23,13 +23,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtProvider implements AuthenticationTokenProvider {
 
-    @Value("${jwt.access-expiration}")
+    @Value("${auth.jwt.access-expiration}")
     private final long accessExpiration;
 
-    @Value("${jwt.refresh-expiration}")
+    @Value("${auth.jwt.refresh-expiration}")
     private final long refreshExpiration;
 
-    @Value("${jwt.secretKey}")
+    @Value("${auth.jwt.secret-key}")
     private final String secretKey;
 
 
