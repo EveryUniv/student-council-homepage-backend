@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir -p ./src/test/resources && cd "$_"
           touch ./application.yml
-          echo ${{ secrets.PROPERTIES_TEST }} | base64 --decode > src/test/resources/application.yml
+          echo ${{ secrets.PROPERTIES_TEST }} | base64 --decode > application.yml
         shell: bash
 
       - name: Build with Gradle
