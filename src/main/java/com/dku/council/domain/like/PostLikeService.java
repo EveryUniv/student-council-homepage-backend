@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +31,7 @@ public class PostLikeService {
      */
     public void like(Long postId, Long userId) {
         memoryRepository.addPostLike(postId, userId);
-        increaseLikeCount(postId);
-    }
-
-    private void increaseLikeCount(Long postId) {
-        doCachedLikeCountTask(postId,
-                (count) -> memoryRepository.setLikeCount(postId, count + 1),
-                () -> memoryRepository.increaseLikeCount(postId));
+        memoryRepository.setLikeCount(postId, getCountOfLikes(postId) + 1);
     }
 
     /**
@@ -49,13 +42,7 @@ public class PostLikeService {
      */
     public void cancelLike(Long postId, Long userId) {
         memoryRepository.removePostLike(postId, userId);
-        decreaseLikeCount(postId);
-    }
-
-    private void decreaseLikeCount(Long postId) {
-        doCachedLikeCountTask(postId,
-                (count) -> memoryRepository.setLikeCount(postId, count - 1),
-                () -> memoryRepository.decreaseLikeCount(postId));
+        memoryRepository.setLikeCount(postId, getCountOfLikes(postId) - 1);
     }
 
     /**
@@ -69,7 +56,11 @@ public class PostLikeService {
         Boolean liked = memoryRepository.isPostLiked(postId, userId);
         if (liked == null) {
             liked = persistenceRepository.findByPostIdAndUserId(postId, userId).isPresent();
-            memoryRepository.removePostLike(postId, userId);
+            if (liked) {
+                memoryRepository.addPostLike(postId, userId);
+            } else {
+                memoryRepository.removePostLike(postId, userId);
+            }
         }
         return liked;
     }
@@ -82,20 +73,10 @@ public class PostLikeService {
      * @return 좋아요 개수
      */
     public int getCountOfLikes(Long postId) {
-        return doCachedLikeCountTask(postId,
-                (count) -> memoryRepository.setLikeCount(postId, count),
-                null);
-    }
-
-    private int doCachedLikeCountTask(Long postId, Consumer<Integer> onNotCached, Runnable onCached) {
         int count = memoryRepository.getCachedLikeCount(postId);
         if (count == -1) {
             count = persistenceRepository.countByPostId(postId);
-            if (onNotCached != null) {
-                onNotCached.accept(count);
-            }
-        } else if (onCached != null) {
-            onCached.run();
+            memoryRepository.setLikeCount(postId, count);
         }
         return count;
     }

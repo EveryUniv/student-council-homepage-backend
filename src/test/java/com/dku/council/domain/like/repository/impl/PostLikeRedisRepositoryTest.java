@@ -167,36 +167,6 @@ class PostLikeRedisRepositoryTest {
     }
 
     @Test
-    @DisplayName("캐싱된 좋아요 수에 +1")
-    void increaseLikeCount() {
-        // given
-        PostLikeKey key = new PostLikeKey(repository);
-        redisTemplate.opsForHash().put(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, key.postId, 3);
-
-        // when
-        repository.increaseLikeCount(key.postId);
-
-        // then
-        Object count = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, key.postId);
-        assertThat(count).isEqualTo(4);
-    }
-
-    @Test
-    @DisplayName("캐싱된 좋아요 수에 -1")
-    void decreaseLikeCount() {
-        // given
-        PostLikeKey key = new PostLikeKey(repository);
-        redisTemplate.opsForHash().put(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, key.postId, 3);
-
-        // when
-        repository.decreaseLikeCount(key.postId);
-
-        // then
-        Object count = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, key.postId);
-        assertThat(count).isEqualTo(2);
-    }
-
-    @Test
     @DisplayName("좋아요 수 직접 캐싱")
     void setLikeCount() {
         // given

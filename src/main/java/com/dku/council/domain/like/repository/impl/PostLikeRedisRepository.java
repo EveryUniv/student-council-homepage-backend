@@ -53,16 +53,6 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
     }
 
     @Override
-    public void increaseLikeCount(Long postId) {
-        redisTemplate.opsForHash().increment(POST_LIKE_COUNT_KEY, postId, 1);
-    }
-
-    @Override
-    public void decreaseLikeCount(Long postId) {
-        redisTemplate.opsForHash().increment(POST_LIKE_COUNT_KEY, postId, -1);
-    }
-
-    @Override
     public void setLikeCount(Long postId, int count) {
         redisTemplate.opsForHash().put(POST_LIKE_COUNT_KEY, postId, count);
     }

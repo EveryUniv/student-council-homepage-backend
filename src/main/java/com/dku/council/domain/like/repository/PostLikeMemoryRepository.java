@@ -43,22 +43,6 @@ public interface PostLikeMemoryRepository {
     int getCachedLikeCount(Long postId);
 
     /**
-     * 게시글의 좋아요 개수 + 1.
-     * 게시글의 좋아요 개수가 캐싱되어있어야 정상 동작한다.
-     *
-     * @param postId 게시글 ID
-     */
-    void increaseLikeCount(Long postId);
-
-    /**
-     * 게시글의 좋아요 개수 - 1.
-     * 게시글의 좋아요 개수가 캐싱되어있어야 정상 동작한다.
-     *
-     * @param postId 게시글 ID
-     */
-    void decreaseLikeCount(Long postId);
-
-    /**
      * 게시글의 좋아요 개수 캐싱
      *
      * @param postId 게시글 ID
