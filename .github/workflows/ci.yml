@@ -28,10 +28,12 @@ jobs:
           distribution: 'temurin'
 
       - name: make test properties
+        env:
+          PROPERTIES_TEST: ${{ secrets.PROPERTIES_TEST }}
         run: |
           mkdir -p ./src/test/resources && cd "$_"
           touch ./application.yml
-          echo ${{ secrets.PROPERTIES_TEST }} | base64 --decode > application.yml
+          echo "$PROPERTIES_TEST" | base64 --decode > application.yml
         shell: bash
 
       - name: Build with Gradle
