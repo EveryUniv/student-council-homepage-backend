@@ -73,8 +73,11 @@ public class MockServerUtil {
     public static String readMockData(String path) {
         String name = "/mockdata/" + path;
         log.debug("Load mocking data: {}", name);
+        return readResource(name);
+    }
 
-        try (InputStream inStream = MockServerUtil.class.getResourceAsStream(name);
+    public static String readResource(String path) {
+        try (InputStream inStream = MockServerUtil.class.getResourceAsStream(path);
              InputStreamReader reader = new InputStreamReader(inStream, StandardCharsets.UTF_8)) {
             return readStringFromReader(reader);
         } catch (IOException e) {
