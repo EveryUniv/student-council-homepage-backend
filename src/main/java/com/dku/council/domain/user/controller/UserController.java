@@ -1,6 +1,6 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.dto.RequestSignupDto;
+import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class UserController {
 
-    private UserService service;
+    private final UserService service;
 
     /**
      * 회원가입

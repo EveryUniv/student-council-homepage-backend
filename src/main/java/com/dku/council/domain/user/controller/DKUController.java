@@ -1,11 +1,16 @@
 package com.dku.council.domain.user.controller;
 
+import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
+import com.dku.council.domain.user.model.dto.response.ResponseStudentInfoDto;
+import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
+import com.dku.council.domain.user.service.DKUAuthService;
+import com.dku.council.infra.dku.model.StudentInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.MessageSource;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Tag(name = "단국대학교 학생 인증", description = "단국대학교 학생 인증 관련 api")
 @RestController
@@ -13,21 +18,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DKUController {
 
+    private final MessageSource messageSource;
+    private final DKUAuthService service;
+
     /**
      * 학생 정보 가져오기 (회원가입용)
-     * 인증된 학생 정보를 가져옵니다. 학과의 경우 인식할 수 없으면 null이 반환됩니다.
-     * 이 경우엔 학생에게 직접 학과를 입력받고, 회원가입시 입력받은 학과 정보를 같이 넘기면 됩니다.
+     * 회원가입 토큰을 통해 인증된 학생 정보를 가져옵니다.
+     *
+     * @param signupToken 회원가입 토큰
      */
-    @GetMapping
-    public void getStudentInfo() {
-
+    @GetMapping("/{signup-token}")
+    public ResponseStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
+        StudentInfo studentInfo = service.getStudentInfo(signupToken);
+        return ResponseStudentInfoDto.from(messageSource, studentInfo);
     }
 
     /**
      * 단국대학교 학생 인증
+     * 학생 인증을 진행합니다. 성공시 반환되는 토큰은 회원가입에 사용됩니다.
+     *
+     * @param dto 요청 body
      */
     @PostMapping("/verify")
-    public void verifyDKUStudent() {
-
+    public ResponseVerifyStudentDto verifyDKUStudent(@Valid @RequestBody RequestVerifyStudentDto dto) {
+        return service.verifyStudent(dto);
     }
 }

@@ -3,7 +3,7 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.user.model.Major;
 import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.UserStatus;
-import com.dku.council.domain.user.model.dto.RequestSignupDto;
+import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.dku.model.StudentInfo;
@@ -23,8 +23,9 @@ public class UserService {
     private final UserRepository userRepository;
 
 
+    @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
-        StudentInfo studentInfo = dkuAuthService.getDKUStudentInfo(signupToken);
+        StudentInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
         String phone = smsVerificationService.getPhoneNumber(signupToken);
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
 

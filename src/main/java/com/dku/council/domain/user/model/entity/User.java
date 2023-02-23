@@ -5,6 +5,7 @@ import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;
+import org.springframework.context.MessageSource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -44,6 +45,7 @@ public class User extends BaseEntity {
      * 결국 사용자에게는 NO_DATA가 아니라 이 학과이름으로 보여지므로 큰 문제는 없습니다.
      * 하지만 시간날 때 틈틈히 이 이름을 Major에 추가해두는 것이 좋습니다.
      */
+    @Getter(AccessLevel.NONE)
     private String unexpectedMajorName;
 
     @NotNull
@@ -73,5 +75,27 @@ public class User extends BaseEntity {
         this.phone = phone;
         this.status = status;
         this.userRole = role;
+    }
+
+    /**
+     * 소속학과 이름을 가져옵니다. 인식되지 않은 학과가 저장된 경우에도
+     * 이름은 DB에 저장되어있으므로, 그 이름을 가져옵니다.
+     *
+     * @return 소속학과 이름
+     */
+    public String getMajorName(MessageSource messageSource) {
+        if (major == Major.NO_DATA) {
+            return unexpectedMajorName;
+        }
+        return major.getName(messageSource);
+    }
+
+    /**
+     * 학과 정보를 인식하지 못한 경우에 NO_DATA로 저장됩니다. 이때는 학과 이름을
+     * getMajorName으로 얻어올 수 있습니다. 애초에 학과 이름을 가져오는게 목적이라면
+     * 이 함수말고 getMajorName을 사용하세요.
+     */
+    public Major getMajor() {
+        return major;
     }
 }
