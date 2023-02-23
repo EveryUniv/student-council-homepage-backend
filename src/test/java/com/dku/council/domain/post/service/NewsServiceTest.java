@@ -85,7 +85,7 @@ class NewsServiceTest {
 
     private User generateUser() {
         return User.builder()
-                .classId("11111111")
+                .studentId("11111111")
                 .password("pwd")
                 .name("name")
                 .major(Major.ADMIN)

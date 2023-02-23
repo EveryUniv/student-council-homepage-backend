@@ -207,7 +207,7 @@ class PostLikeServiceTest {
 
     private User dummyUserWithId(Long id) throws NoSuchFieldException, IllegalAccessException {
         User user = User.builder()
-                .classId("")
+                .studentId("")
                 .password("")
                 .name("")
                 .major(Major.ADMIN)
