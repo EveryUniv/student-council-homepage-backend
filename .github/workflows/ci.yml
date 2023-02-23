@@ -27,7 +27,7 @@ jobs:
 
       - name: make test properties
         env:
-          PROPERTIES: ${{ secrets.PROPERTIES_TEST }}
+          PROPERTIES: ${{ secrets.CI_PROPERTIES }}
         run: |
           mkdir -p ./src/test/resources && cd "$_"
           touch ./application.yml
