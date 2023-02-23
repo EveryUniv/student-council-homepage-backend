@@ -84,7 +84,7 @@ public class User extends BaseEntity {
      * @return 소속학과 이름
      */
     public String getMajorName(MessageSource messageSource) {
-        if (major == Major.NO_DATA) {
+        if (major.isEmpty()) {
             return unexpectedMajorName;
         }
         return major.getName(messageSource);

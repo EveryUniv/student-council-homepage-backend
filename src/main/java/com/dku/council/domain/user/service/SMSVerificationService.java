@@ -3,6 +3,7 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.user.exception.NotSMSAuthorizedException;
 import org.springframework.stereotype.Service;
 
+// TODO Test it
 @Service
 public class SMSVerificationService {
 

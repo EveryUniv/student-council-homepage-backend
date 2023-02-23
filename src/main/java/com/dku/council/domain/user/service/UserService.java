@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.user.model.Major;
 import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
@@ -12,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// TODO Test it
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class UserService {
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.USER);
 
-        if (studentInfo.getMajor() == Major.NO_DATA) {
+        if (studentInfo.getMajor().isEmpty()) {
             userBuilder.unexpectedMajorName(studentInfo.getNotRecognizedMajor());
         }
 

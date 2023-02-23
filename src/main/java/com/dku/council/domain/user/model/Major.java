@@ -85,4 +85,8 @@ public enum Major {
 
         return null;
     }
+
+    public boolean isEmpty() {
+        return this == NO_DATA;
+    }
 }

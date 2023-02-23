@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
+// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class DKUAuthService {
