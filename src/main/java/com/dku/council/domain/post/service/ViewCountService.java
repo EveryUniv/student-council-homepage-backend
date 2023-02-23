@@ -1,0 +1,35 @@
+package com.dku.council.domain.post.service;
+
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.repository.ViewCountMemoryRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional
+@RequiredArgsConstructor
+public class ViewCountService {
+
+    private final ViewCountMemoryRepository memoryRepository;
+
+    @Value("${post.view-counting-expires}")
+    private final long expiresAfter;
+
+    // TODO 조회수 자체 처리도 캐싱하면 좋을 듯! (현재는 동일인물 구분에만 사용)
+
+    /**
+     * 조회수 증가 처리. 동일성은 (remoteAddress, postId)로 구분하며, n분에 1회씩만 증가시킬 수 있다.
+     * n분은 post.view-counting-duration 설정을 통해 분 단위로 조절할 수 있다.
+     *
+     * @param post          증가 대상 post
+     * @param remoteAddress client의 remote address
+     */
+    public void increasePostViews(Post post, String remoteAddress) {
+        if (!memoryRepository.isAlreadyContains(post.getId(), remoteAddress)) {
+            memoryRepository.put(post.getId(), remoteAddress, expiresAfter);
+            post.increaseViewCount();
+        }
+    }
+}

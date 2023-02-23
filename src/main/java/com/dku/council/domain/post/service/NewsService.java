@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,7 +29,7 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
-    private final PostService postService;
+    private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
 
     /**
@@ -78,7 +77,7 @@ public class NewsService {
      */
     public ResponseSingleNewsDto findOne(Long postId, String remoteAddress) {
         News news = newsRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        postService.increasePostViews(news, remoteAddress);
+        viewCountService.increasePostViews(news, remoteAddress);
         return new ResponseSingleNewsDto(fileUploadService.getBaseURL(), news);
     }
 

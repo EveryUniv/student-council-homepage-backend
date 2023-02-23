@@ -48,7 +48,7 @@ class NewsServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private PostService postService;
+    private ViewCountService viewCountService;
 
     @Mock
     private FileUploadService fileUploadService;
@@ -188,7 +188,7 @@ class NewsServiceTest {
         ResponseSingleNewsDto dto = service.findOne(4L, "Addr");
 
         // then
-        verify(postService).increasePostViews(argThat(post -> {
+        verify(viewCountService).increasePostViews(argThat(post -> {
             assertThat(post.getId()).isEqualTo(news.getId());
             return true;
         }), eq("Addr"));
