@@ -13,7 +13,8 @@ public class PostLikeDumpTask extends QuartzJobBean {
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        log.info("PostLikes in memory dump to DB.");
-        service.dumpToDB();
+        if (service.dumpToDB() > 0) {
+            log.info("PostLikes in memory dump to DB.");
+        }
     }
 }
