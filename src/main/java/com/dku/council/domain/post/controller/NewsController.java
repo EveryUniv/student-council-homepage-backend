@@ -39,8 +39,6 @@ public class NewsController {
         return new ResponsePage<>(list);
     }
 
-    // TODO 이렇게 void인 controller의 response가 자동으로 SuccessResponseDto로 변환되도록 수정
-
     /**
      * 게시글 등록
      *
