@@ -29,6 +29,7 @@ public enum Major {
     ARCHITECTURE(Department.ENGINEERING),
     SOFTWARE(Department.SOFTWARE),
     COMPUTER_SCIENCE(Department.SOFTWARE),
+    APPLIED_COMPUTER_SCIENCE(Department.ENGINEERING),
     MOBILE_SYSTEM(Department.SOFTWARE),
     STATISTICS(Department.SOFTWARE),
     SECURITY(Department.SOFTWARE),

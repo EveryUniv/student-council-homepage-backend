@@ -25,7 +25,7 @@ public class DKUAuthService {
     private final MessageSource messageSource;
     private final DkuCrawlerService crawlerService;
     private final DkuAuthenticationService authenticationService;
-    private final SignupAuthRepository repository;
+    private final SignupAuthRepository dkuAuthRepository;
 
     /**
      * 회원가입 토큰을 기반으로 인증된 학생 정보를 가져옵니다. 학생인증이 되어있지 않으면 Exception이 발생합니다.
@@ -35,7 +35,7 @@ public class DKUAuthService {
      * @throws NotDKUAuthorizedException 학생 인증을 하지 않았을 경우
      */
     public StudentInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
-        return repository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class)
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 
@@ -51,7 +51,7 @@ public class DKUAuthService {
         DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
 
-        repository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
 
         ResponseStudentInfoDto studentInfoDto = ResponseStudentInfoDto.from(messageSource, studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
