@@ -20,6 +20,7 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
     public static final String KEY_DELIMITER = ":";
 
     private final RedisTemplate<String, Integer> redisTemplate;
+    private final RedisTemplate<String, Integer> countRedisTemplate;
 
     @Override
     public void addPostLike(Long postId, Long userId) {
@@ -45,7 +46,7 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
 
     @Override
     public int getCachedLikeCount(Long postId) {
-        Object value = redisTemplate.opsForHash().get(POST_LIKE_COUNT_KEY, postId);
+        Object value = countRedisTemplate.opsForHash().get(POST_LIKE_COUNT_KEY, postId);
         if (value == null) {
             return -1;
         }
@@ -54,7 +55,7 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
 
     @Override
     public void setLikeCount(Long postId, int count) {
-        redisTemplate.opsForHash().put(POST_LIKE_COUNT_KEY, postId, count);
+        countRedisTemplate.opsForHash().put(POST_LIKE_COUNT_KEY, postId, count);
     }
 
     @Override
