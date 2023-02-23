@@ -33,7 +33,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public void login() {
-
+        // TODO Implementation
     }
 
     /**
@@ -42,7 +42,7 @@ public class UserController {
      */
     @DeleteMapping
     public void logout() {
-
+        // TODO Implementation
     }
 
     /**
@@ -50,7 +50,7 @@ public class UserController {
      */
     @PostMapping("/reissue")
     public void refreshToken() {
-
+        // TODO Implementation
     }
 
     /**
@@ -58,7 +58,7 @@ public class UserController {
      */
     @GetMapping("/major")
     public void getAllMajors() {
-
+        // TODO Implementation
     }
 
     /**
@@ -66,6 +66,6 @@ public class UserController {
      */
     @PatchMapping("/password")
     public void changePassword() {
-
+        // TODO Implementation
     }
 }
