@@ -12,11 +12,11 @@ public class PostSpec {
 
     public static <T extends Post> Specification<T> withTitleOrBody(String keyword) {
         String pattern = "%" + keyword + "%";
-        return ((root, query, builder) ->
+        return (root, query, builder) ->
                 builder.or(
                         builder.like(root.get("title"), pattern),
                         builder.like(root.get("body"), pattern)
-                ));
+                );
     }
 
     public static <T extends Post> Specification<T> isActive(){

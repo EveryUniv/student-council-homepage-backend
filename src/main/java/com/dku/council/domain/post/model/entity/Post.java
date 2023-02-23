@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.category.Category;
-import com.dku.council.domain.comment.entity.Comment;
+import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.user.model.entity.User;

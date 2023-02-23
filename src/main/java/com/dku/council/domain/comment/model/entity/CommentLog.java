@@ -1,4 +1,4 @@
-package com.dku.council.domain.comment.entity;
+package com.dku.council.domain.comment.model.entity;
 
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-import static com.dku.council.domain.comment.entity.Comment.COMMENT_MAX_LENGTH;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -30,7 +29,7 @@ public class CommentLog extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = COMMENT_MAX_LENGTH)
+    @Column(length = Comment.COMMENT_MAX_LENGTH)
     private String text;
 
 
