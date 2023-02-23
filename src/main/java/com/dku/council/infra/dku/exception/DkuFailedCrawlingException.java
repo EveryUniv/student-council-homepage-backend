@@ -1,11 +1,7 @@
 package com.dku.council.infra.dku.exception;
 
 import com.dku.council.global.error.exception.LocalizedMessageException;
-import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
-import java.util.Locale;
 
 public class DkuFailedCrawlingException extends LocalizedMessageException {
 

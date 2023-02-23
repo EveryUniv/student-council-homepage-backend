@@ -2,18 +2,14 @@ package com.dku.council.infra.nhn.service.impl;
 
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
-import com.dku.council.infra.nhn.model.dto.request.RequestNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.request.RequestToken;
 import com.dku.council.infra.nhn.model.dto.response.ResponseToken;
 import com.dku.council.infra.nhn.service.NHNAuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
