@@ -76,4 +76,8 @@ public class Post extends BaseEntity {
         this.views = views;
         this.status = PostStatus.ACTIVE;
     }
+
+    public void increaseViewCount() {
+        views++;
+    }
 }
