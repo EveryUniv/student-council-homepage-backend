@@ -1,6 +1,7 @@
 package com.dku.council.domain.user.repository.impl;
 
 import com.dku.council.domain.user.repository.SignupAuthRepository;
+import com.dku.council.global.config.RedisKeys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SignupAuthRedisRepository implements SignupAuthRepository {
 
-    public static final String SIGNUP_AUTH_KEY = "SignupAuth";
-    public static final String KEY_DELIMITER = ":";
-
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -25,7 +23,7 @@ public class SignupAuthRedisRepository implements SignupAuthRepository {
         String key = makeEntryKey(signupToken, authName);
         try {
             String value = objectMapper.writeValueAsString(data);
-            redisTemplate.opsForHash().put(SIGNUP_AUTH_KEY, key, value);
+            redisTemplate.opsForHash().put(RedisKeys.SIGNUP_AUTH_KEY, key, value);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -34,7 +32,7 @@ public class SignupAuthRedisRepository implements SignupAuthRepository {
     @Override
     public <T> Optional<T> getAuthPayload(String signupToken, String authName, Class<T> payloadClass) {
         String key = makeEntryKey(signupToken, authName);
-        Object value = redisTemplate.opsForHash().get(SIGNUP_AUTH_KEY, key);
+        Object value = redisTemplate.opsForHash().get(RedisKeys.SIGNUP_AUTH_KEY, key);
         if (value == null) {
             return Optional.empty();
         }
@@ -47,6 +45,6 @@ public class SignupAuthRedisRepository implements SignupAuthRepository {
     }
 
     public String makeEntryKey(String signupToken, String authName) {
-        return signupToken + KEY_DELIMITER + authName;
+        return signupToken + RedisKeys.KEY_DELIMITER + authName;
     }
 }

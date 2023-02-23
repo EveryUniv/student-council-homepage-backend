@@ -2,6 +2,7 @@ package com.dku.council.domain.like.repository.impl;
 
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
+import com.dku.council.global.config.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,7 @@ class PostLikeRedisRepositoryTest {
         repository.addPostLike(key.postId, key.userId);
 
         // then
-        Object value = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_KEY, key.toString());
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_KEY, key.toString());
         assertThat(value).isEqualTo(LikeState.LIKED.name());
     }
 
@@ -59,13 +60,13 @@ class PostLikeRedisRepositoryTest {
     void addDuplicatedPostLike() {
         // given
         PostLikeKey key = new PostLikeKey(repository);
-        redisTemplate.opsForHash().put(PostLikeRedisRepository.POST_LIKE_KEY, key.toString(), "0");
+        redisTemplate.opsForHash().put(RedisKeys.POST_LIKE_KEY, key.toString(), "0");
 
         // when
         repository.addPostLike(key.postId, key.userId);
 
         // then
-        Object value = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_KEY, key.toString());
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_KEY, key.toString());
         assertThat(value).isEqualTo(LikeState.LIKED.name());
     }
 
@@ -80,7 +81,7 @@ class PostLikeRedisRepositoryTest {
         repository.removePostLike(key.postId, key.userId);
 
         // then
-        Object value = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_KEY, key.toString());
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_KEY, key.toString());
         assertThat(value).isEqualTo(LikeState.CANCELLED.name());
     }
 
@@ -94,7 +95,7 @@ class PostLikeRedisRepositoryTest {
         repository.removePostLike(key.postId, key.userId);
 
         // then
-        Object value = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_KEY, key.toString());
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_KEY, key.toString());
         assertThat(value).isEqualTo(LikeState.CANCELLED.name());
     }
 
@@ -144,7 +145,7 @@ class PostLikeRedisRepositoryTest {
     void getCachedLikeCount() {
         // given
         PostLikeKey key = new PostLikeKey(repository);
-        redisTemplate.opsForHash().put(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, key.postId.toString(), "3");
+        redisTemplate.opsForHash().put(RedisKeys.POST_LIKE_COUNT_KEY, key.postId.toString(), "3");
 
         // when
         int count = repository.getCachedLikeCount(key.postId);
@@ -176,7 +177,7 @@ class PostLikeRedisRepositoryTest {
         repository.setLikeCount(key.postId, 8);
 
         // then
-        Object count = redisTemplate.opsForHash().get(PostLikeRedisRepository.POST_LIKE_COUNT_KEY, String.valueOf(key.postId));
+        Object count = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_COUNT_KEY, String.valueOf(key.postId));
         assertThat(count).isEqualTo("8");
     }
 
@@ -199,7 +200,7 @@ class PostLikeRedisRepositoryTest {
         List<LikeEntry> likes = repository.getAllPostLikes();
 
         // then
-        Long size = redisTemplate.opsForHash().size(PostLikeRedisRepository.POST_LIKE_KEY);
+        Long size = redisTemplate.opsForHash().size(RedisKeys.POST_LIKE_KEY);
         LikeEntry[] expected = new LikeEntry[count];
         for (int i = 0; i < count; i++) {
             expected[i] = new LikeEntry(keys[i].postId, keys[i].userId,
@@ -224,7 +225,7 @@ class PostLikeRedisRepositoryTest {
         List<LikeEntry> likes = repository.getAllPostLikesAndClear();
 
         // then
-        Long size = redisTemplate.opsForHash().size(PostLikeRedisRepository.POST_LIKE_KEY);
+        Long size = redisTemplate.opsForHash().size(RedisKeys.POST_LIKE_KEY);
         assertThat(likes.size()).isEqualTo(count);
         assertThat(size).isEqualTo(0);
     }

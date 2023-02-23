@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.repository.impl;
 
+import com.dku.council.global.config.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +46,7 @@ class ViewCountRedisRepositoryTest {
         repository.put(10L, userIdentifier, 100, now);
 
         // then
-        Object value = redisTemplate.opsForHash().get(ViewCountRedisRepository.POST_VIEW_COUNT_SET_KEY, key);
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
         long expectedEpoch = now.plus(100, ChronoUnit.MINUTES).getEpochSecond();
         assertThat(value).isEqualTo(String.valueOf(expectedEpoch));
     }
