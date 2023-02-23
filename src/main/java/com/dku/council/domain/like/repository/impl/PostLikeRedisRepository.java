@@ -4,7 +4,10 @@ import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
