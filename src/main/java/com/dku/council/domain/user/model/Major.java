@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.model;
 
-import com.dku.council.global.error.exception.MajorNotFoundException;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
@@ -48,7 +47,7 @@ public enum Major {
     LIBERAL_ARTS(Department.LIBERAL_ARTS),
     GRADUATE(Department.GRADUATE),
     ADMIN(Department.ADMIN),
-    ;
+    NO_DATA(Department.NO_DATA);
 
     private final Department department;
 
@@ -72,7 +71,6 @@ public enum Major {
      * @param source MessageSource
      * @param major  학과 명
      * @return 매칭되는 Major.
-     * @throws MajorNotFoundException 존재하지 않는 학과일 경우
      */
     public static Major of(MessageSource source, String major) {
         major = major.replace(" ", "")
@@ -85,6 +83,6 @@ public enum Major {
             }
         }
 
-        throw new MajorNotFoundException();
+        return null;
     }
 }

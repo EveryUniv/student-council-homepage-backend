@@ -35,7 +35,7 @@ public class TestController {
     public AuthenticationToken test() {
         User user = User.builder()
                 .name("테스트")
-                .classId("32171111")
+                .studentId("32171111")
                 .phone("010-1234-5678")
                 .status(UserStatus.ACTIVE)
                 .major(Major.COMPUTER_SCIENCE)

@@ -1,8 +1,12 @@
 package com.dku.council.domain.user.controller;
 
+import com.dku.council.domain.user.model.dto.RequestSignupDto;
+import com.dku.council.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Tag(name = "사용자", description = "사용자 인증 및 정보 관련 api")
 @RestController
@@ -10,11 +14,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
+    private UserService service;
+
     /**
      * 회원가입
+     *
+     * @param dto         요청 Body
+     * @param signupToken 회원가입 토큰
      */
-    @PostMapping
-    public void signup() {
+    @PostMapping("/{signup-token}")
+    public void signup(@Valid @RequestBody RequestSignupDto dto,
+                       @PathVariable("signup-token") String signupToken) {
+        service.signup(dto, signupToken);
     }
 
     /**

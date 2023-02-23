@@ -25,6 +25,7 @@ public class NewsController {
     private final NewsService newsService;
 
     // TODO summary와 description 둘 다 javadoc으로 표현할 수 있게 하기
+    // TODO void를 반환하는 api들도 Swagger에서는 모두 SuccessResponseDto를 반환하는 걸로 보이게 하기
 
     /**
      * 게시글 목록으로 조회
