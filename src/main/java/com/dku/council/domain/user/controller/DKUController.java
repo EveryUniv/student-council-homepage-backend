@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DKUController {
 
     /**
-     * 회원가입용 학생 정보 가져오기
+     * 학생 정보 가져오기 (회원가입용)
      */
     @GetMapping
     public void getStudentInfo() {
