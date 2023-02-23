@@ -27,8 +27,9 @@ public class CommentController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(Authentication authentication, @PathVariable Long id){
-        Long userId = (Long) authentication.getPrincipal();
-        commentService.delete(id, userId);
+    public void delete(Authentication auth, @PathVariable Long id){
+        Long userId = (Long) auth.getPrincipal();
+        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        commentService.delete(id, userId, isAdmin);
     }
 }

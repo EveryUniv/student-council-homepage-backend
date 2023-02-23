@@ -26,5 +26,11 @@ public interface CommentService {
      * @param commentId 댓글 ID
      * @param userId    사용자 ID
      */
-    void delete(Long commentId, Long userId);
+    /**
+     * 댓글을 삭제합니다. 사용자가 댓글을 삭제할 수 있는 권한이 있어야 합니다. Admin 은 즉시 삭제 가능.
+     * @param commentId 댓글 ID
+     * @param userId    사용자 ID
+     * @param isAdmin   Admin 여부
+     */
+    void delete(Long commentId, Long userId, boolean isAdmin);
 }
