@@ -43,19 +43,11 @@ public class GeneralForumService {
      * @return 페이징된 자유게시판 목록
      */
     public Page<SummarizedGeneralForumDto> list(String keyword, String category, Pageable pageable) {
-        Page<GeneralForum> page;
         /**
          * todo : QueryDsl로 변환하기
          */
-        if (keyword != null && category != null) {
-            page = generalForumRepository.findAll(PostSpec.withQueryAndCategory(keyword, category), pageable);
-        } else if (keyword != null) {
-            page = generalForumRepository.findAll(PostSpec.withTitleOrBody(keyword), pageable);
-        } else if (category != null){
-            page = generalForumRepository.findAll(PostSpec.withCategory(category), pageable);
-        } else {
-            page = generalForumRepository.findAll(pageable);
-        }
+        Page<GeneralForum> page = generalForumRepository.findAll(PostSpec.condition(keyword, category), pageable);
+
         return page.map(generalForum -> new SummarizedGeneralForumDto(fileUploadService.getBaseURL(), generalForum));
     }
 
