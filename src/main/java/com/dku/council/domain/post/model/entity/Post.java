@@ -80,4 +80,8 @@ public class Post extends BaseEntity {
     public void increaseViewCount() {
         views++;
     }
+
+    public void updateStatus(PostStatus status){
+        this.status = status;
+    }
 }
