@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class NotSMSAuthorizedException extends LocalizedMessageException {
     public NotSMSAuthorizedException() {
-        super(HttpStatus.BAD_REQUEST, "required.sms-authorization");
+        super(HttpStatus.FORBIDDEN, "required.sms-authorization");
     }
 }

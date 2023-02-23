@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class NotDKUAuthorizedException extends LocalizedMessageException {
     public NotDKUAuthorizedException() {
-        super(HttpStatus.BAD_REQUEST, "required.dku-authorization");
+        super(HttpStatus.FORBIDDEN, "required.dku-authorization");
     }
 }
