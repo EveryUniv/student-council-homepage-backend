@@ -19,7 +19,7 @@ public class ViewCountRedisRepository implements ViewCountMemoryRepository {
     private final RedisTemplate<String, Long> redisTemplate;
 
     @Override
-    public boolean isAlreadyContains(Long postId, String userIdentifier) {
+    public boolean isAlreadyContains(Long postId, String userIdentifier, Instant now) {
         String key = makeEntryKey(postId, userIdentifier);
         Object value = redisTemplate.opsForHash().get(POST_VIEW_COUNT_SET_KEY, key);
         if (value == null) {
@@ -27,7 +27,7 @@ public class ViewCountRedisRepository implements ViewCountMemoryRepository {
         }
 
         long expiresAt = (long) value;
-        if (Instant.now().isAfter(Instant.ofEpochSecond(expiresAt))) {
+        if (now.isAfter(Instant.ofEpochSecond(expiresAt))) {
             redisTemplate.opsForHash().delete(POST_VIEW_COUNT_SET_KEY, key);
             return false;
         }
@@ -36,11 +36,9 @@ public class ViewCountRedisRepository implements ViewCountMemoryRepository {
     }
 
     @Override
-    public void put(Long postId, String userIdentifier, long expiresAfter) {
+    public void put(Long postId, String userIdentifier, long expiresAfter, Instant now) {
         String key = makeEntryKey(postId, userIdentifier);
-        long expiresAt = Instant.now()
-                .plus(expiresAfter, ChronoUnit.MINUTES)
-                .getEpochSecond();
+        long expiresAt = now.plus(expiresAfter, ChronoUnit.MINUTES).getEpochSecond();
         redisTemplate.opsForHash().put(POST_VIEW_COUNT_SET_KEY, key, expiresAt);
     }
 

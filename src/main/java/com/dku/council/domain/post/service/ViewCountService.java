@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ViewCountService {
 
     private final ViewCountMemoryRepository memoryRepository;
+    private final Clock clock;
 
     @Value("${post.view-counting-expires}")
     private final long expiresAfter;
@@ -27,8 +31,9 @@ public class ViewCountService {
      * @param remoteAddress client의 remote address
      */
     public void increasePostViews(Post post, String remoteAddress) {
-        if (!memoryRepository.isAlreadyContains(post.getId(), remoteAddress)) {
-            memoryRepository.put(post.getId(), remoteAddress, expiresAfter);
+        Instant now = Instant.now(clock);
+        if (!memoryRepository.isAlreadyContains(post.getId(), remoteAddress, now)) {
+            memoryRepository.put(post.getId(), remoteAddress, expiresAfter, now);
             post.increaseViewCount();
         }
     }
