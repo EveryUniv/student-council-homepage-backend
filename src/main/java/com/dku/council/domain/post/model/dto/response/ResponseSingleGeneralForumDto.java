@@ -4,6 +4,7 @@ import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import lombok.Getter;
+import org.springframework.context.MessageSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ResponseSingleGeneralForumDto {
     private final boolean isMine;
 
 
-    public ResponseSingleGeneralForumDto(String baseFileUrl, GeneralForum generalForum, Long userId) {
+    public ResponseSingleGeneralForumDto(MessageSource messageSource, String baseFileUrl, GeneralForum generalForum, Long userId) {
         this.id = generalForum.getId();
         this.title = generalForum.getTitle();
         this.body = generalForum.getBody();
@@ -29,7 +30,7 @@ public class ResponseSingleGeneralForumDto {
         this.category = generalForum.getCategory().getName();
         this.createdAt = generalForum.getCreatedAt();
         this.files = PostFileDto.listOf(baseFileUrl, generalForum.getFiles());
-        this.commentList = CommentDto.listOf(generalForum.getComments());
+        this.commentList = CommentDto.listOf(messageSource, generalForum.getComments());
         this.isMine = generalForum.getUser().getId().equals(userId);
     }
 }
