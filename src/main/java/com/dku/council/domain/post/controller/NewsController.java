@@ -70,8 +70,7 @@ public class NewsController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    public ResponsePostIdDto delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         newsService.delete(id);
-        return new ResponsePostIdDto(id);
     }
 }
