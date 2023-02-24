@@ -42,14 +42,7 @@ public class NewsService {
      * @return 페이징된 총학 소식 목록
      */
     public Page<SummarizedNewsDto> list(String keyword, Pageable pageable) {
-        Page<News> page;
-
-        if (keyword != null) {
-            page = newsRepository.findAll(PostSpec.withTitleOrBody(keyword), pageable);
-        } else {
-            page = newsRepository.findAll(pageable);
-        }
-
+        Page<News> page = newsRepository.findAll(PostSpec.keywordCondition(keyword), pageable);
         return page.map(news -> new SummarizedNewsDto(fileUploadService.getBaseURL(), news));
     }
 
