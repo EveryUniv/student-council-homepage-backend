@@ -68,7 +68,7 @@ jobs:
           proxy_key: ${{ secrets.PUBLIC_PEM_KEY }}
           envs: GITHUB_SHA
           script: |
-            docker pull ${{ secrets.USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7}
-            docker tag ${{ secrets.USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7} ${{ secrets.DOCKER_REPO }}
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7}
+            docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7} ${{ secrets.DOCKER_REPO }}
             docker stop ${{ secrets.DOCKER_REPO }}
             docker run -d --rm --name ${{ secrets.DOCKER_REPO }} -p 7001:8080 -e TZ=Asia/Seoul ${{ secrets.DOCKER_REPO }}
