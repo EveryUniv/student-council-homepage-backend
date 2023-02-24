@@ -26,7 +26,7 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: make test properties
+      - name: Make test properties
         env:
           PROPERTIES: ${{ secrets.PROPERTIES_TEST }}
         run: |
