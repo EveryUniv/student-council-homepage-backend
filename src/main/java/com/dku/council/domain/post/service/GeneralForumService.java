@@ -46,8 +46,7 @@ public class GeneralForumService {
         /**
          * todo : QueryDsl로 변환하기
          */
-        Page<GeneralForum> page = generalForumRepository.findAll(PostSpec.condition(keyword, category), pageable);
-
+        Page<GeneralForum> page = generalForumRepository.findAll(PostSpec.generalForumCondition(keyword, category), pageable);
         return page.map(generalForum -> new SummarizedGeneralForumDto(fileUploadService.getBaseURL(), generalForum));
     }
 
