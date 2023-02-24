@@ -1,6 +1,6 @@
-package com.dku.council.domain.post.model.dto;
+package com.dku.council.domain.comment.model.dto;
 
-import com.dku.council.domain.comment.entity.Comment;
+import com.dku.council.domain.comment.model.entity.Comment;
 import lombok.Getter;
 import org.springframework.context.MessageSource;
 
