@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class RequestCreatePostDto {
 
-    @NotBlank
+    @NotBlank @Schema(description = "본문 제목", example = "제목")
     private final String title;
 
-    @NotBlank
+    @NotBlank @Schema(description = "본문", example = "내용")
     private final String body;
-
+    @Schema(description = "첨부파일")
     private final List<MultipartFile> files;
 }
