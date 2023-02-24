@@ -9,7 +9,8 @@ import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.NewsRepository;
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.DummyMultipartFile;
@@ -88,7 +89,7 @@ class NewsServiceTest {
                 .studentId("11111111")
                 .password("pwd")
                 .name("name")
-                .major(Major.ADMIN)
+                .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")
                 .build();
     }

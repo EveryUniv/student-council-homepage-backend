@@ -1,6 +1,6 @@
 package com.dku.council.infra.dku.service;
 
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
@@ -70,7 +70,7 @@ class DkuCrawlerServiceTest {
         assertThat(studentInfo.getStudentName()).isEqualTo("학생명");
         assertThat(studentInfo.getStudentId()).isEqualTo("32220000");
         assertThat(studentInfo.getYearOfAdmission()).isEqualTo(2022);
-        assertThat(studentInfo.getMajor()).isEqualTo(Major.POLITICAL);
+        assertThat(studentInfo.getMajorData()).isEqualTo(MajorData.POLITICAL);
     }
 
     @Test

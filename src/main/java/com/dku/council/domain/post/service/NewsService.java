@@ -14,6 +14,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,10 +32,12 @@ public class NewsService {
     private final UserRepository userRepository;
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
+    private final MessageSource messageSource;
 
     /**
      * 게시글 목록으로 조회
-     * @param keyword 검색 키워드
+     *
+     * @param keyword  검색 키워드
      * @param pageable 페이징 size, sort, page
      * @return 페이징된 총학 소식 목록
      */
@@ -54,7 +57,7 @@ public class NewsService {
      * 게시글 등록
      *
      * @param userId 등록한 사용자 id
-     * @param dto 게시글 dto
+     * @param dto    게시글 dto
      */
     @Transactional
     public Long create(Long userId, RequestCreateNewsDto dto) {
@@ -71,14 +74,14 @@ public class NewsService {
     /**
      * 게시글 단건 조회
      *
-     * @param postId 조회할 게시글 id
+     * @param postId        조회할 게시글 id
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 총학소식 게시글 정보
      */
     public ResponseSingleNewsDto findOne(Long postId, String remoteAddress) {
         News news = newsRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         viewCountService.increasePostViews(news, remoteAddress);
-        return new ResponseSingleNewsDto(fileUploadService.getBaseURL(), news);
+        return new ResponseSingleNewsDto(messageSource, fileUploadService.getBaseURL(), news);
     }
 
     /**

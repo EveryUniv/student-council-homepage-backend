@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class SMSAuthObject {
+public class SMSAuth {
     private final String phone;
     private final String code;
 }

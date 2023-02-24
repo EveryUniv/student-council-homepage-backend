@@ -40,6 +40,16 @@ public class DKUAuthService {
     }
 
     /**
+     * 회원가입 토큰을 기반으로 인증된 학생 정보를 삭제합니다. 회원가입이 끝나면
+     * 학생 인증 정보를 모두 삭제해야합니다.
+     *
+     * @param signupToken 회원가입 토큰
+     */
+    public boolean deleteStudentAuth(String signupToken) {
+        return dkuAuthRepository.deleteAuthPayload(signupToken, DKU_AUTH_NAME);
+    }
+
+    /**
      * 단대 id, password로 학생 인증을 진행합니다.
      *
      * @param dto 요청 dto

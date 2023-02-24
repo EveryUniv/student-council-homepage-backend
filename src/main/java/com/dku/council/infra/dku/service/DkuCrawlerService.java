@@ -1,6 +1,6 @@
 package com.dku.council.infra.dku.service;
 
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.global.config.qualifier.ChromeAgentWebClient;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -64,15 +64,20 @@ public class DkuCrawlerService {
         String studentName = getElementValueOrNull(doc, "nm");
         String studentId = getElementValueOrNull(doc, "stuid");
 
-        String pstnOrgzNm;
-        Major major;
+        String major, department = "";
+        MajorData majorData;
         int yearOfAdmission;
 
         try {
-            pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
+            String pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
             String[] orgToken = pstnOrgzNm.trim().split(" ");
-            pstnOrgzNm = orgToken[orgToken.length - 1];
-            major = Major.of(messageSource, pstnOrgzNm);
+
+            major = orgToken[orgToken.length - 1];
+            if (orgToken.length > 1) {
+                department = orgToken[orgToken.length - 2];
+            }
+
+            majorData = MajorData.of(messageSource, major);
 
             String etrsYy = getElementValueOrNull(doc, "etrsYy");
             yearOfAdmission = Integer.parseInt(etrsYy);
@@ -80,11 +85,11 @@ public class DkuCrawlerService {
             throw new DkuFailedCrawlingException(t);
         }
 
-        if (major == null) {
-            log.error("Unexpected major name: {}. It will be treated as {}", pstnOrgzNm, Major.NO_DATA.name());
-            return new StudentInfo(studentName, studentId, yearOfAdmission, pstnOrgzNm);
+        if (majorData == null) {
+            log.error("Unexpected major name: {} {}. It will be treated as {}", department, major, MajorData.NO_DATA.name());
+            return new StudentInfo(studentName, studentId, yearOfAdmission, major, department);
         } else {
-            return new StudentInfo(studentName, studentId, yearOfAdmission, major);
+            return new StudentInfo(studentName, studentId, yearOfAdmission, majorData);
         }
     }
 
