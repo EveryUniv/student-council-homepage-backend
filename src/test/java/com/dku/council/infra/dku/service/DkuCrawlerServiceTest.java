@@ -67,6 +67,7 @@ class DkuCrawlerServiceTest {
         StudentInfo studentInfo = service.crawlStudentInfo(dummyAuth);
 
         // then
+        assertThat(studentInfo.getStudentName()).isEqualTo("학생명");
         assertThat(studentInfo.getStudentId()).isEqualTo("32220000");
         assertThat(studentInfo.getYearOfAdmission()).isEqualTo(2022);
         assertThat(studentInfo.getMajor()).isEqualTo(Major.POLITICAL);

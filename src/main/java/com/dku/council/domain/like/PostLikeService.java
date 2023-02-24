@@ -83,8 +83,10 @@ public class PostLikeService {
 
     /**
      * 영속성 DB에 실제로 데이터를 반영한다.
+     *
+     * @return 처리한 entity 개수
      */
-    public void dumpToDB() {
+    public long dumpToDB() {
         List<LikeEntry> allLikes = memoryRepository.getAllPostLikes();
         for (LikeEntry ent : allLikes) {
             if (ent.getState() == LikeState.LIKED) {
@@ -95,5 +97,7 @@ public class PostLikeService {
                 persistenceRepository.deleteByPostIdAndUserId(ent.getPostId(), ent.getUserId());
             }
         }
+
+        return allLikes.size();
     }
 }

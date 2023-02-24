@@ -1,19 +1,26 @@
 package com.dku.council.infra.dku.model;
 
 import com.dku.council.domain.user.model.Major;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 @Getter
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StudentInfo {
-    private final String studentId;
-    private final int yearOfAdmission;
-    private final Major major;
+    private String studentName;
+    private String studentId;
+    private int yearOfAdmission;
+    private Major major;
+    private String notRecognizedMajor;
 
-    public StudentInfo(String studentId, int yearOfAdmission, Major major) {
-        this.studentId = studentId;
-        this.yearOfAdmission = yearOfAdmission;
-        this.major = major;
+    public StudentInfo(String studentName, String studentId, int yearOfAdmission, Major major) {
+        this(studentName, studentId, yearOfAdmission, major, null);
+    }
+
+    public StudentInfo(String studentName, String studentId, int yearOfAdmission, String notRecognizedMajor) {
+        this(studentName, studentId, yearOfAdmission, Major.NO_DATA, notRecognizedMajor);
     }
 }

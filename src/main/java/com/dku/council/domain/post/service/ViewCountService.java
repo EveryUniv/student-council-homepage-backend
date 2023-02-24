@@ -18,7 +18,7 @@ public class ViewCountService {
     private final ViewCountMemoryRepository memoryRepository;
     private final Clock clock;
 
-    @Value("${post.view-counting-expires}")
+    @Value("${app.post.view-counting-expires}")
     private final long expiresAfter;
 
     // TODO 조회수 자체 처리도 캐싱하면 좋을 듯! (현재는 동일인물 구분에만 사용)

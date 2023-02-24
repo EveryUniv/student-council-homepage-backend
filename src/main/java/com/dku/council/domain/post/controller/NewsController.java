@@ -25,6 +25,7 @@ public class NewsController {
     private final NewsService newsService;
 
     // TODO summary와 description 둘 다 javadoc으로 표현할 수 있게 하기
+    // TODO void를 반환하는 api들도 Swagger에서는 모두 SuccessResponseDto를 반환하는 걸로 보이게 하기
 
     /**
      * 게시글 목록으로 조회
@@ -38,8 +39,6 @@ public class NewsController {
         Page<SummarizedNewsDto> list = newsService.list(query, pageable);
         return new ResponsePage<>(list);
     }
-
-    // TODO 이렇게 void인 controller의 response가 자동으로 SuccessResponseDto로 변환되도록 수정
 
     /**
      * 게시글 등록

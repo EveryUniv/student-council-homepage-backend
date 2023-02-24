@@ -3,8 +3,12 @@ package com.dku.council.domain.like.repository.impl;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
+import com.dku.council.global.config.RedisKeys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.*;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.ScanOptions;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -15,47 +19,42 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PostLikeRedisRepository implements PostLikeMemoryRepository {
 
-    public static final String POST_LIKE_KEY = "PostLike";
-    public static final String POST_LIKE_COUNT_KEY = "PostLikeCount";
-    public static final String KEY_DELIMITER = ":";
-
-    private final RedisTemplate<String, Integer> redisTemplate;
-    private final RedisTemplate<String, Integer> countRedisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public void addPostLike(Long postId, Long userId) {
         String key = makeEntryKey(postId, userId);
-        redisTemplate.opsForHash().put(POST_LIKE_KEY, key, LikeState.LIKED.ordinal());
+        redisTemplate.opsForHash().put(RedisKeys.POST_LIKE_KEY, key, LikeState.LIKED.name());
     }
 
     @Override
     public void removePostLike(Long postId, Long userId) {
         String key = makeEntryKey(postId, userId);
-        redisTemplate.opsForHash().put(POST_LIKE_KEY, key, LikeState.CANCELLED.ordinal());
+        redisTemplate.opsForHash().put(RedisKeys.POST_LIKE_KEY, key, LikeState.CANCELLED.name());
     }
 
     @Override
     public Boolean isPostLiked(Long postId, Long userId) {
         String key = makeEntryKey(postId, userId);
-        Object value = redisTemplate.opsForHash().get(POST_LIKE_KEY, key);
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_KEY, key);
         if (value == null) {
             return null;
         }
-        return (int) value == LikeState.LIKED.ordinal();
+        return value.equals(LikeState.LIKED.name());
     }
 
     @Override
     public int getCachedLikeCount(Long postId) {
-        Object value = countRedisTemplate.opsForHash().get(POST_LIKE_COUNT_KEY, postId);
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_LIKE_COUNT_KEY, postId.toString());
         if (value == null) {
             return -1;
         }
-        return (int) value;
+        return Integer.parseInt((String) value);
     }
 
     @Override
     public void setLikeCount(Long postId, int count) {
-        countRedisTemplate.opsForHash().put(POST_LIKE_COUNT_KEY, postId, count);
+        redisTemplate.opsForHash().put(RedisKeys.POST_LIKE_COUNT_KEY, postId.toString(), String.valueOf(count));
     }
 
     @Override
@@ -72,19 +71,19 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
         List<LikeEntry> result = new ArrayList<>();
         HashOperations<String, Object, Object> op = redisTemplate.opsForHash();
 
-        try (Cursor<Map.Entry<Object, Object>> cursor = op.scan(POST_LIKE_KEY, ScanOptions.NONE)) {
+        try (Cursor<Map.Entry<Object, Object>> cursor = op.scan(RedisKeys.POST_LIKE_KEY, ScanOptions.NONE)) {
             while (cursor.hasNext()) {
                 Map.Entry<Object, Object> entry = cursor.next();
 
                 String key = (String) entry.getKey();
-                String[] keyValue = key.split(KEY_DELIMITER);
+                String[] keyValue = key.split(RedisKeys.KEY_DELIMITER);
                 Long postId = Long.valueOf(keyValue[0]);
                 Long userId = Long.valueOf(keyValue[1]);
-                LikeState state = LikeState.values()[(int) entry.getValue()];
+                LikeState state = LikeState.of((String) entry.getValue());
 
                 result.add(new LikeEntry(postId, userId, state));
                 if (clear) {
-                    op.delete(POST_LIKE_KEY, key);
+                    op.delete(RedisKeys.POST_LIKE_KEY, key);
                 }
             }
         }
@@ -93,6 +92,6 @@ public class PostLikeRedisRepository implements PostLikeMemoryRepository {
     }
 
     public String makeEntryKey(Long postId, Long userId) {
-        return postId.toString() + KEY_DELIMITER + userId;
+        return postId.toString() + RedisKeys.KEY_DELIMITER + userId;
     }
 }

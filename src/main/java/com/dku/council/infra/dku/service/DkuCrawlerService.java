@@ -6,6 +6,7 @@ import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DkuCrawlerService {
@@ -59,14 +61,18 @@ public class DkuCrawlerService {
     private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
 
+        String studentName = getElementValueOrNull(doc, "nm");
         String studentId = getElementValueOrNull(doc, "stuid");
+
+        String pstnOrgzNm;
         Major major;
         int yearOfAdmission;
 
         try {
-            String pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
-            pstnOrgzNm = pstnOrgzNm.trim().split(" ")[1];
-            major = Major.of(messageSource, pstnOrgzNm); // TODO 존재하지 않는 학과일 경우는 어떻게 handling할 것인가?
+            pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
+            String[] orgToken = pstnOrgzNm.trim().split(" ");
+            pstnOrgzNm = orgToken[orgToken.length - 1];
+            major = Major.of(messageSource, pstnOrgzNm);
 
             String etrsYy = getElementValueOrNull(doc, "etrsYy");
             yearOfAdmission = Integer.parseInt(etrsYy);
@@ -74,7 +80,12 @@ public class DkuCrawlerService {
             throw new DkuFailedCrawlingException(t);
         }
 
-        return new StudentInfo(studentId, yearOfAdmission, major);
+        if (major == null) {
+            log.error("Unexpected major name: {}. It will be treated as {}", pstnOrgzNm, Major.NO_DATA.name());
+            return new StudentInfo(studentName, studentId, yearOfAdmission, pstnOrgzNm);
+        } else {
+            return new StudentInfo(studentName, studentId, yearOfAdmission, major);
+        }
     }
 
     private String getElementValueOrNull(Document doc, String id) {

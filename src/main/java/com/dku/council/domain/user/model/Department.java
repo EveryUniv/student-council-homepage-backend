@@ -17,7 +17,8 @@ public enum Department {
     MUSIC_ART,
     LIBERAL_ARTS,
     GRADUATE,
-    ADMIN;
+    ADMIN,
+    NO_DATA;
 
     public String getName(MessageSource source) {
         Locale locale = LocaleContextHolder.getLocale();

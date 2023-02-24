@@ -120,6 +120,7 @@ public class DkuAuthenticationService {
         return response;
     }
 
+    // TODO 제대로 동작 안함. body가 정확하게 출력되도록 수정
     private static void throwLoginFailedWithAlertMessage(ClientResponse response) {
         String responseBody = response.bodyToMono(String.class).block();
         if (responseBody == null) {

@@ -1,11 +1,12 @@
 package com.dku.council.domain.post.repository.impl;
 
+import com.dku.council.global.config.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -20,7 +21,7 @@ class ViewCountRedisRepositoryTest {
     private ViewCountRedisRepository repository;
 
     @Autowired
-    private RedisTemplate<String, Long> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
 
     @BeforeEach
@@ -45,8 +46,9 @@ class ViewCountRedisRepositoryTest {
         repository.put(10L, userIdentifier, 100, now);
 
         // then
-        Object value = redisTemplate.opsForHash().get(ViewCountRedisRepository.POST_VIEW_COUNT_SET_KEY, key);
-        assertThat(value).isEqualTo(now.plus(100, ChronoUnit.MINUTES).getEpochSecond());
+        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
+        long expectedEpoch = now.plus(100, ChronoUnit.MINUTES).getEpochSecond();
+        assertThat(value).isEqualTo(String.valueOf(expectedEpoch));
     }
 
     @Test
@@ -54,7 +56,6 @@ class ViewCountRedisRepositoryTest {
     void isAlreadyContainsNoCached() {
         // given
         String userIdentifier = "User";
-        String key = repository.makeEntryKey(10L, userIdentifier);
         Instant now = Instant.now();
 
         // when
@@ -69,7 +70,6 @@ class ViewCountRedisRepositoryTest {
     void isAlreadyContainsCached() {
         // given
         String userIdentifier = "User";
-        String key = repository.makeEntryKey(10L, userIdentifier);
         Instant now = Instant.now();
 
         // when
@@ -85,7 +85,6 @@ class ViewCountRedisRepositoryTest {
     void isAlreadyContainsExpired() {
         // given
         String userIdentifier = "User";
-        String key = repository.makeEntryKey(10L, userIdentifier);
         Instant now = Instant.now();
 
         // when

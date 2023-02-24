@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,22 +17,20 @@ public class VoidSuccessResponseInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object object, Exception ex) throws Exception {
-        final ContentCachingResponseWrapper cachingResponse = (ContentCachingResponseWrapper) response;
-
         HttpStatus status = HttpStatus.valueOf(response.getStatus());
         if (!status.is2xxSuccessful()) {
             return;
         }
 
-        if (cachingResponse.getContentType() != null) {
+        if (response.getContentType() != null) {
             return;
         }
 
         String wrappedBody = objectMapper.writeValueAsString(new SuccessResponseDto());
 
         byte[] bytesData = wrappedBody.getBytes();
-        cachingResponse.setContentType("application/json");
-        cachingResponse.resetBuffer();
-        cachingResponse.getOutputStream().write(bytesData, 0, bytesData.length);
+        response.setContentType("application/json");
+        response.resetBuffer();
+        response.getOutputStream().write(bytesData, 0, bytesData.length);
     }
 }

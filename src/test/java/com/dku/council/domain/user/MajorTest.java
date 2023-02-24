@@ -1,7 +1,6 @@
 package com.dku.council.domain.user;
 
 import com.dku.council.domain.user.model.Major;
-import com.dku.council.global.error.exception.MajorNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -55,13 +53,15 @@ class MajorTest {
     }
 
     @Test
-    @DisplayName("of로 없는 Major 조회시 오류")
+    @DisplayName("of로 없는 Major 조회시 null 반환")
     public void failedOfByNotFound() {
         // given
         when(messageSource.getMessage(Mockito.startsWith("Major."), any(), any())).thenReturn("모르는 학과");
 
-        // when & then
-        assertThrows(MajorNotFoundException.class, () ->
-                Major.of(messageSource, "국어국문학과"));
+        // when
+        Major major = Major.of(messageSource, "국어국문학과");
+
+        // then
+        assertThat(major).isEqualTo(null);
     }
 }
