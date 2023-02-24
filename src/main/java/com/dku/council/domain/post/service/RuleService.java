@@ -14,6 +14,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ public class RuleService {
     private final UserRepository userRepository;
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
+    private final MessageSource messageSource;
 
     /**
      * 게시글 목록으로 조회
@@ -39,7 +41,7 @@ public class RuleService {
      */
     public Page<SummarizedRuleDto> list(String keyword, Pageable pageable){
         Page<Rule> page = ruleRepository.findAll(PostSpec.keywordCondition(keyword), pageable);
-        return page.map(rule -> new SummarizedRuleDto(fileUploadService.getBaseURL(), rule));
+        return page.map(rule -> new SummarizedRuleDto(messageSource, fileUploadService.getBaseURL(), rule));
     }
 
     /**
@@ -69,7 +71,7 @@ public class RuleService {
     public ResponseSingleRuleDto findOne(Long postId, String remoteAddress) {
         Rule rule = ruleRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         viewCountService.increasePostViews(rule, remoteAddress);
-        return new ResponseSingleRuleDto(fileUploadService.getBaseURL(), rule);
+        return new ResponseSingleRuleDto(messageSource, fileUploadService.getBaseURL(), rule);
     }
 
     /**

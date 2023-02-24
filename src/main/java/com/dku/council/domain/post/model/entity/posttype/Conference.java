@@ -26,6 +26,9 @@ public class Conference extends Post {
      */
     private int round;
 
+    /**
+     * 회의록 개최 일자
+     */
     private LocalDate date;
 
     @Builder
