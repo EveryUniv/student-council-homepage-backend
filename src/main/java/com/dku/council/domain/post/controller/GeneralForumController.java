@@ -65,14 +65,13 @@ public class GeneralForumController {
 
     /**
      * 게시글 삭제 For Admin & Owner
-     *
-     * @param id 삭제할 게시글 id
+     * @param auth 사용자 인증정보
+     * @param id   삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    public ResponsePostIdDto delete(Authentication auth, @PathVariable Long id) {
+    public void delete(Authentication auth, @PathVariable Long id) {
         Long userId = (Long) auth.getPrincipal();
         boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
         generalForumService.delete(id, userId, isAdmin);
-        return new ResponsePostIdDto(id);
     }
 }
