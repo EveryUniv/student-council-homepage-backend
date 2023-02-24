@@ -1,0 +1,77 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Dev_CD
+
+on:
+  push:
+    branches: [ "dev_deploy" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Make test properties
+        env:
+          PROPERTIES: ${{ secrets.PROPERTIES_TEST }}
+        run: |
+          mkdir -p ./src/test/resources && cd "$_"
+          touch ./application.yml
+          echo $PROPERTIES | base64 --decode > application.yml
+        shell: bash
+
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: build
+
+      - name: Docker build
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          REPO: ${{ secrets.DOCKER_REPO }}
+        run: |
+          docker build -t $USERNAME/$REPO:${GITHUB_SHA::7} .
+
+      - name: Docker push
+        env:
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          REPO: ${{ secrets.DOCKER_REPO }}
+        run: |
+          docker login -u $USERNAME -p $PASSWORD
+          docker push $USERNAME/$REPO:${GITHUB_SHA::7}
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@master
+        env:
+          SHA: ${GITHUB_SHA::7}
+          REPO: ${{ secrets.DOCKER_REPO }}
+          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        with:
+          host: ${{ secrets.PRIVATE_SERVER_IP }}
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_PEM_KEY }}
+          proxy_host: ${{ secrets.BASTION_IP }}
+          proxy_username: ubuntu
+          proxy_key: ${{ secrets.PUBLIC_PEM_KEY }}
+          envs: SHA,REPO,USERNAME
+          script: |
+            docker pull $USERNAME/$REPO:$SHA
+            docker tag $USERNAME/$REPO:$SHA $REPO
+            docker stop $REPO
+            docker run -d --rm --name $REPO -p 7001:8080 -v ~/application.yml:/usr/app/application.yml -e TZ=Asia/Seoul $REPO
