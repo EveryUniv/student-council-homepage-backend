@@ -28,6 +28,7 @@ public class SummarizedRuleDto {
     @Schema(description = "조회수", example = "16")
     private final int views;
 
+
     public SummarizedRuleDto(MessageSource messageSource, String baseFileUrl, Rule rule) {
         this.id = rule.getId();
         this.title = rule.getTitle();

@@ -33,7 +33,6 @@ public class RuleService {
     private final FileUploadService fileUploadService;
     private final MessageSource messageSource;
 
-
     /**
      * 게시글 목록으로 조회
      * @param keyword  검색 키워드
