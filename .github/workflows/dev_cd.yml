@@ -58,7 +58,7 @@ jobs:
           docker push $USERNAME/$REPO:${GITHUB_SHA::7}
 
       - name: SSH Remote Commands
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v0.1.4
         env:
           SHA: ${GITHUB_SHA::7}
           REPO: ${{ secrets.DOCKER_REPO }}
