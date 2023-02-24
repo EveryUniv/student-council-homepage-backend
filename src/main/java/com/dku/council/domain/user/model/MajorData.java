@@ -5,7 +5,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
 
-public enum Major {
+public enum MajorData {
     KOREAN_LITERATURE(Department.LIBERAL),
     HISTORY(Department.LIBERAL),
     PHILOSOPHY(Department.LIBERAL),
@@ -52,7 +52,7 @@ public enum Major {
 
     private final Department department;
 
-    Major(Department department) {
+    MajorData(Department department) {
         this.department = department;
     }
 
@@ -73,14 +73,14 @@ public enum Major {
      * @param major  학과 명
      * @return 매칭되는 Major.
      */
-    public static Major of(MessageSource source, String major) {
+    public static MajorData of(MessageSource source, String major) {
         major = major.replace(" ", "")
                 .replace("\t", "");
 
-        Major[] values = values();
-        for (Major majorEnum : values) {
-            if (majorEnum.getName(source).equals(major)) {
-                return majorEnum;
+        MajorData[] values = values();
+        for (MajorData majorDataEnum : values) {
+            if (majorDataEnum.getName(source).equals(major)) {
+                return majorDataEnum;
             }
         }
 
@@ -89,5 +89,14 @@ public enum Major {
 
     public boolean isEmpty() {
         return this == NO_DATA;
+    }
+
+    public boolean isSpecial() {
+        switch (this) {
+            case NO_DATA:
+            case ADMIN:
+                return true;
+        }
+        return false;
     }
 }

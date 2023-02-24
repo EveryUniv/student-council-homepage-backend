@@ -22,4 +22,8 @@ public enum UserRole {
     public static UserRole of(String name) {
         return BY_LABEL.get(name);
     }
+
+    public boolean isAdmin() {
+        return this == ADMIN;
+    }
 }

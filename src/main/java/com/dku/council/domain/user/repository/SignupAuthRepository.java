@@ -20,4 +20,13 @@ public interface SignupAuthRepository {
      * @param authName    인증 정보 이름 (구분자)
      */
     <T> Optional<T> getAuthPayload(String signupToken, String authName, Class<T> payloadClass);
+
+    /**
+     * 회원가입 토큰을 통해 저장된 인증 정보를 삭제합니다.
+     *
+     * @param signupToken 회원가입 토큰
+     * @param authName    인증 정보 이름 (구분자)
+     * @return 삭제된 경우 true, 아니면 false반환
+     */
+    boolean deleteAuthPayload(String signupToken, String authName);
 }

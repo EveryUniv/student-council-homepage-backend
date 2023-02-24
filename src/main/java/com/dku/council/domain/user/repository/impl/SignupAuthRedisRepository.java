@@ -44,6 +44,12 @@ public class SignupAuthRedisRepository implements SignupAuthRepository {
         }
     }
 
+    @Override
+    public boolean deleteAuthPayload(String signupToken, String authName) {
+        String key = makeEntryKey(signupToken, authName);
+        return redisTemplate.opsForHash().delete(RedisKeys.SIGNUP_AUTH_KEY, key) > 0;
+    }
+
     public String makeEntryKey(String signupToken, String authName) {
         return signupToken + RedisKeys.KEY_DELIMITER + authName;
     }

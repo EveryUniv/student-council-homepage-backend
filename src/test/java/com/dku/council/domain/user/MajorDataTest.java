@@ -1,6 +1,6 @@
 package com.dku.council.domain.user;
 
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MajorTest {
+class MajorDataTest {
 
     @Mock
     MessageSource messageSource;
@@ -26,7 +26,7 @@ class MajorTest {
         when(messageSource.getMessage(Mockito.startsWith("Major."), any(), any())).thenReturn("컴퓨터공학과");
 
         // when
-        String majorName = Major.COMPUTER_SCIENCE.getName(messageSource);
+        String majorName = MajorData.COMPUTER_SCIENCE.getName(messageSource);
 
         // then
         assertThat(majorName).isEqualTo("컴퓨터공학과");
@@ -46,10 +46,10 @@ class MajorTest {
 
         // when
         // 띄어쓰기나 tab 해도 모두 삭제
-        Major major = Major.of(messageSource, "  국어국 문학과 ");
+        MajorData majorData = MajorData.of(messageSource, "  국어국 문학과 ");
 
         // then
-        assertThat(major).isEqualTo(Major.KOREAN_LITERATURE);
+        assertThat(majorData).isEqualTo(MajorData.KOREAN_LITERATURE);
     }
 
     @Test
@@ -59,9 +59,9 @@ class MajorTest {
         when(messageSource.getMessage(Mockito.startsWith("Major."), any(), any())).thenReturn("모르는 학과");
 
         // when
-        Major major = Major.of(messageSource, "국어국문학과");
+        MajorData majorData = MajorData.of(messageSource, "국어국문학과");
 
         // then
-        assertThat(major).isEqualTo(null);
+        assertThat(majorData).isEqualTo(null);
     }
 }

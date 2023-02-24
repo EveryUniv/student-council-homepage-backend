@@ -1,6 +1,6 @@
 package com.dku.council.domain.user;
 
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ class DepartmentTest {
         when(messageSource.getMessage(Mockito.startsWith("Department."), any(), any())).thenReturn("SW융합대학");
 
         // when
-        String majorName = Major.COMPUTER_SCIENCE.getDepartment().getName(messageSource);
+        String majorName = MajorData.COMPUTER_SCIENCE.getDepartment().getName(messageSource);
 
         // then
         assertThat(majorName).isEqualTo("SW융합대학");

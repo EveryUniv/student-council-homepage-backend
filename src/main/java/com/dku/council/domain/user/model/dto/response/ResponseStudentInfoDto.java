@@ -1,6 +1,6 @@
 package com.dku.council.domain.user.model.dto.response;
 
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.infra.dku.model.StudentInfo;
 import lombok.Getter;
 import org.springframework.context.MessageSource;
@@ -12,10 +12,10 @@ public class ResponseStudentInfoDto {
     private final String studentId;
     private final String major;
 
-    private ResponseStudentInfoDto(MessageSource messageSource, String studentName, String studentId, Major major) {
+    private ResponseStudentInfoDto(MessageSource messageSource, String studentName, String studentId, MajorData majorData) {
         this.studentName = studentName;
         this.studentId = studentId;
-        this.major = major.getName(messageSource);
+        this.major = majorData.getName(messageSource);
     }
 
     private ResponseStudentInfoDto(String studentName, String studentId, String notRecognizedMajor) {
@@ -25,8 +25,8 @@ public class ResponseStudentInfoDto {
     }
 
     public static ResponseStudentInfoDto from(MessageSource messageSource, StudentInfo info) {
-        Major infoMajor = info.getMajor();
-        if (infoMajor == null) {
+        MajorData infoMajorData = info.getMajorData();
+        if (infoMajorData == null) {
             return new ResponseStudentInfoDto(info.getStudentName(),
                     info.getStudentId(),
                     info.getNotRecognizedMajor());
@@ -34,7 +34,7 @@ public class ResponseStudentInfoDto {
             return new ResponseStudentInfoDto(messageSource,
                     info.getStudentName(),
                     info.getStudentId(),
-                    infoMajor);
+                    infoMajorData);
         }
     }
 }

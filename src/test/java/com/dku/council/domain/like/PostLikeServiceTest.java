@@ -6,7 +6,8 @@ import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.PostRepository;
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -210,7 +211,7 @@ class PostLikeServiceTest {
                 .studentId("")
                 .password("")
                 .name("")
-                .major(Major.ADMIN)
+                .major(new Major(MajorData.ADMIN))
                 .phone("")
                 .build();
 
