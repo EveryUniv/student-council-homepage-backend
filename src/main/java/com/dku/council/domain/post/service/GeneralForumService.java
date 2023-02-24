@@ -18,6 +18,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class GeneralForumService {
     private final FileUploadService fileUploadService;
     private final CategoryRepository categoryRepository;
     private final ViewCountService viewCountService;
+    private final MessageSource messageSource;
 
     /**
      * 게시글 목록으로 조회
@@ -79,7 +81,7 @@ public class GeneralForumService {
     public ResponseSingleGeneralForumDto findOne(Long postId, String remoteAddress, Long userId) {
         GeneralForum generalForum = generalForumRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         viewCountService.increasePostViews(generalForum, remoteAddress);
-        return new ResponseSingleGeneralForumDto(fileUploadService.getBaseURL(), generalForum, userId);
+        return new ResponseSingleGeneralForumDto(messageSource, fileUploadService.getBaseURL(), generalForum, userId);
     }
 
     /**

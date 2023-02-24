@@ -4,6 +4,7 @@ import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import org.springframework.context.MessageSource;
 
 import java.util.List;
 
@@ -27,13 +28,13 @@ public class SummarizedRuleDto {
     @Schema(description = "조회수", example = "16")
     private final int views;
 
-    public SummarizedRuleDto(String baseFileUrl, Rule rule) {
+
+    public SummarizedRuleDto(MessageSource messageSource, String baseFileUrl, Rule rule) {
         this.id = rule.getId();
         this.title = rule.getTitle();
         this.createdDate = rule.getCreatedDateText();
         this.files = PostFileDto.listOf(baseFileUrl, rule.getFiles());
-        // TODO : getMajorName() 사용하기
-        this.department = "총학생회";
+        this.department = rule.getUser().getMajor().getDepartmentName(messageSource);
         this.views = rule.getViews();
     }
 }
