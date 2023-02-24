@@ -12,8 +12,9 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGeneralForum
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.GeneralForumRepository;
-import com.dku.council.domain.user.model.Major;
+import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.UserRole;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -66,29 +67,20 @@ public class GeneralForumTest {
     @DisplayName("list가 잘 동작하는가?")
     public void list() throws NoSuchFieldException, IllegalAccessException {
         // given
-        List<GeneralForum> categoryList = generateGeneralForumList("category-", "카테고리", 10);
         List<GeneralForum> generalList = generateGeneralForumList("generic-", "일반게시글", 20);
-
-        Page<GeneralForum> category = new DummyPage<>(categoryList, 10);
         Page<GeneralForum> general = new DummyPage<>(generalList, 20);
 
-        when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(category);
-        when(generalForumRepository.findAll((Pageable) any())).thenReturn(general);
+        when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(general);
         when(fileUploadService.getBaseURL()).thenReturn("http://base/");
 
-        //when
-        Page<SummarizedGeneralForumDto> categoryPage = service.list("keyword", "카테고리1", Pageable.unpaged());
+        // when
         Page<SummarizedGeneralForumDto> generalPage = service.list(null, null, Pageable.unpaged());
 
-
-        //then
-        assertThat(categoryPage.getTotalElements()).isEqualTo(categoryList.size());
-        assertSummarizedNewsDtoList(categoryPage.getContent(), categoryList);
-
+        // then
         assertThat(generalPage.getTotalElements()).isEqualTo(generalList.size());
         assertSummarizedNewsDtoList(generalPage.getContent(), generalList);
     }
-    
+
     @Test
     @DisplayName("create GeneralForum")
     public void create() throws NoSuchFieldException, IllegalAccessException {
@@ -115,7 +107,7 @@ public class GeneralForumTest {
             return true;
         }));
 
-        verify(fileUploadService).uploadFiles(argThat(fileList ->{
+        verify(fileUploadService).uploadFiles(argThat(fileList -> {
             assertThat(fileList).isEqualTo(multipartFiles);
             return true;
         }), any());
@@ -124,7 +116,7 @@ public class GeneralForumTest {
 
     @Test
     @DisplayName("생성할 때 user없으면 오류")
-    public void failedCreateByNotFoundUser(){
+    public void failedCreateByNotFoundUser() {
         //given
         when(userRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -133,6 +125,7 @@ public class GeneralForumTest {
             service.create(2L, new RequestCreateGeneralForumDto("title", "body", List.of(), 10L));
         });
     }
+
     @Test
     @DisplayName("생성할 때 category 없으면 오류")
     public void failedCreateByNotFoundCategory() throws NoSuchFieldException, IllegalAccessException {
@@ -187,12 +180,12 @@ public class GeneralForumTest {
 
     @Test
     @DisplayName("없는 게시글 단건 조회시 오류")
-    public void failedFindOneByNotFound(){
+    public void failedFindOneByNotFound() {
         //given
         when(generalForumRepository.findById(any())).thenReturn(Optional.empty());
 
         //when&then
-        assertThrows(PostNotFoundException.class, () ->{
+        assertThrows(PostNotFoundException.class, () -> {
             service.findOne(1L, "", 2L);
         });
     }
@@ -249,14 +242,12 @@ public class GeneralForumTest {
     }
 
 
-
-
     private User generateUser(Long userId) throws NoSuchFieldException, IllegalAccessException {
         User build = User.builder()
-                .classId("11111111")
+                .studentId("11111111")
                 .password("pwd")
                 .name("name")
-                .major(Major.ADMIN)
+                .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")
                 .role(UserRole.USER)
                 .build();
@@ -268,10 +259,10 @@ public class GeneralForumTest {
 
     private User generateAdmin(Long userId) throws NoSuchFieldException, IllegalAccessException {
         User build = User.builder()
-                .classId("11111111")
+                .studentId("11111111")
                 .password("pwd")
                 .name("name")
-                .major(Major.ADMIN)
+                .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")
                 .role(UserRole.ADMIN)
                 .build();
