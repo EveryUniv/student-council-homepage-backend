@@ -58,21 +58,17 @@ jobs:
           docker push $USERNAME/$REPO:${GITHUB_SHA::7}
 
       - name: SSH Remote Commands
-        uses: appleboy/ssh-action@v0.1.4
-        env:
-          SHA: ${GITHUB_SHA::7}
-          REPO: ${{ secrets.DOCKER_REPO }}
-          USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.PRIVATE_SERVER_IP }}
           username: ubuntu
           key: ${{ secrets.PRIVATE_PEM_KEY }}
-          proxy_host: ${{ secrets.BASTION_IP }}
+          proxy_host: ${{ secrets.BASTION_IP }} 
           proxy_username: ubuntu
           proxy_key: ${{ secrets.PUBLIC_PEM_KEY }}
-          envs: SHA,REPO,USERNAME
+          envs: GITHUB_SHA
           script: |
-            docker pull $USERNAME/$REPO:$SHA
-            docker tag $USERNAME/$REPO:$SHA $REPO
-            docker stop $REPO
-            docker run -d --rm --name $REPO -p 7001:8080 -v ~/application.yml:/usr/app/application.yml -e TZ=Asia/Seoul $REPO
+            docker pull ${{ secrets.USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7}
+            docker tag ${{ secrets.USERNAME }}/${{ secrets.DOCKER_REPO }}:${GITHUB_SHA::7} ${{ secrets.DOCKER_REPO }}
+            docker stop ${{ secrets.DOCKER_REPO }}
+            docker run -d --rm --name ${{ secrets.DOCKER_REPO }} -p 7001:8080 -e TZ=Asia/Seoul ${{ secrets.DOCKER_REPO }}
