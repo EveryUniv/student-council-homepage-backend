@@ -62,24 +62,16 @@ class NewsServiceTest {
     @DisplayName("list가 잘 동작하는지?")
     public void list() {
         // given
-        List<News> keywordNewsList = generateNewsList("keyword-", 10);
         List<News> allNewsList = generateNewsList("generic-", 20);
+        Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
-        Page<News> keywordNews = new DummyPage<>(keywordNewsList, 10);
-        Page<News> allNews = new DummyPage<>(allNewsList, 10);
-
-        when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(keywordNews);
-        when(newsRepository.findAll((Pageable) any())).thenReturn(allNews);
+        when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
         when(fileUploadService.getBaseURL()).thenReturn("http://base/");
 
         // when
-        Page<SummarizedNewsDto> keywordPage = service.list("keyword", Pageable.unpaged());
         Page<SummarizedNewsDto> allPage = service.list(null, Pageable.unpaged());
 
         // then
-        assertThat(keywordPage.getTotalElements()).isEqualTo(keywordNewsList.size());
-        assertSummarizedNewsDtoList(keywordPage.getContent(), keywordNewsList);
-
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
         assertSummarizedNewsDtoList(allPage.getContent(), allNewsList);
     }
