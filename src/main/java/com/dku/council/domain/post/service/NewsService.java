@@ -78,8 +78,7 @@ public class NewsService {
     }
 
     /**
-     * 게시글 삭제
-     *
+     * 게시글 삭제 (ONLY FOR ADMIN)
      * @param postId 삭제할 게시글 id
      */
     @Transactional
