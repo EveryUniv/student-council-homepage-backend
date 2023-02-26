@@ -31,7 +31,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (LocalizedMessageException ex) {
             writeErrorResponse(response, request.getLocale(), ex);
         } catch (Exception ex) {
-            writeUnexpectedErrorResponse(response, ex);
+            writeUnexpectedErrorResponse(response, request.getLocale(), ex);
         }
     }
 
@@ -41,8 +41,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         writeResponse(response, dto, ex.getStatus().value());
     }
 
-    private void writeUnexpectedErrorResponse(HttpServletResponse response, Exception ex) throws IOException {
-        ErrorResponseDto dto = new ErrorResponseDto(ex);
+    private void writeUnexpectedErrorResponse(HttpServletResponse response, Locale locale, Exception ex) throws IOException {
+        ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, LocalizedMessageException.of(ex));
         log.error("Unexpected exception has occurred in filter: [id={}]", dto.getTrackingId(), ex);
         writeResponse(response, dto, 500);
     }

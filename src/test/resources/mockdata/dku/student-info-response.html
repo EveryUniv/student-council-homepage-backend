@@ -1,0 +1,1720 @@
+<!doctype html>
+<html>
+<head>
+    <base href="https://webinfo.dankook.ac.kr:443/tiac/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- crosseditor를 사용하기 위해서는 아래 meta 태크 삽입 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>기본학적(신상정보변경)-웹정보</title>
+    <link rel="shortcut icon" type="image/x-icon" href="images/layout/favicon.ICO" />
+    <link href="css/widgets/jquery-ui.min.css" rel="stylesheet">
+
+    <link href="css/chosen/chosen.css" rel="stylesheet">
+    <link href="css/style.css?1" rel="stylesheet">
+    <link href="css/tablesorter/tablesorter.css" rel="stylesheet">
+
+    <!-- 구글 Analytics -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-68894441-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+
+    <!-- jquery-->
+    <script src="js/jquery/jquery-1.11.1.min.js" ></script>
+
+    <script src="js/browser/jquery.browser.min.js"></script>
+
+    <!-- placeholder-->
+    <script src="js/placeholder/jquery.placeholder.min.js" ></script>
+
+    <!-- jquery-ui script & datepicker i18n -->
+    <script src="js/widgets/jquery-ui.min.js" ></script>
+    <script src="js/widgets/i18n/jquery.ui.datepicker-ko.js"></script>
+
+    <!-- jquery-validation script & i18n -->
+    <script src="js/validate/jquery.validate.min.js"></script>
+    <script src="js/validate/i18n/messages_ko.js"></script>
+
+    <!-- mask -->
+    <script src="js/mask/jquery.inputmask.bundle.min.js"></script>
+
+    <!-- chosen -->
+    <script src="js/chosen/chosen.jquery.js"></script>
+
+    <!-- tablesorter -->
+    <script src="js/tablesorter/jquery.tablesorter.js"></script>
+
+    <!-- rexpert -->
+    <script src="js/rexpert/rexpert.min.js"></script>
+    <script src="js/rexpert/rexpert.properties.js"></script>
+
+    <script src="js/storageapi/jquery.storageapi.min.js"></script>
+    <script src="js/cookie/jquery.cookie.js"></script>
+    <script src="js/highlight/jquery.highlight.min.js"></script>
+
+    <!-- commons -->
+    <script src="js/hashmap.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/common-popup.js"></script>
+    <script src="js/validation.js"></script>
+    <script src="js/mask.js"></script>
+    <script src="js/layout.js"></script>
+    <script src="js/menu.js"></script>
+
+    <script type="text/javascript">
+
+
+        setLocal("", "/tiac");
+
+
+        setPermission(true, true, true, false, false);
+
+
+        setPageAttribute("WUNIV", "WSREC", "3893", "10", true);
+
+
+        var backgroundClasses = ["ico_engin", "ico_pofol"];
+        $(document).ready(function() {
+            setRptServiceUrl("production");
+            renderContextMenu("","");
+
+            // 사용자 목록
+            var changeUsers = $.sessionStorage.get( "changeUsers" );
+            if ( changeUsers ) {
+                renderChangeUsers( changeUsers );
+            } else {
+                $.getJSON( "findWebMultiIndentList.do" ,function ( data ) {
+                    $.sessionStorage.set( "changeUsers" ,data );
+                    renderChangeUsers( data );
+                } );
+            }
+
+            $( "#lang" ).val( "ko" ).attr( "selected" ,"selected" );
+            $( "#lang" ).change( function () {
+                if ( this.value != "" ) {
+                    $.sessionStorage.removeAll();
+                    $( "#localeChange" ).submit();
+                }
+            } );
+        });
+
+        function renderChangeUsers ( data ) {
+            var $changeUsers = $( "#changeUsers" );
+            if ( data.multiIndentList.length > 0 ) {
+                $.each( data.multiIndentList ,function ( index ,user ) {
+                    if ( user.authTy == "M" ) {
+                        $changeUsers.append( $( "<option>" ,{
+                            value : user.intgUid ,
+                            text : user.userTyNm + "-" + user.intgUid
+                        } ) );
+                    } else {
+                        // 이양받은 권한
+                        $changeUsers.append( $( "<option value='" + user.intgUid + "' data-orgid='" + user.orgid + "'>" + user.userTyNm + "</option>" ) );
+                    }
+                } );
+                $changeUsers.change( function ( event ) {
+                    // 이양받은 권한에서 이양받은 권한으로 변환 방지.
+                    var orgid = $( this ).find( ':selected' ).data( 'orgid' );
+                    if ( "false" == "true" && orgid ) {
+                        alert( "이양받은 권한에서 이양받은 권한으로 변경할수 없습니다." );
+                        $changeUsers.selected( "32220000" );
+                        return false;
+                    }
+                    if ( confirm( "[" + this.value + "] 아이디로 로그인 하시겠습니까?" ) ) {
+                        $( "#orgid" ).val( $( this ).find( ':selected' ).data( 'orgid' ) );
+                        $( this ).parents( "form" ).submit();
+                    }
+                } );
+            } else {
+                // 홍길동(부서-교직원번호/학번)
+                // 신분-학번
+                $changeUsers.append( $( "<option>" ,{
+                    value : "32220000" ,
+                    text : "학부-재학생" + "-" + "32220000"
+                } ) );
+            }
+            $changeUsers.selected( "32220000" );
+        }
+    </script>
+</head>
+<!-- 마우스 우클릭 방지 oncontextmenu="return false" -->
+<body id="body">
+<!-- wrap -->
+<div id="wrap">
+    <!-- header -->
+    <div id="header">
+        <div class="top_sec">
+            <h1 class="">
+                <a href="main.do" data-context="ticm"><img src="images/layout/top_logo.png" alt="DKU Web Information System" /></a>
+            </h1>
+            <a href="https://portal.dankook.ac.kr" class="btn_portal">portal 바로가기</a>
+            <div class="util_box">
+                <form method="post" action="comm/syst/accm/changeUser.do">
+                    <!-- my_name -->
+                    <div class="my_name">
+                        <p>학생명(사회과학대학 정치외교학과-32220000)</p>
+                        <span class="my_count" style="display:none"></span>
+                    </div>
+                    <!-- //my_name -->
+                    <!-- 학과 -->
+                    <div class="study_select">
+                        <select id="changeUsers" name="changeId" title="조직" class="chosen-select-no-single">
+                        </select>
+                        <input type="hidden" id="orgid" name="orgid">
+                    </div>
+                    <!-- //학과 -->
+                    <a href="/j_security_logout" class="btn_logout"><span class="blind">로그아웃</span></a>
+                </form>
+            </div>
+        </div>
+
+        <div class="nav_wrap">
+            <h2 class="nav_tit"><img src="images/layout/nav_tit.png" alt="단국대학교 웹정보시스템" /></h2>
+            <!-- 메인메뉴 -->
+            <ul class="nav"></ul>
+            <!-- //메인메뉴 -->
+            <!-- 다국어 선택 -->
+            <form id="localeChange" method="post">
+                <div class="language_select">
+                    <select id="lang" name="lang" title="다국어선택">
+                        <option value="ko">한글</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </form>
+            <!-- //다국어 선택 -->
+        </div>
+    </div>
+    <!-- //header -->
+
+    <!-- contents -->
+    <div id="contents">
+        <!-- 사이드메뉴 폴더 -->
+        <div class="btn_fold"><a href="#"><span class="blind">사이드메뉴 보기</span></a></div>
+        <!-- //사이드메뉴 폴더 -->
+        <!-- aside -->
+        <div class="aside">
+            <div class="snb">
+                <h2 class="aside_tit"></h2>
+                <ul class="sub_nav"></ul>
+            </div>
+        </div>
+        <!-- //aside -->
+
+        <!-- cont -->
+        <div class="cont">
+
+
+
+
+
+            <!-- 필드입력 미입력안내 -->
+            <div id="_error_" class="section_required " style="display: none">
+                <h3 class="blind">해당 항목을 입력해주세요.</h3>
+                <ul id="errorContainer" class="lst_square">
+
+                </ul>
+            </div>
+            <!-- //필수입력 미기재 -->
+
+            <!-- 타이틀 -->
+            <div id="titleSection" class="section_top_tit" style="display:none;">
+                <!-- 현재위치 -->
+                <ul class="gps">
+                    <li class="home">
+                        <span class="blind">home</span>
+                    </li>
+                </ul>
+                <!-- //현재위치 -->
+                <h3 id="title" class="tit_now"></h3>
+            </div>
+
+
+
+
+
+
+
+
+
+
+            <script type="text/javascript">
+
+                /**
+                 * 첨부파일 이벤트 처리
+                 */
+                function setFileBtn(add){
+                    if (add){
+                        $("#addFile").unbind('click', false);
+                        $(".fake_photo").unbind('click', false);
+                    }else{
+                        $("#addFile").bind('click', false);
+                        $(".fake_photo").bind('click', false);
+                    }
+                }
+
+                //전화번호 자동 하이픈 입력
+                function autoHypenPhone(str){
+                    str = str.replace(/[^0-9]/g, '');
+                    var tmp = '';
+                    if( str.length < 4){
+                        return str;
+                    }else if(str.length < 7){
+                        tmp += str.substr(0, 3);
+                        tmp += '-';
+                        tmp += str.substr(3);
+                        return tmp;
+                    }else if(str.length < 11){
+                        tmp += str.substr(0, 3);
+                        tmp += '-';
+                        tmp += str.substr(3, 3);
+                        tmp += '-';
+                        tmp += str.substr(6);
+                        return tmp;
+                    }else{
+                        tmp += str.substr(0, 3);
+                        tmp += '-';
+                        tmp += str.substr(3, 4);
+                        tmp += '-';
+                        tmp += str.substr(7);
+                        return tmp;
+                    }
+                    return str;
+                }
+
+                $(document).ready(function() {
+                    $("#bday").mask("date");
+                    $("#regsDt").mask("date");
+                    $("#scregModDt").mask("date");
+                    $("#etrsDt").mask("date");
+
+
+
+                    var success = "0";
+
+                    if(success == "1") {
+                        alert("저장되었습니다.");
+                    }
+
+
+                    if(   "0001" == "0002"
+                        || "0001" == "0003"
+                        || "0001" == "0004"){
+                        $("#infoForm1").hide();
+                    } else {
+                        $("#infoForm2").hide();
+                    }
+
+
+                    //2015.03.21 신상정보변경신청 부분 hidden  처리, 오픈이후 작업
+                    $("#stdtPiChgAplDsc").hide();
+
+
+
+                    //첨부파일버튼 이벤트처리
+                    setFileBtn(false);
+                    //파일첨부 설정
+                    var url="";
+                    if (""){
+                        url = "comm/syst/file/download.do?fileSeq="+""+"&fileCdval="+"";
+                        $("#fileSeq").val("");
+                        $("#attachFileFileSeq").val("");
+                        $("#attachFileFileCdval").val("");
+                        $("#stdtPiChgAplDsc #fileNm").val("");
+                        $("#downFile").attr("href",url);
+                        $("#attachFileFileCdval").enable(true);
+                        $("#stdtPiChgAplDsc #fileNm").enable(false);
+                    }
+                    //파일첨부 설정 종료
+
+                    // 다운로드버튼 클릭시 파일이 없으면 리턴시켜줌.
+                    $("#downFile").click(function (e) {
+                        if( $("#stdtPiChgAplDsc #attachFileFileCdval").val()=='' || $("#stdtPiChgAplDsc #attachFileFileCdval").val()==null||$("#stdtPiChgAplDsc #attachFileFileCdval").val()==""){
+                            alert("다운로드 가능 파일이 없습니다.");
+                            return false;
+                        }else {
+                            $("#fileSeq").val("");
+                            $("#attachFileFileSeq").val("");
+                            $("#attachFileFileCdval").val("");
+                        }
+                    });
+
+
+
+                    //변경신청 버튼 disable
+                    $("#applyBtn").enable(false);
+                    $("#stuInfoBottom").validate({
+                        submitHandler: function(form) {
+                            if(!confirm("저장 하시겠습니까?")) {
+                                return false;
+                            } else {
+                                $(form).unmask();
+
+                                /* 계좌수정시 유효성 체크 */
+                                /*
+                                if($("#bankCd").val() != "" && $("#ban").val() != "")  {
+                                    var ret = checkBankValid($("#bankCd").val(),$("#ban").val());  // 계좌 유효성 체크 함수, 받는  값으로 success, message이 있다.
+                                    if (ret.success) {
+
+                                        if($("#depstNm").val() != ret.message) {
+                                            alert("입력하신 예금주명과 일치하지 않습니다. 다시 확인하여 주십시오.");
+                                            return false;
+                                        }
+
+                                        $("#depstNm").val(ret.message);
+                                        $("#baAcredYn").val("1");        //계좌인증여부
+
+                                    }else{
+                                        $("#baAcredYn").val("0");
+                                        return false;
+                                    }
+                                } else if($("#bankCd").val() != $("#preBankCd").val() || $("#preBan").val() != $("#ban").val()) {
+                                    alert("계좌정보가 변경되었거나, 올바르지 않습니다. '계좌 확인' 후 저장하십시오.");
+                                    return false;
+                                }  else
+                                */
+
+                                // 계좌정보 null check
+                                //if(($("#bankCd").val() != "" && $("#ban").val() == "") || ($("#bankCd").val() == "" && $("#ban").val() != "" )||$("#depstNm").val() == "") {
+                                //  alert("계좌검증에 필요한 계좌정보가 없습니다.");
+                                //$("#ban").focus();
+                                //return false;
+                                //}
+
+                                // 계좌 확인 여부 체크
+                                //if(($("#bankCd").val() != "" && $("#ban").val() != "") && $("#baAcredYn").val() != "1") {
+                                //	   alert("계좌검증확인이 되지 않았습니다 '계좌 확인' 후 저장하십시오.");
+                                //      $("#ban").focus();
+                                //    return false;
+                                // }
+
+
+                                // 계좌 확인 여부 체크
+                                if($("#bankCd").val() == "005" ) {
+                                    alert("외환은행은 KEB하나은행으로 변경하여 저장하십시오.");
+                                    $("#ban").focus();
+                                    return false;
+                                }
+
+
+
+                                form.submit();
+
+                            }
+                        }
+                    });
+
+                    $("#stdtPiChgAplDsc").validate({
+                        submitHandler: function(form) {
+                            if(!confirm("변경신청 하시겠습니까?")) {
+                                return false;
+                            } else {
+                                $(form).unmask();
+                                form.submit();
+                            }
+
+                        }
+                    });
+
+
+                    //2015.03.27  전화번호 입력
+                    /****** Start ******/
+                    $("#protrTelno").keyup(function(event) {
+                        event = event || window.event;
+                        var _val = this.value.trim();
+                        //this.value = autoHypenPhone(_val) ;
+                    });
+
+                    $("#wkplTelno").keyup(function(event) {
+                        event = event || window.event;
+                        var _val = this.value.trim();
+                        //this.value = autoHypenPhone(_val) ;
+                    });
+
+                    $("#telno").keyup(function(event) {
+                        event = event || window.event;
+                        var _val = this.value.trim();
+                        //this.value = autoHypenPhone(_val) ;
+                    });
+
+                    $("#mpTelno").keyup(function(event) {
+                        event = event || window.event;
+                        var _val = this.value.trim();
+                        //this.value = autoHypenPhone(_val) ;
+                    });
+                    /******* End ********/
+
+
+                    //if($("#stdtPiChgAplDsc #stdtPiChgAplDscLength").val() > 0){
+                    //	  $("#applyBtn").enable(true);
+                    //}
+                    // 신규버튼 클릭시 form을 초기화 하고 status를 신규(2)로 넣어준다.
+                    $("#newBtn").click(function (e) {
+                        $("#stdtPiChgAplDsc #nm").val($("#stuInfotop #nm").val()); // 성명을 현재 학적의 이름으로 설정
+                        $("#stdtPiChgAplDsc #resno").val($("#stuInfotop #resnoUncov").val());//주민등록 번호를 현재 학적의 주민등록 번호로 설정
+                        $("#stdtPiChgAplDsc #rsdtRegsZipcd").val($("#stuInfotop #zipcd").val()); //주민등록주소의 우편번호를 현재 학적의 우편번호로 설정
+                        $("#stdtPiChgAplDsc #rsdtRegsAddr").val($("#stuInfotop #addr").val()); //주민등록주소의 주소를 현재 학적의 주소로 설정
+                        $("#stdtPiChgAplDsc #rsdtRegsDetAddr").val($("#stuInfotop #detAddr").val()); //주민등록주소의 상세주소를 현재 학적의 상세주소로 설정
+                        $("#stdtPiChgAplDsc #aplStaCdNm").val("0001");//신청상태 '작성'설정
+                        $("#stdtPiChgAplDsc #aplStaCdNm").val("작성");//신청상태 '작성'설정
+                        $("#stdtPiChgAplDsc #aplStaCdNm").enalbe=false;
+                        $("#stdtPiChgAplDsc #aplDt").val($("#stdtPiChgAplDsc #today").val());//신청일자 '오늘'설정
+                        //증빙첨부 초기화  #stdtPiChgAplDsc #attachFileFileCdval
+                        $("#stdtPiChgAplDsc #attachFileFileSeq").val("");
+                        $("#stdtPiChgAplDsc #attachFileFileCdval").val("");
+                        $("#stdtPiChgAplDsc #fileSeq").val("");
+                        $("#stdtPiChgAplDsc #fileNm").val("");
+                        $("#stdtPiChgAplDsc #rclRsn").val("");//반려사유 초기화 설정
+                        //변경신청 버튼 ehable
+                        $("#applyBtn").enable(true);
+                        //첨부파일 버튼제어
+                        setFileBtn(true);
+                    });
+
+//변경 신청 버튼 클릭시 신상변경 신청 테이블에 인서트 해준다.
+                    $("#applyBtn").click(function (e) {
+                        //유효성 체크
+                        var $stdtPiChgAplDsc = $(this).parents("form");
+                        $stdtPiChgAplDsc.find("[name$=nm]").addRules({
+                            required: true,
+                            messages: {
+                                required: "한글 성명을 입력하세요."
+                            }
+                        }),
+                            $stdtPiChgAplDsc.find("[name$=resno]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "주민등록 번호를 입력하세요."
+                                }
+                            }),
+                            $stdtPiChgAplDsc.find("[name$=zipcd]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "주민등록지 주소를 입력하세요."
+                                }
+                            }),
+                            $stdtPiChgAplDsc.find("[name$=rsdtRegsDetAddr]").addRules({
+                                required: true,
+                                maxlength: 60,
+                                messages: {
+                                    required: "주민등록지 상세주소를 입력하세요",
+                                    maxlength:   "주민등록지 상세주소는 60자 이내로 입력하세요."
+                                }
+                            });
+                        //신청전 적용값
+                        $("#stdtPiChgAplDsc #status").val("2");// status insert설정
+                        $("#stdtPiChgAplDsc #aplStaCd").val("0002");//신청상태 '작성'설정
+                        $("#stdtPiChgAplDsc #aplStaCdNm").val("신청");//신청상태 '작성'설정
+                        $("#stdtPiChgAplDsc #aplDt").val($("#stdtPiChgAplDsc #today").val());//신청일자 '오늘'설정
+                    });
+
+                    //저장 버튼 클릭시 신상접보를 업데이트 해준다.
+                    $("#saveBtn").click(function (e) {
+
+                        var $stuInfoBottom = $(this).parents("form");
+                        $stuInfoBottom.find("[name$=zipcd]").addRules({
+                            required: true,
+                            messages: {
+                                required: "현거주지 주소를 입력하세요."
+                            }
+                        }),
+                            // 현거주지 상세주소 특수문자 방지 추가
+                            $stuInfoBottom.find("[name$=detAddr]").addRules({
+                                required: true,
+                                maxlength: 60,
+                                addrdet: true,
+                                messages: {
+                                    required: "현거주지 상세주소를 입력하세요",
+                                    maxlength: "현거주지 상세주소는 60자 이내로 입력하세요.",
+                                    addrdet: "현거주지 상세주소는 특수문자를 입력할 수 없습니다."
+                                }
+                            }),
+                            // 2020.07.21 kim.ki.joo, 휴대전화 앞자리 형식 추가
+                            $stuInfoBottom.find("[name$=mpAraNb]").addRules({
+                                required: true,
+                                mblnum: true,
+                                messages: {
+                                    required: "휴대폰 앞자리 번호를 입력하세요.",
+                                    mblnum: "휴대폰 앞자리 번호형식(010-0000-0000)으로 입력하세요."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=mpPrfx]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "휴대폰 중간자리 번호를 입력하세요.",
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=mpJnpsNb]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "휴대폰 끝자리 번호를 입력하세요.",
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=wkplDetAddr]").addRules({
+                                maxlength: 60,
+                                messages: {
+                                    maxlength: "직장 상세주소는 60자 이내로 입력하세요."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=protrNm]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "긴급연락처 성명을 입력하세요."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=protrAraNb]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "긴급연락처 휴대폰 앞자리 번호를 입력하세요."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=protrPrfx]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "긴급연락처 휴대폰 중간자리 번호를 입력하세요."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=protrJnpsNb]").addRules({
+                                required: true,
+                                messages: {
+                                    required: "긴급연락처 휴대폰 끝자리 번호를 입력하세요."
+                                }
+                            }),	// 2020.07.21 kim.ki.joo, 이메일형식 validation 추가
+                            $stuInfoBottom.find("[name$=eml]").addRules({
+                                email: true,
+                                messages: {
+                                    email: "잘못된 이메일 형식입니다."
+                                }
+                            }),
+                            $stuInfoBottom.find("[name$=eml]").addRules({
+                                email: true,
+                                messages: {
+                                    email: "잘못된 이메일 형식입니다."
+                                }
+                            });
+                        /* 계좌수정시 유효성 체크 */
+                        /*
+                        if($("#bankCd").val() != $("#preBankCd").val() || $("#preBan").val() != $("#ban").val()){
+                            if($("#baAcredYn").val()=="0"){
+                                alert("계좌정보가 변경되었거나, 올바르지 않습니다. 유효성 체크 후 저장하십시오.");
+                                return false;
+                            }
+                        }*/
+
+
+
+                        //   if($("#bankCd").val() =="외환은행" ){
+                        //
+                        //           alert("계좌정보가 변경되었거나, 올바르지 않습니다. 유효성 체크 후 저장하십시오.");
+                        //          return false;
+
+                        //  }
+
+
+                        //  if($("#bankCd").val() =="005" ){
+
+                        //     alert("계좌정보가ㅇㅇ 변경되었거나, 올바르지 않습니다. 유효성 체크 후 저장하십시오.");
+                        //    return false;
+
+                        // }
+
+
+                    });
+
+                    /* 계좌유효성체크 */
+                    $("#checkBankValidBtn").click(function (e) {
+                        if($("#ban").val() == "undefined" || $.trim($("#ban").val()).length == 0) {
+                            alert("계좌검증에 필요한 계좌번호정보가 없습니다.");
+                            $("#ban").focus();
+                            return false;
+                        }
+
+                        var ret = checkBankValid($("#bankCd").val(),$("#ban").val());
+
+                        if (ret.success) {
+                            $("#depstNm").val(ret.message);
+                            $("#baAcredYn").val("1");        //계좌인증여부
+                            alert("계좌 인증 처리되었습니다.");
+                        }else{
+                            $("#baAcredYn").val("0");
+                        }
+
+                    });
+
+                    /* 계좌번경시 인증여부 - 비인증 처리*/
+                    $("input[name=ban]").change(function() {
+                        $("#baAcredYn").val("0");
+                    });
+                    $("select[name=bankCd]").change(function() {
+                        $("#baAcredYn").val("0");
+                    });
+
+// 2020.07.21 kim.ki.joo, 휴대전화번호 010~ validation 추가
+                    $.validator.addMethod("mblnum", function (mblnum, element) {
+                        var pattern = /^[0]{1}[1]{1}[0]{1}$/;
+                        if(!pattern.test(mblnum)){
+                            return this.optional(element)||false;
+                        }
+                        return true;
+                    });
+// 2020.07.21 kim.ki.joo, 현거주지 상세주소 특수문자 방지 추가
+                    $.validator.addMethod("addrdet", function (addrdet, element) {
+                        var pattern = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
+                        if(pattern.test(addrdet)){
+                            return this.optional(element)||false;
+                        }
+                        return true;
+                    });
+
+                });
+
+            </script>
+
+            <form name="stuInfotop" id="stuInfotop" method="post" enctype="multipart/form-data" class="form-inline">
+                <div class="section_tbl"><!-- 여백을 주기위한 클래스 -->
+                    <div class="section_mid_tit">
+                        <h4 class="tit_mid f_l">기본정보</h4>
+                    </div>
+                    <!-- 개인정보 -->
+                    <div class="section_tbl section_profile">
+                        <div class="group_photo" >
+
+
+
+                            <!-- //Fake File Area -->
+                        </div>
+                        <div class="group_profile">
+                            <div class="tbl_row">
+                                <table>
+                                    <caption>기본정보</caption>
+                                    <colgroup>
+                                        <col style="width: 10%;" />
+                                        <col style="width: 11%;" />
+                                        <col style="width: 10%;" />
+                                        <col style="width: 10%;" />
+                                        <col style="width: 9%;" />
+                                        <col style="width: 10%;" />
+                                        <col style="width: 9%;" />
+                                        <col style="width: 12%;" />
+                                        <col style="width: 10%;" />
+                                        <col style="width: 9%;" />
+                                    </colgroup>
+                                    <tbody>
+
+                                    <tr>
+                                        <th scope="row" width="60px;">학번</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="stuid" id="stuid" value="32220000" disabled >
+                                                <!--
+                                                <input type="hidden" name="zipcd" id="zipcd" value="17037" disabled>
+                                                <input type="hidden" name="detAddr" id="detAddr" value="" disabled>
+                                                 -->
+                                                <input type="hidden" name="dsbtTyCd " id="dszbtTyCd" value="" disabled>
+                                                <input type="hidden" name="dsbtRatCd" id="dsbtRatCd" value="" disabled>
+                                            </div>
+                                        </td>
+                                        <th scope="row" width="55px;">학적상태</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="scregStaNm" id="scregStaNm" value="재학" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row" width="55px;">최종학적<br/>변동</th>
+                                        <td colspan="3">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="scregModStaNm" id="scregModStaNm" value="재학" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row" width="90px;">입학년도</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="etrsYy" id="etrsYy" value="2022" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">성명(한글)</th>
+                                        <td colspan="">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="nm" id="nm" value="학생명" disabled>
+                                            </div>
+                                        </td>
+                                        <th scope="row">주야</th>
+                                        <td colspan="">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="dnnCd" id="dnnCd" value="주간" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">소속</th>
+                                        <td colspan="3">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="pstnOrgzNm" id="pstnOrgzNm" value="사회과학대학 정치외교학과" disabled>
+                                            </div>
+                                        </td>
+                                        <th scope="row">입학구분</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="etrsTyNm" id="etrsTyNm" value="신입학" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">성명(영문)</th>
+                                        <td colspan="3">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="egnm" id="egnm" value="My Student" disabled>
+                                            </div>
+                                        </td>
+                                        <th scope="row">학위과정</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="dgreCrsNm" id="dgreCrsNm" value="학사" disabled >
+                                            </div>
+                                        </td>
+                                        <th scope="row" width="15px;">학년(기)</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="schgr" id="schgr" value="4" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row" style="width: 65px;">학기</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="semNm" id="semNm" value="2학기" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">성명(한자)</th>
+                                        <td colspan="3">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="chnm" id="formchnm" value="學生" disabled>
+                                            </div>
+                                        </td>
+                                        <th scope="row">국적</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="cntyNm" id="cntyNm" value="대한민국" disabled >
+                                            </div>
+                                        </td>
+                                        <th scope="row">공학인증</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="abeekYnNm" id="abeekYnNm" value="미인증" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">이수학기</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="complSemCnt" id="complSemCnt" value="8" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">주민번호</th>
+                                        <td colspan="3">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="resno" id="resno" value="040101-1111111" disabled>
+                                                <input type="hidden" name="resnoUncov" id="resnoUncov" value="040101-1111111" readonly>
+                                            </div>
+                                        </td>
+                                        <th scope="row">성별</th>
+                                        <td >
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="sexNm" id="sexNm" value="남자" disabled >
+                                            </div>
+                                        </td >
+                                        <th scope="row">생년월일</th>
+                                        <td colspan="">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="bday" id="bday" value="20040101" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">특기<br>유형/종목</th>
+                                        <td colspan="">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="spltyEvntNm" id="spltyEvntNm" value="/" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">등록구분</th>
+                                        <td colspan="">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="regsStaCdNm" id="regsStaCdNm" value="완납" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">등록횟수</th>
+                                        <td >
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="regsSemCnt" id="regsSemCnt" value="8" disabled style="text-align:center;" style="text-align:center;">
+                                            </div>
+                                        </td >
+                                        <th scope="row">등록일자</th>
+                                        <td colspan="2">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="regsDt" id="regsDt" value="20220822" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">학적변동일자</th>
+                                        <td colspan="2">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="scregModDt" id="scregModDt" value="20230215" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">토픽</th>
+                                        <td>
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="topikGdNm" id="topikGdNm" value="" disabled style="text-align:center;">
+                                            </div>
+                                        </td>
+                                        <th scope="row">특기유형</th>
+                                        <td >
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="spltyEvntCdNm" id="spltyEvntCdNm" value="" disabled style="text-align:center;">
+                                            </div>
+                                        </td >
+                                        <th scope="row">특기구분</th>
+                                        <td colspan="2">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" id="spltyTyCdNm" name="spltyTyCdNm" value="" disabled style="text-align:center;" />
+                                            </div>
+                                        </td>
+                                        <th scope="row">특기급수</th>
+                                        <td colspan="2">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" id="spltyRatCdNm" name="spltyRatCdNm" value="" disabled style="text-align:center;"/>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">입학일자</th>
+                                        <td >
+                                            <div class="form_text form_readonly">
+                                                <input type="text" id="etrsDt" name="etrsDt" value="20220301" disabled style="text-align:center;"/>
+                                            </div>
+                                        </td>
+                                        <th scope="row">학위등록<br>번호</th>
+                                        <td colspan="2">
+                                            <div class="form_text form_readonly">
+                                                <input type="text" name="dgreRegsNb" id="dgreRegsNb" value="" disabled style="text-align:left;">
+                                            </div>
+                                        </td>
+                                        <td colspan="6">
+                                            <input type="text"  name="dgreRegs" id="dgreRegs" value="" disabled style="text-align:left;color:red;border:2;font-weight:bold;" >
+                                        </td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- 가로테이블 -->
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <form name="stdtPiChgAplDsc" id="stdtPiChgAplDsc" method="post" enctype="multipart/form-data" action="univ/srec/srlm/saveStdtPiChgAplDscWeb.do" class="form-inline">
+                <div class="section_tbl"><!-- 여백을 주기위한 클래스 -->
+                    <div class="section_mid_tit">
+                        <h4 class="tit_mid f_l">신상정보 변경신청</h4>
+                        <h1 class="f_l">&nbsp(증빙서류가 필요한경우: 신청 후 승인되면 최종 변경됩니다./사진만 변경 한 경우 증빙서류 불필요)</h1>
+                    </div>
+                    <!-- 신상정보 -->
+                    <div class="group_profile">
+                        <div class="tbl_row">
+                            <table>
+                                <caption>신상정보 변경신청</caption>
+                                <colgroup>
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                    <col style="width: 12%;" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th scope="row" >성명(한글)</th>
+                                    <td colspan="">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="nm" id="nm" maxlength="60" value="" >
+                                            <input type="hidden" name="today" id="today" value="" >
+                                            <input type="hidden" name="stuid" id="stuidApl" value="32220000" >
+                                            <input type="hidden" id="stdtPiChgAplDscLength" value="1" >
+                                            <input type="hidden" name="aplStaCd" id="aplStaCd" >
+                                            <input type="hidden" name="aplDt" id="aplDt" >
+                                            <input type="hidden" name="status" id="status" >
+                                        </div>
+                                    </td>
+                                    <th scope="row" >주민번호</th>
+                                    <td colspan="" >
+                                        <div class="form_text form_required">
+                                            <input type="text" name="resno" id="resno" value="" maxlength="14" placeholder="123456-1234567 형태로 입력">
+                                        </div>
+                                    </td>
+                                    <th scope="row">승인상태</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_readonly">
+                                            <input type="text" name="aplStaCdNm" id="aplStaCdNm" value="" disabled>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" >주소(주민등록)</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_required">
+                                            <div class="form_inline">
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 100px;">
+                                                        <input type="text" id="rsdtRegsZipcd" name="rsdtRegsZipcd" placeholder="우편번호검색" title="우편번호검색" value="" readonly />
+                                                        <a href="#" id="rsdtRegsZipcdrSearchButton" class="ico_find"><span class="blind">찾기</span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 250px;">
+                                                        <input type="text" id="rsdtRegsAddr" name="rsdtRegsAddr" value="" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                $("#rsdtRegsZipcdrSearchButton").click(function (e) {
+                                                    e.preventDefault();
+                                                    $.openAddrPopup("rsdtRegsZipcd", "rsdtRegsAddr");
+                                                });
+                                            </script>
+                                        </div>
+                                    </td>
+                                    <th scope="row" >상세주소</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="rsdtRegsDetAddr" id="rsdtRegsDetAddr" maxlength="60" value="" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"><label for="fileSeq">증빙첨부</label></th>
+                                    <td colspan="2">
+                                        <!-- fake file -->
+                                        <div class="form_text file_add" >
+                                            <input type="hidden" name="fileSeq" id="fileSeq">
+                                            <input type="hidden" name="attachFile.fileSeq" id="attachFileFileSeq">
+                                            <input type="hidden" name="attachFile.fileCdval" id="attachFileFileCdval">
+                                            <input type="text" id="fileNm" name="fileNm" title="파일선택" class="fake_val">
+                                            <input type="file" title="파일선택" id="addFile" name="attachFile.multipartFile" class="fake_file">
+                                            <button id="addButton" type="button" class="btn btn_ctr"><span class="btn_txt">파일선택</span></button>
+                                        </div>
+                                        <!-- //fake file -->
+                                    </td>
+                                    <td class="ta_l">
+                                        <strong><a id="downFile" href="" class="btn btn_ctr" ><span class="btn_txt">다운로드</span></a></strong>
+                                    </td>
+                                    <th scope="row" >반려사유</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_readonly">
+                                            <input type="text" name="rclRsn" id="rclRsn" value="" maxlength="300" disabled>
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 가로테이블 -->
+                    </div>
+                </div>
+                <div class="section_btn">
+                    <div class="f_l">
+                    </div>
+                    <div class="f_r">
+                        <button type="button" id="newBtn" name="newBtn" class="btn btn_basic"  data-userAuth="true" data-enabled="true" ><span class="btn_txt">신규</span></button>
+                        <button type="" id="applyBtn" name="applyBtn" class="btn btn btn_success"  data-userAuth="true" data-enabled="true" ><span class="btn_txt">변경신청</span></button>
+                    </div>
+                </div>
+            </form>
+
+            <form name="stuInfoBottom" id="stuInfoBottom" method="post" enctype="multipart/form-data" class="form-inline" action="univ/srec/srlm/updatePrsnAddrWebRev.do">
+                <div class="section_tbl"><!-- 여백을 주기위한 클래스 -->
+                    <div class="section_mid_tit">
+                        <h4 class="tit_mid f_l">신상정보</h4>
+                        <h1 class="f_l">&nbsp(정보 변경 후 저장하면 변경됩니다.)</h1> <p class="f_l"><font color=red>※ 계좌정보를 외환은행으로 등록한 학생은 KEB하나은행으로 변경등록해야합니다.</font></p>
+                    </div>
+                    <!-- 신상정보 -->
+
+                    <div class="group_profile">
+                        <div class="tbl_row">
+                            <table>
+                                <caption>신상정보</caption>
+                                <colgroup>
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                    <col style="width: 8%;" />
+                                </colgroup>
+                                <tbody>
+                                <tr>
+                                    <th scope="row" >성명</th>
+                                    <!--
+                                     <th scope="row" >성명(영문)</th>
+                                    <td td colspan="3">
+                                      <div class="form_text form_disabled">
+                                        <input type="text" name="egnm" id="egnm" maxlength="60" value="My Student"  readonly>
+
+                                      </div>
+                                    </td>
+                                      -->
+                                    <th scope="row" >성명(한자)</th>
+                                    <td td colspan="3">
+                                        <div class="form_text ">
+                                            <input type="text" name="chnm" id="chnm" maxlength="30" value="學生" >
+                                            <input type="hidden" name="acctInfoId" id="acctInfoId" value="364605" >
+                                            <input type="hidden" name="nm" id="nm" value="학생명" >
+                                            <input type="hidden" name="resnoid" id="resnoid" value="431315" >
+                                            <input type="hidden" name="baAcredYn" id="baAcredYn" value="" >
+                                            <input type="hidden" name="stuid" id="stuid" value="32220000" >
+                                        </div>
+                                    </td>
+                                    <th scope="row" >이메일</th>
+                                    <td colspan="3">
+                                        <div class="form_text">
+                                            <input type="text" name="eml" id="eml" value="student@dku.ac.kr" maxlength="30" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" rowspan="2" >주소</th>
+                                    <th scope="row" >현거주지</th>
+                                    <td colspan="3" >
+                                        <div class="form_text form_required">
+                                            <div class="form_inline">
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 100px;">
+                                                        <input type="text" id="zipcd" name="zipcd" placeholder="우편번호검색" title="우편번호검색" value="17036" readonly />
+                                                        <a href="#" id="zipcdrSearchButton" class="ico_find"><span class="blind">찾기</span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 250px;">
+                                                        <input type="text" id="addr" name="addr" value="경기도 용인시 수지구 죽전로 152" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                $("#zipcdrSearchButton").click(function (e) {
+                                                    e.preventDefault();
+                                                    $.openAddrPopup("zipcd", "addr");
+                                                });
+                                            </script>
+                                        </div>
+                                    </td>
+                                    <th scope="row">상세 주소</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="detAddr" id="detAddr" value="학교" maxlength="60" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" >등본</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_readonly">
+                                            <input type="text" name="juminAddr" id="juminAddr"  value="경기도 용인시 수지구 죽전로 152" disabled>
+                                        </div>
+                                    </td>
+                                    <th scope="row">상세 주소</th>
+                                    <td colspan="3">
+                                        <div class="form_text form_readonly">
+                                            <input type="text" name="juminDetAddr" id="juminDetAddr"  value="" disabled>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row"  >연락처</th>
+                                    <th scope="row" >집전화번호</th>
+                                    <td colspan="" >
+                                        <div class="form_text">
+                                            <input type="text" name="araNb" id="araNb" value="010" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="" >
+                                        <div class="form_text">
+                                            <input type="text" name="telPrfx" id="telPrfx" value="1111" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="" >
+                                        <div class="form_text">
+                                            <input type="text" name="jnpsNb" id="jnpsNb" value="2222" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <th scope="row">휴대전화번호</th>
+                                    <td colspan="">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="mpAraNb" id="mpAraNb" value="010" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="mpPrfx" id="mpPrfx" value="1111" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="">
+                                        <div class="form_text form_required">
+                                            <input type="text" name="mpJnpsNb" id="mpJnpsNb" value="2222" maxlength="4" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!--  -->
+                                <tr>
+                                    <th scope="row" rowspan="2" >직장정보</th>
+                                    <th scope="row" >직장명</th>
+                                    <td colspan="">
+                                        <div class="form_text">
+                                            <input type="text" name="wkplNm" id="wkplNm" value="" maxlength="33" >
+                                        </div>
+                                    </td>
+                                    <th scope="row" >직위</th>
+                                    <td colspan="" >
+                                        <div class="form_text">
+                                            <input type="text" name="wkpsNm" id="wkpsNm" value="" maxlength="33" >
+                                        </div>
+                                    </td>
+                                    <th scope="row">직장전화번호</th>
+                                    <td colspan="">
+                                        <div class="form_text ">
+                                            <input type="text" name="wkplAraNb" id="wkplAraNb" value="" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="">
+                                        <div class="form_text ">
+                                            <input type="text" name="wkplTelPrfx" id="wkplTelPrfx" value="" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td colspan="">
+                                        <div class="form_text ">
+                                            <input type="text" name="wkplJnpsNb" id="wkplJnpsNb" value="" maxlength="4" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th scope="row" >직장</th>
+                                    <td colspan="3">
+                                        <div class="form_text">
+                                            <div class="form_inline">
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 100px;">
+                                                        <input type="text" id="wkplZipcd" name="wkplZipcd" placeholder="우편번호검색" title="우편번호검색" value="" readonly />
+                                                        <a href="#" id="wkplZipcdrSearchButton" class="ico_find"><span class="blind">찾기</span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="form_group">
+                                                    <div class="form_text form_disabled" style="width: 250px;">
+                                                        <input type="text" id="wkplAddr" name="wkplAddr" value="" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <script type="text/javascript">
+                                                $("#wkplZipcdrSearchButton").click(function (e) {
+                                                    e.preventDefault();
+                                                    $.openAddrPopup("wkplZipcd", "wkplAddr");
+                                                });
+                                            </script>
+                                        </div>
+                                    </td>
+                                    <th scope="row">상세 주소</th>
+                                    <td colspan="3">
+                                        <div class="form_text">
+                                            <input type="text" name="wkplDetAddr" id="wkplDetAddr"  value="" maxlength="60" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!--  -->
+                                <tr>
+                                    <th scope="row" >긴급(보호자)연락처</th>
+                                    <th scope="row" >성명</th>
+                                    <td colspan="3" >
+                                        <div class="form_text form_required">
+                                            <input type="text" name="protrNm" id="protrNm" value="학생명" maxlength="33" >
+                                        </div>
+                                    </td>
+                                    <th scope="row">휴대폰 번호</th>
+                                    <td >
+                                        <div class="form_text form_required">
+                                            <input type="text" name="protrAraNb" id="protrAraNb" value="010" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td >
+                                        <div class="form_text form_required">
+                                            <input type="text" name="protrPrfx" id="protrPrfx" value="1111" maxlength="4" >
+                                        </div>
+                                    </td>
+                                    <td >
+                                        <div class="form_text form_required">
+                                            <input type="text" name="protrJnpsNb" id="protrJnpsNb" value="2222" maxlength="4" >
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <th scope="row" >은행</th>
+                                    <td colspan="2">
+                                        <div class="form_select">
+                                            <select id="bankCd" name="bankCd" class="chosen-select" data-placeholder="선택" value="020">
+                                                <option value="">선택</option>
+
+
+
+                                                <option value="039">경남은행</option>
+
+
+
+
+                                                <option value="095">경찰청</option>
+
+
+
+
+                                                <option value="034">광주은행</option>
+
+
+
+
+                                                <option value="261">교보증권</option>
+
+
+
+
+                                                <option value="004">국민은행</option>
+
+
+
+
+                                                <option value="099">금융결제원</option>
+
+
+
+
+                                                <option value="003">기업은행</option>
+
+
+
+
+                                                <option value="011">농협은행</option>
+
+
+
+
+                                                <option value="031">대구은행</option>
+
+
+
+
+                                                <option value="267">대신증권</option>
+
+
+
+
+                                                <option value="238">미래에셋대우</option>
+
+
+
+
+                                                <option value="065">대화은행</option>
+
+
+
+
+                                                <option value="055">도이치은행</option>
+
+
+
+
+                                                <option value="279">동부증권</option>
+
+
+
+
+                                                <option value="287">메리츠종합금융증권</option>
+
+
+
+
+                                                <option value="052">모간스탠리은행</option>
+
+
+
+
+                                                <option value="059">미쓰비시도쿄UFJ은행</option>
+
+
+
+
+                                                <option value="058">미즈호은행</option>
+
+
+
+
+                                                <option value="290">부국증권</option>
+
+
+
+
+                                                <option value="032">부산은행</option>
+
+
+
+
+                                                <option value="061">비엔피파리바은행</option>
+
+
+
+
+                                                <option value="064">산림조합중앙회</option>
+
+
+
+
+                                                <option value="002">산업은행</option>
+
+
+
+
+                                                <option value="240">삼성증권</option>
+
+
+
+
+                                                <option value="050">상호저축은행</option>
+
+
+
+
+                                                <option value="045">새마을금고중앙회</option>
+
+
+
+
+                                                <option value="094">서울보증보험</option>
+
+
+
+
+                                                <option value="008">수출입은행</option>
+
+
+
+
+                                                <option value="007">수협중앙회</option>
+
+
+
+
+                                                <option value="291">신영증권</option>
+
+
+
+
+                                                <option value="278">신한금융투자</option>
+
+
+
+
+                                                <option value="088">신한은행</option>
+
+
+
+
+                                                <option value="048">신협중앙회</option>
+
+
+
+
+                                                <option value="268">아이엠투자증권</option>
+
+
+
+
+                                                <option value="056">알비에스피엘씨은행</option>
+
+
+
+
+                                                <option value="266">에스케이증권</option>
+
+
+
+
+                                                <option value="289">엔에이치농협증권</option>
+
+
+
+
+                                                <option value="292">엘아이지투자증권</option>
+
+
+
+                                                <option value="020" selected>우리은행</option>
+
+
+
+
+
+                                                <option value="247">우리투자증권</option>
+
+
+
+
+                                                <option value="071">우체국</option>
+
+
+
+
+                                                <option value="209">유안타증권</option>
+
+
+
+
+                                                <option value="280">유진투자증권</option>
+
+
+
+
+                                                <option value="265">이트레이드증권</option>
+
+
+
+
+                                                <option value="037">전북은행</option>
+
+
+
+
+                                                <option value="057">제이피모간체이스은행</option>
+
+
+
+
+                                                <option value="035">제주은행</option>
+
+
+
+
+                                                <option value="062">중국공상은행</option>
+
+
+
+
+                                                <option value="063">중국은행</option>
+
+
+
+
+                                                <option value="012">지역농ㆍ축협</option>
+
+
+
+
+                                                <option value="264">키움증권</option>
+
+
+
+
+                                                <option value="270">하나금융투자</option>
+
+
+
+
+                                                <option value="081">하나은행</option>
+
+
+
+
+                                                <option value="262">하이투자증권</option>
+
+
+
+
+                                                <option value="027">한국씨티은행</option>
+
+
+
+
+                                                <option value="001">한국은행</option>
+
+
+
+
+                                                <option value="096">한국전자금융(주)</option>
+
+
+
+
+                                                <option value="092">토스뱅크</option>
+
+
+
+
+                                                <option value="093">한국주택금융공사</option>
+
+
+
+
+                                                <option value="243">한국투자증권</option>
+
+
+
+
+                                                <option value="269">한화투자증권</option>
+
+
+
+
+                                                <option value="218">현대증권</option>
+
+
+
+
+                                                <option value="060">BOA은행</option>
+
+
+
+
+                                                <option value="263">HMC투자증권</option>
+
+
+
+
+                                                <option value="054">HSBC은행</option>
+
+
+
+
+                                                <option value="023">SC제일은행</option>
+
+
+
+
+                                                <option value="089">케이뱅크</option>
+
+
+
+
+                                                <option value="090">카카오뱅크</option>
+
+
+
+
+                                                <option value="005">외환은행</option>
+
+
+
+
+                                                <option value="230">미래에셋증권</option>
+
+
+
+
+                                                <option value="092_1">한국정책금융공사</option>
+
+
+                                            </select>
+                                            <input type="hidden" name="preBankCd" id="preBankCd" value="020" >
+                                        </div>
+                                    </td>
+                                    <th scope="row">계좌번호</th>
+                                    <td colspan="2">
+                                        <div class="form_text">
+                                            <input type="text" name="ban" id="ban" value="1111222333333" maxlength="30" >
+                                            <input type="hidden" name="preBan" id="preBan" value="1111222333333" >
+                                        </div>
+                                    </td>
+                                    <td class="ta_c">
+                                        <button type="button" class="btn btn_inner btn_apl" id="checkBankValidBtn"><span class="btn_txt">계좌확인</span></button>
+                                    </td>
+                                    <th scope="row">예금주명</th>
+                                    <td colspan="">
+                                        <div class="form_text ">
+                                            <input type="text" name="depstNm" id="depstNm" value="학생명" maxlength="33"  >
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- 가로테이블 -->
+                    </div>
+                </div>
+                <div class="section_btn">
+                    <div class="f_r">
+                        <button type="" id="saveBtn" name="saveBtn" class="btn btn btn_success"  data-userAuth="true" data-enabled="true" ><span class="btn_txt">저장</span></button>
+                    </div>
+                </div>
+            </form>
+
+            <div id = "infoForm2" name ="infoForm2" class="section_note">
+                <h3 class="tit_check">안내</h3>
+                <font color="red">1.기본정보 관련사항(성명,영문명,한자명,주민번호 등) 수정은 소속학과나 대학원 교학행정팀으로 문의하여 주시길 바랍니다.
+                    <br> 2.계좌번호 입력 시 반드시 계좌 확인 버튼을 누른 후 저장 하십시오.(은행 서버와 연동해서 계좌 정보 처리를 하고 있습니다.)
+                    <br> &nbsp계좌 확인 버튼 클릭시 오류가 발생하는 경우에 한해서만 계좌확인 버튼을 누르지 않고 직접 예금주명을 입력후 저장 처리하여 주시기 바랍니다.</font>
+            </div>
+
+
+            <div id = "infoForm1" name ="infoForm1" class="section_note">
+                <h3 class="tit_check">안내</h3>
+                <font color="red">1. 개인정보 변경(성명, 주민번호, 주소(등본))할 경우는 아래 첨부파일 다운로드 후 작성하여 학사팀으로 제출하시기 바랍니다.
+                    <br>&nbsp▷ 첨부서류
+                    <br>&nbsp&nbsp&nbsp[개명] 개명 전 후 사항이 기재된 주민등록초본 또는 등본, 개명 후 발급받은 신분증 사본
+                    <br>&nbsp&nbsp&nbsp[주소(등본) 변경] 주민등록등본, 신분증 사본
+                    <br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp※ 현거주지 주소, 연락처(집, 휴대폰, 보호자)는 직접 변경 가능
+                    <br> 2.계좌번호 입력 시 반드시 계좌 확인 버튼을 누른 후 저장 하십시오.(은행 서버와 연동해서 계좌 정보 처리를 하고 있습니다.)
+                    <br> &nbsp계좌 확인 버튼 클릭시 오류가 발생하는 경우에 한해서만 계좌확인 버튼을 누르지 않고 직접 예금주명을 입력후 저장 처리하여 주시기 바랍니다.
+                </font>
+
+
+                <div><p>&nbsp</p></div>
+
+                <h3 class="tit_check">첨부파일</h3>
+                <ul class="lst_hyphen">
+                    <li><span class="lst_head">-</span><strong class="fc_blue"><a href="comm/syst/file/ddownload.do?path=templates/srec/prsnInfoform1.hwp">개인정보 변경(성명, 주민번호, 주소(등본)) 양식 다운로드</a></strong></li>
+                </ul>
+            </div>
+
+        </div>
+        <!-- //cont -->
+    </div>
+    <!-- //contents -->
+
+    <!-- footer -->
+    <div id="footer">
+        <div class="addr_box">
+            <p class="addr">죽전캠퍼스 경기도 용인시 수지구 죽전로 152 (우)16890 / 천안캠퍼스 충남 천안시 동남구 단대로 119 (우)31116 </p>
+            <p class="copy">COPYRIGHT(C) 2015 BY DANKOOK UNIVERSITY. ALL RIGHTS RESERVED.</p>
+        </div>
+        <!--
+        <ul class="footer_btn">
+          <li><a href="#" id="help"><img src="images/layout/footer_help.gif" alt="문의하기" /></a></li>
+        </ul>
+         -->
+    </div>
+    <!-- //footer -->
+</div>
+<!-- //wrap -->
+
+<iframe src="https://logon.dankook.ac.kr/dummy.jsp" width="0" height="0" style="display: none"></iframe>
+
+</body>
+</html>

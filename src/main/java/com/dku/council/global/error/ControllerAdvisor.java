@@ -3,6 +3,7 @@ package com.dku.council.global.error;
 import com.dku.council.global.error.exception.BadRequestException;
 import com.dku.council.global.error.exception.BindingFailedException;
 import com.dku.council.global.error.exception.LocalizedMessageException;
+import com.dku.council.global.error.exception.NotSupportedMethodException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +11,10 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Locale;
 
@@ -40,8 +43,18 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler
-    protected ResponseEntity<ErrorResponseDto> exception(Exception e) {
-        ErrorResponseDto dto = new ErrorResponseDto(e);
+    protected ResponseEntity<ErrorResponseDto> badRequest(MethodArgumentTypeMismatchException e, Locale locale) {
+        return localizedException(new BadRequestException(e), locale);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponseDto> badRequest(HttpRequestMethodNotSupportedException e, Locale locale) {
+        return localizedException(new NotSupportedMethodException(e), locale);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponseDto> unexpectedException(Exception e, Locale locale) {
+        ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, LocalizedMessageException.of(e));
         log.error("Unexpected exception has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
         return ResponseEntity.internalServerError().body(dto);
     }

@@ -1,9 +1,10 @@
 package com.dku.council.debug;
 
-import com.dku.council.domain.UserRole;
-import com.dku.council.domain.user.Major;
-import com.dku.council.domain.user.User;
-import com.dku.council.domain.user.UserStatus;
+import com.dku.council.domain.user.model.MajorData;
+import com.dku.council.domain.user.model.UserRole;
+import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.domain.user.model.entity.Major;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
@@ -35,15 +36,16 @@ public class TestController {
     public AuthenticationToken test() {
         User user = User.builder()
                 .name("테스트")
-                .classId("32171111")
+                .studentId("32171111")
                 .phone("010-1234-5678")
                 .status(UserStatus.ACTIVE)
-                .major(Major.COMPUTER_SCIENCE)
+                .major(new Major(MajorData.COMPUTER_SCIENCE))
                 .password("TestPwd")
                 .role(UserRole.USER).build();
         return jwtProvider.issue(user);
     }
 
+    // TODO Authentication말고 이를 상속받은 authentication도 자동으로 주입이 되는지 테스트
     @GetMapping("/auth")
     public String auth(Authentication authentication) {
         Object principal = authentication.getPrincipal();

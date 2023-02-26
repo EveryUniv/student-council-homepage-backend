@@ -1,0 +1,14 @@
+{
+  "header": {
+    "resultCode": 0,
+    "resultMessage": "SUCCESS",
+    "isSuccessful": true
+  },
+  "body": {
+    "data": {
+      "requestId": "20230220045202fvYD7GLyVX3",
+      "statusCode": "2",
+      "senderGroupingKey": null
+    }
+  }
+}
