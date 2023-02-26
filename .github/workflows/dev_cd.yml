@@ -63,7 +63,7 @@ jobs:
         env:
           REPO: ${{ secrets.DOCKER_REPO }}
         with:
-          host: ${{ secrets.PRIVATE_SERVER_IP }}
+          host: ${{ secrets.SERVER_HOST }}
           username: ubuntu
           key: ${{ secrets.PRIVATE_PEM_KEY }}
           proxy_host: ${{ secrets.BASTION_IP }} 
