@@ -75,4 +75,4 @@ jobs:
             docker tag ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7} $REPO
             docker stop $REPO
             docker rm $REPO
-            docker run -d --name $REPO -p 8081:8080 -v ~/application.yml:/usr/app/application.yml -e TZ=Asia/Seoul $REPO
+            docker run -d --name $REPO -p 8081:8080 -v ~/application.yml:/usr/app/application.yml -e TZ=Asia/Seoul --restart=always --network=app-net $REPO
