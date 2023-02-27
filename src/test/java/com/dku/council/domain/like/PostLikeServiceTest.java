@@ -4,12 +4,10 @@ import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
-import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.PostRepository;
-import com.dku.council.domain.user.model.MajorData;
-import com.dku.council.domain.user.model.entity.Major;
-import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -190,9 +185,9 @@ class PostLikeServiceTest {
 
         when(memoryRepository.getAllPostLikes()).thenReturn(likes);
         when(userRepository.getReferenceById(any()))
-                .thenAnswer(inv -> dummyUserWithId(inv.getArgument(0)));
+                .thenAnswer(inv -> UserMock.create(inv.getArgument(0)));
         when(postRepository.getReferenceById(any()))
-                .thenAnswer(inv -> dummyPostWithId(inv.getArgument(0)));
+                .thenAnswer(inv -> NewsMock.create(inv.getArgument(0)));
 
         // when
         service.dumpToDB();
@@ -204,35 +199,5 @@ class PostLikeServiceTest {
             Long l = (long) i;
             verify(persistenceRepository).deleteByPostIdAndUserId(l, l);
         }
-    }
-
-    private User dummyUserWithId(Long id) throws NoSuchFieldException, IllegalAccessException {
-        User user = User.builder()
-                .studentId("")
-                .password("")
-                .name("")
-                .major(new Major(MajorData.ADMIN))
-                .phone("")
-                .build();
-
-        // set id
-        Field field = User.class.getDeclaredField("id");
-        field.setAccessible(true);
-        field.set(user, id);
-
-        return user;
-    }
-
-    private Post dummyPostWithId(Long id) throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Constructor<?> constructor = Post.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Post post = (Post) constructor.newInstance();
-
-        // set id
-        Field field = Post.class.getDeclaredField("id");
-        field.setAccessible(true);
-        field.set(post, id);
-
-        return post;
     }
 }

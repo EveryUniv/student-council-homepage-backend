@@ -4,16 +4,15 @@ import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.user.model.MajorData;
-import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
-import com.dku.council.infra.nhn.service.DummyMultipartFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
+import com.dku.council.mock.MultipartFileMock;
+import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +24,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +56,7 @@ class GenericPostServiceTest {
     @DisplayName("list가 잘 동작하는지?")
     public void list() {
         // given
-        List<News> allNewsList = generateNewsList("generic-", 20);
+        List<News> allNewsList = NewsMock.createList("generic-", 20);
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
@@ -72,66 +69,14 @@ class GenericPostServiceTest {
         assertThat(allPage.getContent()).containsExactlyInAnyOrderElementsOf(allNewsList);
     }
 
-    private User generateUser(Long userId) {
-        User user = User.builder()
-                .studentId("11111111")
-                .password("pwd")
-                .name("name")
-                .major(new Major(MajorData.ADMIN))
-                .phone("010-1111-2222")
-                .build();
-
-        try {
-            Field id = User.class.getDeclaredField("id");
-            id.setAccessible(true);
-            id.set(user, userId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        return user;
-    }
-
-    private List<News> generateNewsList(String prefix, int size) {
-        List<News> result = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            News news = News.builder()
-                    .user(generateUser(99L))
-                    .title(prefix + i)
-                    .body("")
-                    .build();
-            result.add(news);
-        }
-
-        return result;
-    }
-
-    private News generateNews(User user, Long newsId) {
-        News news = News.builder()
-                .user(user)
-                .title("")
-                .body("")
-                .build();
-
-        try {
-            Field id = Post.class.getDeclaredField("id");
-            id.setAccessible(true);
-            id.set(news, newsId);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-
-        return news;
-    }
-
     @Test
     @DisplayName("새롭게 잘 생성되는지?")
     public void create() {
         // given
-        User user = generateUser(99L);
-        News news = generateNews(user, 3L);
+        User user = UserMock.create(99L);
+        News news = NewsMock.create(user, 3L);
 
-        List<MultipartFile> files = generateMultipartFiles();
+        List<MultipartFile> files = MultipartFileMock.createList(10);
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, files);
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
@@ -153,14 +98,6 @@ class GenericPostServiceTest {
         }));
     }
 
-    private List<MultipartFile> generateMultipartFiles() {
-        List<MultipartFile> files = new ArrayList<>(10);
-        for (int i = 1; i <= 10; i++) {
-            files.add(new DummyMultipartFile("file", "myFile" + i + ".txt"));
-        }
-        return files;
-    }
-
     @Test
     @DisplayName("생성할 때 유저가 없으면 오류")
     public void failedCreateByNotFoundUser() {
@@ -176,7 +113,7 @@ class GenericPostServiceTest {
     @DisplayName("단건 조회가 잘 동작하는지?")
     public void findOne() {
         // given
-        News news = generateNews(generateUser(99L), 4L);
+        News news = NewsMock.create(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when
@@ -217,7 +154,7 @@ class GenericPostServiceTest {
     @DisplayName("권한 없는 게시글 삭제시 오류")
     public void failedDeleteByAccessDenied() {
         // given
-        News news = generateNews(generateUser(99L), 4L);
+        News news = NewsMock.create(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when & then

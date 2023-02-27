@@ -1,4 +1,4 @@
-package com.dku.council.infra.nhn.service;
+package com.dku.council.mock;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
