@@ -1,4 +1,4 @@
-package com.dku.council.global.config;
+package com.dku.council.global.config.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

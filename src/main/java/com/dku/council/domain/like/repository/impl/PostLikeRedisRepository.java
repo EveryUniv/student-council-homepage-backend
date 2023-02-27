@@ -3,7 +3,7 @@ package com.dku.council.domain.like.repository.impl;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
-import com.dku.council.global.config.RedisKeys;
+import com.dku.council.global.config.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
