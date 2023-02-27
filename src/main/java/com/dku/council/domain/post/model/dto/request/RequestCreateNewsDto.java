@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
@@ -15,9 +16,10 @@ public class RequestCreateNewsDto extends RequestCreateGenericPostDto<News> {
         super(title, body, categoryId, files);
     }
 
-    public News toEntity(User user) {
+    public News toEntity(User user, Category category) {
         return News.builder()
                 .body(getBody())
+                .category(category)
                 .title(getTitle())
                 .user(user)
                 .build();

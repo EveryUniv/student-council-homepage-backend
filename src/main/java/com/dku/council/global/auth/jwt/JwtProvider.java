@@ -23,6 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtProvider implements AuthenticationTokenProvider {
 
+    public static final String AUTHORIZATION = "Authorization";
+
     @Value("${app.auth.jwt.access-expiration}")
     private final long accessExpiration;
 
@@ -35,7 +37,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     @Override
     public String getAccessTokenFromHeader(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
+        String header = request.getHeader(AUTHORIZATION);
         if (!StringUtils.hasText(header)) return null;
         if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
         return header.substring(7);

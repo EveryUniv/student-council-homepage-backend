@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,10 +28,11 @@ public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conf
         super(title, body, categoryId, files);
     }
 
-    public Conference toEntity(User user) {
+    public Conference toEntity(User user, Category category) {
         return Conference.builder()
                 .body(getBody())
                 .title(getTitle())
+                .category(category)
                 .user(user)
                 .round(getRound())
                 .date(LocalDate.parse(date))

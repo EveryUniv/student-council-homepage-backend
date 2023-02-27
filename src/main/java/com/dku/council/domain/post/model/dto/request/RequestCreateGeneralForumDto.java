@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
@@ -15,9 +16,10 @@ public class RequestCreateGeneralForumDto extends RequestCreateGenericPostDto<Ge
         super(title, body, categoryId, files);
     }
 
-    public GeneralForum toEntity(User user) {
+    public GeneralForum toEntity(User user, Category category) {
         return GeneralForum.builder()
                 .body(getBody())
+                .category(category)
                 .title(getTitle())
                 .user(user)
                 .build();

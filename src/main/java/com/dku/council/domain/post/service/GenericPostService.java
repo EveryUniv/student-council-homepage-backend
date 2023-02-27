@@ -1,5 +1,8 @@
 package com.dku.council.domain.post.service;
 
+import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.repository.CategoryRepository;
+import com.dku.council.domain.post.exception.CategoryNotFoundException;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.PostStatus;
@@ -35,6 +38,7 @@ public class GenericPostService<E extends Post> {
 
     private final GenericPostRepository<E> postRepository;
     private final UserRepository userRepository;
+    private final CategoryRepository categoryRepository;
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
     private final MessageSource messageSource;
@@ -52,7 +56,6 @@ public class GenericPostService<E extends Post> {
 
     /**
      * 게시글 등록
-     * todo category 처리 추가
      *
      * @param userId 등록한 사용자 id
      * @param dto    게시글 dto
@@ -60,7 +63,14 @@ public class GenericPostService<E extends Post> {
     @Transactional
     public Long create(Long userId, RequestCreateGenericPostDto<E> dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        E post = dto.toEntity(user);
+        Long categoryId = dto.getCategoryId();
+
+        Category category = null;
+        if (categoryId != null) {
+            category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+        }
+
+        E post = dto.toEntity(user, category);
 
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));
