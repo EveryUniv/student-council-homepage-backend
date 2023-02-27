@@ -1,6 +1,6 @@
 package com.dku.council.domain.like.repository.impl;
 
-import com.dku.council.config.EmbeddedRedisConfig;
+import com.dku.council.base.AbstractContainerRedisTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.global.config.redis.RedisKeys;
@@ -22,8 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 느린 테스트, 빠른 테스트(유닛), 실제 테스트 등...
  * gradle build 에서는 빠른 테스트만
  */
-@SpringBootTest(classes = EmbeddedRedisConfig.class)
-class PostLikeRedisRepositoryTest {
+@SpringBootTest
+class PostLikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private PostLikeRedisRepository repository;
