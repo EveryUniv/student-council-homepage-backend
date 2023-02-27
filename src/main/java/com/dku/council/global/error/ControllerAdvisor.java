@@ -1,15 +1,13 @@
 package com.dku.council.global.error;
 
-import com.dku.council.global.error.exception.BadRequestException;
-import com.dku.council.global.error.exception.BindingFailedException;
-import com.dku.council.global.error.exception.LocalizedMessageException;
-import com.dku.council.global.error.exception.NotSupportedMethodException;
+import com.dku.council.global.error.exception.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +48,11 @@ public class ControllerAdvisor {
     @ExceptionHandler
     protected ResponseEntity<ErrorResponseDto> badRequest(HttpRequestMethodNotSupportedException e, Locale locale) {
         return localizedException(new NotSupportedMethodException(e), locale);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponseDto> accessDenied(AccessDeniedException e, Locale locale) {
+        return localizedException(new NotGrantedException(e), locale);
     }
 
     @ExceptionHandler

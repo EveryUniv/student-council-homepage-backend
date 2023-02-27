@@ -45,7 +45,6 @@ public class TestController {
         return jwtProvider.issue(user);
     }
 
-    // TODO Authentication말고 이를 상속받은 authentication도 자동으로 주입이 되는지 테스트
     @GetMapping("/auth")
     public String auth(Authentication authentication) {
         Object principal = authentication.getPrincipal();

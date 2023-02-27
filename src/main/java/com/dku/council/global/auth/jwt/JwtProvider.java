@@ -46,7 +46,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
         Jws<Claims> claimsJws = validateAccessToken(accessToken);
 
         Claims body = claimsJws.getBody();
-        String userId = (String) body.get("userId");
+        Long userId = Long.parseLong((String) body.get("userId"));
         String userRole = (String) body.get("Role");
 
         return new JwtAuthentication(userId, userRole);
