@@ -12,7 +12,10 @@ public class EmbeddedRedisConfig {
     private final RedisServer redisServer;
 
     public EmbeddedRedisConfig(@Value("${spring.redis.port}") int redisPort) {
-        this.redisServer = new RedisServer(redisPort);
+        this.redisServer = RedisServer.builder()
+                .port(redisPort)
+                .setting("maxmemory 128M")
+                .build();
     }
 
     @PostConstruct

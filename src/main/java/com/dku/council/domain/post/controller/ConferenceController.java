@@ -4,12 +4,21 @@ import com.dku.council.domain.post.model.dto.page.SummarizedConferenceDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
-import com.dku.council.domain.post.service.ConferenceService;
+import com.dku.council.domain.post.model.entity.posttype.Conference;
+import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.config.SecurityConfig;
+import com.dku.council.global.config.SwaggerConfig;
+import com.dku.council.infra.nhn.service.FileUploadService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -20,40 +29,48 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class ConferenceController {
 
-    private final ConferenceService conferenceService;
+    private final GenericPostService<Conference> conferenceService;
+    private final FileUploadService fileUploadService;
 
     /**
      * 게시글 목록으로 조회
-     * @param query     제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
-     * @param pageable  페이징 size, sort, page
-     * @return          페이징 된 회의록 목록
+     *
+     * @param keyword  제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
+     * @param pageable 페이징 size, sort, page
+     * @return 페이징 된 회의록 목록
      */
     @GetMapping
-    public ResponsePage<SummarizedConferenceDto> list(@RequestParam(required = false) String query, Pageable pageable){
-        Page<SummarizedConferenceDto> list = conferenceService.list(query, pageable);
+    public ResponsePage<SummarizedConferenceDto> list(@RequestParam(required = false) String keyword,
+                                                      @ParameterObject Pageable pageable) {
+        Specification<Conference> spec = PostSpec.genericPostCondition(keyword, null);
+        Page<SummarizedConferenceDto> list = conferenceService.list(spec, pageable)
+                .map(post -> new SummarizedConferenceDto(fileUploadService.getBaseURL(), post));
         return new ResponsePage<>(list);
     }
 
     /**
-     * 게시글 등록
+     * 게시글 등록 (Admin)
+     *
      * @param request 요청 dto
-     * @return        생성된 게시글 id
+     * @return 생성된 게시글 id
      */
     @PostMapping
-    public ResponsePostIdDto create(Authentication auth, @Valid @RequestBody RequestCreateConferenceDto request) {
-        Long userId = (Long) auth.getPrincipal();
-        Long postId = conferenceService.create(userId, request);
+    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
+    @Secured(SecurityConfig.ADMIN_ROLE)
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateConferenceDto request) {
+        Long postId = conferenceService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
 
     /**
-     * 게시글 삭제
-     * @param id  삭제할 게시글 id
+     * 게시글 삭제 (Admin)
+     *
+     * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        conferenceService.delete(id);
+    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
+    @Secured(SecurityConfig.ADMIN_ROLE)
+    public void delete(AppAuthentication auth, @PathVariable Long id) {
+        conferenceService.delete(id, auth.getUserId(), auth.isAdmin());
     }
-
-
 }
