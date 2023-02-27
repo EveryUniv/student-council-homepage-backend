@@ -20,7 +20,7 @@ public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conf
             message = "개최일자는 YYYY-MM-dd(YYYY-M-d) 형식만 가능합니다.")
     private String date;
 
-    protected RequestCreateConferenceDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
+    public RequestCreateConferenceDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
         super(title, body, categoryId, files);
     }
 

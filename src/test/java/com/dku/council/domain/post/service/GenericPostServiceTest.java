@@ -2,15 +2,16 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
-import com.dku.council.domain.post.model.dto.page.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
+import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.model.entity.posttype.News;
+import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.infra.nhn.service.DummyMultipartFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +29,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.when;
 class GenericPostServiceTest {
 
     @Mock
-    private NewsRepository newsRepository;
+    private GenericPostRepository<News> newsRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -53,7 +52,7 @@ class GenericPostServiceTest {
     private FileUploadService fileUploadService;
 
     @InjectMocks
-    private GenericPostService service;
+    private GenericPostService<News> service;
 
 
     @Test
@@ -64,31 +63,40 @@ class GenericPostServiceTest {
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
-        when(fileUploadService.getBaseURL()).thenReturn("http://base/");
 
         // when
-        Page<SummarizedGenericPostDto> allPage = service.list(null, Pageable.unpaged());
+        Page<News> allPage = service.list(null, Pageable.unpaged());
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
-        assertSummarizedNewsDtoList(allPage.getContent(), allNewsList);
+        assertThat(allPage.getContent()).containsExactlyInAnyOrderElementsOf(allNewsList);
     }
 
-    private User generateUser() {
-        return User.builder()
+    private User generateUser(Long userId) {
+        User user = User.builder()
                 .studentId("11111111")
                 .password("pwd")
                 .name("name")
                 .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")
                 .build();
+
+        try {
+            Field id = User.class.getDeclaredField("id");
+            id.setAccessible(true);
+            id.set(user, userId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
+        return user;
     }
 
     private List<News> generateNewsList(String prefix, int size) {
         List<News> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             News news = News.builder()
-                    .user(generateUser())
+                    .user(generateUser(99L))
                     .title(prefix + i)
                     .body("")
                     .build();
@@ -98,37 +106,33 @@ class GenericPostServiceTest {
         return result;
     }
 
-    private News generateNews(User user, Long newsId) throws NoSuchFieldException, IllegalAccessException {
+    private News generateNews(User user, Long newsId) {
         News news = News.builder()
                 .user(user)
                 .title("")
                 .body("")
                 .build();
 
-        Field id = Post.class.getDeclaredField("id");
-        id.setAccessible(true);
-        id.set(news, newsId);
+        try {
+            Field id = Post.class.getDeclaredField("id");
+            id.setAccessible(true);
+            id.set(news, newsId);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         return news;
     }
 
-    private void assertSummarizedNewsDtoList(List<SummarizedGenericPostDto> actual, List<News> expected) {
-        for (int i = 0; i < actual.size(); i++) {
-            SummarizedGenericPostDto dto = actual.get(i);
-            News news = expected.get(i);
-            assertThat(dto.getTitle()).isEqualTo(news.getTitle());
-        }
-    }
-
     @Test
     @DisplayName("새롭게 잘 생성되는지?")
-    public void create() throws NoSuchFieldException, IllegalAccessException {
+    public void create() {
         // given
-        User user = generateUser();
+        User user = generateUser(99L);
         News news = generateNews(user, 3L);
 
         List<MultipartFile> files = generateMultipartFiles();
-        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", files);
+        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, files);
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
 
@@ -165,18 +169,18 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(UserNotFoundException.class, () ->
-                service.create(2L, new RequestCreateNewsDto("title", "body", List.of())));
+                service.create(2L, new RequestCreateNewsDto("title", "body", 0L, List.of())));
     }
 
     @Test
     @DisplayName("단건 조회가 잘 동작하는지?")
-    public void findOne() throws NoSuchFieldException, IllegalAccessException {
+    public void findOne() {
         // given
-        News news = generateNews(generateUser(), 4L);
+        News news = generateNews(generateUser(99L), 4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when
-        ResponseSingleNewsDto dto = service.findOne(4L, "Addr");
+        ResponseSingleGenericPostDto dto = service.findOne(4L, 5L, "Addr");
 
         // then
         verify(viewCountService).increasePostViews(argThat(post -> {
@@ -195,36 +199,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                service.findOne(0L, ""));
-    }
-
-    @Test
-    @DisplayName("게시글 삭제가 잘 동작하는지?")
-    public void delete() throws NoSuchFieldException, IllegalAccessException {
-        // given
-        News news = generateNews(generateUser(), 4L);
-        List<PostFile> files = IntStream.range(1, 10)
-                .mapToObj(i -> new PostFile("id" + i, "name" + i))
-                .collect(Collectors.toList());
-        attachFilesToNews(news, files);
-        when(newsRepository.findById(any())).thenReturn(Optional.of(news));
-
-        // when
-        service.delete(4L);
-
-        // then
-        verify(fileUploadService).deletePostFiles(argThat(fileList -> {
-            assertThat(fileList.size()).isEqualTo(news.getFiles().size());
-            return true;
-        }));
-
-        verify(newsRepository).delete(eq(news));
-    }
-
-    private void attachFilesToNews(News news, List<PostFile> newFiles) throws NoSuchFieldException, IllegalAccessException {
-        Field files = Post.class.getDeclaredField("files");
-        files.setAccessible(true);
-        files.set(news, newFiles);
+                service.findOne(0L, 4L, "Addr"));
     }
 
     @Test
@@ -235,6 +210,18 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                service.delete(0L));
+                service.delete(0L, 0L, false));
+    }
+
+    @Test
+    @DisplayName("권한 없는 게시글 삭제시 오류")
+    public void failedDeleteByAccessDenied() {
+        // given
+        News news = generateNews(generateUser(99L), 4L);
+        when(newsRepository.findById(any())).thenReturn(Optional.of(news));
+
+        // when & then
+        assertThrows(NotGrantedException.class, () ->
+                service.delete(0L, 0L, false));
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 public class RequestCreateRuleDto extends RequestCreateGenericPostDto<Rule> {
 
-    protected RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
+    public RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
         super(title, body, categoryId, files);
     }
 

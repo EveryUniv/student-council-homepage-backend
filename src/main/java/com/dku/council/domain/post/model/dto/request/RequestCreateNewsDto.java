@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 public class RequestCreateNewsDto extends RequestCreateGenericPostDto<News> {
 
-    protected RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
+    public RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
         super(title, body, categoryId, files);
     }
 
