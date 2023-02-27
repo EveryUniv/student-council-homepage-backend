@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+// TODO Test it
 @Tag(name = "총학 회칙", description = "총학 회칙 관련 api")
 @RestController
 @RequestMapping("/post/rule")

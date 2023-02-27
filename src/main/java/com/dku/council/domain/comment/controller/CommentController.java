@@ -18,7 +18,6 @@ public class CommentController {
     private final CommentService commentService;
 
     // TODO 댓글이 활성화 되어 있는 게시글만 생성
-    // TODO 권한 annotation은 통합할 수 있으면 좋겠다.
 
     /***
      * 게시글에 댓글 생성

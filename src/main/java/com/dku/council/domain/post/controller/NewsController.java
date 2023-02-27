@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+// TODO Test it
 @Tag(name = "총학소식", description = "총학소식 게시판 관련 api")
 @RestController
 @RequestMapping("/post/news")
@@ -31,9 +32,6 @@ public class NewsController {
 
     private final GenericPostService<News> postService;
     private final FileUploadService fileUploadService; // TODO 썩 좋은건 아닌데 나중에 리펙토링
-
-    // TODO summary와 description 둘 다 javadoc으로 표현할 수 있게 하기
-    // TODO void를 반환하는 api들도 Swagger에서는 모두 SuccessResponseDto를 반환하는 걸로 보이게 하기
 
     /**
      * 게시글 목록으로 조회

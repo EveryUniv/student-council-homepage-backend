@@ -52,6 +52,7 @@ public class GenericPostService<E extends Post> {
 
     /**
      * 게시글 등록
+     * todo category 처리 추가
      *
      * @param userId 등록한 사용자 id
      * @param dto    게시글 dto
