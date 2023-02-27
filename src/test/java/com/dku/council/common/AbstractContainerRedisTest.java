@@ -1,4 +1,4 @@
-package com.dku.council.base;
+package com.dku.council.common;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

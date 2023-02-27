@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.base.AbstractContainerRedisTest;
+import com.dku.council.common.AbstractContainerRedisTest;
+import com.dku.council.common.DevTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
+@DevTest
 class NewsControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
