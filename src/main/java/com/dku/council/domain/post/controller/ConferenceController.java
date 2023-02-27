@@ -7,6 +7,7 @@ import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -51,9 +51,8 @@ public class ConferenceController {
      * @return 생성된 게시글 id
      */
     @PostMapping
-    public ResponsePostIdDto create(Authentication auth, @Valid @RequestBody RequestCreateConferenceDto request) {
-        Long userId = (Long) auth.getPrincipal();
-        Long postId = conferenceService.create(userId, request);
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateConferenceDto request) {
+        Long postId = conferenceService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
 
@@ -63,9 +62,7 @@ public class ConferenceController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    public void delete(Authentication auth, @PathVariable Long id) {
-        Long userId = (Long) auth.getPrincipal();
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
-        conferenceService.delete(id, userId, isAdmin);
+    public void delete(AppAuthentication auth, @PathVariable Long id) {
+        conferenceService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 }

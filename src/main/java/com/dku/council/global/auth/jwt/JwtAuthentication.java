@@ -32,6 +32,11 @@ public class JwtAuthentication implements AppAuthentication {
     }
 
     @Override
+    public boolean isAdmin() {
+        return getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
+    }
+
+    @Override
     public Object getCredentials() {
         return userId;
     }

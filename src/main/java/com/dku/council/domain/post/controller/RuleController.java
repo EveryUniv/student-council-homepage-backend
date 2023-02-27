@@ -8,6 +8,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,9 +54,8 @@ public class RuleController {
      * @return 게시글 id
      */
     @PostMapping
-    public ResponsePostIdDto create(Authentication auth, @Valid @RequestBody RequestCreateRuleDto request) {
-        Long userId = (Long) auth.getPrincipal();
-        Long postId = ruleService.create(userId, request);
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateRuleDto request) {
+        Long postId = ruleService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
 
@@ -67,11 +66,10 @@ public class RuleController {
      * @return 총학 회칙 게시글 정보
      */
     @GetMapping("/{id}")
-    public ResponseSingleGenericPostDto findOne(Authentication auth,
+    public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        Long userId = (Long) auth.getPrincipal();
-        return ruleService.findOne(id, userId, request.getRemoteAddr());
+        return ruleService.findOne(id, auth.getUserId(), request.getRemoteAddr());
     }
 
     /**
@@ -80,10 +78,8 @@ public class RuleController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    public void delete(Authentication auth, @PathVariable Long id) {
-        Long userId = (Long) auth.getPrincipal();
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
-        ruleService.delete(id, userId, isAdmin);
+    public void delete(AppAuthentication auth, @PathVariable Long id) {
+        ruleService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
 }

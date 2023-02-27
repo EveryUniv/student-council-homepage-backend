@@ -6,4 +6,6 @@ public interface AppAuthentication extends Authentication {
     Long getUserId();
 
     String getUserRole();
+
+    boolean isAdmin();
 }

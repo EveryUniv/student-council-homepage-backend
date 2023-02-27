@@ -58,8 +58,7 @@ public class NewsController {
     @PostMapping
     @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
     public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateNewsDto request) {
-        Long userId = auth.getUserId();
-        Long postId = postService.create(userId, request);
+        Long postId = postService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
 
@@ -74,8 +73,7 @@ public class NewsController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        Long userId = auth.getUserId();
-        return postService.findOne(id, userId, request.getRemoteAddr());
+        return postService.findOne(id, auth.getUserId(), request.getRemoteAddr());
     }
 
     /**
@@ -86,8 +84,6 @@ public class NewsController {
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        Long userId = auth.getUserId();
-        boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
-        postService.delete(id, userId, isAdmin);
+        postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 }
