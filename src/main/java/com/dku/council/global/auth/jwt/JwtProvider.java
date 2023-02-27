@@ -1,7 +1,7 @@
 package com.dku.council.global.auth.jwt;
 
-import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.ExpiredTokenException;
 import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.global.error.exception.InvalidTokenException;
