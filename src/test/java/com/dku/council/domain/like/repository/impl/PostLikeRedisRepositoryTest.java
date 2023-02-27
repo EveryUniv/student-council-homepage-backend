@@ -2,7 +2,7 @@ package com.dku.council.domain.like.repository.impl;
 
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
-import com.dku.council.global.config.RedisKeys;
+import com.dku.council.global.config.redis.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

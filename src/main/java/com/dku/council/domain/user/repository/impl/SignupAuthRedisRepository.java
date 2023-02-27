@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.repository.impl;
 
 import com.dku.council.domain.user.repository.SignupAuthRepository;
-import com.dku.council.global.config.RedisKeys;
+import com.dku.council.global.config.redis.RedisKeys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

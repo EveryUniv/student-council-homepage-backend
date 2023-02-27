@@ -1,4 +1,4 @@
-package com.dku.council.global.config;
+package com.dku.council.global.config.redis;
 
 public class RedisKeys {
     public static final String KEY_DELIMITER = ":";
