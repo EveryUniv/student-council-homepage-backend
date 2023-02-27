@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import com.dku.council.domain.category.Category;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -35,5 +36,5 @@ public abstract class RequestCreateGenericPostDto<T> {
         this.files = Objects.requireNonNullElseGet(files, ArrayList::new);
     }
 
-    public abstract T toEntity(User user);
+    public abstract T toEntity(User user, Category category);
 }

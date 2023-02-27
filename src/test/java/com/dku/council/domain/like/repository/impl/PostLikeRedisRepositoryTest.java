@@ -1,8 +1,10 @@
 package com.dku.council.domain.like.repository.impl;
 
+import com.dku.council.common.AbstractContainerRedisTest;
+import com.dku.council.common.DevTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
-import com.dku.council.global.config.RedisKeys;
+import com.dku.council.global.config.redis.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,13 +18,9 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * TODO 테스트 카테고라이징 필요.
- * 느린 테스트, 빠른 테스트(유닛), 실제 테스트 등...
- * gradle build 에서는 빠른 테스트만
- */
 @SpringBootTest
-class PostLikeRedisRepositoryTest {
+@DevTest
+class PostLikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private PostLikeRedisRepository repository;
