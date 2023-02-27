@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
@@ -10,9 +9,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
-public class RequestCreateRuleDto extends RequestCreatePostDto{
-    public RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, List<MultipartFile> files) {
-        super(title, body, files);
+public class RequestCreateRuleDto extends RequestCreateGenericPostDto<Rule> {
+
+    protected RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
+        super(title, body, categoryId, files);
     }
 
     public Rule toEntity(User user) {

@@ -9,10 +9,10 @@ import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Getter
-public class RequestCreateNewsDto extends RequestCreatePostDto {
+public class RequestCreateNewsDto extends RequestCreateGenericPostDto<News> {
 
-    public RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, List<MultipartFile> files) {
-        super(title, body, files);
+    protected RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
+        super(title, body, categoryId, files);
     }
 
     public News toEntity(User user) {

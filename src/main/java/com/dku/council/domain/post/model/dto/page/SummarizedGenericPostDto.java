@@ -1,14 +1,14 @@
 package com.dku.council.domain.post.model.dto.page;
 
 import com.dku.council.domain.post.model.dto.PostFileDto;
-import com.dku.council.domain.post.model.entity.posttype.News;
+import com.dku.council.domain.post.model.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class SummarizedNewsDto {
+public class SummarizedGenericPostDto {
 
     // TODO 이것도 example 포함해서 javadoc으로 표현할 수 있도록 하기
     @Schema(description = "게시글 아이디", example = "1")
@@ -26,11 +26,11 @@ public class SummarizedNewsDto {
     @Schema(description = "조회수", example = "16")
     private final int views;
 
-    public SummarizedNewsDto(String baseFileUrl, News news) {
-        this.id = news.getId();
-        this.title = news.getTitle();
-        this.createdDate = news.getCreatedDateText();
-        this.files = PostFileDto.listOf(baseFileUrl, news.getFiles());
-        this.views = news.getViews();
+    public SummarizedGenericPostDto(String baseFileUrl, Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.createdDate = post.getCreatedDateText();
+        this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
+        this.views = post.getViews();
     }
 }

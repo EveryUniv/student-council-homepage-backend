@@ -2,25 +2,20 @@ package com.dku.council.domain.post.repository.spec;
 
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import org.springframework.data.jpa.domain.Specification;
-
-import javax.persistence.criteria.CriteriaBuilder;
 
 // TODO Test 추가
 public class PostSpec {
 
-    public static <T extends Post> Specification<T> generalForumCondition(String keyword, String category) {
-        Specification<T> active = isActive();
-        if(keyword != null) active.and(withTitleOrBody(keyword));
-        if(category != null) active.and(withCategory(category));
-        return active;
+    public static <T extends Post> Specification<T> createPostCondition() {
+        return withActive();
     }
 
-    public static <T extends Post> Specification<T> keywordCondition(String keyword) {
-        Specification<T> active = isActive();
-        if(keyword != null) active.and(withTitleOrBody(keyword));
-        return active;
+    public static <T extends Post> Specification<T> genericPostCondition(String keyword, Long categoryId) {
+        Specification<T> spec = createPostCondition();
+        if (keyword != null) spec.and(withTitleOrBody(keyword));
+        if (categoryId != null) spec.and(withCategory(categoryId));
+        return spec;
     }
 
     private static <T extends Post> Specification<T> withTitleOrBody(String keyword) {
@@ -32,17 +27,13 @@ public class PostSpec {
                 );
     }
 
-    private static <T extends Post> Specification<T> isActive(){
+    private static <T extends Post> Specification<T> withActive() {
         return (root, query, builder) ->
-                builder.equal(root.get("status"), PostStatus.ACTIVE.name());
+                builder.equal(root.get("status"), PostStatus.ACTIVE);
     }
 
-    private static <T extends Post> Specification<T> withCategory(String category){
+    private static <T extends Post> Specification<T> withCategory(Long categoryId) {
         return (root, query, builder) ->
-                builder.equal(root.get("category"), category);
+                builder.equal(root.get("category"), categoryId);
     }
-
-
-
-
 }

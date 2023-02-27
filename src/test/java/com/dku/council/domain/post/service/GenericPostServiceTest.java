@@ -2,13 +2,11 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
-import com.dku.council.domain.post.model.dto.page.SummarizedNewsDto;
+import com.dku.council.domain.post.model.dto.page.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
-import com.dku.council.domain.post.model.dto.response.ResponseSingleNewsDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.repository.NewsRepository;
 import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
@@ -40,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class NewsServiceTest {
+class GenericPostServiceTest {
 
     @Mock
     private NewsRepository newsRepository;
@@ -55,7 +53,7 @@ class NewsServiceTest {
     private FileUploadService fileUploadService;
 
     @InjectMocks
-    private NewsService service;
+    private GenericPostService service;
 
 
     @Test
@@ -69,7 +67,7 @@ class NewsServiceTest {
         when(fileUploadService.getBaseURL()).thenReturn("http://base/");
 
         // when
-        Page<SummarizedNewsDto> allPage = service.list(null, Pageable.unpaged());
+        Page<SummarizedGenericPostDto> allPage = service.list(null, Pageable.unpaged());
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
@@ -114,9 +112,9 @@ class NewsServiceTest {
         return news;
     }
 
-    private void assertSummarizedNewsDtoList(List<SummarizedNewsDto> actual, List<News> expected) {
+    private void assertSummarizedNewsDtoList(List<SummarizedGenericPostDto> actual, List<News> expected) {
         for (int i = 0; i < actual.size(); i++) {
-            SummarizedNewsDto dto = actual.get(i);
+            SummarizedGenericPostDto dto = actual.get(i);
             News news = expected.get(i);
             assertThat(dto.getTitle()).isEqualTo(news.getTitle());
         }

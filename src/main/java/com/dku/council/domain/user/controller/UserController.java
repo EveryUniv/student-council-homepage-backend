@@ -27,6 +27,7 @@ public class UserController {
 
     /**
      * 회원가입
+     * todo 이메일 인증으로 전환 + 회원가입 토큰 만료시간 정하기
      *
      * @param dto         요청 Body
      * @param signupToken 회원가입 토큰
