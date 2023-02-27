@@ -26,9 +26,6 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    public static final String ADMIN_ROLE = "ROLE_ADMIN";
-    public static final String USER_ROLE = "ROLE_USER";
-
     private static final String[] PUBLIC_URI = {
             "/swagger-ui/**", "/api-docs/**", "/test"
     };

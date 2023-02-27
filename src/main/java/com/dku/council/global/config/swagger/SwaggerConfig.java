@@ -1,4 +1,4 @@
-package com.dku.council.global.config;
+package com.dku.council.global.config.swagger;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

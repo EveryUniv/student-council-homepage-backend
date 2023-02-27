@@ -1,5 +1,7 @@
 package com.dku.council.domain.post.service;
 
+import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
@@ -43,6 +45,9 @@ class GenericPostServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
     private ViewCountService viewCountService;
 
     @Mock
@@ -77,7 +82,7 @@ class GenericPostServiceTest {
         News news = NewsMock.create(user, 3L);
 
         List<MultipartFile> files = MultipartFileMock.createList(10);
-        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, files);
+        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", null, files);
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
 
@@ -94,6 +99,32 @@ class GenericPostServiceTest {
 
         verify(newsRepository).save(argThat(entity -> {
             assertThat(entity.getUser()).isEqualTo(user);
+            return true;
+        }));
+    }
+
+    @Test
+    @DisplayName("카테고리를 명시하며 생성하기")
+    public void createWithCategory() {
+        // given
+        User user = UserMock.create(99L);
+        News news = NewsMock.create(user, 3L);
+        Category category = new Category("category");
+
+        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, List.of());
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        when(newsRepository.save(any())).thenReturn(news);
+        when(categoryRepository.findById(any())).thenReturn(Optional.of(category));
+
+        // when
+        Long newsId = service.create(2L, dto);
+
+        // then
+        assertThat(newsId).isEqualTo(3L);
+
+        verify(newsRepository).save(argThat(entity -> {
+            assertThat(entity.getUser()).isEqualTo(user);
+            assertThat(entity.getCategory()).isEqualTo(category);
             return true;
         }));
     }

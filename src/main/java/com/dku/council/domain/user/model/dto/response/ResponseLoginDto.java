@@ -1,8 +1,8 @@
 package com.dku.council.domain.user.model.dto.response;
 
-import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.Getter;
 import org.springframework.context.MessageSource;
 

@@ -9,22 +9,21 @@ import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.config.SecurityConfig;
-import com.dku.council.global.config.SwaggerConfig;
+import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+// TODO Test it
 @Tag(name = "총학소식", description = "총학소식 게시판 관련 api")
 @RestController
 @RequestMapping("/post/news")
@@ -33,9 +32,6 @@ public class NewsController {
 
     private final GenericPostService<News> postService;
     private final FileUploadService fileUploadService; // TODO 썩 좋은건 아닌데 나중에 리펙토링
-
-    // TODO summary와 description 둘 다 javadoc으로 표현할 수 있게 하기
-    // TODO void를 반환하는 api들도 Swagger에서는 모두 SuccessResponseDto를 반환하는 걸로 보이게 하기
 
     /**
      * 게시글 목록으로 조회
@@ -54,13 +50,10 @@ public class NewsController {
 
     /**
      * 게시글 등록
-     *
-     * @param request 요청 dto
      */
-    @PostMapping
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.USER_ROLE)
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateNewsDto request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @UserOnly
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
         Long postId = postService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
@@ -72,8 +65,7 @@ public class NewsController {
      * @return 총학소식 게시글 정보
      */
     @GetMapping("/{id}")
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.USER_ROLE)
+    @UserOnly
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
@@ -86,8 +78,7 @@ public class NewsController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.USER_ROLE)
+    @UserOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
     }

@@ -10,10 +10,14 @@ import java.util.List;
 
 public class NewsMock {
     public static List<News> createList(String prefix, int size) {
+        return createList(prefix, UserMock.create(3L), size);
+    }
+
+    public static List<News> createList(String prefix, User user, int size) {
         List<News> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             News news = News.builder()
-                    .user(UserMock.create((long) i))
+                    .user(user)
                     .title(prefix + i)
                     .body("")
                     .build();

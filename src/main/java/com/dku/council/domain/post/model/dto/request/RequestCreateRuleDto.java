@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
+import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
@@ -15,9 +16,10 @@ public class RequestCreateRuleDto extends RequestCreateGenericPostDto<Rule> {
         super(title, body, categoryId, files);
     }
 
-    public Rule toEntity(User user) {
+    public Rule toEntity(User user, Category category) {
         return Rule.builder()
                 .body(getBody())
+                .category(category)
                 .title(getTitle())
                 .user(user)
                 .build();

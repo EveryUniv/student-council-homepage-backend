@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.repository.impl;
 
 import com.dku.council.domain.post.repository.ViewCountMemoryRepository;
-import com.dku.council.global.config.RedisKeys;
+import com.dku.council.global.config.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;

@@ -9,10 +9,9 @@ import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.config.SecurityConfig;
-import com.dku.council.global.config.SwaggerConfig;
+import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -20,12 +19,13 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.annotation.Secured;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+// TODO Test it
 @Tag(name = "총학 회칙", description = "총학 회칙 관련 api")
 @RestController
 @RequestMapping("/post/rule")
@@ -54,13 +54,11 @@ public class RuleController {
     /**
      * 게시글 등록 (Admin)
      *
-     * @param request 요청 dto
      * @return 게시글 id
      */
-    @PostMapping
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.ADMIN_ROLE)
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateRuleDto request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @AdminOnly
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateRuleDto request) {
         Long postId = ruleService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }
@@ -72,8 +70,7 @@ public class RuleController {
      * @return 총학 회칙 게시글 정보
      */
     @GetMapping("/{id}")
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.USER_ROLE)
+    @UserOnly
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
@@ -86,8 +83,7 @@ public class RuleController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-    @Secured(SecurityConfig.ADMIN_ROLE)
+    @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         ruleService.delete(id, auth.getUserId(), auth.isAdmin());
     }
