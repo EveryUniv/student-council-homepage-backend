@@ -1,13 +1,13 @@
 package com.dku.council.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.test.context.TestConfiguration;
 import redis.embedded.RedisServer;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-@Configuration
+@TestConfiguration
 public class EmbeddedRedisConfig {
     private final RedisServer redisServer;
 

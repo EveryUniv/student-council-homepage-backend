@@ -1,10 +1,20 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.common.IntegrationControllerTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 
-class NewsControllerTest extends IntegrationControllerTest {
+@AutoConfigureMockMvc
+@SpringBootTest
+class NewsControllerTest {
 
     @Autowired
-    private NewsController controller;
+    private MockMvc mvc;
+
+    @Test
+    void list(){
+
+    }
 }
