@@ -16,6 +16,7 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -48,12 +49,11 @@ public class ConferenceController {
     /**
      * 게시글 등록 (Admin)
      *
-     * @param request 요청 dto
      * @return 생성된 게시글 id
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateConferenceDto request) {
+    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
         Long postId = conferenceService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }

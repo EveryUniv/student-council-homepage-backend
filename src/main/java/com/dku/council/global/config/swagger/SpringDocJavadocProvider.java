@@ -63,25 +63,26 @@ public class SpringDocJavadocProvider implements JavadocProvider {
         if (StringUtils.isEmpty(text)) {
             return text;
         }
+
         int pOpenIndex = text.indexOf("<p>");
         int pCloseIndex = text.indexOf("</p>");
-        int dotIndex = text.indexOf(".");
+        int newLineIndex = text.indexOf("\n");
         if (pOpenIndex != -1) {
             if (pOpenIndex == 0 && pCloseIndex != -1) {
-                if (dotIndex != -1) {
-                    return text.substring(3, min(pCloseIndex, dotIndex));
+                if (newLineIndex != -1) {
+                    return text.substring(3, min(pCloseIndex, newLineIndex));
                 }
                 return text.substring(3, pCloseIndex);
             }
-            if (dotIndex != -1) {
-                return text.substring(0, min(pOpenIndex, dotIndex));
+            if (newLineIndex != -1) {
+                return text.substring(0, min(pOpenIndex, newLineIndex));
             }
             return text.substring(0, pOpenIndex);
         }
-        if (dotIndex != -1
-                && text.length() != dotIndex + 1
-                && Character.isWhitespace(text.charAt(dotIndex + 1))) {
-            return text.substring(0, dotIndex + 1);
+        if (newLineIndex != -1
+                && text.length() != newLineIndex + 1
+                && Character.isWhitespace(text.charAt(newLineIndex + 1))) {
+            return text.substring(0, newLineIndex + 1);
         }
         return text;
     }

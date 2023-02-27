@@ -17,6 +17,7 @@ import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,12 +52,11 @@ public class GeneralForumController {
 
     /**
      * 게시글 등록
-     *
-     * @param request 요청 dto
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateGeneralForumDto request) {
+    public ResponsePostIdDto create(AppAuthentication auth,
+                                    @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
         Long postId = generalForumService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
     }

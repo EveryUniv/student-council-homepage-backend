@@ -1,6 +1,6 @@
 package com.dku.council.global.auth.role;
 
-import com.dku.council.global.config.SwaggerConfig;
+import com.dku.council.global.config.swagger.SwaggerConfig;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.security.access.annotation.Secured;
 

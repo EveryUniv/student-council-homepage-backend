@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 public class SummarizedGenericPostDto {
 
-    // TODO 이것도 example 포함해서 javadoc으로 표현할 수 있도록 하기
     @Schema(description = "게시글 아이디", example = "1")
     private final Long id;
 
