@@ -9,7 +9,10 @@ import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.config.SecurityConfig;
+import com.dku.council.global.config.SwaggerConfig;
 import com.dku.council.infra.nhn.service.FileUploadService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -17,6 +20,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,12 +52,14 @@ public class RuleController {
     }
 
     /**
-     * 게시글 등록
+     * 게시글 등록 (Admin)
      *
      * @param request 요청 dto
      * @return 게시글 id
      */
     @PostMapping
+    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
+    @Secured(SecurityConfig.ADMIN_ROLE)
     public ResponsePostIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateRuleDto request) {
         Long postId = ruleService.create(auth.getUserId(), request);
         return new ResponsePostIdDto(postId);
@@ -66,6 +72,8 @@ public class RuleController {
      * @return 총학 회칙 게시글 정보
      */
     @GetMapping("/{id}")
+    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
+    @Secured(SecurityConfig.USER_ROLE)
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
@@ -73,11 +81,13 @@ public class RuleController {
     }
 
     /**
-     * 게시글 삭제
+     * 게시글 삭제 (Admin)
      *
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
+    @Secured(SecurityConfig.ADMIN_ROLE)
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         ruleService.delete(id, auth.getUserId(), auth.isAdmin());
     }
