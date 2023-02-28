@@ -7,7 +7,7 @@ import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -30,7 +30,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class NewsController {
 
-    private final GenericPostService<News> postService;
+    private final NewsService postService;
     private final FileUploadService fileUploadService; // TODO 썩 좋은건 아닌데 나중에 리펙토링
 
     /**

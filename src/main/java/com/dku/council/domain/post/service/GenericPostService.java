@@ -20,7 +20,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -31,17 +30,18 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * @param <E> Entity 타입
  */
-@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class GenericPostService<E extends Post> {
+public abstract class GenericPostService<E extends Post> {
 
-    private final GenericPostRepository<E> postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
     private final MessageSource messageSource;
+
+
+    protected abstract GenericPostRepository<E> getRepository();
 
     /**
      * 게시글 목록으로 조회
@@ -51,7 +51,7 @@ public class GenericPostService<E extends Post> {
      * @return 페이징된 목록
      */
     public Page<E> list(Specification<E> specification, Pageable pageable) {
-        return postRepository.findAll(specification, pageable);
+        return getRepository().findAll(specification, pageable);
     }
 
     /**
@@ -75,7 +75,7 @@ public class GenericPostService<E extends Post> {
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));
 
-        E savedPost = postRepository.save(post);
+        E savedPost = getRepository().save(post);
         return savedPost.getId();
     }
 
@@ -87,7 +87,7 @@ public class GenericPostService<E extends Post> {
      * @return 총학소식 게시글 정보
      */
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
-        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        E post = getRepository().findById(postId).orElseThrow(PostNotFoundException::new);
         if (post.getStatus().isDeleted()) {
             throw new PostNotFoundException();
         }
@@ -105,7 +105,7 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional
     public void delete(Long postId, Long userId, boolean isUserAdmin) {
-        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        E post = getRepository().findById(postId).orElseThrow(PostNotFoundException::new);
         if (isUserAdmin) {
             post.updateStatus(PostStatus.DELETED_BY_ADMIN);
         } else if (post.getUser().getId().equals(userId)) {
