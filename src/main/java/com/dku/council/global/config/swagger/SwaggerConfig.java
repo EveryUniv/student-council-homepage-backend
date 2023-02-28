@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "단국대학교 프론트엔드 개발에 활용할 수 있는 RESTFUL API 제공"
         ),
         servers = {
-                @Server(url = "https://dev.dkustu.com", description = "개발 서버"),
+                @Server(url = "https://dev.dkustu.com/api", description = "개발 서버"),
                 @Server(url = "/", description = "로컬 서버")
         }
 )

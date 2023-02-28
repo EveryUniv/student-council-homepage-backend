@@ -40,7 +40,7 @@ public class RuleController {
      * 게시글 목록으로 조회
      *
      * @param keyword 제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
-     * @return 페지이된 총학 회칙 목록
+     * @return 페이징된 총학 회칙 목록
      */
     @GetMapping
     public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
