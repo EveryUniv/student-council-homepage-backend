@@ -3,13 +3,13 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.dto.page.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -53,9 +53,9 @@ public class NewsController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
+    public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
         Long postId = postService.create(auth.getUserId(), request);
-        return new ResponsePostIdDto(postId);
+        return new ResponseIdDto(postId);
     }
 
     /**

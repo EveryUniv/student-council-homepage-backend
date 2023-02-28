@@ -8,15 +8,15 @@ import lombok.Getter;
  * response로 "ok"만 보내주는 것보다는, json으로 보내주면 받는 입장에서 dto와 ok를 구분할 필요가 없어지므로 좀 더 편할 것이다.
  */
 @Getter
-public class SuccessResponseDto {
+public class ResponseSuccessDto {
 
     private final String message;
 
-    public SuccessResponseDto() {
+    public ResponseSuccessDto() {
         this("ok");
     }
 
-    public SuccessResponseDto(String message) {
+    public ResponseSuccessDto(String message) {
         this.message = message;
     }
 }

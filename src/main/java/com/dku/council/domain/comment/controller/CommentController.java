@@ -1,6 +1,6 @@
 package com.dku.council.domain.comment.controller;
 
-import com.dku.council.domain.comment.model.dto.request.RequestCreateCommentDto;
+import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;

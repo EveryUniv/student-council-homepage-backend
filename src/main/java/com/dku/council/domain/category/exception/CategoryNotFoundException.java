@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.exception;
+package com.dku.council.domain.category.exception;
 
 import com.dku.council.global.error.exception.LocalizedMessageException;
 import org.springframework.http.HttpStatus;

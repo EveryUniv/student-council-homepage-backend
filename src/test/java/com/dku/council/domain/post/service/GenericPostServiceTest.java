@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;

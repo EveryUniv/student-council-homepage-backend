@@ -3,12 +3,12 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.dto.page.SummarizedConferenceDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -54,9 +54,9 @@ public class ConferenceController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
+    public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
         Long postId = conferenceService.create(auth.getUserId(), request);
-        return new ResponsePostIdDto(postId);
+        return new ResponseIdDto(postId);
     }
 
     /**

@@ -1,9 +1,11 @@
 package com.dku.council.domain.comment.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 // Todo Test it
 @Service
+@Transactional
 public class CommentService {
 
     /**

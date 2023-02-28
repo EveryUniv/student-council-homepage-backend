@@ -3,7 +3,6 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.dto.page.SummarizedRuleDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateRuleDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.post.repository.spec.PostSpec;
@@ -11,6 +10,7 @@ import com.dku.council.domain.post.service.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +58,9 @@ public class RuleController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
-    public ResponsePostIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateRuleDto request) {
+    public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateRuleDto request) {
         Long postId = ruleService.create(auth.getUserId(), request);
-        return new ResponsePostIdDto(postId);
+        return new ResponseIdDto(postId);
     }
 
     /**
