@@ -1,6 +1,6 @@
 package com.dku.council.global.interceptor;
 
-import com.dku.council.global.dto.SuccessResponseDto;
+import com.dku.council.global.dto.ResponseSuccessDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +44,7 @@ class VoidSuccessResponseInterceptorTest {
         when(response.getStatus()).thenReturn(200);
         when(response.getContentType()).thenReturn(null);
         when(response.getOutputStream()).thenReturn(outputStream);
-        byte[] bytes = objectMapper.writeValueAsString(new SuccessResponseDto()).getBytes();
+        byte[] bytes = objectMapper.writeValueAsString(new ResponseSuccessDto()).getBytes();
 
         // when
         interceptor.afterCompletion(request, response, new Object(), null);

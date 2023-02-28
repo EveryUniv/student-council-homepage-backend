@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;

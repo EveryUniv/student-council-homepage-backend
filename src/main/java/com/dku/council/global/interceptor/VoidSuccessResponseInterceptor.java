@@ -1,6 +1,6 @@
 package com.dku.council.global.interceptor;
 
-import com.dku.council.global.dto.SuccessResponseDto;
+import com.dku.council.global.dto.ResponseSuccessDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class VoidSuccessResponseInterceptor implements HandlerInterceptor {
             return;
         }
 
-        String wrappedBody = objectMapper.writeValueAsString(new SuccessResponseDto());
+        String wrappedBody = objectMapper.writeValueAsString(new ResponseSuccessDto());
 
         byte[] bytesData = wrappedBody.getBytes();
         response.setContentType("application/json");

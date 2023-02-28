@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
