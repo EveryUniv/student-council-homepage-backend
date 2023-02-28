@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.model.dto.response;
+package com.dku.council.global.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,10 +6,10 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ResponsePostIdDto {
+public class ResponseIdDto {
     private Long id;
 
-    public ResponsePostIdDto(Long id) {
+    public ResponseIdDto(Long id) {
         this.id = id;
     }
 }

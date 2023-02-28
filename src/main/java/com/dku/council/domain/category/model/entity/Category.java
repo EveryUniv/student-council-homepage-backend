@@ -1,4 +1,4 @@
-package com.dku.council.domain.category;
+package com.dku.council.domain.category.model.entity;
 
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -22,6 +22,10 @@ public class Category extends BaseEntity {
     private String name;
 
     public Category(String name) {
+        this.name = name;
+    }
+
+    public void updateName(String name) {
         this.name = name;
     }
 }

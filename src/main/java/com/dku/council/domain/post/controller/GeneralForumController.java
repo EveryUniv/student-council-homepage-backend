@@ -3,13 +3,13 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.dto.page.SummarizedGeneralForumDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GeneralForumService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -56,10 +56,10 @@ public class GeneralForumController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
-    public ResponsePostIdDto create(AppAuthentication auth,
-                                    @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
+    public ResponseIdDto create(AppAuthentication auth,
+                                @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
         Long postId = generalForumService.create(auth.getUserId(), request);
-        return new ResponsePostIdDto(postId);
+        return new ResponseIdDto(postId);
     }
 
     /**
@@ -78,6 +78,7 @@ public class GeneralForumController {
 
     /**
      * 게시글 삭제
+     * 게시글 삭제시 연관된 파일, 댓글, 좋아요 등이 모두 함께 삭제됩니다.
      *
      * @param auth 사용자 인증정보
      * @param id   삭제할 게시글 id

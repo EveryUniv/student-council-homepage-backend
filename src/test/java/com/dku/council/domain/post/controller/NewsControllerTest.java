@@ -3,13 +3,13 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.common.AbstractContainerRedisTest;
 import com.dku.council.common.MvcMockResponse;
 import com.dku.council.common.OnlyDevTest;
-import com.dku.council.domain.category.Category;
+import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.category.repository.CategoryRepository;
-import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
@@ -108,7 +108,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("id").exists())
                 .andReturn();
 
-        ResponsePostIdDto dto = MvcMockResponse.getResponse(response, ResponsePostIdDto.class);
+        ResponseIdDto dto = MvcMockResponse.getResponse(response, ResponseIdDto.class);
         News actualNews = postRepository.findById(dto.getId()).orElseThrow();
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
@@ -134,7 +134,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("id").exists())
                 .andReturn();
 
-        ResponsePostIdDto dto = MvcMockResponse.getResponse(response, ResponsePostIdDto.class);
+        ResponseIdDto dto = MvcMockResponse.getResponse(response, ResponseIdDto.class);
         News actualNews = postRepository.findById(dto.getId()).orElseThrow();
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
