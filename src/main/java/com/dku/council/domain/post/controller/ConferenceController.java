@@ -6,7 +6,7 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePostIdDto;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -28,7 +28,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class ConferenceController {
 
-    private final GenericPostService<Conference> conferenceService;
+    private final ConferenceService conferenceService;
     private final FileUploadService fileUploadService;
 
     /**
