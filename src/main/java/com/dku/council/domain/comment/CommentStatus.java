@@ -19,5 +19,7 @@ public enum CommentStatus {
     /**
      * 운영자에 의해 삭제된 상태
      */
-    DELETED_BY_ADMIN
+    DELETED_BY_ADMIN;
+
+    public static final String ACTIVE_NAME = "ACTIVE";
 }

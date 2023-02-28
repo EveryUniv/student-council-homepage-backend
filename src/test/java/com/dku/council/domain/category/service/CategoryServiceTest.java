@@ -70,7 +70,7 @@ class CategoryServiceTest {
     void rename() {
         // given
         Category category = CategoryMock.create(10L);
-        when(repository.findById(any())).thenReturn(Optional.of(category));
+        when(repository.findById(10L)).thenReturn(Optional.of(category));
 
         // when
         Long edited = service.rename(10L, "new name");
@@ -84,7 +84,7 @@ class CategoryServiceTest {
     @DisplayName("카테고리 이름 변경 실패 - 카테고리가 없음")
     void failedRenameByNotFound() {
         // given
-        when(repository.findById(any())).thenReturn(Optional.empty());
+        when(repository.findById(10L)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(CategoryNotFoundException.class,
@@ -96,7 +96,7 @@ class CategoryServiceTest {
     void delete() {
         // given
         Category category = CategoryMock.create(10L);
-        when(repository.findById(any())).thenReturn(Optional.of(category));
+        when(repository.findById(10L)).thenReturn(Optional.of(category));
 
         // when
         Long deleted = service.delete(10L);
@@ -110,7 +110,7 @@ class CategoryServiceTest {
     @DisplayName("카테고리 삭제 실패 - 카테고리가 없음")
     void failedDeletionByNotFound() {
         // given
-        when(repository.findById(any())).thenReturn(Optional.empty());
+        when(repository.findById(10L)).thenReturn(Optional.empty());
 
         // when & then
         assertThrows(CategoryNotFoundException.class,

@@ -78,6 +78,7 @@ public class GeneralForumController {
 
     /**
      * 게시글 삭제
+     * 게시글 삭제시 연관된 파일, 댓글, 좋아요 등이 모두 함께 삭제됩니다.
      *
      * @param auth 사용자 인증정보
      * @param id   삭제할 게시글 id

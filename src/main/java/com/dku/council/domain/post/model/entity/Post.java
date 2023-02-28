@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.category.model.entity.Category;
+import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
@@ -9,6 +10,7 @@ import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -56,6 +58,7 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostFile> files = new ArrayList<>();
 
+    @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
@@ -81,7 +84,7 @@ public class Post extends BaseEntity {
         views++;
     }
 
-    public void updateStatus(PostStatus status){
+    public void updateStatus(PostStatus status) {
         this.status = status;
     }
 }

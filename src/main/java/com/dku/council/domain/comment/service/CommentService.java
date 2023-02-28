@@ -1,12 +1,28 @@
 package com.dku.council.domain.comment.service;
 
+import com.dku.council.domain.comment.CommentRepository;
+import com.dku.council.domain.comment.CommentStatus;
+import com.dku.council.domain.comment.exception.CommentNotFoundException;
+import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.post.exception.PostNotFoundException;
+import com.dku.council.domain.post.exception.UserNotFoundException;
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.repository.PostRepository;
+import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.error.exception.NotGrantedException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Todo Test it
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class CommentService {
+
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * Post에 댓글을 추가합니다.
@@ -15,8 +31,18 @@ public class CommentService {
      * @param userId  사용자 ID
      * @param content 댓글 내용
      */
-    public void add(Long postId, Long userId, String content) {
-        // TODO Implementation
+    public Long create(Long postId, Long userId, String content) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        Comment comment = Comment.builder()
+                .user(user)
+                .post(post)
+                .text(content)
+                .build();
+
+        comment = commentRepository.save(comment);
+        return comment.getId();
     }
 
     /**
@@ -26,8 +52,15 @@ public class CommentService {
      * @param userId    사용자 ID
      * @param content   댓글 내용
      */
-    public void edit(Long commentId, Long userId, String content) {
-        // TODO Implementation
+    public Long edit(Long commentId, Long userId, String content) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if (!comment.getUser().getId().equals(userId)) {
+            throw new NotGrantedException();
+        }
+
+        comment.updateText(content);
+        return commentId;
     }
 
     /**
@@ -37,7 +70,17 @@ public class CommentService {
      * @param userId    사용자 ID
      * @param isAdmin   Admin 여부
      */
-    public void delete(Long commentId, Long userId, boolean isAdmin) {
-        // TODO Implementation
+    public Long delete(Long commentId, Long userId, boolean isAdmin) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+
+        if (isAdmin) {
+            comment.updateStatus(CommentStatus.DELETED_BY_ADMIN);
+        } else if (comment.getUser().getId().equals(userId)) {
+            comment.updateStatus(CommentStatus.DELETED);
+        } else {
+            throw new NotGrantedException();
+        }
+
+        return commentId;
     }
 }
