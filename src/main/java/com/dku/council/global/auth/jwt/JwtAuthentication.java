@@ -27,11 +27,6 @@ public class JwtAuthentication implements AppAuthentication {
     }
 
     @Override
-    public String getUserRole() {
-        return userRole.getName();
-    }
-
-    @Override
     public boolean isAdmin() {
         return getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
