@@ -1,4 +1,4 @@
-package com.dku.council.util;
+package com.dku.council.mock;
 
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -13,9 +13,9 @@ import java.nio.charset.StandardCharsets;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class MockServerUtil {
+public class ServerMock {
 
-    private static final Logger log = getLogger(MockServerUtil.class);
+    private static final Logger log = getLogger(ServerMock.class);
 
     /**
      * MockWebServer에 json타입의 body 응답을 추가합니다.
@@ -77,7 +77,7 @@ public class MockServerUtil {
     }
 
     public static String readResource(String path) {
-        try (InputStream inStream = MockServerUtil.class.getResourceAsStream(path);
+        try (InputStream inStream = ServerMock.class.getResourceAsStream(path);
              InputStreamReader reader = new InputStreamReader(inStream, StandardCharsets.UTF_8)) {
             return readStringFromReader(reader);
         } catch (IOException e) {

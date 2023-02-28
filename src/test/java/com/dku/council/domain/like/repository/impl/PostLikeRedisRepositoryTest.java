@@ -1,7 +1,7 @@
 package com.dku.council.domain.like.repository.impl;
 
 import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.DevTest;
+import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.global.config.redis.RedisKeys;
@@ -19,7 +19,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@DevTest
+@OnlyDevTest
 class PostLikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired

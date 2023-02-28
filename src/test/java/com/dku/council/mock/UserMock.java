@@ -11,9 +11,10 @@ public class UserMock {
 
     public static final String STUDENT_ID = "12345678";
     public static final String PASSWORD = "abcdabab";
+    public static final String NAME = "username";
 
     public static User create() {
-        return create(1L);
+        return create(RandomGen.nextLong());
     }
 
     public static User create(Long userId) {
@@ -34,7 +35,7 @@ public class UserMock {
         User user = User.builder()
                 .studentId(STUDENT_ID)
                 .password(password)
-                .name("name")
+                .name(NAME)
                 .role(role)
                 .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")

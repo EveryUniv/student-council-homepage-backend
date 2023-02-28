@@ -1,22 +1,22 @@
 package com.dku.council.global.auth.jwt;
 
-import lombok.AccessLevel;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class JwtAuthentication implements AppAuthentication {
     private Long userId;
-    private String userRole;
+    private UserRole userRole;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
-        for (String role : userRole.split(",")) {
-            authorities.add(() -> role);
+        for (String authority : userRole.getName().split(",")) {
+            authorities.add(() -> authority);
         }
         return authorities;
     }
@@ -28,12 +28,12 @@ public class JwtAuthentication implements AppAuthentication {
 
     @Override
     public String getUserRole() {
-        return userRole;
+        return userRole.getName();
     }
 
     @Override
     public boolean isAdmin() {
-        return getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        return getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     @Override

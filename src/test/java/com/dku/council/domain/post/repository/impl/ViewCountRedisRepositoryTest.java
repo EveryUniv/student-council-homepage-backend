@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.repository.impl;
 
 import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.DevTest;
+import com.dku.council.common.OnlyDevTest;
 import com.dku.council.global.config.redis.RedisKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@DevTest
+@OnlyDevTest
 class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired

@@ -49,7 +49,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
         Claims body = claimsJws.getBody();
         Long userId = Long.parseLong((String) body.get("userId"));
-        String userRole = (String) body.get("Role");
+        UserRole userRole = UserRole.of((String) body.get("userRole"));
 
         return new JwtAuthentication(userId, userRole);
     }
@@ -80,10 +80,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
             Jws<Claims> claimsJws = validateAccessToken(accessToken);
             Claims body = claimsJws.getBody();
             userId = (String) body.get("userId");
-            role = UserRole.of((String) body.get("Role"));
+            role = UserRole.of((String) body.get("userRole"));
         } catch (ExpiredJwtException e) {
             userId = (String) e.getClaims().get("userId");
-            role = UserRole.of((String) e.getClaims().get("Role"));
+            role = UserRole.of((String) e.getClaims().get("userRole"));
         }
         return createAccessToken(userId, role);
     }
@@ -94,7 +94,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("userId", userId);
-        payloads.put("Role", role.getRole());
+        payloads.put("userRole", role.getName());
 
         return Jwts.builder()
                 .setSubject("UserInfo") //"sub":"userId"
