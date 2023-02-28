@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @SecurityRequirement(name = SwaggerConfig.AUTHENTICATION)
-@Secured(UserRoleNames.ROLE_USER)
+@Secured(UserAuthNames.ROLE_USER)
 public @interface UserOnly {
 }

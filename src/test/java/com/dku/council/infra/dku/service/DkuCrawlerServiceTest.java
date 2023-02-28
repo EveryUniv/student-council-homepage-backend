@@ -4,7 +4,7 @@ import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
-import com.dku.council.util.MockServerUtil;
+import com.dku.council.mock.ServerMock;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +60,7 @@ class DkuCrawlerServiceTest {
                 return "모르는 학과";
             }
         });
-        MockServerUtil.html(mockServer, "dku/student-info-response");
+        ServerMock.html(mockServer, "dku/student-info-response");
 
         // when
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -77,7 +77,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 실패 status code")
     public void failedCrawlByInvalidStatusCode() {
         // given
-        MockServerUtil.status(mockServer, HttpStatus.NOT_FOUND);
+        ServerMock.status(mockServer, HttpStatus.NOT_FOUND);
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -89,7 +89,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 학번정보가 누락된 response")
     public void failedCrawlByInvalidResponse1() {
         // given
-        MockServerUtil.html(mockServer, "dku/student-info-response-failed-1");
+        ServerMock.html(mockServer, "dku/student-info-response-failed-1");
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -101,7 +101,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 없는 학과인 response")
     public void failedCrawlByInvalidResponse2() {
         // given
-        MockServerUtil.html(mockServer, "dku/student-info-response-failed-2");
+        ServerMock.html(mockServer, "dku/student-info-response-failed-2");
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
