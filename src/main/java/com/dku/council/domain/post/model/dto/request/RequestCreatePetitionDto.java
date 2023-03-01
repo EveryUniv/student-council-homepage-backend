@@ -8,13 +8,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
 public class RequestCreatePetitionDto extends RequestCreateGenericPostDto<Petition> {
 
-    @NotBlank
+    @NotNull
     @Schema(description = "카테고리 ID", example = "11")
     private final Long categoryId;
 

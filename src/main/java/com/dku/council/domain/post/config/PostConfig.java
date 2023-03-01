@@ -1,14 +1,8 @@
 package com.dku.council.domain.post.config;
 
 import com.dku.council.domain.category.repository.CategoryRepository;
-import com.dku.council.domain.post.model.entity.posttype.Conference;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
-import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.model.entity.posttype.Rule;
-import com.dku.council.domain.post.repository.ConferenceRepository;
-import com.dku.council.domain.post.repository.GeneralForumRepository;
-import com.dku.council.domain.post.repository.NewsRepository;
-import com.dku.council.domain.post.repository.RuleRepository;
+import com.dku.council.domain.post.model.entity.posttype.*;
+import com.dku.council.domain.post.repository.*;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -29,22 +23,27 @@ public class PostConfig {
     private final MessageSource messageSource;
 
     @Bean
-    public GenericPostService<Conference> conferenceService(ConferenceRepository repository) {
+    public GenericPostService<Conference> conferencePostService(ConferenceRepository repository) {
         return new GenericPostService<>(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
     }
 
     @Bean
-    public GenericPostService<GeneralForum> generalForumService(GeneralForumRepository repository) {
+    public GenericPostService<GeneralForum> generalForumPostService(GeneralForumRepository repository) {
         return new GenericPostService<>(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
     }
 
     @Bean
-    public GenericPostService<News> newsService(NewsRepository repository) {
+    public GenericPostService<News> newsPostService(NewsRepository repository) {
         return new GenericPostService<>(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
     }
 
     @Bean
-    public GenericPostService<Rule> ruleService(RuleRepository repository) {
+    public GenericPostService<Rule> rulePostService(RuleRepository repository) {
+        return new GenericPostService<>(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
+    }
+
+    @Bean
+    public GenericPostService<Petition> petitionPostService(PetitionRepository repository) {
         return new GenericPostService<>(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
     }
 }

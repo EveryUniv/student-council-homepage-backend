@@ -9,6 +9,7 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.post.service.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
@@ -34,6 +35,7 @@ import javax.validation.Valid;
 public class PetitionController {
 
     private final PetitionService petitionService;
+    private final GenericPostService<Petition> petitionPostService;
     private final FileUploadService fileUploadService;
 
     /**
@@ -48,7 +50,7 @@ public class PetitionController {
                                                     @RequestParam(required = false) Long categoryId,
                                                     @ParameterObject Pageable pageable) {
         Specification<Petition> spec = PostSpec.genericPostCondition(keyword, categoryId);
-        Page<SummarizedPetitionDto> list = petitionService.list(spec, pageable)
+        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
                 .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);
     }
@@ -61,7 +63,7 @@ public class PetitionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreatePetitionDto request) {
-        Long postId = petitionService.create(auth.getUserId(), request);
+        Long postId = petitionPostService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -88,7 +90,7 @@ public class PetitionController {
     @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        petitionService.delete(id, auth.getUserId(), auth.isAdmin());
+        petitionPostService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
     /**
@@ -100,7 +102,7 @@ public class PetitionController {
     @PatchMapping("/blind/{id}")
     @AdminOnly
     public void blind(@PathVariable Long id) {
-        petitionService.blind(id);
+        petitionPostService.blind(id);
     }
 
     /**

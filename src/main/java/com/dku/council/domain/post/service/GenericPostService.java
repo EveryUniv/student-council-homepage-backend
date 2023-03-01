@@ -102,7 +102,7 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    protected E viewPost(Long postId, String remoteAddress) {
+    public E viewPost(Long postId, String remoteAddress) {
         E post = findPost(postId);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
@@ -115,7 +115,7 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    protected E findPost(Long postId) {
+    public E findPost(Long postId) {
         E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         if (post.getStatus() != PostStatus.ACTIVE) {
             throw new PostNotFoundException();
@@ -135,9 +135,9 @@ public class GenericPostService<E extends Post> {
     public void delete(Long postId, Long userId, boolean isUserAdmin) {
         E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         if (isUserAdmin) {
-            post.updateStatus(PostStatus.DELETED_BY_ADMIN);
+            post.markAsDeleted(true);
         } else if (post.getUser().getId().equals(userId)) {
-            post.updateStatus(PostStatus.DELETED);
+            post.markAsDeleted(false);
         } else {
             throw new NotGrantedException();
         }
@@ -151,7 +151,7 @@ public class GenericPostService<E extends Post> {
     @Transactional
     public void blind(Long postId) {
         E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        post.updateStatus(PostStatus.BLINDED);
+        post.blind();
     }
 
     /**
