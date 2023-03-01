@@ -45,4 +45,12 @@ public class Petition extends Post {
     public static PetitionBuilder builder() {
         return new PetitionBuilder().petitionStatus(PetitionStatus.ACTIVE);
     }
+
+    public void replyAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public void updatePetitionStatus(PetitionStatus status) {
+        this.petitionStatus = status;
+    }
 }

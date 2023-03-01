@@ -34,11 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public abstract class GenericPostService<E extends Post> {
 
-    private final UserRepository userRepository;
-    private final CategoryRepository categoryRepository;
-    private final ViewCountService viewCountService;
-    private final FileUploadService fileUploadService;
-    private final MessageSource messageSource;
+    protected final UserRepository userRepository;
+    protected final CategoryRepository categoryRepository;
+    protected final ViewCountService viewCountService;
+    protected final FileUploadService fileUploadService;
+    protected final MessageSource messageSource;
 
 
     protected abstract GenericPostRepository<E> getRepository();
@@ -84,15 +84,38 @@ public abstract class GenericPostService<E extends Post> {
      *
      * @param postId        조회할 게시글 id
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
-     * @return 총학소식 게시글 정보
+     * @return 게시글 정보
      */
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
+        E post = viewPost(postId, remoteAddress);
+        return new ResponseSingleGenericPostDto(messageSource, fileUploadService.getBaseURL(), userId, post);
+    }
+
+    /**
+     * post를 가져옵니다. 조회와 동시에 조회수가 올라갑니다.
+     *
+     * @param postId        조회할 게시글 id
+     * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
+     * @return 게시글 Entity
+     */
+    protected E viewPost(Long postId, String remoteAddress) {
+        E post = findPost(postId);
+        viewCountService.increasePostViews(post, remoteAddress);
+        return post;
+    }
+
+    /**
+     * post를 가져옵니다.
+     *
+     * @param postId 조회할 게시글 id
+     * @return 게시글 Entity
+     */
+    protected E findPost(Long postId) {
         E post = getRepository().findById(postId).orElseThrow(PostNotFoundException::new);
         if (post.getStatus().isDeleted()) {
             throw new PostNotFoundException();
         }
-        viewCountService.increasePostViews(post, remoteAddress);
-        return new ResponseSingleGenericPostDto(messageSource, fileUploadService.getBaseURL(), userId, post);
+        return post;
     }
 
     /**

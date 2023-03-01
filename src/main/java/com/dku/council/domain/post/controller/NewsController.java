@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-// TODO Test it
 @Tag(name = "총학소식", description = "총학소식 게시판 관련 api")
 @RestController
 @RequestMapping("/post/news")

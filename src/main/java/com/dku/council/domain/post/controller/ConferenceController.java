@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-// TODO Test it
 @Tag(name = "회의록 게시판", description = "회의록 게시판 관련 api")
 @RestController
 @RequestMapping("/post/conference")
