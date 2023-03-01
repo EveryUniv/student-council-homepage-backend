@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
  * 기본 기능은 제목, 본문, 댓글, 파일, 카테고리를 포함한 게시판을 의미합니다.
  * 왠만한 게시판들은 이 서비스로 커버가 가능합니다. 복잡한 조회, 생성, 비즈니스 로직이 포함된 게시판은
  * 이걸 사용하지말고 따로 만드는 게 낫습니다.
+ * 이걸 사용하려면, 반드시 Bean에 등록되어있어야 합니다. (PostConfig)
+ * todo 의존성을 좀 줄여보자
  *
  * @param <E> Entity 타입
  */
@@ -115,7 +117,7 @@ public class GenericPostService<E extends Post> {
     @Transactional(readOnly = true)
     protected E findPost(Long postId) {
         E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        if (post.getStatus().isDeleted()) {
+        if (post.getStatus() != PostStatus.ACTIVE) {
             throw new PostNotFoundException();
         }
         return post;
@@ -139,6 +141,17 @@ public class GenericPostService<E extends Post> {
         } else {
             throw new NotGrantedException();
         }
+    }
+
+    /**
+     * 게시글을 blind처리 합니다.
+     *
+     * @param postId 게시글 id
+     */
+    @Transactional
+    public void blind(Long postId) {
+        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        post.updateStatus(PostStatus.BLINDED);
     }
 
     /**

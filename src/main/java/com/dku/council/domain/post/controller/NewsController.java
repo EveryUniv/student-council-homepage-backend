@@ -8,6 +8,7 @@ import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -78,5 +79,17 @@ public class NewsController {
     @UserOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
+    }
+
+    /**
+     * 게시글을 블라인드 처리
+     * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
+     *
+     * @param id 블라인드 처리할 게시글 id
+     */
+    @PatchMapping("/blind/{id}")
+    @AdminOnly
+    public void blind(@PathVariable Long id) {
+        postService.blind(id);
     }
 }

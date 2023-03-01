@@ -1,5 +1,7 @@
 package com.dku.council.domain.post.controller;
 
+import com.dku.council.domain.comment.model.dto.CommentDto;
+import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.post.model.dto.page.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
@@ -90,7 +92,19 @@ public class PetitionController {
     }
 
     /**
-     * 운영진 답변 등록
+     * 게시글을 블라인드 처리
+     * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
+     *
+     * @param id 블라인드 처리할 게시글 id
+     */
+    @PatchMapping("/blind/{id}")
+    @AdminOnly
+    public void blind(@PathVariable Long id) {
+        petitionService.blind(id);
+    }
+
+    /**
+     * 운영진 답변 등록 (Admin)
      *
      * @param postId 답변할 게시글 ID
      * @param dto    요청 body
@@ -100,5 +114,44 @@ public class PetitionController {
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
         petitionService.reply(postId, dto.getAnswer());
+    }
+
+    /**
+     * 동의 댓글 목록 가져오기
+     *
+     * @param postId 댓글 생성할 게시글 id
+     */
+    @GetMapping("/comment/{postId}")
+    @UserOnly
+    public ResponsePage<CommentDto> listComment(@PathVariable Long postId, @ParameterObject Pageable pageable) {
+        Page<CommentDto> comments = petitionService.listComment(postId, pageable);
+        return new ResponsePage<>(comments);
+    }
+
+    /**
+     * 동의 댓글 생성
+     *
+     * @param postId     댓글 생성할 게시글 id
+     * @param commentDto 댓글 내용(text)
+     */
+    @PostMapping("/comment/{postId}")
+    @UserOnly
+    public ResponseIdDto createComment(AppAuthentication auth,
+                                       @PathVariable Long postId,
+                                       @Valid @RequestBody RequestCreateCommentDto commentDto) {
+        Long id = petitionService.createComment(postId, auth.getUserId(), commentDto.getText());
+        return new ResponseIdDto(id);
+    }
+
+    /**
+     * 동의 댓글 삭제 (Admin)
+     *
+     * @param id 댓글 id
+     */
+    @DeleteMapping("/comment/{id}")
+    @AdminOnly
+    public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
+        Long deleteId = petitionService.deleteComment(id, auth.getUserId());
+        return new ResponseIdDto(deleteId);
     }
 }

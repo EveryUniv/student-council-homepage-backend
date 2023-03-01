@@ -1,48 +1,63 @@
 package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.category.repository.CategoryRepository;
+import com.dku.council.domain.comment.model.dto.CommentDto;
+import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.PetitionRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PetitionService extends GenericPostService<Petition> {
+
+    private final CommentService commentService;
+    private final int thresholdCommentCount;
 
     public PetitionService(UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ViewCountService viewCountService,
                            FileUploadService fileUploadService,
                            MessageSource messageSource,
-                           GenericPostRepository<Petition> repository) {
+                           PetitionRepository repository,
+                           CommentService CommentService,
+                           @Value("${app.post.petition.threshold-comment-count}") int thresholdCommentCount) {
         super(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
+        this.commentService = CommentService;
+        this.thresholdCommentCount = thresholdCommentCount;
     }
 
-    /**
-     * 청원 게시글 단건 조회
-     *
-     * @param postId        조회할 게시글 id
-     * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
-     * @return 게시글 정보
-     */
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         Petition post = viewPost(postId, remoteAddress);
         return new ResponsePetitionDto(fileUploadService.getBaseURL(), userId, post);
     }
 
-    /**
-     * 운영진 답변 등록
-     *
-     * @param postId 답변할 게시글 ID
-     * @param answer 답변 본문
-     */
     public void reply(Long postId, String answer) {
         Petition post = findPost(postId);
         post.replyAnswer(answer);
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
+    }
+
+    public Page<CommentDto> listComment(Long postId, Pageable pageable) {
+        return commentService.list(postId, pageable);
+    }
+
+    public Long createComment(Long postId, Long userId, String text) {
+        Petition post = findPost(postId);
+        if (post.getPetitionStatus() == PetitionStatus.ACTIVE && post.getComments().size() >= thresholdCommentCount) { // todo 댓글 수 캐싱
+            post.updatePetitionStatus(PetitionStatus.WAITING);
+        }
+        return commentService.create(postId, userId, text);
+    }
+
+    public Long deleteComment(Long id, Long userId) {
+        return commentService.delete(id, userId, true);
     }
 }
