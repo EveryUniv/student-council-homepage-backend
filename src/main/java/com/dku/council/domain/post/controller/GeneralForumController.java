@@ -6,11 +6,10 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GeneralForumService;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -29,8 +28,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class GeneralForumController {
 
-    private final GeneralForumService generalForumService;
-    private final FileUploadService fileUploadService;
+    private final GenericPostService<GeneralForum> postService;
 
     /**
      * 게시글 목록 및 카테고리 조회
@@ -45,8 +43,8 @@ public class GeneralForumController {
                                                         @RequestParam(required = false) Long categoryId,
                                                         @ParameterObject Pageable pageable) {
         Specification<GeneralForum> spec = PostSpec.genericPostCondition(keyword, categoryId);
-        Page<SummarizedGeneralForumDto> list = generalForumService.list(spec, pageable)
-                .map(post -> new SummarizedGeneralForumDto(fileUploadService.getBaseURL(), post));
+        Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
+                .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), post));
         return new ResponsePage<>(list);
     }
 
@@ -57,7 +55,7 @@ public class GeneralForumController {
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth,
                                 @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
-        Long postId = generalForumService.create(auth.getUserId(), request);
+        Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -72,7 +70,7 @@ public class GeneralForumController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return generalForumService.findOne(id, auth.getUserId(), request.getRemoteAddr());
+        return postService.findOne(id, auth.getUserId(), request.getRemoteAddr());
     }
 
     /**
@@ -85,6 +83,6 @@ public class GeneralForumController {
     @DeleteMapping("/{id}")
     @UserOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        generalForumService.delete(id, auth.getUserId(), auth.isAdmin());
+        postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 }

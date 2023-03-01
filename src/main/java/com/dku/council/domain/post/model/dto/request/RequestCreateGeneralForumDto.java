@@ -8,12 +8,13 @@ import lombok.Getter;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Getter
 public class RequestCreateGeneralForumDto extends RequestCreateGenericPostDto<GeneralForum> {
 
-    @NotBlank
+    @NotNull
     @Schema(description = "카테고리 ID", example = "11")
     private final Long categoryId;
 

@@ -5,7 +5,6 @@ import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.post.repository.PetitionRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import org.springframework.context.MessageSource;
@@ -14,21 +13,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class PetitionService extends GenericPostService<Petition> {
 
-    private final PetitionRepository repository;
-
     public PetitionService(UserRepository userRepository,
                            CategoryRepository categoryRepository,
                            ViewCountService viewCountService,
                            FileUploadService fileUploadService,
                            MessageSource messageSource,
-                           PetitionRepository repository) {
-        super(userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
-        this.repository = repository;
-    }
-
-    @Override
-    protected GenericPostRepository<Petition> getRepository() {
-        return repository;
+                           GenericPostRepository<Petition> repository) {
+        super(repository, userRepository, categoryRepository, viewCountService, fileUploadService, messageSource);
     }
 
     /**

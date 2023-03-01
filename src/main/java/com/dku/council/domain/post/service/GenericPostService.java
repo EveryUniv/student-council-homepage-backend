@@ -31,17 +31,15 @@ import org.springframework.transaction.annotation.Transactional;
  * @param <E> Entity 타입
  */
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public abstract class GenericPostService<E extends Post> {
+public class GenericPostService<E extends Post> {
 
+    protected final GenericPostRepository<E> postRepository;
     protected final UserRepository userRepository;
     protected final CategoryRepository categoryRepository;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
     protected final MessageSource messageSource;
 
-
-    protected abstract GenericPostRepository<E> getRepository();
 
     /**
      * 게시글 목록으로 조회
@@ -50,8 +48,9 @@ public abstract class GenericPostService<E extends Post> {
      * @param pageable      페이징 방법
      * @return 페이징된 목록
      */
+    @Transactional(readOnly = true)
     public Page<E> list(Specification<E> specification, Pageable pageable) {
-        return getRepository().findAll(specification, pageable);
+        return postRepository.findAll(specification, pageable);
     }
 
     /**
@@ -75,7 +74,7 @@ public abstract class GenericPostService<E extends Post> {
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));
 
-        E savedPost = getRepository().save(post);
+        E savedPost = postRepository.save(post);
         return savedPost.getId();
     }
 
@@ -86,6 +85,7 @@ public abstract class GenericPostService<E extends Post> {
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 게시글 정보
      */
+    @Transactional(readOnly = true)
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
         E post = viewPost(postId, remoteAddress);
         return new ResponseSingleGenericPostDto(messageSource, fileUploadService.getBaseURL(), userId, post);
@@ -98,6 +98,7 @@ public abstract class GenericPostService<E extends Post> {
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 게시글 Entity
      */
+    @Transactional
     protected E viewPost(Long postId, String remoteAddress) {
         E post = findPost(postId);
         viewCountService.increasePostViews(post, remoteAddress);
@@ -110,8 +111,9 @@ public abstract class GenericPostService<E extends Post> {
      * @param postId 조회할 게시글 id
      * @return 게시글 Entity
      */
+    @Transactional(readOnly = true)
     protected E findPost(Long postId) {
-        E post = getRepository().findById(postId).orElseThrow(PostNotFoundException::new);
+        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         if (post.getStatus().isDeleted()) {
             throw new PostNotFoundException();
         }
@@ -128,7 +130,7 @@ public abstract class GenericPostService<E extends Post> {
      */
     @Transactional
     public void delete(Long postId, Long userId, boolean isUserAdmin) {
-        E post = getRepository().findById(postId).orElseThrow(PostNotFoundException::new);
+        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         if (isUserAdmin) {
             post.updateStatus(PostStatus.DELETED_BY_ADMIN);
         } else if (post.getUser().getId().equals(userId)) {
@@ -136,5 +138,14 @@ public abstract class GenericPostService<E extends Post> {
         } else {
             throw new NotGrantedException();
         }
+    }
+
+    /**
+     * 첨부파일의 Base URL을 가져옵니다.
+     *
+     * @return 첨부파일 Base URL
+     */
+    public String getFileBaseUrl() {
+        return fileUploadService.getBaseURL();
     }
 }
