@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.controller;
 
 import com.dku.council.common.AbstractContainerRedisTest;
+import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
@@ -39,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-//@OnlyDevTest
+@OnlyDevTest
 class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
