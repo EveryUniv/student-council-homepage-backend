@@ -1,25 +1,21 @@
 package com.dku.council.infra.dku.service;
 
 import com.dku.council.global.config.qualifier.ChromeAgentWebClient;
+import com.dku.council.global.util.WebUtil;
 import com.dku.council.infra.dku.exception.DkuFailedLoginException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
-import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +26,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class DkuAuthenticationService {
 
-    private static final Pattern ERROR_ALERT_PATTERN = Pattern.compile("\\);[\\s\\n]+alert\\(\"(.+)\"\\)");
+    private static final Pattern ERROR_ALERT_PATTERN = Pattern.compile("<li>\\s*<p\\s*class=\"warn\">\\s*(.*)\\s*</p>\\s*</li>");
 
     @ChromeAgentWebClient
     private final WebClient webClient;
@@ -48,35 +44,28 @@ public class DkuAuthenticationService {
     public DkuAuth login(String classId, String password) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
-        ClientResponse response = tryLogin(classId, password);
-        ClientResponse.Headers headers = response.headers();
-        addMappedCookies(cookies, response.cookies());
+        ResponseEntity<String> response = tryLogin(classId, password);
+        HttpHeaders headers = response.getHeaders();
+        addMappedCookies(cookies, headers);
 
-        List<String> ssoLocations = headers.header("Location");
-        if (ssoLocations.size() != 1) {
-            throw new DkuFailedLoginException();
-        }
-
-        String ssoLocation = ssoLocations.get(0);
+        URI ssoLocation = headers.getLocation();
         response = trySSOAuth(ssoLocation, cookies);
-        addMappedCookies(cookies, response.cookies());
+        addMappedCookies(cookies, response.getHeaders());
 
         return new DkuAuth(cookies);
     }
 
-    private void addMappedCookies(MultiValueMap<String, String> dest, MultiValueMap<String, ResponseCookie> src) {
-        Set<Map.Entry<String, List<ResponseCookie>>> cookies = src.entrySet();
-        for (Map.Entry<String, List<ResponseCookie>> ent : cookies) {
-            for (ResponseCookie value : ent.getValue()) {
-                dest.add(ent.getKey(), value.getValue());
-            }
+    private void addMappedCookies(MultiValueMap<String, String> dest, HttpHeaders src) {
+        List<ResponseCookie> cookies = WebUtil.extractCookies(src);
+        for (ResponseCookie ent : cookies) {
+            dest.add(ent.getName(), ent.getValue());
         }
     }
 
-    private ClientResponse tryLogin(String classId, String password) {
+    private ResponseEntity<String> tryLogin(String classId, String password) {
         String param = String.format("username=%s&password=%s&tabIndex=0", classId, password);
 
-        ClientResponse response;
+        ResponseEntity<String> response;
         try {
             response = webClient.post()
                     .uri(loginApiPath)
@@ -84,7 +73,8 @@ public class DkuAuthenticationService {
                     .header("Referer", "https://webinfo.dankook.ac.kr/member/logon.do?returnurl=http://webinfo.dankook.ac.kr:80/main.do&sso=ok")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromValue(param))
-                    .exchangeToMono(Mono::just)
+                    .retrieve()
+                    .toEntity(String.class)
                     .block();
         } catch (Throwable t) {
             throw new DkuFailedLoginException(t);
@@ -92,7 +82,7 @@ public class DkuAuthenticationService {
 
         validateResponse(response);
 
-        HttpStatus statusCode = response.statusCode();
+        HttpStatus statusCode = response.getStatusCode();
         if (statusCode == HttpStatus.OK) {
             throwLoginFailedWithAlertMessage(response);
         }
@@ -101,28 +91,28 @@ public class DkuAuthenticationService {
         return response;
     }
 
-    private ClientResponse trySSOAuth(String ssoUrl, MultiValueMap<String, String> cookies) {
-        ClientResponse response;
+    private ResponseEntity<String> trySSOAuth(URI ssoURI, MultiValueMap<String, String> cookies) {
+        ResponseEntity<String> response;
 
         try {
             response = webClient.post()
-                    .uri(ssoUrl)
+                    .uri(ssoURI)
                     .cookies(map -> map.addAll(cookies))
                     .header("Referer", "https://webinfo.dankook.ac.kr/")
-                    .exchangeToMono(Mono::just)
+                    .retrieve()
+                    .toEntity(String.class)
                     .block();
         } catch (Throwable t) {
             throw new DkuFailedLoginException(t);
         }
 
         validateResponse(response);
-        validateStatusCode(response.statusCode());
+        validateStatusCode(response.getStatusCode());
         return response;
     }
 
-    // TODO 제대로 동작 안함. body가 정확하게 출력되도록 수정
-    private static void throwLoginFailedWithAlertMessage(ClientResponse response) {
-        String responseBody = response.bodyToMono(String.class).block();
+    private static void throwLoginFailedWithAlertMessage(ResponseEntity<String> response) {
+        String responseBody = response.getBody();
         if (responseBody == null) {
             throw new DkuFailedLoginException();
         }
@@ -143,7 +133,7 @@ public class DkuAuthenticationService {
         return null;
     }
 
-    private static void validateResponse(ClientResponse response) {
+    private static void validateResponse(ResponseEntity<String> response) {
         if (response == null) {
             throw new DkuFailedLoginException(new NullPointerException("response"));
         }
