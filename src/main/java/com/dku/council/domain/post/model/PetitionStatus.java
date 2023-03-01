@@ -18,6 +18,7 @@ public enum PetitionStatus {
 
     /**
      * 기간 만료
+     * todo batch로 기간 만료 구현
      */
     EXPIRED
 }

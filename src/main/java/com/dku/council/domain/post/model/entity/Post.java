@@ -84,7 +84,11 @@ public class Post extends BaseEntity {
         views++;
     }
 
-    public void updateStatus(PostStatus status) {
-        this.status = status;
+    public void markAsDeleted(boolean byAdmin) {
+        this.status = byAdmin ? PostStatus.DELETED_BY_ADMIN : PostStatus.DELETED;
+    }
+
+    public void blind(){
+        this.status = PostStatus.BLINDED;
     }
 }

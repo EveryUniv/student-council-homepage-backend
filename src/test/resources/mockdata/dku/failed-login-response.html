@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <base href="https://webinfo.dankook.ac.kr:443/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=768, user-scalable=yes, target-densitydpi=device-dpi">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>단국대학교</title>
+    <link rel="shortcut icon" type="image/x-icon" href="images/layout/favicon.ICO" />
+    <link rel="stylesheet" type="text/css" href="css/member/bootstrap.css">
+    <link rel="stylesheet" type="text/css" href="css/member/bootstrap-theme.css">
+    <link rel="stylesheet" type="text/css" href="css/member/contents.css">
+    <link rel="stylesheet" type="text/css" href="css/member/layout.css">
+    <link href="css/widgets/jquery-ui.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/member/keyboard/keyboard.css">
+    <!-- 구글
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-68894441-2', 'auto');
+      ga('send', 'pageview');
+    </script>
+     Anayltics  -->
+    <script src="js/jquery/jquery-1.11.1.min.js"></script>
+    <script src="js/widgets/jquery-ui.min.js"></script>
+    <script src="js/browser/jquery.browser.min.js"></script>
+    <script src="js/cookie/jquery.cookie.js"></script>
+
+    <!-- jquery-validation script & i18n -->
+    <script src="js/validate/jquery.validate.min.js"></script>
+
+    <script src="js/member/html5shiv.js"></script>
+    <script src="js/member/bootstrap.js"></script>
+    <script src="js/member/keyboard/jquery.keyboard.min.js"></script>
+    <script src="js/member/keyboard/jquery.keyboard.extension-typing.min.js"></script>
+    <script src="js/member/jquery.colorbox.js"></script>
+
+    <script src="js/hashmap.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/validate/i18n/messages_ko.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            if ($.browser.msie && $.browser.version < 10) {
+                $("input[type=password]").attr("placeholder", "");
+            }
+
+            $("a[data-prevent-default]").click(function(e) {
+                e.preventDefault();
+            });
+
+            $("#lang").after($("<span>", {text: $("#lang option:selected").text(), "class": "select"}));
+            $("#lang").change(function () {
+                if (this.value != "") {
+                    var url = location.href;
+                    if ( url.indexOf("lang") > 0 ) {
+                        var searchText = (this.value=="en") ? "ko":"en";
+                        url = url.replace(new RegExp("(lang=)("+searchText+")","g"), "$1"+this.value);
+                    } else {
+                        var param = ( url.indexOf("?") > 0 ) ? "&" : "?";
+                        url = url + param + "lang=" + $("#lang").val();
+                    }
+                    location.href = url;
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="wrap">
+    <dl class="skip_navigation">
+        <dt>건너뛰기 메뉴</dt>
+        <dd><a href="#container">본문바로가기</a></dd>
+    </dl>
+    <!-- 헤더 -->
+    <div id="header">
+        <div class="container">
+            <!-- 로고 -->
+            <h1>
+                <a href="member/logon.do"><span class="logo">단국대학교</span></a>
+                <span class="name">로그인</span>
+            </h1>
+            <!-- //로고 -->
+            <!-- 랭귀지 -->
+            <form id="locale" method="get">
+                <div class="select_lang">
+                    <label for="lang">LANGUAGE</label>
+                    <select id="lang" name="lang" class="select" style="z-index: 10; opacity: 0;">
+                        <option value="">LANGUAGE</option>
+                        <option value="ko" selected>KOREAN</option>
+                        <option value="en" >ENGLISH</option>
+                    </select>
+                </div>
+            </form>
+            <!-- //랭귀지 -->
+        </div>
+    </div>
+    <!-- //헤더 -->
+    <!-- 컨테이너 -->
+    <div id="container" class="container">
+        <div class="content_section">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            <script src="js/member/pwstrength.js"></script>
+            <script type="text/javascript">
+                var verdict = false;
+
+                $(document).ready(function() {
+                    $("input[type=password]").keyboard({openOn : null, stayOpen : false, layout : "qwerty"}).addTyping();
+                    $(".btn_keyboard").click(function(e) {
+                        $(this).parent().find("input[type=password]").getkeyboard().reveal();
+                    });
+
+                    $("#password, #newPassword").pwstrength({
+                        common: {
+                            usernameField: "#name",
+                            minChar: 8,
+                            onKeyUp: function (e, data) {
+                                verdict = (data.errors.length == 0) ? true : false;
+                            }
+                        },
+                        rules: {
+                            activated: {
+                                wordNotEmail: true, // 비밀번호로 이메일을 사용하지 마십시오.
+                                wordLength: true, // 비밀번호가 너무 짧습니다. 최소 8자 이상으로 비밀번호를 입력해 주십시오.
+                                wordSequences: true, // 비밀번호에 연속된 문자를 사용하지 마십시오.
+                                wordSimilarToUsername: true, // 비밀번호는 사용자 이름을 포함 할 수 없습니다
+                                wordLetterNumberCombo: true, // 비밀번호에는 하나 이상의 숫자,문자가 포함되어야 합니다.
+                                wordOneSpecialChar: true // 비밀번호에는 하나 이상의 특수문자가 포함되어야 합니다.
+                            }
+                        },
+                        ui: {
+                            showErrors: true,
+                            showProgressBar: false,
+                            showVerdicts: false,
+                            container: "#pwd",
+                            viewports: {
+                                errors: ".pwd_error"
+                            },
+                            errorMessages: {
+                                wordNotEmail: "비밀번호로 이메일을 사용하지 마십시오.", // 비밀번호로 이메일을 사용하지 마십시오.
+                                wordLength: "비밀번호가 너무 짧습니다. 최소 8자 이상으로 비밀번호를 입력해 주십시오.", // 비밀번호가 너무 짧습니다. 최소 8자 이상으로 비밀번호를 입력해 주십시오.
+                                wordSequences: "비밀번호에 연속된 문자를 사용하지 마십시오.", // 비밀번호에 연속된 문자를 사용하지 마십시오.
+                                wordSimilarToUsername: "비밀번호는 사용자 이름을 포함 할 수 없습니다",// 비밀번호는 사용자 이름을 포함 할 수 없습니다
+                                wordLetterNumberCombo: "비밀번호에는 하나 이상의 숫자,문자가 포함되어야 합니다.", // 비밀번호에는 하나 이상의 숫자,문자가 포함되어야 합니다.
+                                wordOneSpecialChar: "비밀번호에는 하나 이상의 특수문자가 포함되어야 합니다." // 비밀번호에는 하나 이상의 특수문자가 포함되어야 합니다.
+                            },
+                            spanError: function (options, key) {
+                                var text = options.ui.errorMessages[key];
+                                if (text) {
+                                    return '<p class="warn">' + text + '</p>';
+                                }
+                                return "";
+                            }
+                        }
+                    });
+                });
+            </script>
+            <script type="text/javascript">
+                $( document ).ready( function () {
+                    // 선택된 탭 활성화
+                    $( ".nav-tabs > li > a" ).eq( "0" ).trigger( "click" );
+
+                    $( "input:hidden" ).val( "" );
+                    // 이메일 로그인 Select box
+                    $.getJSON( "comm/syst/cdmg/findCommCodeData.do" ,{
+                        cmnCdId : "SRV_URL_CD"
+                    } ,function ( data ) {
+                        $.each( data.commCdList ,function ( index ,entry ) {
+                            var optionValue = null;
+                            //             if ("production" == "production") {
+                            //               optionValue = entry.userInfoValu1;
+                            //             } else
+                            if ( "production" == "staging" ) {
+                                optionValue = entry.userInfoValu2;
+                            } else {
+                                optionValue = entry.userInfoValu1;
+                                //optionValue = entry.userInfoValu3;
+                            }
+                            var cmdCdValNm = ( $( "#lang" ).val() == "ko" ) ? entry.cmnCdvalNm : ( entry.cmnCdvalEnm == null ) ? entry.cmnCdvalNm : entry.cmnCdvalEnm;
+                            $( "#redirectUrl" ).append( $( "<option>" ,{
+                                value : ( optionValue == null ) ? "" : optionValue ,
+                                text : cmdCdValNm
+                            } ) );
+                        } );
+                        var $returnurl = $( "<a>" ,{
+                            href : "http://webinfo.dankook.ac.kr:80/main.do"
+                        } );
+                        $( "#redirectUrl option" ).each( function () {
+                            var $option = $( "<a>" ,{
+                                href : this.value
+                            } );
+                            if ( $option[ 0 ].hostname == $returnurl[ 0 ].hostname ) {
+                                $( this ).prop( "selected" ,true );
+                            }
+                        } );
+                        var selectedIndex = $( "#redirectUrl option" ).index( $( "#redirectUrl option:selected" ) );
+                        if ( selectedIndex == -1 ) {
+                            $( "#redirectUrl option:eq(0)" ).prop( "selected" ,true );
+                        } else {
+                            if ( selectedIndex != 0 && selectedIndex != 1 && selectedIndex != 10 ) { /* 포털,홈페이지,웹정보 */
+                                $( ".nav-tabs > li > a" ).eq( "1" ).trigger( "click" ); //이메일로그인 탭으로 변경
+                                $( "#emailForm #username" ).focus();
+                            } else {
+                                $( "#logonForm #username" ).focus();
+                            }
+                        }
+                    } );
+                    // 레이어 팝업
+                    var close = $( ".layer_popup > .layer_close" );
+                    $( ".login_notice a" ).colorbox( {
+                        inline : true ,
+                        href : "#login_notice"
+                    } );
+                    close.click( function () {
+                        $.colorbox.close();
+                    } );
+                    var validateOption = {
+                        onfocusout : false ,
+                        rules : {
+                            username : {
+                                required : true ,
+                                email : {
+                                    depends : function ( element ) {
+                                        return $( element ).attr( "placeholder" ) == "이메일" || $( element ).attr( "placeholder" ) == "Email";
+                                    }
+                                }
+                            } ,
+                            password : {
+                                required : true
+                            }
+                        } ,
+                        messages : {
+                            username : {
+                                required : "아이디를 입력하여 주세요." ,
+                                email : "올바른 E-Mail 주소를 입력하여 주세요."
+                            } ,
+                            password : {
+                                required : "비밀번호를 입력하여 주세요."
+                            }
+                        } ,
+                        showErrors : function ( messages ,elements ) {
+                            $( ".error-list" ).empty();
+                            var $errorContainer = $( ".error-list" ,this.currentForm );
+                            $.each( messages ,function ( name ,message ) {
+                                $errorContainer.append( $( "<p>" ,{
+                                    text : message ,
+                                    "class" : "warn"
+                                } ) );
+                            } );
+                            $errorContainer.find( "p" ).wrap( "<li>" );
+                        } ,
+                        submitHandler : function ( form ) {
+                            $( "button[type=submit]" ,form ).prop( "disabled" ,true );
+                            $( form ).find( "input[name=tabIndex]" ).val( ( form.id == "logonForm" ) ? 0 : 1 );
+                            form.submit();
+                        }
+                    };
+                    $( "#logonForm" ).validate( validateOption );
+                    $( "#emailForm" ).validate( validateOption );
+                    $( "#certLogonBtn" ).click( function ( event ) {
+                        var KSIGN_ACTIVEX_PROG_ID = "AxDankook.AxDankook.1";
+                        try {
+                            var obj = new ActiveXObject( KSIGN_ACTIVEX_PROG_ID );
+                            if ( obj ) {
+                                $( "<object>" ,{
+                                    id : "AxKCASE" ,
+                                    classid : "CLSID:83E0F2E8-6B41-4f34-9354-82667EB7AC62" ,
+                                    codebase : "plugins/cert/AxDankook(3.3.1.1).cab#Version=3,3,1,1"
+                                } ).appendTo( "body" );
+                                var certDialog = $( "#AxKCASE" )[ 0 ];
+                                var dn = certDialog.SelectCert();
+                                if ( dn != null && dn != "" ) {
+                                    $( "#dn" ).val( dn );
+                                    $( "#logonForm" )[ 0 ].submit();
+                                }
+                            }
+                        } catch ( e ) {
+                            if ( $.browser.msie ) {
+                                alert( "인증서 로그인 프로그램이 설치되어 있지않습니다. 설치 페이지로 이동합니다." );
+                                location.href = $( "base" ).attr( "href" ) + "installCertToolkit.jsp";
+                            } else {
+                                alert( "인증서 로그인은 Internet Expolere 에서만 가능합니다." );
+                            }
+                        }
+                    } );
+                    $( ".find" ).click( function ( e ) {
+                        e.preventDefault();
+                        $.openWindow( {
+                            url : $( this ).attr( "href" ) ,
+                            width : 820 ,
+                            height : 350
+                        } );
+                    } );
+                    $( ".certLink a" ).click( function ( e ) {
+                        e.preventDefault();
+                        alert( "로그인 하시면 인증센터관련 페이지로 이동합니다." );
+                        location.href = this.href;
+                    } );
+                } );
+            </script>
+            <!-- 컨텐츠 -->
+            <div class="login_notice">
+                <a href="#login_notice" data-prevent-default="true">단국대학교 로그인 안내</a>
+            </div>
+            <div class="dku_login_section">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#dku_login" class="n_01" data-toggle="tab" id="dkuTab">단국인 로그인</a>
+                    </li>
+                    <li>
+                        <a href="#mail_login" class="n_02" data-toggle="tab" id="mailTab">이메일 로그인 <span>only guest</span></a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="dku_login">
+                        <form id="logonForm" action="/member/logon.do;TIS_JSESSIONID=03LhRkEuv4dQjFWUTmQQNFePlAUY1876uMFA2CFuUj6EJJP10c0Q!137310023?returnurl=http://webinfo.dankook.ac.kr:80/main.do&amp;sso=ok" method="post">
+                            <input type="hidden" id="dn" name="dn">
+                            <!-- 단국 로그인 -->
+                            <div class="dku_login_area">
+                                <ul>
+                                    <li>
+                                        <label for="username">아이디</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-addon"><i class="ico_id"></i></span>
+                                            <input id="username" name="username" placeholder="아이디" class="form-control input-lg" type="text" value="32173582"/>
+                                        </div>
+                                    </li>
+                                    <li><label for="password">비밀번호</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-addon"><i class="ico_pw"></i></span> <input type="password" id="password" name="password" class="form-control input-lg" placeholder="비밀번호">
+                                        </div>
+                                        <button type="button" class="btn_keyboard" data-prevent-default="true">
+                                            <span>키보드입력</span>
+                                        </button> <input type="hidden" name="tabIndex" value="" />
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- 경고 노출 -->
+                            <div id="errors">
+                                <div class="error_align error">
+                                    <ul class="error-list align_left">
+
+                                        <li><p class="warn">회원 아이디 또는 비밀번호가 일치하지 않습니다.</p></li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- //경고 노출 -->
+                            <!-- 버튼 영역 -->
+                            <div class="btn_area">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                    로그인
+                                </button>
+                            </div>
+                            <!-- //버튼 영역 -->
+                            <div class="txt_disc">
+                                <ul>
+                                    <li>* <em>아이디는 학번/교직원번호 입니다.</em></li>
+                                    <li>* <em>99학번 이전은 학번 규칙 변경(6자리->8자리)에 의하여 다음과 같이 조정하여 아이디를 입력 바랍니다.</em></li>
+                                    <li>&nbsp;&nbsp;&nbsp;- 서울 : 31 + 학번 / 천안 : 51 + 학번 / 대학원 : 71 + 학번</li>
+                                    <li>* <em>최초 비밀번호는 생년월일(예, 19961010) 또는 주민등록번호 뒤7자리(2015년 이전 구성원)입니다.</em></li>
+                                    <li>* <em>최초 비밀번호는 로그인 후 반드시 변경하시기 바랍니다.</em></li>
+                                    <li>* <em>안전한 비밀번호 만들기는 선택이 아닌 필수입니다.(관련근거:사용자보안 지침 제19조)</em></li>
+                                    <li>&nbsp;&nbsp;&nbsp;- 비밀번호는 학기별 1회 이상 변경한다.<br>&nbsp;&nbsp;&nbsp;- 비밀번호는 재사용하지 않는다.<br>&nbsp;&nbsp;&nbsp;- 비밀번호는 연속적인 숫자나 생일, 전화번호, 계정 등 추측하기 쉬운 정보를 사용하지 아니하도록 한다.</li>
+                                    <li>* <a href="http://www.dankook.ac.kr/web/kor/privacy" target="_blank"><em>개인정보 처리방침</em></a></li>
+                                </ul>
+                            </div>
+                            <!-- 바 링크영역 -->
+                            <div class="text_link">
+                                <!--a href="https://daninfo.dankook.ac.kr/common/idpassword/findid.aspx" class="find">아이디 찾기</a> |
+                                <a href="https://daninfo.dankook.ac.kr/common/idpassword/findpassword_.aspx" class="find">비밀번호 찾기(재설정)</a-->
+                                <a href="member/findIdForm.do"> 아이디 찾기</a> |
+                                <a href="member/resetPasswordForm.do?type=dku"> 비밀번호 찾기(재설정)</a> |
+                                <a href="http://sugang.dankook.ac.kr/findId.do">신편입생 학번조회</a>
+                            </div>
+                            <!-- //바 링크영역 -->
+                            <div style="display:none">
+                                <hr>
+                                <div class="btn_area">
+                                    <button type="button" id="certLogonBtn" class="btn btn-default btn-lg btn-block">
+                                        인증서 로그인 <span>교직원 시간강사만 가능</span>
+                                    </button>
+                                </div>
+                                <div class="text_link certLink">
+                                    <a href="https://pki.dankook.ac.kr">인증관리센터</a> |
+                                    <a href="https://pki.dankook.ac.kr/dankook_AC/AcInfo.ks?menu=01">인증서 이용 안내</a>
+                                </div>
+                            </div>
+                            <!-- //단국 로그인 -->
+                        </form>
+                    </div>
+                    <div class="tab-pane" id="mail_login">
+                        <form id="emailForm" action="/member/logon.do;TIS_JSESSIONID=03LhRkEuv4dQjFWUTmQQNFePlAUY1876uMFA2CFuUj6EJJP10c0Q!137310023?returnurl=http://webinfo.dankook.ac.kr:80/main.do&amp;sso=ok" method="post">
+                            <!-- 이메일 로그인 -->
+                            <div class="dku_login_area">
+                                <ul>
+                                    <li>
+                                        <label for="username">이메일</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-addon"><i class="ico_id"></i></span>
+                                            <input id="username" name="username" placeholder="이메일" class="form-control input-lg" type="text" value="32173582"/>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <label for="password">비밀번호</label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-addon"><i class="ico_pw"></i></span>
+                                            <input type="password" id="password" name="password" class="form-control input-lg" placeholder="비밀번호">
+                                        </div>
+                                        <button type="button" class="btn_keyboard">
+                                            <span>키보드입력</span>
+                                        </button> <input type="hidden" name="tabIndex" value="" />
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- 경고 노출 -->
+                            <div id="errors">
+                                <div class="error_align error">
+                                    <ul class="error-list align_left">
+
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- //경고 노출 -->
+                            <div class="select_area">
+                                <label for="select_site">단국대학교 서비스 선택</label> <select class="form-control" id="redirectUrl" name="redirectUrl"></select>
+                            </div>
+                            <br>
+                            <div class="btn_area">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                                    로그인
+                                </button>
+                            </div>
+                            <div class="text_link">
+                                <a href="member/joinForm.do?step=valification">이메일 회원가입</a> |
+                                <a href="member/joinConfirmForm.do"> 가입확인</a> |
+                                <a href="member/findEmailForm.do"> 아이디 찾기</a> |
+                                <a href="member/resetPasswordForm.do?type=email"> 비밀번호 찾기(재설정)</a>
+                            </div>
+                            <!-- //이메일 로그인 -->
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 정책안내 팝업 -->
+            <div style="display: none;">
+                <div class="layer_popup layer_wd01" id="login_notice">
+                    <dl>
+                        <dt class="layer_title">단국대학교 로그인 안내</dt>
+                        <dd class="layer_cont">
+                            <dl>
+                                <dt class="bul_type_01">
+                                    <strong>단국인 로그인 안내</strong>
+                                </dt>
+                                <dd>
+                                    <br>
+                                    <div class="text_box">
+                                        <b>아 이 디 :</b> 학생-학번, 교직원-교번<br>
+                                        <b>패스워드 :</b> 기존 통합로그인 패스워드<br> <br>
+                                        신규 구성원(신입생, 신규교직원) 최초비밀번호는 생년월일 8자리(예, 19961010)<br>
+                                        통합로그인 사용가능 서비스
+                                        홈페이지, Portal, 웹정보, 종합정보, 그룹웨어, 웹메일, 도서관, 기숙사, 이러닝 등
+                                    </div>
+                                    <br> <br>
+                                </dd>
+                                <dt class="bul_type_01">
+                                    <strong>이메일 로그인 안내</strong>
+                                </dt>
+                                <dd>
+                                    <br>
+                                    <div class="text_box">
+                                        <br>
+                                        일반인이 홈페이지 및 부속/부설기관의 민원신청 등을 위해 이메일 회원으로 가입할 수 있습니다.<br>
+                                        가입시 기입한 이메일 주소가 아이디이며 입력한 비밀번호로 로그인이 가능합니다.<br>
+                                        <br>
+                                        <b>이메일로그인 사용가능 서비스</b><br><br>
+                                        홈페이지, Portal, 평생교육원, 국제처, 박물관, 교육연수원 등<br><br>
+                                        <b>이메일 회원의 로그인 개인정보 수집 및 활용</b><br><br>
+                                        &nbsp;1. 수집목적 : 홈페이지 게시물 작성 및 부속/부설기관의 민원 신청 등<br>
+                                        &nbsp;2. 수집항목 : 이메일 주소, 성명<br>
+                                        &nbsp;3. 보유 및 보유기간 : 가입시부터 2년마다 일괄 삭제<br>
+                                        &nbsp;4. 개인정보 수집 거부시 조회는 가능하나 게시물 작성, 민원 신청은 불가능<br>
+                                        &nbsp;5. 수집되는 정보는 권한확인 이외에 다른목적으로는 사용하지 않습니다.<br>
+                                    </div>
+                                </dd>
+                            </dl>
+                        </dd>
+                    </dl>
+                    <a href="#none" class="layer_close" data-prevent-default="true"> <span>팝업창 닫기</span>
+                    </a>
+                </div>
+            </div>
+            <!-- //정책안내 팝업 -->
+        </div>
+    </div>
+    <!-- //컨테이너 -->
+    <!-- 푸터 -->
+    <div id="footer">
+        <div class="container" align="center">
+            <address>
+                죽전캠퍼스 경기도 용인시 수지구 죽전로 152 (우)16890 / 천안캠퍼스 충남 천안시 동남구 단대로 119 (우)31116
+            </address>
+            <div class="copy_right">Copyright(c) 2015 BY DANKOOK UNIVERSITY. All rights reserved. </div>
+        </div>
+    </div>
+    <!-- //푸터 -->
+</div>
+</body>
+</html>

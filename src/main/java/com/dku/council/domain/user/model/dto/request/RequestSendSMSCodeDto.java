@@ -12,7 +12,6 @@ import javax.validation.constraints.Pattern;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED, onConstructor_ = {@JsonCreator})
 public class RequestSendSMSCodeDto {
 
-    // TODO Test it
     @NotBlank
     @Pattern(regexp = "\\d{3}-*\\d{4}-*\\d{4}")
     private final String phoneNumber;

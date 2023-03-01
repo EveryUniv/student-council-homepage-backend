@@ -15,7 +15,6 @@ import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.mock.MultipartFileMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.UserMock;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,9 +35,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-// TODO 향후 이건 리펙토링하고 테스트를 다시 구성
 @ExtendWith(MockitoExtension.class)
-@Disabled
 class GenericPostServiceTest {
 
     @Mock
@@ -57,7 +54,7 @@ class GenericPostServiceTest {
     private FileUploadService fileUploadService;
 
     @InjectMocks
-    private NewsService service;
+    private GenericPostService<News> service;
 
 
     @Test

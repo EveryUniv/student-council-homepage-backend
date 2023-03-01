@@ -3,6 +3,7 @@ package com.dku.council.domain.comment.service;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
+import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
@@ -12,6 +13,9 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,20 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final MessageSource messageSource;
+
+
+    /**
+     * 댓글 목록을 가져옵니다.
+     *
+     * @param postId 게시글 ID
+     * @return 페이징된 댓글 목록
+     */
+    public Page<CommentDto> list(Long postId, Pageable pageable) {
+        postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
+        return commentRepository.findAllByPostId(postId, pageable)
+                .map(ent -> new CommentDto(messageSource, ent));
+    }
 
     /**
      * Post에 댓글을 추가합니다.
@@ -32,7 +50,7 @@ public class CommentService {
      * @param content 댓글 내용
      */
     public Long create(Long postId, Long userId, String content) {
-        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         Comment comment = Comment.builder()
@@ -41,6 +59,7 @@ public class CommentService {
                 .text(content)
                 .build();
 
+        post.getComments().add(comment);
         comment = commentRepository.save(comment);
         return comment.getId();
     }
@@ -82,5 +101,9 @@ public class CommentService {
         }
 
         return commentId;
+    }
+
+    public boolean isCommentedAlready(Long postId, Long userId) {
+        return commentRepository.findAllByPostIdAndUserId(postId, userId).isPresent();
     }
 }

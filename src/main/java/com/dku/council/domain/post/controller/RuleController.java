@@ -6,12 +6,11 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.Rule;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.RuleService;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -25,15 +24,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-// TODO Test it
 @Tag(name = "총학 회칙", description = "총학 회칙 관련 api")
 @RestController
 @RequestMapping("/post/rule")
 @RequiredArgsConstructor
 public class RuleController {
 
-    private final RuleService ruleService;
-    private final FileUploadService fileUploadService;
+    private final GenericPostService<Rule> postService;
     private final MessageSource messageSource;
 
     /**
@@ -46,8 +43,8 @@ public class RuleController {
     public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
                                                 @ParameterObject Pageable pageable) {
         Specification<Rule> spec = PostSpec.genericPostCondition(keyword, null);
-        Page<SummarizedRuleDto> list = ruleService.list(spec, pageable)
-                .map(post -> new SummarizedRuleDto(messageSource, fileUploadService.getBaseURL(), post));
+        Page<SummarizedRuleDto> list = postService.list(spec, pageable)
+                .map(post -> new SummarizedRuleDto(messageSource, postService.getFileBaseUrl(), post));
         return new ResponsePage<>(list);
     }
 
@@ -59,7 +56,7 @@ public class RuleController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateRuleDto request) {
-        Long postId = ruleService.create(auth.getUserId(), request);
+        Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -74,7 +71,7 @@ public class RuleController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return ruleService.findOne(id, auth.getUserId(), request.getRemoteAddr());
+        return postService.findOne(id, auth.getUserId(), request.getRemoteAddr());
     }
 
     /**
@@ -85,7 +82,7 @@ public class RuleController {
     @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        ruleService.delete(id, auth.getUserId(), auth.isAdmin());
+        postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
 }
