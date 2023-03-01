@@ -31,7 +31,7 @@ public class PetitionService extends GenericPostService<Petition> {
      */
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         Petition post = viewPost(postId, remoteAddress);
-        return new ResponsePetitionDto(messageSource, fileUploadService.getBaseURL(), userId, post);
+        return new ResponsePetitionDto(fileUploadService.getBaseURL(), userId, post);
     }
 
     /**

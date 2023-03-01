@@ -1,12 +1,10 @@
 package com.dku.council.domain.post.model.dto.response;
 
 import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import org.springframework.context.MessageSource;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,13 +34,10 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "파일 목록")
     private final List<PostFileDto> files;
 
-    @Schema(description = "댓글 목록")
-    private final List<CommentDto> commentList;
-
     @Schema(description = "내가 쓴 게시물인지?", example = "true")
     private final boolean isMine;
 
-    public ResponseSingleGenericPostDto(MessageSource messageSource, String baseFileUrl, Long userId, Post post) {
+    public ResponseSingleGenericPostDto(String baseFileUrl, Long userId, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
@@ -52,7 +47,6 @@ public class ResponseSingleGenericPostDto {
                 .orElse(null);
         this.createdAt = post.getCreatedAt();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
-        this.commentList = CommentDto.listOf(messageSource, post.getComments());
         this.isMine = post.getUser().getId().equals(userId);
     }
 }

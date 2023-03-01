@@ -82,13 +82,14 @@ public class GenericPostService<E extends Post> {
      * 게시글 단건 조회
      *
      * @param postId        조회할 게시글 id
+     * @param userId        조회하는 사용자 id. 내 게시글인지 판단하는데 사용된다.
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 게시글 정보
      */
     @Transactional(readOnly = true)
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
         E post = viewPost(postId, remoteAddress);
-        return new ResponseSingleGenericPostDto(messageSource, fileUploadService.getBaseURL(), userId, post);
+        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), userId, post);
     }
 
     /**
@@ -106,7 +107,7 @@ public class GenericPostService<E extends Post> {
     }
 
     /**
-     * post를 가져옵니다.
+     * post를 가져옵니다. deletion처리를 위해 repository에서 직접 가져오지말고 이걸 사용해야합니다.
      *
      * @param postId 조회할 게시글 id
      * @return 게시글 Entity
