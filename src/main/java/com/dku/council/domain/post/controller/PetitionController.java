@@ -111,7 +111,7 @@ public class PetitionController {
      * @param postId 답변할 게시글 ID
      * @param dto    요청 body
      */
-    @DeleteMapping("/reply/{postId}")
+    @PostMapping("/reply/{postId}")
     @AdminOnly
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
@@ -141,7 +141,7 @@ public class PetitionController {
     public ResponseIdDto createComment(AppAuthentication auth,
                                        @PathVariable Long postId,
                                        @Valid @RequestBody RequestCreateCommentDto commentDto) {
-        Long id = petitionService.createComment(postId, auth.getUserId(), commentDto.getText());
+        Long id = petitionService.createComment(postId, auth.getUserId(), commentDto.getText(), auth.isAdmin());
         return new ResponseIdDto(id);
     }
 

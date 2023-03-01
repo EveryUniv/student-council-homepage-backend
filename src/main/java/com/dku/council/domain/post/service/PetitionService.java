@@ -2,6 +2,7 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.service.CommentService;
+import com.dku.council.domain.post.exception.DuplicateCommentException;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
@@ -43,11 +44,17 @@ public class PetitionService {
         return commentService.list(postId, pageable);
     }
 
-    public Long createComment(Long postId, Long userId, String text) {
+    public Long createComment(Long postId, Long userId, String text, boolean isAdmin) {
         Petition post = postService.findPost(postId);
-        if (post.getPetitionStatus() == PetitionStatus.ACTIVE && post.getComments().size() >= thresholdCommentCount) { // todo 댓글 수 캐싱
+
+        if (!isAdmin && commentService.isCommentedAlready(postId, userId)) {
+            throw new DuplicateCommentException();
+        }
+
+        if (post.getPetitionStatus() == PetitionStatus.ACTIVE && post.getComments().size() + 1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
             post.updatePetitionStatus(PetitionStatus.WAITING);
         }
+
         return commentService.create(postId, userId, text);
     }
 

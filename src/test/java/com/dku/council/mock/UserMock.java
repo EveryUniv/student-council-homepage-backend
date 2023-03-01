@@ -7,11 +7,22 @@ import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.util.FieldInjector;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserMock {
 
     public static final String STUDENT_ID = "12345678";
     public static final String PASSWORD = "abcdabab";
     public static final String NAME = "username";
+
+    public static List<User> createList(int size) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            users.add(create());
+        }
+        return users;
+    }
 
     public static User create() {
         return create(RandomGen.nextLong());

@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -53,9 +52,6 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private GenericPostRepository<News> postRepository;
 
     private User user;
@@ -63,7 +59,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L, passwordEncoder);
+        user = UserMock.create(0L);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
     }

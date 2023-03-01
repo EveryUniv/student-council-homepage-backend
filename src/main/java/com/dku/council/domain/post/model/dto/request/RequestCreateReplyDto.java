@@ -1,14 +1,14 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import lombok.AccessLevel;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor(onConstructor_ = {@JsonCreator})
 public class RequestCreateReplyDto {
     @NotBlank
-    private String answer;
+    private final String answer;
 }

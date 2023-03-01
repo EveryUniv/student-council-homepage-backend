@@ -59,6 +59,7 @@ public class CommentService {
                 .text(content)
                 .build();
 
+        post.getComments().add(comment);
         comment = commentRepository.save(comment);
         return comment.getId();
     }
@@ -100,5 +101,9 @@ public class CommentService {
         }
 
         return commentId;
+    }
+
+    public boolean isCommentedAlready(Long postId, Long userId) {
+        return commentRepository.findAllByPostIdAndUserId(postId, userId).isPresent();
     }
 }
