@@ -10,7 +10,7 @@ public class SummarizedGeneralForumDto extends SummarizedGenericPostDto {
     @Schema(description = "카테고리", example = "기타")
     private final String category;
 
-    // TODO DB Lazy loading 없이 바로 count 가져오기
+    // TODO 댓글수 캐싱
     @Schema(description = "댓글수", example = "5")
     private final int comments;
 

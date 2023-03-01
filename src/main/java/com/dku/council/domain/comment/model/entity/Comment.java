@@ -43,8 +43,8 @@ public class Comment extends BaseEntity {
 
     @Builder
     private Comment(@NonNull Post post, User user, String text) {
-        this.status = CommentStatus.ACTIVE;
         this.post = post;
+        this.status = CommentStatus.ACTIVE;
         this.user = user;
         this.text = text;
     }

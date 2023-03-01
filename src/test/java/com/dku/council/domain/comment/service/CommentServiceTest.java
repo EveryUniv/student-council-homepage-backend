@@ -49,7 +49,7 @@ class CommentServiceTest {
         User user = UserMock.create();
         Comment comment = CommentMock.create(post, user);
         when(commentRepository.save(any())).thenReturn(comment);
-        when(postRepository.findById(1L)).thenReturn(Optional.ofNullable(post));
+        when(postRepository.findByIdAndActived(1L)).thenReturn(Optional.ofNullable(post));
         when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
 
         // when

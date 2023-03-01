@@ -5,11 +5,10 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.ConferenceService;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -21,15 +20,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-// TODO Test it
 @Tag(name = "회의록 게시판", description = "회의록 게시판 관련 api")
 @RestController
 @RequestMapping("/post/conference")
 @RequiredArgsConstructor
 public class ConferenceController {
 
-    private final ConferenceService conferenceService;
-    private final FileUploadService fileUploadService;
+    private final GenericPostService<Conference> postService;
 
     /**
      * 게시글 목록으로 조회
@@ -42,8 +39,8 @@ public class ConferenceController {
     public ResponsePage<SummarizedConferenceDto> list(@RequestParam(required = false) String keyword,
                                                       @ParameterObject Pageable pageable) {
         Specification<Conference> spec = PostSpec.genericPostCondition(keyword, null);
-        Page<SummarizedConferenceDto> list = conferenceService.list(spec, pageable)
-                .map(post -> new SummarizedConferenceDto(fileUploadService.getBaseURL(), post));
+        Page<SummarizedConferenceDto> list = postService.list(spec, pageable)
+                .map(post -> new SummarizedConferenceDto(postService.getFileBaseUrl(), post));
         return new ResponsePage<>(list);
     }
 
@@ -55,7 +52,7 @@ public class ConferenceController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
-        Long postId = conferenceService.create(auth.getUserId(), request);
+        Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -67,6 +64,6 @@ public class ConferenceController {
     @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        conferenceService.delete(id, auth.getUserId(), auth.isAdmin());
+        postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.context.MessageSource;
 @Getter
 public class SummarizedRuleDto extends SummarizedGenericPostDto {
 
-    @Schema(description = "부서명", example = "총학생회")
+    @Schema(description = "부서명 (소속대학)", example = "공과대학")
     private final String department;
 
     public SummarizedRuleDto(MessageSource messageSource, String baseFileUrl, Rule rule) {

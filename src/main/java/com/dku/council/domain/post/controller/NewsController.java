@@ -6,11 +6,10 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.NewsService;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -23,15 +22,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-// TODO Test it
 @Tag(name = "총학소식", description = "총학소식 게시판 관련 api")
 @RestController
 @RequestMapping("/post/news")
 @RequiredArgsConstructor
 public class NewsController {
 
-    private final NewsService postService;
-    private final FileUploadService fileUploadService; // TODO 썩 좋은건 아닌데 나중에 리펙토링
+    private final GenericPostService<News> postService;
 
     /**
      * 게시글 목록으로 조회
@@ -44,7 +41,7 @@ public class NewsController {
                                                        @ParameterObject Pageable pageable) {
         Specification<News> spec = PostSpec.genericPostCondition(keyword, null);
         Page<SummarizedGenericPostDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGenericPostDto(fileUploadService.getBaseURL(), post));
+                .map(post -> new SummarizedGenericPostDto(postService.getFileBaseUrl(), post));
         return new ResponsePage<>(list);
     }
 
