@@ -68,8 +68,8 @@ public class UserController {
     }
 
     /**
-     * 로그아웃
-     * (현재 동작 안함) 서버에 같은 토큰으로 로그인 할 수 없게 로그아웃합니다.
+     * 로그아웃 (현재 동작 안함)
+     * 서버에 같은 토큰으로 로그인 할 수 없게 로그아웃합니다.
      */
     @DeleteMapping
     public void logout() {
@@ -102,7 +102,7 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 변경
+     * 비밀번호 변경 (현재 동작 안함)
      */
     @PatchMapping("/password")
     public void changePassword() {
