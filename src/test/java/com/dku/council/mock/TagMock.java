@@ -6,7 +6,7 @@ import com.dku.council.util.FieldInjector;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryMock {
+public class TagMock {
 
     public static Tag create() {
         return new Tag(RandomGen.nextUUID());
