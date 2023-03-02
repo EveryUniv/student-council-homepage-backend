@@ -7,6 +7,7 @@ import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
+import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -20,6 +21,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 // TODO Test it
 @Service
@@ -81,5 +84,11 @@ public class UserService {
         } else {
             throw new WrongPasswordException();
         }
+    }
+
+    public ResponseRefreshTokenDto refreshToken(HttpServletRequest request, String refreshToken) {
+        String accessToken = jwtProvider.getAccessTokenFromHeader(request);
+        AuthenticationToken token = jwtProvider.reissue(accessToken, refreshToken);
+        return new ResponseRefreshTokenDto(token);
     }
 }
