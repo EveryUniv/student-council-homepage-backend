@@ -6,32 +6,32 @@ import lombok.Getter;
 import org.springframework.context.MessageSource;
 
 @Getter
-public class ResponseStudentInfoDto {
+public class ResponseScrappedStudentInfoDto {
 
     private final String studentName;
     private final String studentId;
     private final String major;
 
-    private ResponseStudentInfoDto(MessageSource messageSource, String studentName, String studentId, MajorData majorData) {
+    private ResponseScrappedStudentInfoDto(MessageSource messageSource, String studentName, String studentId, MajorData majorData) {
         this.studentName = studentName;
         this.studentId = studentId;
         this.major = majorData.getName(messageSource);
     }
 
-    private ResponseStudentInfoDto(String studentName, String studentId, String notRecognizedMajor) {
+    private ResponseScrappedStudentInfoDto(String studentName, String studentId, String notRecognizedMajor) {
         this.studentName = studentName;
         this.studentId = studentId;
         this.major = notRecognizedMajor;
     }
 
-    public static ResponseStudentInfoDto from(MessageSource messageSource, StudentInfo info) {
+    public static ResponseScrappedStudentInfoDto from(MessageSource messageSource, StudentInfo info) {
         MajorData infoMajorData = info.getMajorData();
         if (infoMajorData == null) {
-            return new ResponseStudentInfoDto(info.getStudentName(),
+            return new ResponseScrappedStudentInfoDto(info.getStudentName(),
                     info.getStudentId(),
                     info.getNotRecognizedMajor());
         } else {
-            return new ResponseStudentInfoDto(messageSource,
+            return new ResponseScrappedStudentInfoDto(messageSource,
                     info.getStudentName(),
                     info.getStudentId(),
                     infoMajorData);
