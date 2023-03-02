@@ -1,9 +1,9 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,8 +36,8 @@ public class Petition extends Post {
     private Petition(@NonNull User user,
                      @NonNull String title,
                      @NonNull String body,
-                     Category category, int views, PetitionStatus petitionStatus, String answer) {
-        super(user, title, body, category, views);
+                     Tag tag, int views, PetitionStatus petitionStatus, String answer) {
+        super(user, title, body, tag, views);
         this.petitionStatus = petitionStatus;
         this.answer = answer;
     }

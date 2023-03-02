@@ -3,10 +3,10 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.common.AbstractContainerRedisTest;
 import com.dku.council.common.MvcMockResponse;
 import com.dku.council.common.OnlyDevTest;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
@@ -49,7 +49,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private UserRepository userRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private TagRepository tagRepository;
 
     @Autowired
     private GenericPostRepository<News> postRepository;
@@ -115,14 +115,14 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 생성 - 카테고리 명시")
     void createWithCategory() throws Exception {
         // given
-        Category category = new Category("category");
-        categoryRepository.save(category);
+        Tag tag = new Tag("category");
+        tagRepository.save(tag);
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
                         .param("title", "제목")
                         .param("body", "본문")
-                        .param("categoryId", category.getId().toString()))
+                        .param("categoryId", tag.getId().toString()))
                 .andDo(print());
 
         // then
@@ -135,7 +135,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
         assertThat(actualNews.getBody()).isEqualTo("본문");
-        assertThat(actualNews.getCategory().getId()).isEqualTo(category.getId());
+        assertThat(actualNews.getTag().getId()).isEqualTo(tag.getId());
     }
 
     @Test

@@ -1,9 +1,9 @@
-package com.dku.council.domain.category.controller;
+package com.dku.council.domain.tag.controller;
 
-import com.dku.council.domain.category.model.dto.CategoryDto;
-import com.dku.council.domain.category.model.dto.RequestCreateCategoryDto;
-import com.dku.council.domain.category.model.dto.RequestRenameCategoryDto;
-import com.dku.council.domain.category.service.CategoryService;
+import com.dku.council.domain.tag.model.dto.RequestCreateTagDto;
+import com.dku.council.domain.tag.model.dto.RequestRenameTagDto;
+import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@Tag(name = "카테고리", description = "카테고리 관련 API")
+@Tag(name = "태그", description = "태그 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/post/category")
-public class CategoryController {
-    private final CategoryService categoryService;
+public class TagController {
+    private final TagService tagService;
 
     /**
      * 카테고리 목록 가져오기
@@ -27,8 +27,8 @@ public class CategoryController {
      * @return 카테고리 목록
      */
     @GetMapping
-    public List<CategoryDto> list() {
-        return categoryService.list();
+    public List<TagDto> list() {
+        return tagService.list();
     }
 
     /**
@@ -39,8 +39,8 @@ public class CategoryController {
      */
     @PostMapping
     @AdminOnly
-    public ResponseIdDto create(@Valid @RequestBody RequestCreateCategoryDto dto) {
-        Long id = categoryService.create(dto.getName());
+    public ResponseIdDto create(@Valid @RequestBody RequestCreateTagDto dto) {
+        Long id = tagService.create(dto.getName());
         return new ResponseIdDto(id);
     }
 
@@ -54,8 +54,8 @@ public class CategoryController {
     @PatchMapping("/{categoryId}")
     @AdminOnly
     public ResponseIdDto rename(@PathVariable Long categoryId,
-                                @Valid @RequestBody RequestRenameCategoryDto dto) {
-        Long id = categoryService.rename(categoryId, dto.getName());
+                                @Valid @RequestBody RequestRenameTagDto dto) {
+        Long id = tagService.rename(categoryId, dto.getName());
         return new ResponseIdDto(id);
     }
 
@@ -69,7 +69,7 @@ public class CategoryController {
     @DeleteMapping("/{categoryId}")
     @AdminOnly
     public ResponseIdDto delete(@PathVariable Long categoryId) {
-        Long id = categoryService.delete(categoryId);
+        Long id = tagService.delete(categoryId);
         return new ResponseIdDto(id);
     }
 }

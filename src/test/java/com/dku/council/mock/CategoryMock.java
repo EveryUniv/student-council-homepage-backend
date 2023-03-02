@@ -1,6 +1,6 @@
 package com.dku.council.mock;
 
-import com.dku.council.domain.category.model.entity.Category;
+import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.util.FieldInjector;
 
 import java.util.ArrayList;
@@ -8,18 +8,18 @@ import java.util.List;
 
 public class CategoryMock {
 
-    public static Category create() {
-        return new Category(RandomGen.nextUUID());
+    public static Tag create() {
+        return new Tag(RandomGen.nextUUID());
     }
 
-    public static Category create(Long id) {
-        Category category = new Category(RandomGen.nextUUID());
-        FieldInjector.injectId(Category.class, category, id);
-        return category;
+    public static Tag create(Long id) {
+        Tag tag = new Tag(RandomGen.nextUUID());
+        FieldInjector.injectId(Tag.class, tag, id);
+        return tag;
     }
 
-    public static List<Category> createList(int size) {
-        List<Category> categories = new ArrayList<>(size);
+    public static List<Tag> createList(int size) {
+        List<Tag> categories = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             categories.add(create());
         }

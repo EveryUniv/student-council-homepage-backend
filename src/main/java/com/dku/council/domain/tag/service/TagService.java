@@ -1,10 +1,10 @@
-package com.dku.council.domain.category.service;
+package com.dku.council.domain.tag.service;
 
-import com.dku.council.domain.category.exception.CategoryIntegrityException;
-import com.dku.council.domain.category.exception.CategoryNotFoundException;
-import com.dku.council.domain.category.model.dto.CategoryDto;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
+import com.dku.council.domain.tag.exception.TagIntegrityException;
+import com.dku.council.domain.tag.exception.TagNotFoundException;
+import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class CategoryService {
+public class TagService {
 
-    private final CategoryRepository repository;
+    private final TagRepository repository;
 
     /**
      * 카테고리 목록을 가져옵니다.
@@ -26,10 +26,10 @@ public class CategoryService {
      * @return 카테고리 목록
      */
     @Transactional(readOnly = true)
-    public List<CategoryDto> list() {
-        List<Category> categories = repository.findAll();
+    public List<TagDto> list() {
+        List<Tag> categories = repository.findAll();
         return categories.stream()
-                .map(CategoryDto::new)
+                .map(TagDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -40,9 +40,9 @@ public class CategoryService {
      * @return 생성된 카테고리 아이디
      */
     public Long create(String name) {
-        Category category = new Category(name);
-        category = repository.save(category);
-        return category.getId();
+        Tag tag = new Tag(name);
+        tag = repository.save(tag);
+        return tag.getId();
     }
 
     /**
@@ -53,8 +53,8 @@ public class CategoryService {
      * @return 변경된 카테고리 아이디
      */
     public Long rename(Long categoryId, String name) {
-        Category category = repository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
-        category.updateName(name);
+        Tag tag = repository.findById(categoryId).orElseThrow(TagNotFoundException::new);
+        tag.updateName(name);
         return categoryId;
     }
 
@@ -65,12 +65,12 @@ public class CategoryService {
      * @return 삭제된 카테고리 아이디
      */
     public Long delete(Long categoryId) {
-        Category category = repository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+        Tag tag = repository.findById(categoryId).orElseThrow(TagNotFoundException::new);
         try {
-            repository.delete(category);
+            repository.delete(tag);
             repository.flush();
         } catch (DataIntegrityViolationException e) {
-            throw new CategoryIntegrityException(e);
+            throw new TagIntegrityException(e);
         }
         return categoryId;
     }

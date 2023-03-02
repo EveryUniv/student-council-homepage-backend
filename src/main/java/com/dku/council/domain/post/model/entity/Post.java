@@ -1,10 +1,10 @@
 package com.dku.council.domain.post.model.entity;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
+import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class Post extends BaseEntity {
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "category_id")
-    private Category category;
+    private Tag tag;
 
     private String title;
 
@@ -71,11 +71,11 @@ public class Post extends BaseEntity {
     private int views;
 
 
-    protected Post(User user, String title, String body, Category category, int views) {
+    protected Post(User user, String title, String body, Tag tag, int views) {
         this.user = user;
         this.title = title;
         this.body = body;
-        this.category = category;
+        this.tag = tag;
         this.views = views;
         this.status = PostStatus.ACTIVE;
     }

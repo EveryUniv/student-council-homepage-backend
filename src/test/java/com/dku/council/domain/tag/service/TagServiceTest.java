@@ -1,9 +1,9 @@
-package com.dku.council.domain.category.service;
+package com.dku.council.domain.tag.service;
 
-import com.dku.council.domain.category.exception.CategoryNotFoundException;
-import com.dku.council.domain.category.model.dto.CategoryDto;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
+import com.dku.council.domain.tag.exception.TagNotFoundException;
+import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.mock.CategoryMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,28 +23,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryServiceTest {
+class TagServiceTest {
 
     @Mock
-    private CategoryRepository repository;
+    private TagRepository repository;
 
     @InjectMocks
-    private CategoryService service;
+    private TagService service;
 
 
     @Test
     @DisplayName("카테고리 목록 불러오기")
     void list() {
         // given
-        List<Category> categories = CategoryMock.createList(10);
+        List<Tag> categories = CategoryMock.createList(10);
         List<Long> repoIdList = categories.stream()
-                .map(Category::getId)
+                .map(Tag::getId)
                 .collect(Collectors.toList());
         when(repository.findAll()).thenReturn(categories);
 
         // when
         List<Long> idList = service.list().stream()
-                .map(CategoryDto::getId)
+                .map(TagDto::getId)
                 .collect(Collectors.toList());
 
         // then
@@ -55,8 +55,8 @@ class CategoryServiceTest {
     @DisplayName("카테고리 추가하기")
     void create() {
         // given
-        Category category = CategoryMock.create(10L);
-        when(repository.save(any())).thenReturn(category);
+        Tag tag = CategoryMock.create(10L);
+        when(repository.save(any())).thenReturn(tag);
 
         // when
         Long created = service.create("");
@@ -69,15 +69,15 @@ class CategoryServiceTest {
     @DisplayName("카테고리 이름 변경")
     void rename() {
         // given
-        Category category = CategoryMock.create(10L);
-        when(repository.findById(10L)).thenReturn(Optional.of(category));
+        Tag tag = CategoryMock.create(10L);
+        when(repository.findById(10L)).thenReturn(Optional.of(tag));
 
         // when
         Long edited = service.rename(10L, "new name");
 
         // then
         assertThat(edited).isEqualTo(10L);
-        assertThat(category.getName()).isEqualTo("new name");
+        assertThat(tag.getName()).isEqualTo("new name");
     }
 
     @Test
@@ -87,7 +87,7 @@ class CategoryServiceTest {
         when(repository.findById(10L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(TagNotFoundException.class,
                 () -> service.rename(10L, "new name"));
     }
 
@@ -95,15 +95,15 @@ class CategoryServiceTest {
     @DisplayName("카테고리 삭제")
     void delete() {
         // given
-        Category category = CategoryMock.create(10L);
-        when(repository.findById(10L)).thenReturn(Optional.of(category));
+        Tag tag = CategoryMock.create(10L);
+        when(repository.findById(10L)).thenReturn(Optional.of(tag));
 
         // when
         Long deleted = service.delete(10L);
 
         // then
         assertThat(deleted).isEqualTo(10L);
-        verify(repository).delete(category);
+        verify(repository).delete(tag);
     }
 
     @Test
@@ -113,7 +113,7 @@ class CategoryServiceTest {
         when(repository.findById(10L)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(CategoryNotFoundException.class,
+        assertThrows(TagNotFoundException.class,
                 () -> service.delete(10L));
     }
 }

@@ -1,13 +1,13 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -45,7 +45,7 @@ class GenericPostServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private CategoryRepository categoryRepository;
+    private TagRepository tagRepository;
 
     @Mock
     private ViewCountService viewCountService;
@@ -109,12 +109,12 @@ class GenericPostServiceTest {
         // given
         User user = UserMock.create(99L);
         News news = NewsMock.create(user, 3L);
-        Category category = new Category("category");
+        Tag tag = new Tag("category");
 
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
-        when(categoryRepository.findById(any())).thenReturn(Optional.of(category));
+        when(tagRepository.findById(any())).thenReturn(Optional.of(tag));
 
         // when
         Long newsId = service.create(2L, dto);
@@ -124,7 +124,7 @@ class GenericPostServiceTest {
 
         verify(newsRepository).save(argThat(entity -> {
             assertThat(entity.getUser()).isEqualTo(user);
-            assertThat(entity.getCategory()).isEqualTo(category);
+            assertThat(entity.getTag()).isEqualTo(tag);
             return true;
         }));
     }

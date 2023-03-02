@@ -16,7 +16,7 @@ public class SummarizedGeneralForumDto extends SummarizedGenericPostDto {
 
     public SummarizedGeneralForumDto(String baseFileUrl, GeneralForum generalForum) {
         super(baseFileUrl, generalForum);
-        this.category = generalForum.getCategory().getName();
+        this.category = generalForum.getTag().getName();
         this.comments = generalForum.getComments().size();
     }
 }

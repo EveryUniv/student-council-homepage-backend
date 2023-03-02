@@ -1,8 +1,8 @@
 package com.dku.council.domain.post.model.dto.response;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.tag.model.entity.Tag;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -42,8 +42,8 @@ public class ResponseSingleGenericPostDto {
         this.title = post.getTitle();
         this.body = post.getBody();
         this.author = post.getUser().getName();
-        this.category = Optional.ofNullable(post.getCategory())
-                .map(Category::getName)
+        this.category = Optional.ofNullable(post.getTag())
+                .map(Tag::getName)
                 .orElse(null);
         this.createdAt = post.getCreatedAt();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());

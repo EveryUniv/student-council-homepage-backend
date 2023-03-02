@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
+import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,10 +23,10 @@ public class RequestCreateGeneralForumDto extends RequestCreateGenericPostDto<Ge
         this.categoryId = categoryId;
     }
 
-    public GeneralForum toEntity(User user, Category category) {
+    public GeneralForum toEntity(User user, Tag tag) {
         return GeneralForum.builder()
                 .body(getBody())
-                .category(category)
+                .category(tag)
                 .title(getTitle())
                 .user(user)
                 .build();

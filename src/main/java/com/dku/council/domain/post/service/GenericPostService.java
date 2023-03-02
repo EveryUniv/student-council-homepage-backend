@@ -1,8 +1,5 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.category.exception.CategoryNotFoundException;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.PostStatus;
@@ -11,6 +8,9 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.exception.TagNotFoundException;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -37,7 +37,7 @@ public class GenericPostService<E extends Post> {
 
     protected final GenericPostRepository<E> postRepository;
     protected final UserRepository userRepository;
-    protected final CategoryRepository categoryRepository;
+    protected final TagRepository tagRepository;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
     protected final MessageSource messageSource;
@@ -66,12 +66,12 @@ public class GenericPostService<E extends Post> {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         Long categoryId = dto.getCategoryId();
 
-        Category category = null;
+        Tag tag = null;
         if (categoryId != null) {
-            category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
+            tag = tagRepository.findById(categoryId).orElseThrow(TagNotFoundException::new);
         }
 
-        E post = dto.toEntity(user, category);
+        E post = dto.toEntity(user, tag);
 
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));

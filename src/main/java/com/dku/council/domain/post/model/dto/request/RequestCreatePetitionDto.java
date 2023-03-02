@@ -1,8 +1,8 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
+import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -23,11 +23,11 @@ public class RequestCreatePetitionDto extends RequestCreateGenericPostDto<Petiti
         this.categoryId = categoryId;
     }
 
-    public Petition toEntity(User user, Category category) {
+    public Petition toEntity(User user, Tag tag) {
         return Petition.builder()
                 .body(getBody())
                 .title(getTitle())
-                .category(category)
+                .category(tag)
                 .user(user)
                 .petitionStatus(PetitionStatus.ACTIVE)
                 .build();
