@@ -7,7 +7,9 @@ import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
+import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.service.UserService;
+import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,18 @@ public class UserController {
 
     private final MessageSource messageSource;
     private final UserService service;
+
+
+    /**
+     * 내 정보 조회
+     *
+     * @return 내 정보
+     */
+    @GetMapping
+    @UserOnly
+    public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
+        return service.getUserInfo(auth.getUserId());
+    }
 
     /**
      * 회원가입

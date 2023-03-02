@@ -8,6 +8,7 @@ import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
+import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -50,6 +51,7 @@ public class UserService {
                 .password(encryptedPassword)
                 .name(studentInfo.getStudentName())
                 .phone(phone)
+                .yearOfAdmission(studentInfo.getYearOfAdmission())
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.USER);
 
@@ -90,5 +92,14 @@ public class UserService {
         String accessToken = jwtProvider.getAccessTokenFromHeader(request);
         AuthenticationToken token = jwtProvider.reissue(accessToken, refreshToken);
         return new ResponseRefreshTokenDto(token);
+    }
+
+    public ResponseUserInfoDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(LoginUserNotFoundException::new);
+
+        String year = user.getYearOfAdmission().toString();
+        String major = user.getMajor().getMajorName(messageSource);
+        return new ResponseUserInfoDto(user.getName(), year, major);
     }
 }
