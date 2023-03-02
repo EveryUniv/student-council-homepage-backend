@@ -47,9 +47,9 @@ public class PetitionController {
      */
     @GetMapping
     public ResponsePage<SummarizedPetitionDto> list(@RequestParam(required = false) String keyword,
-                                                    @RequestParam(required = false) Long categoryId,
+                                                    @RequestParam(required = false) Long tagId,
                                                     @ParameterObject Pageable pageable) {
-        Specification<Petition> spec = PostSpec.genericPostCondition(keyword, categoryId);
+        Specification<Petition> spec = PostSpec.genericPostCondition(keyword, tagId);
         Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
                 .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);

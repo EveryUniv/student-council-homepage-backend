@@ -16,15 +16,15 @@ import java.util.List;
 @Tag(name = "태그", description = "태그 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/post/category")
+@RequestMapping("/post/tag")
 public class TagController {
     private final TagService tagService;
 
     /**
-     * 카테고리 목록 가져오기
-     * 모든 카테고리 목록을 가져옵니다. 카테고리는 모든 게시판이 공유해서 사용합니다.
+     * 태그 목록 가져오기
+     * 모든 태그 목록을 가져옵니다. 태그는 모든 게시판이 공유해서 사용합니다.
      *
-     * @return 카테고리 목록
+     * @return 태그 목록
      */
     @GetMapping
     public List<TagDto> list() {
@@ -32,10 +32,10 @@ public class TagController {
     }
 
     /**
-     * 카테고리를 추가합니다.
+     * 태그를 추가합니다.
      *
      * @param dto 요청 body
-     * @return 생성된 카테고리 아이디
+     * @return 생성된 태그 아이디
      */
     @PostMapping
     @AdminOnly
@@ -45,31 +45,31 @@ public class TagController {
     }
 
     /**
-     * 카테고리 이름을 변경합니다.
+     * 태그 이름을 변경합니다.
      *
-     * @param categoryId 카테고리 아이디
+     * @param tagId 태그 아이디
      * @param dto        요청 body
-     * @return 변경된 카테고리 아이디
+     * @return 변경된 태그 아이디
      */
-    @PatchMapping("/{categoryId}")
+    @PatchMapping("/{tagId}")
     @AdminOnly
-    public ResponseIdDto rename(@PathVariable Long categoryId,
+    public ResponseIdDto rename(@PathVariable Long tagId,
                                 @Valid @RequestBody RequestRenameTagDto dto) {
-        Long id = tagService.rename(categoryId, dto.getName());
+        Long id = tagService.rename(tagId, dto.getName());
         return new ResponseIdDto(id);
     }
 
     /**
-     * 카테고리를 삭제합니다.
-     * 카테고리에 속한 다른 포스트가 존재하면 카테고리를 삭제할 수 없습니다.
+     * 태그를 삭제합니다.
+     * 태그에 속한 다른 포스트가 존재하면 태그를 삭제할 수 없습니다.
      *
-     * @param categoryId 카테고리 아이디
-     * @return 삭제된 카테고리 아이디
+     * @param tagId 태그 아이디
+     * @return 삭제된 태그 아이디
      */
-    @DeleteMapping("/{categoryId}")
+    @DeleteMapping("/{tagId}")
     @AdminOnly
-    public ResponseIdDto delete(@PathVariable Long categoryId) {
-        Long id = tagService.delete(categoryId);
+    public ResponseIdDto delete(@PathVariable Long tagId) {
+        Long id = tagService.delete(tagId);
         return new ResponseIdDto(id);
     }
 }

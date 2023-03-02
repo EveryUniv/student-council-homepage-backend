@@ -25,8 +25,8 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "작성자", example = "작성자")
     private final String author;
 
-    @Schema(description = "카테고리", example = "학교생활")
-    private final String category;
+    @Schema(description = "태그", example = "학교생활")
+    private final String tag;
 
     @Schema(description = "생성 시각", example = "2022-03-01T11:31:11.444")
     private final LocalDateTime createdAt;
@@ -42,7 +42,7 @@ public class ResponseSingleGenericPostDto {
         this.title = post.getTitle();
         this.body = post.getBody();
         this.author = post.getUser().getName();
-        this.category = Optional.ofNullable(post.getTag())
+        this.tag = Optional.ofNullable(post.getTag())
                 .map(Tag::getName)
                 .orElse(null);
         this.createdAt = post.getCreatedAt();

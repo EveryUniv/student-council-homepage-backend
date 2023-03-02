@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 기본 기능만 제공하는 게시판을 대상으로 하는 서비스입니다.
- * 기본 기능은 제목, 본문, 댓글, 파일, 카테고리를 포함한 게시판을 의미합니다.
+ * 기본 기능은 제목, 본문, 댓글, 파일, 태그를 포함한 게시판을 의미합니다.
  * 왠만한 게시판들은 이 서비스로 커버가 가능합니다. 복잡한 조회, 생성, 비즈니스 로직이 포함된 게시판은
  * 이걸 사용하지말고 따로 만드는 게 낫습니다.
  * 이걸 사용하려면, 반드시 Bean에 등록되어있어야 합니다. (PostConfig)
@@ -64,11 +64,11 @@ public class GenericPostService<E extends Post> {
     @Transactional
     public Long create(Long userId, RequestCreateGenericPostDto<E> dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Long categoryId = dto.getCategoryId();
+        Long tagId = dto.getTagId();
 
         Tag tag = null;
-        if (categoryId != null) {
-            tag = tagRepository.findById(categoryId).orElseThrow(TagNotFoundException::new);
+        if (tagId != null) {
+            tag = tagRepository.findById(tagId).orElseThrow(TagNotFoundException::new);
         }
 
         E post = dto.toEntity(user, tag);

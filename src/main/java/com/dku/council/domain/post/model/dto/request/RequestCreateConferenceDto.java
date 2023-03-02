@@ -25,8 +25,8 @@ public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conf
             requiredMode = Schema.RequiredMode.REQUIRED)
     private final String date;
 
-    public RequestCreateConferenceDto(String title, String body, Long categoryId, List<MultipartFile> files, Integer round, String date) {
-        super(title, body, categoryId, files);
+    public RequestCreateConferenceDto(String title, String body, Long tagId, List<MultipartFile> files, Integer round, String date) {
+        super(title, body, tagId, files);
         this.round = round;
         this.date = date;
     }
@@ -35,7 +35,7 @@ public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conf
         return Conference.builder()
                 .body(getBody())
                 .title(getTitle())
-                .category(tag)
+                .tag(tag)
                 .user(user)
                 .round(getRound())
                 .date(LocalDate.parse(getDate()))

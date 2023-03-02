@@ -44,7 +44,7 @@ public class Post extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "tag_id")
     private Tag tag;
 
     private String title;

@@ -104,12 +104,12 @@ class GenericPostServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리를 명시하며 생성하기")
-    public void createWithCategory() {
+    @DisplayName("태그를 명시하며 생성하기")
+    public void createWithTag() {
         // given
         User user = UserMock.create(99L);
         News news = NewsMock.create(user, 3L);
-        Tag tag = new Tag("category");
+        Tag tag = new Tag("tag");
 
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));

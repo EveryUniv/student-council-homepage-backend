@@ -11,10 +11,10 @@ public class PostSpec {
         return withActive();
     }
 
-    public static <T extends Post> Specification<T> genericPostCondition(String keyword, Long categoryId) {
+    public static <T extends Post> Specification<T> genericPostCondition(String keyword, Long tagId) {
         Specification<T> spec = createPostCondition();
         if (keyword != null) spec.and(withTitleOrBody(keyword));
-        if (categoryId != null) spec.and(withCategory(categoryId));
+        if (tagId != null) spec.and(withTag(tagId));
         return spec;
     }
 
@@ -32,8 +32,8 @@ public class PostSpec {
                 builder.equal(root.get("status"), PostStatus.ACTIVE);
     }
 
-    private static <T extends Post> Specification<T> withCategory(Long categoryId) {
+    private static <T extends Post> Specification<T> withTag(Long tagId) {
         return (root, query, builder) ->
-                builder.equal(root.get("category"), categoryId);
+                builder.equal(root.get("tag"), tagId);
     }
 }

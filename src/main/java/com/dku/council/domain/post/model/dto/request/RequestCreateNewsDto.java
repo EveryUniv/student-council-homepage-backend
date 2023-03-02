@@ -12,14 +12,14 @@ import java.util.List;
 @Getter
 public class RequestCreateNewsDto extends RequestCreateGenericPostDto<News> {
 
-    public RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
-        super(title, body, categoryId, files);
+    public RequestCreateNewsDto(@NotBlank String title, @NotBlank String body, Long tagId, List<MultipartFile> files) {
+        super(title, body, tagId, files);
     }
 
     public News toEntity(User user, Tag tag) {
         return News.builder()
                 .body(getBody())
-                .category(tag)
+                .tag(tag)
                 .title(getTitle())
                 .user(user)
                 .build();

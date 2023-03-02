@@ -12,14 +12,14 @@ import java.util.List;
 @Getter
 public class RequestCreateRuleDto extends RequestCreateGenericPostDto<Rule> {
 
-    public RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
-        super(title, body, categoryId, files);
+    public RequestCreateRuleDto(@NotBlank String title, @NotBlank String body, Long tagId, List<MultipartFile> files) {
+        super(title, body, tagId, files);
     }
 
     public Rule toEntity(User user, Tag tag) {
         return Rule.builder()
                 .body(getBody())
-                .category(tag)
+                .tag(tag)
                 .title(getTitle())
                 .user(user)
                 .build();

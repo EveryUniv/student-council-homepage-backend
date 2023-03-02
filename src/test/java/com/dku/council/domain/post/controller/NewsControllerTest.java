@@ -112,17 +112,17 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     }
 
     @Test
-    @DisplayName("News 생성 - 카테고리 명시")
-    void createWithCategory() throws Exception {
+    @DisplayName("News 생성 - 태그 명시")
+    void createWithTag() throws Exception {
         // given
-        Tag tag = new Tag("category");
+        Tag tag = new Tag("tag");
         tagRepository.save(tag);
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
                         .param("title", "제목")
                         .param("body", "본문")
-                        .param("categoryId", tag.getId().toString()))
+                        .param("tagId", tag.getId().toString()))
                 .andDo(print());
 
         // then

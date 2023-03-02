@@ -15,19 +15,19 @@ import java.util.List;
 public class RequestCreatePetitionDto extends RequestCreateGenericPostDto<Petition> {
 
     @NotNull
-    @Schema(description = "카테고리 ID", example = "11")
-    private final Long categoryId;
+    @Schema(description = "태그 ID", example = "11")
+    private final Long tagId;
 
-    public RequestCreatePetitionDto(String title, String body, Long categoryId, List<MultipartFile> files) {
-        super(title, body, categoryId, files);
-        this.categoryId = categoryId;
+    public RequestCreatePetitionDto(String title, String body, Long tagId, List<MultipartFile> files) {
+        super(title, body, tagId, files);
+        this.tagId = tagId;
     }
 
     public Petition toEntity(User user, Tag tag) {
         return Petition.builder()
                 .body(getBody())
                 .title(getTitle())
-                .category(tag)
+                .tag(tag)
                 .user(user)
                 .petitionStatus(PetitionStatus.ACTIVE)
                 .build();

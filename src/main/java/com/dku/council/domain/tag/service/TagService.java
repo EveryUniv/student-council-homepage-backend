@@ -21,9 +21,9 @@ public class TagService {
     private final TagRepository repository;
 
     /**
-     * 카테고리 목록을 가져옵니다.
+     * 태그 목록을 가져옵니다.
      *
-     * @return 카테고리 목록
+     * @return 태그 목록
      */
     @Transactional(readOnly = true)
     public List<TagDto> list() {
@@ -34,10 +34,10 @@ public class TagService {
     }
 
     /**
-     * 카테고리를 추가합니다.
+     * 태그를 추가합니다.
      *
-     * @param name 카테고리 이름
-     * @return 생성된 카테고리 아이디
+     * @param name 태그 이름
+     * @return 생성된 태그 아이디
      */
     public Long create(String name) {
         Tag tag = new Tag(name);
@@ -46,32 +46,32 @@ public class TagService {
     }
 
     /**
-     * 카테고리의 이름을 변경합니다.
+     * 태그의 이름을 변경합니다.
      *
-     * @param categoryId 카테고리 아이디
+     * @param tagId 태그 아이디
      * @param name       새로운 이름
-     * @return 변경된 카테고리 아이디
+     * @return 변경된 태그 아이디
      */
-    public Long rename(Long categoryId, String name) {
-        Tag tag = repository.findById(categoryId).orElseThrow(TagNotFoundException::new);
+    public Long rename(Long tagId, String name) {
+        Tag tag = repository.findById(tagId).orElseThrow(TagNotFoundException::new);
         tag.updateName(name);
-        return categoryId;
+        return tagId;
     }
 
     /**
-     * 카테고리를 삭제합니다.
+     * 태그를 삭제합니다.
      *
-     * @param categoryId 카테고리 아이디
-     * @return 삭제된 카테고리 아이디
+     * @param tagId 태그 아이디
+     * @return 삭제된 태그 아이디
      */
-    public Long delete(Long categoryId) {
-        Tag tag = repository.findById(categoryId).orElseThrow(TagNotFoundException::new);
+    public Long delete(Long tagId) {
+        Tag tag = repository.findById(tagId).orElseThrow(TagNotFoundException::new);
         try {
             repository.delete(tag);
             repository.flush();
         } catch (DataIntegrityViolationException e) {
             throw new TagIntegrityException(e);
         }
-        return categoryId;
+        return tagId;
     }
 }

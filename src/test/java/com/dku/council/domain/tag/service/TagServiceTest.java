@@ -4,7 +4,7 @@ import com.dku.council.domain.tag.exception.TagNotFoundException;
 import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;
-import com.dku.council.mock.CategoryMock;
+import com.dku.council.mock.TagMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,10 +33,10 @@ class TagServiceTest {
 
 
     @Test
-    @DisplayName("카테고리 목록 불러오기")
+    @DisplayName("태그 목록 불러오기")
     void list() {
         // given
-        List<Tag> categories = CategoryMock.createList(10);
+        List<Tag> categories = TagMock.createList(10);
         List<Long> repoIdList = categories.stream()
                 .map(Tag::getId)
                 .collect(Collectors.toList());
@@ -52,10 +52,10 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리 추가하기")
+    @DisplayName("태그 추가하기")
     void create() {
         // given
-        Tag tag = CategoryMock.create(10L);
+        Tag tag = TagMock.create(10L);
         when(repository.save(any())).thenReturn(tag);
 
         // when
@@ -66,10 +66,10 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리 이름 변경")
+    @DisplayName("태그 이름 변경")
     void rename() {
         // given
-        Tag tag = CategoryMock.create(10L);
+        Tag tag = TagMock.create(10L);
         when(repository.findById(10L)).thenReturn(Optional.of(tag));
 
         // when
@@ -81,7 +81,7 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리 이름 변경 실패 - 카테고리가 없음")
+    @DisplayName("태그 이름 변경 실패 - 태그가 없음")
     void failedRenameByNotFound() {
         // given
         when(repository.findById(10L)).thenReturn(Optional.empty());
@@ -92,10 +92,10 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리 삭제")
+    @DisplayName("태그 삭제")
     void delete() {
         // given
-        Tag tag = CategoryMock.create(10L);
+        Tag tag = TagMock.create(10L);
         when(repository.findById(10L)).thenReturn(Optional.of(tag));
 
         // when
@@ -107,7 +107,7 @@ class TagServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리 삭제 실패 - 카테고리가 없음")
+    @DisplayName("태그 삭제 실패 - 태그가 없음")
     void failedDeletionByNotFound() {
         // given
         when(repository.findById(10L)).thenReturn(Optional.empty());

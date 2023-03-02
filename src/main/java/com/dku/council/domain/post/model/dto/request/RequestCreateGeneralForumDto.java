@@ -15,18 +15,18 @@ import java.util.List;
 public class RequestCreateGeneralForumDto extends RequestCreateGenericPostDto<GeneralForum> {
 
     @NotNull
-    @Schema(description = "카테고리 ID", example = "11")
-    private final Long categoryId;
+    @Schema(description = "태그 ID", example = "11")
+    private final Long tagId;
 
-    public RequestCreateGeneralForumDto(@NotBlank String title, @NotBlank String body, Long categoryId, List<MultipartFile> files) {
-        super(title, body, categoryId, files);
-        this.categoryId = categoryId;
+    public RequestCreateGeneralForumDto(@NotBlank String title, @NotBlank String body, Long tagId, List<MultipartFile> files) {
+        super(title, body, tagId, files);
+        this.tagId = tagId;
     }
 
     public GeneralForum toEntity(User user, Tag tag) {
         return GeneralForum.builder()
                 .body(getBody())
-                .category(tag)
+                .tag(tag)
                 .title(getTitle())
                 .user(user)
                 .build();
