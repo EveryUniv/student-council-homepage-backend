@@ -8,9 +8,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.tag.exception.TagNotFoundException;
-import com.dku.council.domain.tag.model.entity.Tag;
-import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -37,7 +35,7 @@ public class GenericPostService<E extends Post> {
 
     protected final GenericPostRepository<E> postRepository;
     protected final UserRepository userRepository;
-    protected final TagRepository tagRepository;
+    protected final TagService tagService;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
     protected final MessageSource messageSource;
@@ -64,14 +62,9 @@ public class GenericPostService<E extends Post> {
     @Transactional
     public Long create(Long userId, RequestCreateGenericPostDto<E> dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Long tagId = dto.getTagId();
 
-        Tag tag = null;
-        if (tagId != null) {
-            tag = tagRepository.findById(tagId).orElseThrow(TagNotFoundException::new);
-        }
-
-        E post = dto.toEntity(user, tag);
+        E post = dto.toEntity(user);
+        tagService.addTagsToPost(post, dto.getTagIds());
 
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));

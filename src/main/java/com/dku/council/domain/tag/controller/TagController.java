@@ -49,7 +49,7 @@ public class TagController {
      *
      * @param tagId 태그 아이디
      * @param dto        요청 body
-     * @return 변경된 태그 아이디
+     * @return 변경된 태그 아이디 (입력받은 tagId와 동일)
      */
     @PatchMapping("/{tagId}")
     @AdminOnly
@@ -61,10 +61,10 @@ public class TagController {
 
     /**
      * 태그를 삭제합니다.
-     * 태그에 속한 다른 포스트가 존재하면 태그를 삭제할 수 없습니다.
+     * 태그와 연관된 다른 포스트가 존재하면 태그를 삭제할 수 없습니다.
      *
      * @param tagId 태그 아이디
-     * @return 삭제된 태그 아이디
+     * @return 삭제된 태그 아이디 (입력받은 tagId와 동일)
      */
     @DeleteMapping("/{tagId}")
     @AdminOnly

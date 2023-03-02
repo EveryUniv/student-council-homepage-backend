@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -22,19 +21,19 @@ public abstract class RequestCreateGenericPostDto<T> {
     @Schema(description = "본문", example = "내용")
     private final String body;
 
-    @Schema(description = "태그 ID", example = "11")
-    private final Long tagId;
+    @Schema(description = "태그 ID 목록")
+    private final List<Long> tagIds;
 
     @Schema(description = "첨부파일")
     private final List<MultipartFile> files;
 
 
-    public RequestCreateGenericPostDto(String title, String body, Long tagId, List<MultipartFile> files) {
+    public RequestCreateGenericPostDto(String title, String body, List<Long> tagIds, List<MultipartFile> files) {
         this.title = title;
         this.body = body;
-        this.tagId = tagId;
+        this.tagIds = Objects.requireNonNullElseGet(tagIds, ArrayList::new);
         this.files = Objects.requireNonNullElseGet(files, ArrayList::new);
     }
 
-    public abstract T toEntity(User user, Tag tag);
+    public abstract T toEntity(User user);
 }

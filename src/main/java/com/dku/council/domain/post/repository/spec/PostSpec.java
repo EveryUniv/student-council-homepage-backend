@@ -2,7 +2,10 @@ package com.dku.council.domain.post.repository.spec;
 
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.tag.model.entity.PostTag;
 import org.springframework.data.jpa.domain.Specification;
+
+import javax.persistence.criteria.Join;
 
 // TODO Test 추가
 public class PostSpec {
@@ -33,7 +36,9 @@ public class PostSpec {
     }
 
     private static <T extends Post> Specification<T> withTag(Long tagId) {
-        return (root, query, builder) ->
-                builder.equal(root.get("tag"), tagId);
+        return (root, query, builder) -> {
+            Join<PostTag, Post> postTags = root.join("postTags");
+            return builder.equal(postTags.get("tag").get("id"), tagId);
+        };
     }
 }

@@ -117,12 +117,15 @@ class NewsControllerTest extends AbstractContainerRedisTest {
         // given
         Tag tag = new Tag("tag");
         tagRepository.save(tag);
+        Tag tag2 = new Tag("tag2");
+        tagRepository.save(tag2);
+        String[] tagIds = new String[]{tag.getId().toString(), tag2.getId().toString()};
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
                         .param("title", "제목")
                         .param("body", "본문")
-                        .param("tagId", tag.getId().toString()))
+                        .param("tagIds", tagIds))
                 .andDo(print());
 
         // then
@@ -135,7 +138,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
         assertThat(actualNews.getBody()).isEqualTo("본문");
-        assertThat(actualNews.getTag().getId()).isEqualTo(tag.getId());
+        assertThat(actualNews.getPostTags().get(0).getTag().getId()).isEqualTo(tag.getId());
+        assertThat(actualNews.getPostTags().get(1).getTag().getId()).isEqualTo(tag2.getId());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +23,7 @@ public class Rule extends Post {
     private Rule(@NonNull User user,
                  @NonNull String title,
                  @NonNull String body,
-                 Tag tag, int views) {
-        super(user, title, body, tag, views);
+                 int views) {
+        super(user, title, body, views);
     }
 }

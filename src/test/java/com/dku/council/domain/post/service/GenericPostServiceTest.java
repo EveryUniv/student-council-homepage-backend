@@ -6,8 +6,7 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.tag.model.entity.Tag;
-import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -45,7 +44,7 @@ class GenericPostServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private TagRepository tagRepository;
+    private TagService tagService;
 
     @Mock
     private ViewCountService viewCountService;
@@ -109,12 +108,11 @@ class GenericPostServiceTest {
         // given
         User user = UserMock.create(99L);
         News news = NewsMock.create(user, 3L);
-        Tag tag = new Tag("tag");
+        List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
 
-        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, List.of());
+        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", tagIds, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
-        when(tagRepository.findById(any())).thenReturn(Optional.of(tag));
 
         // when
         Long newsId = service.create(2L, dto);
@@ -124,9 +122,9 @@ class GenericPostServiceTest {
 
         verify(newsRepository).save(argThat(entity -> {
             assertThat(entity.getUser()).isEqualTo(user);
-            assertThat(entity.getTag()).isEqualTo(tag);
             return true;
         }));
+        verify(tagService).addTagsToPost(any(), eq(tagIds));
     }
 
     @Test
@@ -137,7 +135,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(UserNotFoundException.class, () ->
-                service.create(2L, new RequestCreateNewsDto("title", "body", 0L, List.of())));
+                service.create(2L, new RequestCreateNewsDto("title", "body", List.of(), List.of())));
     }
 
     @Test

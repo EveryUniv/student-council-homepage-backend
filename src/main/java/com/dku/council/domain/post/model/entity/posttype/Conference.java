@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,9 +35,9 @@ public class Conference extends Post {
                        @NonNull String title,
                        @NonNull String body,
                        @NonNull LocalDate date,
-                       Tag tag, int views, int round) {
+                       int views, int round) {
 
-        super(user, title, body, tag, views);
+        super(user, title, body, views);
         this.round = round;
         this.date = date;
     }

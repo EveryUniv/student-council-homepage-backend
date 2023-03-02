@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.model.dto.request;
 
 import com.dku.council.domain.post.model.entity.posttype.Conference;
-import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.user.model.entity.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -25,17 +24,16 @@ public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conf
             requiredMode = Schema.RequiredMode.REQUIRED)
     private final String date;
 
-    public RequestCreateConferenceDto(String title, String body, Long tagId, List<MultipartFile> files, Integer round, String date) {
-        super(title, body, tagId, files);
+    public RequestCreateConferenceDto(String title, String body, List<Long> tagIds, List<MultipartFile> files, Integer round, String date) {
+        super(title, body, tagIds, files);
         this.round = round;
         this.date = date;
     }
 
-    public Conference toEntity(User user, Tag tag) {
+    public Conference toEntity(User user) {
         return Conference.builder()
                 .body(getBody())
                 .title(getTitle())
-                .tag(tag)
                 .user(user)
                 .round(getRound())
                 .date(LocalDate.parse(getDate()))

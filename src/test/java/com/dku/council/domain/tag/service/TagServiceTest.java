@@ -1,9 +1,12 @@
 package com.dku.council.domain.tag.service;
 
+import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.tag.exception.TagNotFoundException;
 import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.PostTagRepository;
 import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,9 @@ class TagServiceTest {
 
     @Mock
     private TagRepository repository;
+
+    @Mock
+    private PostTagRepository postTagRepository;
 
     @InjectMocks
     private TagService service;
@@ -115,5 +121,26 @@ class TagServiceTest {
         // when & then
         assertThrows(TagNotFoundException.class,
                 () -> service.delete(10L));
+    }
+
+    @Test
+    @DisplayName("Post에 태그 추가하기")
+    void addTagsToPost() {
+        // given
+        Post post = NewsMock.create();
+        List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
+        List<Tag> tags = List.of(TagMock.create(10L), TagMock.create(11L), TagMock.create(12L), TagMock.create(13L));
+        when(repository.findAllById(tagIds)).thenReturn(tags);
+
+        // when
+        service.addTagsToPost(post, tagIds);
+
+        // then
+        List<Long> actualTagIds = post.getPostTags().stream()
+                .map((pt) -> pt.getTag().getId())
+                .collect(Collectors.toList());
+
+        assertThat(tagIds).containsExactlyInAnyOrderElementsOf(actualTagIds);
+        verify(postTagRepository).saveAll(any());
     }
 }

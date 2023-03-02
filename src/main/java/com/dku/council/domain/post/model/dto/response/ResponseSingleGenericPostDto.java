@@ -2,13 +2,13 @@ package com.dku.council.domain.post.model.dto.response;
 
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.model.dto.TagDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Getter
 public class ResponseSingleGenericPostDto {
@@ -25,8 +25,8 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "작성자", example = "작성자")
     private final String author;
 
-    @Schema(description = "태그", example = "학교생활")
-    private final String tag;
+    @Schema(description = "태그 목록")
+    private final List<TagDto> tag;
 
     @Schema(description = "생성 시각", example = "2022-03-01T11:31:11.444")
     private final LocalDateTime createdAt;
@@ -42,9 +42,10 @@ public class ResponseSingleGenericPostDto {
         this.title = post.getTitle();
         this.body = post.getBody();
         this.author = post.getUser().getName();
-        this.tag = Optional.ofNullable(post.getTag())
-                .map(Tag::getName)
-                .orElse(null);
+        // TODO 쿼리 확인해보기. 일괄쿼리로 나가는지?
+        this.tag = post.getPostTags().stream()
+                .map(e -> new TagDto(e.getTag()))
+                .collect(Collectors.toList());
         this.createdAt = post.getCreatedAt();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.isMine = post.getUser().getId().equals(userId);
