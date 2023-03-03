@@ -47,7 +47,7 @@ class CommentServiceTest {
         // given
         Post post = NewsMock.create();
         User user = UserMock.create();
-        Comment comment = CommentMock.create(post, user);
+        Comment comment = CommentMock.createWithId(post, user);
         when(commentRepository.save(any())).thenReturn(comment);
         when(postRepository.findByIdAndActived(1L)).thenReturn(Optional.ofNullable(post));
         when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
@@ -64,7 +64,7 @@ class CommentServiceTest {
     void edit() {
         // given
         User user = UserMock.create(10L);
-        Comment comment = CommentMock.create(user);
+        Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
 
         // when
@@ -80,7 +80,7 @@ class CommentServiceTest {
     void failedEditByNotMine() {
         // given
         User user = UserMock.create(11L);
-        Comment comment = CommentMock.create(user);
+        Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
 
         // when & then
@@ -93,7 +93,7 @@ class CommentServiceTest {
     void deleteMine() {
         // given
         User user = UserMock.create(10L);
-        Comment comment = CommentMock.create(user);
+        Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
         // when
@@ -109,7 +109,7 @@ class CommentServiceTest {
     void deleteByAdmin() {
         // given
         User user = UserMock.create(11L);
-        Comment comment = CommentMock.create(user);
+        Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
         // when
@@ -125,7 +125,7 @@ class CommentServiceTest {
     void failedDeleteByNotGranted() {
         // given
         User user = UserMock.create(11L);
-        Comment comment = CommentMock.create(user);
+        Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
         // when & then

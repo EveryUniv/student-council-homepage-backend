@@ -1,10 +1,12 @@
 package com.dku.council.util;
 
 import com.dku.council.mock.ServerMock;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
 
+@Disabled
 public class PropertiesBase64Encoder {
 
     @Test
