@@ -42,16 +42,18 @@ public class PetitionController {
      * 게시글 목록으로 조회
      *
      * @param keyword  제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
+     * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
      * @param pageable 페이징 size, sort, page
      * @return 페이징 된 회의록 목록
      */
     @GetMapping
     public ResponsePage<SummarizedPetitionDto> list(@RequestParam(required = false) String keyword,
+                                                    @RequestParam(defaultValue = "50") int bodySize,
                                                     @RequestParam(required = false) Long categoryId,
                                                     @ParameterObject Pageable pageable) {
         Specification<Petition> spec = PostSpec.genericPostCondition(keyword, categoryId);
         Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
-                .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
+                .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, bodySize, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);
     }
 

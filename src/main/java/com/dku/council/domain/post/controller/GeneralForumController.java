@@ -39,17 +39,19 @@ public class GeneralForumController {
      * 게시글 목록 및 카테고리 조회
      *
      * @param keyword    제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
+     * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
      * @param categoryId 탐색할 카테고리 ID. 지정하지않으면 모든 게시글 조회.
      * @param pageable   페이징 size, sort, page
      * @return 페이징된 자유게시판 목록
      */
     @GetMapping
     public ResponsePage<SummarizedGeneralForumDto> list(@RequestParam(required = false) String keyword,
+                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                         @RequestParam(required = false) Long categoryId,
                                                         @ParameterObject Pageable pageable) {
         Specification<GeneralForum> spec = PostSpec.genericPostCondition(keyword, categoryId);
         Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), post));
+                .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);
     }
 
