@@ -2,19 +2,28 @@ package com.dku.council.domain.post.repository.spec;
 
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.tag.model.entity.PostTag;
 import org.springframework.data.jpa.domain.Specification;
 
-// TODO Test 추가
+import javax.persistence.criteria.Join;
+import java.util.List;
+
 public class PostSpec {
 
     public static <T extends Post> Specification<T> createPostCondition() {
         return withActive();
     }
 
-    public static <T extends Post> Specification<T> genericPostCondition(String keyword, Long categoryId) {
+    public static <T extends Post> Specification<T> genericPostCondition(String keyword, List<Long> tagIds) {
         Specification<T> spec = createPostCondition();
-        if (keyword != null) spec.and(withTitleOrBody(keyword));
-        if (categoryId != null) spec.and(withCategory(categoryId));
+        if (keyword != null) spec = spec.and(withTitleOrBody(keyword));
+        if (tagIds != null && !tagIds.isEmpty()) {
+            Specification<T> orSpec = withTag(tagIds.get(0));
+            for (int i = 1; i < tagIds.size(); i++) {
+                orSpec = orSpec.or(withTag(tagIds.get(i)));
+            }
+            spec = spec.and(orSpec);
+        }
         return spec;
     }
 
@@ -32,8 +41,10 @@ public class PostSpec {
                 builder.equal(root.get("status"), PostStatus.ACTIVE);
     }
 
-    private static <T extends Post> Specification<T> withCategory(Long categoryId) {
-        return (root, query, builder) ->
-                builder.equal(root.get("category"), categoryId);
+    private static <T extends Post> Specification<T> withTag(Long tagId) {
+        return (root, query, builder) -> {
+            Join<PostTag, Post> postTags = root.join("postTags");
+            return builder.equal(postTags.get("tag").get("id"), tagId);
+        };
     }
 }

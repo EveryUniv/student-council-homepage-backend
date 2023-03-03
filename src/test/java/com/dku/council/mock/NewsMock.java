@@ -41,7 +41,9 @@ public class NewsMock {
                 .title("")
                 .body("")
                 .build();
-        FieldInjector.injectId(Post.class, news, newsId);
+        if (newsId != null) {
+            FieldInjector.injectId(Post.class, news, newsId);
+        }
         return news;
     }
 }
