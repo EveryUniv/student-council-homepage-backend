@@ -50,8 +50,8 @@ public class NHNEmailServiceImpl implements NHNEmailService {
                 .title(title)
                 .body(text)
                 .receiver(NhnMessage.Receiver.builder()
-//                        .receiveMailAddr(studentId + "@dankook.ac.kr")
-                        .receiveMailAddr(studentId + "@gmail.com")
+                        .receiveMailAddr(studentId + "@dankook.ac.kr")
+//                        .receiveMailAddr(studentId + "@gmail.com")
                         .build())
                 .build();
     }
