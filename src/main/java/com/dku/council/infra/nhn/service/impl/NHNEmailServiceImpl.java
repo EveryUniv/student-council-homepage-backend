@@ -2,7 +2,6 @@ package com.dku.council.infra.nhn.service.impl;
 
 import com.dku.council.infra.nhn.model.dto.NhnMessage;
 import com.dku.council.infra.nhn.service.NHNEmailService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class NHNEmailServiceImpl implements NHNEmailService {
     private final WebClient client;
-    private final ObjectMapper objectMapper;
     @Value("${email.api-path}")
     private final String NHN_EMAIL_URL;
     @Value("${email.secret-key}")

@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.model.dto.request;
 
+import com.dku.council.domain.user.model.MajorData;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +12,6 @@ import javax.validation.constraints.Pattern;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED, onConstructor_ = {@JsonCreator})
 public class RequestSendEmailCode {
-
     @NotBlank
     @Pattern(regexp = "^\\d{8}$")
     private final String studentId;
