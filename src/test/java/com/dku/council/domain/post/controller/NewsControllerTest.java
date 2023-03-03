@@ -2,6 +2,7 @@ package com.dku.council.domain.post.controller;
 
 import com.dku.council.common.AbstractContainerRedisTest;
 import com.dku.council.common.MvcMockResponse;
+import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-//@OnlyDevTest
+@OnlyDevTest
 class NewsControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
