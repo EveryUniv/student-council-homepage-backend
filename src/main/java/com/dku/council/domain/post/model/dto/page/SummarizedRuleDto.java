@@ -11,8 +11,8 @@ public class SummarizedRuleDto extends SummarizedGenericPostDto {
     @Schema(description = "부서명 (소속대학)", example = "공과대학")
     private final String department;
 
-    public SummarizedRuleDto(MessageSource messageSource, String baseFileUrl, Rule rule) {
-        super(baseFileUrl, rule);
+    public SummarizedRuleDto(MessageSource messageSource, String baseFileUrl, int bodySize, Rule rule) {
+        super(baseFileUrl, bodySize, rule);
         this.department = rule.getUser().getMajor().getDepartmentName(messageSource);
     }
 }

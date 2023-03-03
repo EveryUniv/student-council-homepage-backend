@@ -11,8 +11,8 @@ public class SummarizedGeneralForumDto extends SummarizedGenericPostDto {
     @Schema(description = "댓글수", example = "5")
     private final int comments;
 
-    public SummarizedGeneralForumDto(String baseFileUrl, GeneralForum generalForum) {
-        super(baseFileUrl, generalForum);
+    public SummarizedGeneralForumDto(String baseFileUrl, int bodySize, GeneralForum generalForum) {
+        super(baseFileUrl, bodySize, generalForum);
         this.comments = generalForum.getComments().size();
     }
 }
