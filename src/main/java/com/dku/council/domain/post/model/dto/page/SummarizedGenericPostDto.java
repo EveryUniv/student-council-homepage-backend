@@ -17,7 +17,7 @@ public class SummarizedGenericPostDto {
     private final String title;
 
     @Schema(description = "본문", example = "게시글 본문")
-    private final String summarizedBody;
+    private final String body;
 
     @Schema(description = "생성 날짜", example = "2022-01-01")
     private final String createdDate;
@@ -31,7 +31,7 @@ public class SummarizedGenericPostDto {
     public SummarizedGenericPostDto(String baseFileUrl, int bodySize, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
-        this.summarizedBody = slice(post.getBody(), bodySize);
+        this.body = slice(post.getBody(), bodySize);
         this.createdDate = post.getCreatedDateText();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
