@@ -13,6 +13,6 @@ import javax.validation.constraints.Pattern;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED, onConstructor_ = {@JsonCreator})
 public class RequestSendEmailCode {
     @NotBlank
-    @Pattern(regexp = "^\\d{8}$")
+    @Pattern(regexp = "^\\d{8}$", message = "학번을 정확히 입력해주세요")
     private final String studentId;
 }

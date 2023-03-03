@@ -16,13 +16,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class NHNEmailServiceImpl implements NHNEmailService {
     private final WebClient client;
-    @Value("${email.api-path}")
+    @Value("${nhn.email.api-path}")
     private final String NHN_EMAIL_URL;
-    @Value("${email.secret-key}")
+    @Value("${nhn.email.secret-key}")
     private final String NHN_EMAIL_KEY;
-    @Value("${email.sender-mail}")
+    @Value("${nhn.email.sender-mail}")
     private final String NHN_SENDER;
-    @Value("${email.sender-name}")
+    @Value("${nhn.email.sender-name}")
     private final String NHN_SENDER_NAME;
 
     @Override
@@ -33,14 +33,13 @@ public class NHNEmailServiceImpl implements NHNEmailService {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .header("X-Secret-Key", NHN_EMAIL_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(makeMessage(title, studentId, text))
+                .bodyValue(makeMessage(studentId, title, text))
                 .retrieve()
                 .toEntity(String.class)
                 .block();
         if(response == null || response.getStatusCode().isError()){
             throw new RuntimeException("전송 실패");
         }
-
         log.info("message = {}", response.getBody());
     }
 
@@ -51,7 +50,8 @@ public class NHNEmailServiceImpl implements NHNEmailService {
                 .title(title)
                 .body(text)
                 .receiver(NhnMessage.Receiver.builder()
-                        .receiveMailAddr(studentId + "@dankook.ac.kr")
+//                        .receiveMailAddr(studentId + "@dankook.ac.kr")
+                        .receiveMailAddr(studentId + "@gmail.com")
                         .build())
                 .build();
     }

@@ -16,7 +16,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PostLikeService {
-
     private final PostLikeMemoryRepository memoryRepository;
     private final PostLikePersistenceRepository persistenceRepository;
     private final UserRepository userRepository;
