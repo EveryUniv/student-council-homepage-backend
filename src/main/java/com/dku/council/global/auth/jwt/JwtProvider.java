@@ -61,11 +61,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
                 .build();
     }
 
-    public AuthenticationToken reIssue(AuthenticationToken authenticationToken) {
-        String refreshToken = authenticationToken.getRefreshToken();
+    public AuthenticationToken reissue(String accessToken, String refreshToken) {
         //만료되면 새로운 refreshToken 반환.
         String validateRefreshToken = validateRefreshToken(refreshToken);
-        String accessToken = refreshAccessToken(authenticationToken.getAccessToken());
+        accessToken = refreshAccessToken(accessToken);
 
         return JwtAuthenticationToken.builder()
                 .accessToken(accessToken)

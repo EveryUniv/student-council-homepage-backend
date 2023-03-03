@@ -1,4 +1,4 @@
-package com.dku.council.domain.category.model.entity;
+package com.dku.council.domain.tag.model.entity;
 
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Category extends BaseEntity {
+public class Tag extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -21,7 +21,7 @@ public class Category extends BaseEntity {
 
     private String name;
 
-    public Category(String name) {
+    public Tag(String name) {
         this.name = name;
     }
 

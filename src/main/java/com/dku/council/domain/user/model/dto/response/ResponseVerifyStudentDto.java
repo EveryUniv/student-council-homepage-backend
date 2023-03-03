@@ -6,9 +6,9 @@ import lombok.Getter;
 public class ResponseVerifyStudentDto {
 
     private final String signupToken;
-    private final ResponseStudentInfoDto student;
+    private final ResponseScrappedStudentInfoDto student;
 
-    public ResponseVerifyStudentDto(String signupToken, ResponseStudentInfoDto student) {
+    public ResponseVerifyStudentDto(String signupToken, ResponseScrappedStudentInfoDto student) {
         this.signupToken = signupToken;
         this.student = student;
     }

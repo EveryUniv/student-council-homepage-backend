@@ -1,8 +1,5 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.category.exception.CategoryNotFoundException;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.PostStatus;
@@ -11,6 +8,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -24,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 기본 기능만 제공하는 게시판을 대상으로 하는 서비스입니다.
- * 기본 기능은 제목, 본문, 댓글, 파일, 카테고리를 포함한 게시판을 의미합니다.
+ * 기본 기능은 제목, 본문, 댓글, 파일, 태그를 포함한 게시판을 의미합니다.
  * 왠만한 게시판들은 이 서비스로 커버가 가능합니다. 복잡한 조회, 생성, 비즈니스 로직이 포함된 게시판은
  * 이걸 사용하지말고 따로 만드는 게 낫습니다.
  * 이걸 사용하려면, 반드시 Bean에 등록되어있어야 합니다. (PostConfig)
@@ -37,7 +35,7 @@ public class GenericPostService<E extends Post> {
 
     protected final GenericPostRepository<E> postRepository;
     protected final UserRepository userRepository;
-    protected final CategoryRepository categoryRepository;
+    protected final TagService tagService;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
     protected final MessageSource messageSource;
@@ -64,14 +62,9 @@ public class GenericPostService<E extends Post> {
     @Transactional
     public Long create(Long userId, RequestCreateGenericPostDto<E> dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        Long categoryId = dto.getCategoryId();
 
-        Category category = null;
-        if (categoryId != null) {
-            category = categoryRepository.findById(categoryId).orElseThrow(CategoryNotFoundException::new);
-        }
-
-        E post = dto.toEntity(user, category);
+        E post = dto.toEntity(user);
+        tagService.addTagsToPost(post, dto.getTagIds());
 
         fileUploadService.uploadFiles(dto.getFiles(), "news")
                 .forEach((file) -> new PostFile(file).changePost(post));

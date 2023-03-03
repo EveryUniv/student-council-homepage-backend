@@ -5,10 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByPostId(Long postId, Pageable pageable);
 
-    Optional<Comment> findAllByPostIdAndUserId(Long postId, Long userId);
+    List<Comment> findAllByPostIdAndUserId(Long postId, Long userId);
 }

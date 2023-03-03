@@ -2,7 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
-import com.dku.council.domain.user.model.dto.response.ResponseStudentInfoDto;
+import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -63,7 +63,7 @@ public class DKUAuthService {
 
         dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
 
-        ResponseStudentInfoDto studentInfoDto = ResponseStudentInfoDto.from(messageSource, studentInfo);
+        ResponseScrappedStudentInfoDto studentInfoDto = ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
     }
 }

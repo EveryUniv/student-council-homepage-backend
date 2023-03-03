@@ -9,6 +9,7 @@ import java.util.Collection;
 
 @AllArgsConstructor
 public class JwtAuthentication implements AppAuthentication {
+
     private Long userId;
     private UserRole userRole;
 

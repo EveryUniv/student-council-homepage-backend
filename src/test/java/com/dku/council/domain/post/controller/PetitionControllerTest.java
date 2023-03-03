@@ -173,8 +173,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         users = userRepository.saveAll(users);
 
         List<Comment> comments = CommentMock.createList(petition, users, 150);
-        comments = commentRepository.saveAll(comments);
-        petition.getComments().addAll(comments);
+        commentRepository.saveAll(comments);
 
         RequestCreateCommentDto dto = new RequestCreateCommentDto("this is comment");
 
