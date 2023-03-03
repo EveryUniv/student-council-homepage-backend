@@ -14,8 +14,8 @@ public class SummarizedPetitionDto extends SummarizedGenericPostDto {
     @Schema(description = "댓글 개수", example = "48")
     private final int commentCount;
 
-    public SummarizedPetitionDto(String baseFileUrl, Petition petition, int commentCount) {
-        super(baseFileUrl, petition);
+    public SummarizedPetitionDto(String baseFileUrl, Petition petition, int bodySize, int commentCount) {
+        super(baseFileUrl, bodySize, petition);
         this.status = petition.getPetitionStatus();
         this.commentCount = commentCount;
     }
