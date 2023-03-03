@@ -6,18 +6,24 @@ import com.dku.council.domain.tag.model.entity.PostTag;
 import org.springframework.data.jpa.domain.Specification;
 
 import javax.persistence.criteria.Join;
+import java.util.List;
 
-// TODO Test 추가
 public class PostSpec {
 
     public static <T extends Post> Specification<T> createPostCondition() {
         return withActive();
     }
 
-    public static <T extends Post> Specification<T> genericPostCondition(String keyword, Long tagId) {
+    public static <T extends Post> Specification<T> genericPostCondition(String keyword, List<Long> tagIds) {
         Specification<T> spec = createPostCondition();
-        if (keyword != null) spec.and(withTitleOrBody(keyword));
-        if (tagId != null) spec.and(withTag(tagId));
+        if (keyword != null) spec = spec.and(withTitleOrBody(keyword));
+        if (tagIds != null && !tagIds.isEmpty()) {
+            Specification<T> orSpec = withTag(tagIds.get(0));
+            for (int i = 1; i < tagIds.size(); i++) {
+                orSpec = orSpec.or(withTag(tagIds.get(i)));
+            }
+            spec = spec.and(orSpec);
+        }
         return spec;
     }
 
