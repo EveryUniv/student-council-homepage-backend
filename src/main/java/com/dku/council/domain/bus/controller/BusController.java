@@ -23,6 +23,7 @@ public class BusController {
 
     /**
      * 예상 버스 도착 시간을 조회합니다.
+     * 캐싱이 적용됩니다. 데이터는 최신이 아닐 수 있으며, 데이터 가져온 시점은 capturedAt을 통해 알 수 있습니다.
      *
      * @param stationName 버스 정류장 이름. 가능한 값: 단국대정문, 곰상
      * @return 버스 도착 예상 시간 목록
