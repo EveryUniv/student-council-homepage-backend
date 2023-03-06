@@ -7,6 +7,7 @@ import com.dku.council.global.config.redis.RedisKeys;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +20,9 @@ public class BusArrivalMemoryRepositoryImpl implements BusArrivalMemoryRepositor
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+
+    @Value("${bus.cache-time}")
+    private final Long busCacheTime;
 
     @Override
     public CachedBusArrivals getArrivals(String stationId, Instant now) {
@@ -35,7 +39,7 @@ public class BusArrivalMemoryRepositoryImpl implements BusArrivalMemoryRepositor
         }
 
         Instant capturedAt = cachedData.getCapturedAt();
-        if (now.isAfter(capturedAt)) {
+        if (now.isAfter(capturedAt.plusSeconds(busCacheTime))) {
             redisTemplate.opsForHash().delete(RedisKeys.BUS_ARRIVAL_KEY, stationId);
             return null;
         }

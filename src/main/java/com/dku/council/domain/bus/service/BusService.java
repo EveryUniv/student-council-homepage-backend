@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class BusService {
 
     private final Clock clock;
-    private final OpenApiBusService openApiBusService;
+    private final com.dku.council.infra.bus.GGApiBusService GGApiBusService;
     private final BusArrivalMemoryRepository memoryRepository;
 
     public ResponseBusArrivalDto listBusArrival(BusStation station) {
@@ -29,7 +29,7 @@ public class BusService {
         CachedBusArrivals cached = memoryRepository.getArrivals(stationId, now);
 
         if (cached == null) {
-            List<BusArrival> arrivals = openApiBusService.retrieveBusArrival(stationId);
+            List<BusArrival> arrivals = GGApiBusService.retrieveBusArrival(stationId);
             cached = memoryRepository.cacheArrivals(stationId, arrivals, now);
         }
 

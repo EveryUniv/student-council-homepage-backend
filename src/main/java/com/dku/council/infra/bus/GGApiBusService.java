@@ -1,4 +1,4 @@
-package com.dku.council.domain.bus.service;
+package com.dku.council.infra.bus;
 
 import com.dku.council.domain.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.domain.bus.model.BusArrival;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class OpenApiBusService {
+public class GGApiBusService {
 
     private final WebClient webClient;
 
@@ -29,6 +29,7 @@ public class OpenApiBusService {
 
     /**
      * 버스 도착 정보를 OpenAPI를 통해 가져옵니다.
+     * 24번은 Kakao Map에서 가져오고, 그 외의 버스들은 OpenAPI를 통해 가져옵니다.
      *
      * @param stationId 정류소 ID
      * @return 버스 도착정보 목록 (도착정보가 없는 버스는 List에 포함되지 않음)
@@ -55,7 +56,13 @@ public class OpenApiBusService {
             }
 
             ResponseOpenApiBusArrival.Header header = response.getMsgHeader();
-            if (header.getResultCode() != 0) {
+            Integer code = header.getResultCode();
+
+            if (code == 4) {
+                return List.of();
+            }
+
+            if (code != 0 && code != 4) {
                 throw new UnexpectedResponseException(header.getResultMessage());
             }
 

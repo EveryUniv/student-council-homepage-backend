@@ -2,6 +2,7 @@ package com.dku.council.domain.bus.service;
 
 import com.dku.council.domain.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.domain.bus.model.BusArrival;
+import com.dku.council.infra.bus.GGApiBusService;
 import com.dku.council.mock.ServerMock;
 import okhttp3.mockwebserver.MockWebServer;
 import org.assertj.core.api.Assertions;
@@ -14,11 +15,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OpenApiBusServiceTest {
+class GGApiBusServiceTest {
 
     private static MockWebServer mockServer;
 
-    private OpenApiBusService service;
+    private GGApiBusService service;
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -30,7 +31,7 @@ class OpenApiBusServiceTest {
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new OpenApiBusService(webClient, apiPath, "serviceKey");
+        this.service = new GGApiBusService(webClient, apiPath, "serviceKey");
     }
 
     @AfterAll

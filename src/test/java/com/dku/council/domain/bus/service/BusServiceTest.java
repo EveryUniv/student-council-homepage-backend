@@ -31,14 +31,14 @@ class BusServiceTest {
     private BusService service;
 
     @Mock
-    private OpenApiBusService openApiBusService;
+    private com.dku.council.infra.bus.GGApiBusService GGApiBusService;
 
     @Mock
     private BusArrivalMemoryRepository memoryRepository;
 
     @BeforeEach
     public void setup() {
-        this.service = new BusService(clock, openApiBusService, memoryRepository);
+        this.service = new BusService(clock, GGApiBusService, memoryRepository);
     }
 
     @Test
@@ -55,7 +55,7 @@ class BusServiceTest {
         ResponseBusArrivalDto dto = service.listBusArrival(BusStation.DKU_GATE);
 
         // then
-        verify(openApiBusService).retrieveBusArrival(stationId);
+        verify(GGApiBusService).retrieveBusArrival(stationId);
         assertThat(dto.getCapturedAt().getEpochSecond()).isEqualTo(now.getEpochSecond());
         assertThat(dto.getBusArrivalList().size()).isEqualTo(5);
     }
