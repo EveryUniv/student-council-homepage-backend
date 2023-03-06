@@ -27,7 +27,12 @@ public class OpenApiBusService {
     @Value("${bus.key}")
     private final String serviceKey;
 
-
+    /**
+     * 버스 도착 정보를 OpenAPI를 통해 가져옵니다.
+     *
+     * @param stationId 정류소 ID
+     * @return 버스 도착정보 목록 (도착정보가 없는 버스는 List에 포함되지 않음)
+     */
     public List<BusArrival> retrieveBusArrival(String stationId) {
         ResponseOpenApiBusArrival response;
         try {
