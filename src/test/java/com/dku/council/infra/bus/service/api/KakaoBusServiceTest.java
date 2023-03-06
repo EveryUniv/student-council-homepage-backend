@@ -65,7 +65,7 @@ class KakaoBusServiceTest {
     }
 
     @Test
-    @DisplayName("실패 - 결과 없는 경우")
+    @DisplayName("실패 - 정류장이 없는 경우")
     public void failedRetrieveBusArrivalByNoResult() {
         // given
         ServerMock.json(mockServer, "/bus/kakao-failed");

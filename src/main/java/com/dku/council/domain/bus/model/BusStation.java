@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum BusStation {
-    DKU_GATE("단국대정문", "228001978", ""),
-    BEAR_STATUE("곰상", "228001980", "");
+    DKU_GATE("단국대정문", "228001978", "BS83664"),
+    BEAR_STATUE("곰상", "228001980", "BS130194");
 
     private final String name;
     private final String ggNodeId;
