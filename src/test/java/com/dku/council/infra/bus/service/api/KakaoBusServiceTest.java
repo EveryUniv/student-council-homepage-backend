@@ -58,8 +58,8 @@ class KakaoBusServiceTest {
         assertThat(arrival.getBusNo()).isEqualTo("24");
         assertThat(arrival.getPlateNo1()).isEqualTo("경기78아9092");
         assertThat(arrival.getPlateNo2()).isEqualTo("경기78아8202");
-        assertThat(arrival.getPredictTime1()).isEqualTo(343);
-        assertThat(arrival.getPredictTime2()).isEqualTo(904);
+        assertThat(arrival.getPredictTimeSec1()).isEqualTo(343);
+        assertThat(arrival.getPredictTimeSec2()).isEqualTo(904);
         assertThat(arrival.getLocationNo1()).isEqualTo(5);
         assertThat(arrival.getLocationNo2()).isEqualTo(9);
     }

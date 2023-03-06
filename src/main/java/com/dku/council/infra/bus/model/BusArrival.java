@@ -10,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 public class BusArrival {
     private final BusStatus status;
     private final Integer locationNo1;
-    private final Integer predictTime1;
+    private final Integer predictTimeSec1;
     private final String plateNo1;
     private final Integer locationNo2;
-    private final Integer predictTime2;
+    private final Integer predictTimeSec2;
     private final String plateNo2;
     private final String busNo;
 }

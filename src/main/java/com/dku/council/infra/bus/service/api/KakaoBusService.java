@@ -47,6 +47,11 @@ public class KakaoBusService implements BusArrivalInfoService {
         }
     }
 
+    @Override
+    public String getBusId(String busNo) {
+        return "K" + busNo;
+    }
+
     private ResponseKakaoBusApi request(String stationId) {
         URI uri = UriComponentsBuilder.fromHttpUrl(apiPath)
                 .queryParam("busstopid", stationId)

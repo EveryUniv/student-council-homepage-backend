@@ -7,11 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BusArrivalMock {
+
     public static BusArrival create() {
+        return create("24");
+    }
+
+    public static BusArrival create(String busNo) {
         return new BusArrival(BusStatus.RUN,
                 5, 10, "경기16바5555",
                 7, 15, "경기16바1111",
-                "24");
+                busNo);
     }
 
     public static List<BusArrival> createList(int size) {

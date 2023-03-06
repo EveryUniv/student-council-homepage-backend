@@ -56,6 +56,11 @@ public class GGBusService implements BusArrivalInfoService {
         }
     }
 
+    @Override
+    public String getBusId(String busNo) {
+        return "GG" + busNo;
+    }
+
     private ResponseGGBusArrival request(String stationId) {
         URI uri = UriComponentsBuilder.fromHttpUrl(apiPath)
                 .queryParam("serviceKey", serviceKey)

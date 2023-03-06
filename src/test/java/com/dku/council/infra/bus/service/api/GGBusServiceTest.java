@@ -53,18 +53,18 @@ class GGBusServiceTest {
         assertThat(arrivals.get(0).getStatus()).isEqualTo(BusStatus.RUN);
         assertThat(arrivals.get(0).getBusNo()).isEqualTo("102");
         assertThat(arrivals.get(0).getLocationNo1()).isEqualTo(1);
-        assertThat(arrivals.get(0).getPredictTime1()).isEqualTo(1);
+        assertThat(arrivals.get(0).getPredictTimeSec1()).isEqualTo(1);
         assertThat(arrivals.get(0).getPlateNo1()).isEqualTo("경기70아6909");
         assertThat(arrivals.get(0).getLocationNo2()).isEqualTo(0);
-        assertThat(arrivals.get(0).getPredictTime2()).isEqualTo(0);
+        assertThat(arrivals.get(0).getPredictTimeSec2()).isEqualTo(0);
         assertThat(arrivals.get(0).getPlateNo2()).isEmpty();
         assertThat(arrivals.get(1).getStatus()).isEqualTo(BusStatus.WAITING);
         assertThat(arrivals.get(1).getBusNo()).isEqualTo("720-3");
         assertThat(arrivals.get(1).getLocationNo1()).isEqualTo(2);
-        assertThat(arrivals.get(1).getPredictTime1()).isEqualTo(6);
+        assertThat(arrivals.get(1).getPredictTimeSec1()).isEqualTo(6);
         assertThat(arrivals.get(1).getPlateNo1()).isEqualTo("경기70아1212");
         assertThat(arrivals.get(1).getLocationNo2()).isEqualTo(5);
-        assertThat(arrivals.get(1).getPredictTime2()).isEqualTo(16);
+        assertThat(arrivals.get(1).getPredictTimeSec2()).isEqualTo(16);
         assertThat(arrivals.get(1).getPlateNo2()).isEqualTo("경기70아1512");
     }
 

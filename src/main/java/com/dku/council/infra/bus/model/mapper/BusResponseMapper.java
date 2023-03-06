@@ -17,8 +17,8 @@ public class BusResponseMapper {
 
         BusStatus state = getGGBusStateLabel(model.getFlag());
         return new BusArrival(state,
-                model.getLocationNo1(), model.getPredictTime1(), model.getPlateNo1(),
-                model.getLocationNo2(), model.getPredictTime2(), model.getPlateNo2(),
+                model.getLocationNo1(), model.getPredictTime1() * 60, model.getPlateNo1(),
+                model.getLocationNo2(), model.getPredictTime2() * 60, model.getPlateNo2(),
                 bus.getName());
     }
 

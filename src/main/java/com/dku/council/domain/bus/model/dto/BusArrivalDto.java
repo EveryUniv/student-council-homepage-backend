@@ -18,10 +18,10 @@ public class BusArrivalDto {
     public BusArrivalDto(BusArrival arrival) {
         this.status = arrival.getStatus();
         this.locationNo1 = arrival.getLocationNo1();
-        this.predictTime1 = arrival.getPredictTime1();
+        this.predictTime1 = arrival.getPredictTimeSec1();
         this.plateNo1 = arrival.getPlateNo1();
         this.locationNo2 = arrival.getLocationNo2();
-        this.predictTime2 = arrival.getPredictTime2();
+        this.predictTime2 = arrival.getPredictTimeSec2();
         this.plateNo2 = arrival.getPlateNo2();
         this.busNo = arrival.getBusNo();
     }

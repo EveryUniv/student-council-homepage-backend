@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface BusArrivalInfoService {
     List<BusArrival> retrieveBusArrival(String stationId);
+
+    String getBusId(String busNo);
 }
