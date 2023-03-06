@@ -1,7 +1,7 @@
 package com.dku.council.domain.bus.repository;
 
-import com.dku.council.domain.bus.model.BusArrival;
 import com.dku.council.domain.bus.model.repository.CachedBusArrivals;
+import com.dku.council.infra.bus.model.BusArrival;
 
 import java.time.Instant;
 import java.util.List;

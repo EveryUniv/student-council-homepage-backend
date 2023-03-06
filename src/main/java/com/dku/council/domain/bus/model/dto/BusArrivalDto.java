@@ -1,11 +1,12 @@
 package com.dku.council.domain.bus.model.dto;
 
-import com.dku.council.domain.bus.model.BusArrival;
+import com.dku.council.infra.bus.model.BusArrival;
+import com.dku.council.infra.bus.model.BusStatus;
 import lombok.Getter;
 
 @Getter
 public class BusArrivalDto {
-    private final String flag;
+    private final BusStatus status;
     private final Integer locationNo1;
     private final Integer predictTime1;
     private final String plateNo1;
@@ -15,7 +16,7 @@ public class BusArrivalDto {
     private final String busNo;
 
     public BusArrivalDto(BusArrival arrival) {
-        this.flag = arrival.getFlag();
+        this.status = arrival.getStatus();
         this.locationNo1 = arrival.getLocationNo1();
         this.predictTime1 = arrival.getPredictTime1();
         this.plateNo1 = arrival.getPlateNo1();

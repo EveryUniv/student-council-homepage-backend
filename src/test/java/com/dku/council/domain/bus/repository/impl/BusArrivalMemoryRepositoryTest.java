@@ -2,10 +2,10 @@ package com.dku.council.domain.bus.repository.impl;
 
 import com.dku.council.common.AbstractContainerRedisTest;
 import com.dku.council.common.OnlyDevTest;
-import com.dku.council.domain.bus.model.BusArrival;
 import com.dku.council.domain.bus.model.repository.CachedBusArrivals;
 import com.dku.council.domain.bus.repository.BusArrivalMemoryRepository;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.mock.BusArrivalMock;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

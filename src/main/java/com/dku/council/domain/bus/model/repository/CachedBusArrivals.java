@@ -1,6 +1,6 @@
 package com.dku.council.domain.bus.model.repository;
 
-import com.dku.council.domain.bus.model.BusArrival;
+import com.dku.council.infra.bus.model.BusArrival;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

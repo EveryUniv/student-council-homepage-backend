@@ -1,4 +1,4 @@
-package com.dku.council.domain.bus.exception;
+package com.dku.council.infra.bus.exception;
 
 import com.dku.council.global.error.exception.LocalizedMessageException;
 import org.springframework.http.HttpStatus;

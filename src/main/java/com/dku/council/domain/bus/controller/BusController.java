@@ -1,9 +1,9 @@
 package com.dku.council.domain.bus.controller;
 
-import com.dku.council.domain.bus.exception.InvalidBusStationException;
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.domain.bus.model.dto.ResponseBusArrivalDto;
 import com.dku.council.domain.bus.service.BusService;
+import com.dku.council.infra.bus.exception.InvalidBusStationException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -24,7 +24,7 @@
             <stationId>228001978</stationId>
         </busArrivalList>
         <busArrivalList>
-            <flag>PASS</flag>
+            <flag>WAIT</flag>
             <locationNo1>2</locationNo1>
             <locationNo2>5</locationNo2>
             <lowPlate1>0</lowPlate1>

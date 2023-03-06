@@ -1,4 +1,4 @@
-package com.dku.council.domain.bus.model.dto;
+package com.dku.council.infra.bus.model;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @XmlRootElement(name = "response")
-public class ResponseOpenApiBusArrival {
+public class ResponseGGBusArrival {
 
     @XmlElement(name = "msgHeader")
     private Header msgHeader;

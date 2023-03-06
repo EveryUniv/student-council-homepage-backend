@@ -1,13 +1,14 @@
 package com.dku.council.mock;
 
-import com.dku.council.domain.bus.model.BusArrival;
+import com.dku.council.infra.bus.model.BusArrival;
+import com.dku.council.infra.bus.model.BusStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class BusArrivalMock {
     public static BusArrival create() {
-        return new BusArrival("PASS",
+        return new BusArrival(BusStatus.RUN,
                 5, 10, "경기16바5555",
                 7, 15, "경기16바1111",
                 "24");
