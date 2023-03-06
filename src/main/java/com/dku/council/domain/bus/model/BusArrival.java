@@ -1,9 +1,13 @@
 package com.dku.council.domain.bus.model;
 
 import com.dku.council.domain.bus.model.dto.ResponseOpenApiBusArrival;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
+@EqualsAndHashCode
 public class BusArrival {
     private final String flag;
     private final Integer locationNo1;
