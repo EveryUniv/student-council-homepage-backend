@@ -24,8 +24,9 @@
  - **클래스 이름**: `[DomainName]``Dto`
  - 생성자와 `@Getter` 조합 사용
  - 인자가 너무 많으면(4개 이상) Builder로 전환
- - Response dto에서는 `@RequiredArgsConstructor`, `@AllArgsConstructor` 사용을 지양하자.
+ - Response dto에서는 `@AllArgsConstructor` 사용을 지양하자.
    - Field 순서가 뒤바뀌었을 때 dto가 가장 버그를 발견하기 어렵다.
+   - 가능한 불변성을 보장하는 `@RequiredArgsConstructor`를 사용.
    - Request Dto에서는 개발자가 아니라 spring이 만들어서 자동 주입해주므로 사용해도 문제없다.
 
 ## Test
