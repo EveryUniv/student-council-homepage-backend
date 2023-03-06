@@ -5,7 +5,6 @@ import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.global.config.redis.RedisKeys;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,16 +26,6 @@ class PostLikeRedisRepositoryTest extends AbstractContainerRedisTest {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-
-    @BeforeEach
-    void setup() {
-        Set<String> keys = redisTemplate.keys("*");
-        if (keys != null) {
-            for (String key : keys) {
-                redisTemplate.delete(key);
-            }
-        }
-    }
 
     @Test
     @DisplayName("like 엔티디가 잘 추가되는가?")
