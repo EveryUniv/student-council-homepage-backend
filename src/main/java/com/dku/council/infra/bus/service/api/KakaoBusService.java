@@ -40,6 +40,7 @@ public class KakaoBusService implements BusArrivalInfoService {
             }
 
             return response.getLines().stream()
+                    .filter(ResponseKakaoBusApi.BusLine::isRunning)
                     .map(BusResponseMapper::to)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
