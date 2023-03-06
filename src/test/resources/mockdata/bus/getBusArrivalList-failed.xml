@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <comMsgHeader/>
+    <msgHeader>
+        <queryTime>2023-03-06 16:36:21.422</queryTime>
+        <resultCode>4</resultCode>
+        <resultMessage>결과가 존재하지 않습니다.</resultMessage>
+    </msgHeader>
+</response>
