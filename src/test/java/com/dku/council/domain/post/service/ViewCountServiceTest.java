@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
@@ -15,8 +14,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ViewCountServiceTest {
@@ -40,7 +38,7 @@ class ViewCountServiceTest {
     @DisplayName("조회수가 잘 올라가는지? - 최근에 조회한 적 없는 경우")
     void increasePostViewsNoCached() {
         // given
-        Mockito.when(memoryRepository.isAlreadyContains(any(), any(), any())).thenReturn(false);
+        when(memoryRepository.isAlreadyContains(any(), any(), any())).thenReturn(false);
 
         // when
         service.increasePostViews(post, "Address");
@@ -53,7 +51,7 @@ class ViewCountServiceTest {
     @DisplayName("조회수가 잘 올라가는지? - 최근에 조회한 적 있는 경우")
     void increasePostViewsCached() {
         // given
-        Mockito.when(memoryRepository.isAlreadyContains(any(), any(), any())).thenReturn(true);
+        when(memoryRepository.isAlreadyContains(any(), any(), any())).thenReturn(true);
 
         // when
         service.increasePostViews(post, "Address");
