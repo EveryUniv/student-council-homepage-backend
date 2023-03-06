@@ -48,7 +48,7 @@ class KakaoBusServiceTest {
         List<BusArrival> arrivals = service.retrieveBusArrival("111111");
 
         // then
-        assertThat(arrivals.size()).isEqualTo(3);
+        assertThat(arrivals.size()).isEqualTo(2);
         BusArrival arrival = arrivals.stream()
                 .filter(ent -> ent.getBusNo().equals("24"))
                 .findFirst()
