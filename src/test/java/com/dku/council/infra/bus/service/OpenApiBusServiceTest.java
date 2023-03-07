@@ -49,7 +49,7 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("102")
         );
         Mockito.when(ggBusProvider.retrieveBusArrival(station)).thenReturn(list1);
-        Mockito.when(ggBusProvider.getProviderPrefix()).thenReturn("GG");
+        Mockito.when(ggBusProvider.getProviderPrefix()).thenReturn("GG_");
 
         List<BusArrival> list2 = List.of(
                 BusArrivalMock.create("24"),
@@ -58,7 +58,7 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("102")
         );
         Mockito.when(townBusProvider.retrieveBusArrival(station)).thenReturn(list2);
-        Mockito.when(townBusProvider.getProviderPrefix()).thenReturn("T");
+        Mockito.when(townBusProvider.getProviderPrefix()).thenReturn("T_");
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(station);
