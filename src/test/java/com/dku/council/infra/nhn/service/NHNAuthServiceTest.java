@@ -3,7 +3,7 @@ package com.dku.council.infra.nhn.service;
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
-import com.dku.council.util.MockServerUtil;
+import com.dku.council.mock.ServerMock;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -54,7 +54,7 @@ class NHNAuthServiceTest {
     @DisplayName("성공 응답 - 정상 처리 여부")
     public void sendSmsSuccess() {
         // given
-        MockServerUtil.json(mockServer, "nhn/auth/response-success");
+        ServerMock.json(mockServer, "nhn/auth/response-success");
 
         // when & then(no error)
         service.requestToken();
@@ -64,7 +64,7 @@ class NHNAuthServiceTest {
     @DisplayName("실패 응답 - 실패 status code")
     public void failedByBadRequest() {
         // given
-        MockServerUtil.json(mockServer, HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
+        ServerMock.json(mockServer, HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
 
         // when & then(no error)
         Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
@@ -74,7 +74,7 @@ class NHNAuthServiceTest {
     @DisplayName("실패 응답 - body가 잘못된 경우")
     public void failedByInvalidBody() {
         // given
-        MockServerUtil.json(mockServer, "nhn/auth/response-fail1");
+        ServerMock.json(mockServer, "nhn/auth/response-fail1");
 
         // when & then
         Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());

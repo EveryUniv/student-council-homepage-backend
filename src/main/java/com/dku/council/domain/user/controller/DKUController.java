@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.controller;
 
 import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
-import com.dku.council.domain.user.model.dto.response.ResponseStudentInfoDto;
+import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.service.DKUAuthService;
 import com.dku.council.infra.dku.model.StudentInfo;
@@ -40,8 +40,8 @@ public class DKUController {
      * @param signupToken 회원가입 토큰
      */
     @GetMapping("/{signup-token}")
-    public ResponseStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
+    public ResponseScrappedStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
         StudentInfo studentInfo = service.getStudentInfo(signupToken);
-        return ResponseStudentInfoDto.from(messageSource, studentInfo);
+        return ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
     }
 }

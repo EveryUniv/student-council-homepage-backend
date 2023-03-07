@@ -4,6 +4,8 @@ import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.impl.FileUploadServiceImpl;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
+import com.dku.council.mock.MultipartFileMock;
+import com.dku.council.mock.UploadedFileMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +46,7 @@ class FileUploadServiceTest {
         String ext = "txt";
         final int totalFiles = 10;
 
-        List<MultipartFile> files = makeMultipartFiles(totalFiles, ext);
+        List<MultipartFile> files = MultipartFileMock.createList(totalFiles, ext);
         when(authService.requestToken()).thenReturn("token");
         when(storageService.isInObject(any())).thenReturn(false);
 
@@ -57,14 +59,6 @@ class FileUploadServiceTest {
             assertFileId(file.getFileId(), prefix, ext);
             assertThat(file.getOriginalName()).isEqualTo("myFile" + i + ".txt");
         }
-    }
-
-    private List<MultipartFile> makeMultipartFiles(int totalFiles, String ext) {
-        List<MultipartFile> files = new ArrayList<>(totalFiles);
-        for (int i = 1; i <= totalFiles; i++) {
-            files.add(new DummyMultipartFile("file", "myFile" + i + "." + ext));
-        }
-        return files;
     }
 
     private void assertFileId(String fileId, String prefix, String ext) {
@@ -81,7 +75,7 @@ class FileUploadServiceTest {
     public void uploadFilesCallProperly() {
         // given
         final int totalFiles = 10;
-        List<MultipartFile> files = makeMultipartFiles(totalFiles, "txt");
+        List<MultipartFile> files = MultipartFileMock.createList(totalFiles, "txt");
         when(authService.requestToken()).thenReturn("token");
         when(storageService.isInObject(any())).thenReturn(false);
 
@@ -97,7 +91,7 @@ class FileUploadServiceTest {
     public void deleteFilesCallProperly() {
         // given
         final int totalFiles = 10;
-        List<UploadedFile> files = makeUploadedFiles(totalFiles);
+        List<UploadedFile> files = UploadedFileMock.createList(totalFiles);
         when(authService.requestToken()).thenReturn("token");
 
         // when
@@ -105,13 +99,5 @@ class FileUploadServiceTest {
 
         // then
         verify(storageService, times(totalFiles)).deleteObject(eq("token"), any());
-    }
-
-    private List<UploadedFile> makeUploadedFiles(int totalFiles) {
-        List<UploadedFile> files = new ArrayList<>(totalFiles);
-        for (int i = 1; i <= totalFiles; i++) {
-            files.add(new UploadedFile("file" + i, "myFile" + i + ".txt"));
-        }
-        return files;
     }
 }

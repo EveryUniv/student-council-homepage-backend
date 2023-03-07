@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.model.entity;
 
-import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;
 
@@ -34,6 +34,8 @@ public class User extends BaseEntity {
     @Embedded
     private Major major;
 
+    private Integer yearOfAdmission;
+
     @NotNull
     private String phone;
 
@@ -50,6 +52,7 @@ public class User extends BaseEntity {
                  @NonNull String name,
                  @NonNull Major major,
                  @NonNull String phone,
+                 Integer yearOfAdmission,
                  UserStatus status,
                  UserRole role) {
         this.studentId = studentId;
@@ -57,6 +60,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.major = major;
         this.phone = phone;
+        this.yearOfAdmission = yearOfAdmission;
         this.status = status;
         this.userRole = role;
     }

@@ -1,9 +1,10 @@
 package com.dku.council.domain.like.repository.impl;
 
+import com.dku.council.common.AbstractContainerRedisTest;
+import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
-import com.dku.council.global.config.RedisKeys;
-import org.junit.jupiter.api.BeforeEach;
+import com.dku.council.global.config.redis.RedisKeys;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,17 +13,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * TODO 테스트 카테고라이징 필요.
- * 느린 테스트, 빠른 테스트(유닛), 실제 테스트 등...
- * gradle build 에서는 빠른 테스트만
- */
 @SpringBootTest
-class PostLikeRedisRepositoryTest {
+@OnlyDevTest
+class PostLikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private PostLikeRedisRepository repository;
@@ -30,16 +26,6 @@ class PostLikeRedisRepositoryTest {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-
-    @BeforeEach
-    void setup() {
-        Set<String> keys = redisTemplate.keys("*");
-        if (keys != null) {
-            for (String key : keys) {
-                redisTemplate.delete(key);
-            }
-        }
-    }
 
     @Test
     @DisplayName("like 엔티디가 잘 추가되는가?")

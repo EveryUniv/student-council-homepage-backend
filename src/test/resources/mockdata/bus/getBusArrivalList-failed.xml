@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<response>
+    <comMsgHeader/>
+    <msgHeader>
+        <queryTime>2023-03-06 16:36:21.422</queryTime>
+        <resultCode>6</resultCode>
+        <resultMessage>등록되지 않은 키입니다.</resultMessage>
+    </msgHeader>
+</response>

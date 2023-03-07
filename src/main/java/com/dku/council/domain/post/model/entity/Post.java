@@ -1,14 +1,16 @@
 package com.dku.council.domain.post.model.entity;
 
-import com.dku.council.domain.category.Category;
+import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
+import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -41,9 +43,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @OneToMany(mappedBy = "post", orphanRemoval = true)
+    private List<PostTag> postTags = new ArrayList<>();
 
     private String title;
 
@@ -56,23 +57,20 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostFile> files = new ArrayList<>();
 
+    @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostLike> likes = new ArrayList<>();
 
-    /**
-     * 조회수
-     */
     private int views;
 
 
-    protected Post(User user, String title, String body, Category category, int views) {
+    protected Post(User user, String title, String body, int views) {
         this.user = user;
         this.title = title;
         this.body = body;
-        this.category = category;
         this.views = views;
         this.status = PostStatus.ACTIVE;
     }
@@ -81,7 +79,11 @@ public class Post extends BaseEntity {
         views++;
     }
 
-    public void updateStatus(PostStatus status){
-        this.status = status;
+    public void markAsDeleted(boolean byAdmin) {
+        this.status = byAdmin ? PostStatus.DELETED_BY_ADMIN : PostStatus.DELETED;
+    }
+
+    public void blind() {
+        this.status = PostStatus.BLINDED;
     }
 }

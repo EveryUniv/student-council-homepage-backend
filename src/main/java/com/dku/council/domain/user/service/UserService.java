@@ -3,16 +3,18 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.MajorData;
-import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
+import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
+import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.dku.model.StudentInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
 
 // TODO Test it
 @Service
@@ -47,6 +51,7 @@ public class UserService {
                 .password(encryptedPassword)
                 .name(studentInfo.getStudentName())
                 .phone(phone)
+                .yearOfAdmission(studentInfo.getYearOfAdmission())
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.USER);
 
@@ -81,5 +86,20 @@ public class UserService {
         } else {
             throw new WrongPasswordException();
         }
+    }
+
+    public ResponseRefreshTokenDto refreshToken(HttpServletRequest request, String refreshToken) {
+        String accessToken = jwtProvider.getAccessTokenFromHeader(request);
+        AuthenticationToken token = jwtProvider.reissue(accessToken, refreshToken);
+        return new ResponseRefreshTokenDto(token);
+    }
+
+    public ResponseUserInfoDto getUserInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(LoginUserNotFoundException::new);
+
+        String year = user.getYearOfAdmission().toString();
+        String major = user.getMajor().getMajorName(messageSource);
+        return new ResponseUserInfoDto(user.getName(), year, major);
     }
 }

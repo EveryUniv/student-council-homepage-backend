@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
@@ -24,7 +23,7 @@ public class News extends Post {
     private News(@NonNull User user,
                  @NonNull String title,
                  @NonNull String body,
-                 Category category, int views) {
-        super(user, title, body, category, views);
+                 int views) {
+        super(user, title, body, views);
     }
 }

@@ -7,7 +7,6 @@ import com.dku.council.global.base.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 import javax.persistence.*;
 
@@ -42,10 +41,26 @@ public class Comment extends BaseEntity {
 
 
     @Builder
-    private Comment(@NonNull Post post, User user, String text) {
+    private Comment(User user, String text) {
         this.status = CommentStatus.ACTIVE;
-        this.post = post;
         this.user = user;
         this.text = text;
+    }
+
+    public void updateText(String text) {
+        this.text = text;
+    }
+
+    public void updateStatus(CommentStatus status) {
+        this.status = status;
+    }
+
+    public void changePost(Post post) {
+        if (this.post != null) {
+            this.post.getComments().remove(this);
+        }
+
+        this.post = post;
+        this.post.getComments().add(this);
     }
 }

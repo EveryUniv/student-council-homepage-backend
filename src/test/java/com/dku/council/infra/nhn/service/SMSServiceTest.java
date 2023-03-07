@@ -2,7 +2,7 @@ package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.CannotSendSMSException;
 import com.dku.council.infra.nhn.service.impl.SMSServiceImpl;
-import com.dku.council.util.MockServerUtil;
+import com.dku.council.mock.ServerMock;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.*;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ class SMSServiceTest {
     @DisplayName("성공 응답 - 정상 처리 여부")
     public void sendSmsSuccess() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-success");
+        ServerMock.json(mockServer, "nhn/sms/response-success");
 
         // when & then(no error)
         service.sendSMS("01011111111", "Test body");
@@ -48,7 +48,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - 실패 status code")
     public void failedByBadRequest() {
         // given
-        MockServerUtil.json(mockServer, HttpStatus.BAD_REQUEST, "nhn/sms/response-success");
+        ServerMock.json(mockServer, HttpStatus.BAD_REQUEST, "nhn/sms/response-success");
 
         // when & then(no error)
         Assertions.assertThrows(CannotSendSMSException.class, () ->
@@ -59,7 +59,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - Header code 0이 아닌 값")
     public void failedByHeaderCodeNotZero() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-fail1");
+        ServerMock.json(mockServer, "nhn/sms/response-fail1");
 
         // when & then
         Assertions.assertThrows(CannotSendSMSException.class, () ->
@@ -70,7 +70,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - body code 0이 아닌 값")
     public void failedByBodyCodeNotZero() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-fail2");
+        ServerMock.json(mockServer, "nhn/sms/response-fail2");
 
         // when & then
         Assertions.assertThrows(CannotSendSMSException.class, () ->
@@ -81,7 +81,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - header가 null인 경우")
     public void failedByNullHeader() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-fail3");
+        ServerMock.json(mockServer, "nhn/sms/response-fail3");
 
         // when & then
         Assertions.assertThrows(CannotSendSMSException.class, () ->
@@ -92,7 +92,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - body가 null인 경우")
     public void failedByNullBody() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-fail4");
+        ServerMock.json(mockServer, "nhn/sms/response-fail4");
 
         // when & then
         Assertions.assertThrows(CannotSendSMSException.class, () ->
@@ -103,7 +103,7 @@ class SMSServiceTest {
     @DisplayName("실패 응답 - body가 일부 누락된 경우")
     public void failedByInvalidBody() {
         // given
-        MockServerUtil.json(mockServer, "nhn/sms/response-fail5");
+        ServerMock.json(mockServer, "nhn/sms/response-fail5");
 
         // when & then
         Assertions.assertThrows(CannotSendSMSException.class, () ->

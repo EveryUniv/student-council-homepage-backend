@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.category.Category;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
@@ -36,13 +35,21 @@ public class Petition extends Post {
     private Petition(@NonNull User user,
                      @NonNull String title,
                      @NonNull String body,
-                     Category category, int views, PetitionStatus petitionStatus, String answer) {
-        super(user, title, body, category, views);
+                     int views, PetitionStatus petitionStatus, String answer) {
+        super(user, title, body, views);
         this.petitionStatus = petitionStatus;
         this.answer = answer;
     }
 
     public static PetitionBuilder builder() {
         return new PetitionBuilder().petitionStatus(PetitionStatus.ACTIVE);
+    }
+
+    public void replyAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public void updatePetitionStatus(PetitionStatus status) {
+        this.petitionStatus = status;
     }
 }

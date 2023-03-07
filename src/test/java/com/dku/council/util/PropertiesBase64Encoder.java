@@ -1,15 +1,18 @@
 package com.dku.council.util;
 
+import com.dku.council.mock.ServerMock;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
 
+@Disabled
 public class PropertiesBase64Encoder {
 
     @Test
     public void propertiesEncode() {
         try {
-            String properties = MockServerUtil.readResource("/application.yml");
+            String properties = ServerMock.readResource("/application.yml");
             String encoded = Base64.getEncoder().encodeToString(properties.getBytes());
             System.out.println("========================= Encoded Properties String =========================");
             System.out.println(encoded);

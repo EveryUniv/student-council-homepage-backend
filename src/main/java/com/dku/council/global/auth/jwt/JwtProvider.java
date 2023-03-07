@@ -1,7 +1,7 @@
 package com.dku.council.global.auth.jwt;
 
-import com.dku.council.domain.user.model.UserRole;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.ExpiredTokenException;
 import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.global.error.exception.InvalidTokenException;
@@ -23,6 +23,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtProvider implements AuthenticationTokenProvider {
 
+    public static final String AUTHORIZATION = "Authorization";
+
     @Value("${app.auth.jwt.access-expiration}")
     private final long accessExpiration;
 
@@ -35,7 +37,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     @Override
     public String getAccessTokenFromHeader(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
+        String header = request.getHeader(AUTHORIZATION);
         if (!StringUtils.hasText(header)) return null;
         if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
         return header.substring(7);
@@ -46,8 +48,8 @@ public class JwtProvider implements AuthenticationTokenProvider {
         Jws<Claims> claimsJws = validateAccessToken(accessToken);
 
         Claims body = claimsJws.getBody();
-        String userId = (String) body.get("userId");
-        String userRole = (String) body.get("Role");
+        Long userId = Long.parseLong((String) body.get("userId"));
+        UserRole userRole = UserRole.of((String) body.get("userRole"));
 
         return new JwtAuthentication(userId, userRole);
     }
@@ -59,11 +61,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
                 .build();
     }
 
-    public AuthenticationToken reIssue(AuthenticationToken authenticationToken) {
-        String refreshToken = authenticationToken.getRefreshToken();
+    public AuthenticationToken reissue(String accessToken, String refreshToken) {
         //만료되면 새로운 refreshToken 반환.
         String validateRefreshToken = validateRefreshToken(refreshToken);
-        String accessToken = refreshAccessToken(authenticationToken.getAccessToken());
+        accessToken = refreshAccessToken(accessToken);
 
         return JwtAuthenticationToken.builder()
                 .accessToken(accessToken)
@@ -78,10 +79,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
             Jws<Claims> claimsJws = validateAccessToken(accessToken);
             Claims body = claimsJws.getBody();
             userId = (String) body.get("userId");
-            role = UserRole.of((String) body.get("Role"));
+            role = UserRole.of((String) body.get("userRole"));
         } catch (ExpiredJwtException e) {
             userId = (String) e.getClaims().get("userId");
-            role = UserRole.of((String) e.getClaims().get("Role"));
+            role = UserRole.of((String) e.getClaims().get("userRole"));
         }
         return createAccessToken(userId, role);
     }
@@ -92,7 +93,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("userId", userId);
-        payloads.put("Role", role.getRole());
+        payloads.put("userRole", role.getName());
 
         return Jwts.builder()
                 .setSubject("UserInfo") //"sub":"userId"
