@@ -50,7 +50,7 @@ public class GGBusProvider implements BusArrivalProvider {
             }
 
             return response.getMsgBody().getBusArrivalList().stream()
-                    .map(BusResponseMapper::to)
+                    .map(model -> BusResponseMapper.to(model, station))
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             throw new CannotGetBusArrivalException(e);

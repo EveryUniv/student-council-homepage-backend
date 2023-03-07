@@ -42,7 +42,7 @@ public class TownBusProvider implements BusArrivalProvider {
 
             return response.getLines().stream()
                     .filter(ResponseKakaoBusApi.BusLine::isRunning)
-                    .map(BusResponseMapper::to)
+                    .map(model -> BusResponseMapper.to(model, station))
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             throw new CannotGetBusArrivalException(e);

@@ -31,7 +31,7 @@ public class ShuttleBusProvider implements BusArrivalProvider {
 
         Duration remaining = shuttleTimeTable.remainingNextBusArrival(now);
         int remainingSec = (int) remaining.getSeconds();
-        BusArrival arrival = new BusArrival(BusStatus.RUN,
+        BusArrival arrival = new BusArrival(BusStatus.RUN, station,
                 1, remainingSec, "",
                 null, null, null,
                 "shuttle"
