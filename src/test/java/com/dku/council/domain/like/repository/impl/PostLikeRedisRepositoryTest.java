@@ -1,10 +1,10 @@
 package com.dku.council.domain.like.repository.impl;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

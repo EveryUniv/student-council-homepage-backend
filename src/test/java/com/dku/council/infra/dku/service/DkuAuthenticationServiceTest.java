@@ -2,40 +2,28 @@ package com.dku.council.infra.dku.service;
 
 import com.dku.council.infra.dku.exception.DkuFailedLoginException;
 import com.dku.council.infra.dku.model.DkuAuth;
-import com.dku.council.mock.ServerMock;
+import com.dku.council.util.base.AbstractMockServerTest;
 import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class DkuAuthenticationServiceTest {
+class DkuAuthenticationServiceTest extends AbstractMockServerTest {
 
-    private static MockWebServer mockServer;
     private DkuAuthenticationService service;
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
 
     @BeforeEach
     void beforeEach() {
         WebClient webClient = WebClient.create();
         this.service = new DkuAuthenticationService(webClient, "http://localhost:" + mockServer.getPort());
-    }
-
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
     }
 
     @Test
@@ -82,7 +70,7 @@ class DkuAuthenticationServiceTest {
     @DisplayName("실패 - 실패 메시지 추출")
     public void failedAndExtractMessage() {
         // given
-        ServerMock.html(mockServer, "dku/failed-login-response");
+        mockHtml("dku/failed-login-response");
 
         try {
             // when

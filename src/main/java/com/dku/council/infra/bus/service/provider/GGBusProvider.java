@@ -1,5 +1,6 @@
-package com.dku.council.infra.bus.service.api;
+package com.dku.council.infra.bus.service.provider;
 
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.global.error.exception.UnexpectedResponseException;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
@@ -8,7 +9,7 @@ import com.dku.council.infra.bus.model.mapper.BusResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,9 +17,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class GGBusService implements BusArrivalInfoService {
+public class GGBusProvider implements BusArrivalProvider {
 
     private final WebClient webClient;
 
@@ -29,9 +30,9 @@ public class GGBusService implements BusArrivalInfoService {
     private final String serviceKey;
 
 
-    public List<BusArrival> retrieveBusArrival(String stationId) {
+    public List<BusArrival> retrieveBusArrival(BusStation station) {
         try {
-            ResponseGGBusArrival response = request(stationId);
+            ResponseGGBusArrival response = request(station.getGgNodeId());
 
             if (response == null) {
                 throw new UnexpectedResponseException("Failed response");
@@ -57,8 +58,8 @@ public class GGBusService implements BusArrivalInfoService {
     }
 
     @Override
-    public String getBusId(String busNo) {
-        return "GG" + busNo;
+    public String getProviderPrefix() {
+        return "GG_";
     }
 
     private ResponseGGBusArrival request(String stationId) {
