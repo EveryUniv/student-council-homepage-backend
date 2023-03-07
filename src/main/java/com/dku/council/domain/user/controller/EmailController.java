@@ -2,7 +2,7 @@ package com.dku.council.domain.user.controller;
 
 import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
-import com.dku.council.domain.user.model.dto.response.ResponseStudentInfoDto;
+import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.service.DkuEmailService;
 import com.dku.council.infra.dku.model.StudentInfo;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Tag(name = "단국대학교 학생 인증-email", description = "단국대학교 학생 인증 관련 api")
-@RestController
+//@RestController
 @RequestMapping("/user/email")
 @RequiredArgsConstructor
 public class EmailController {
@@ -50,9 +50,9 @@ public class EmailController {
      * @param signupToken 회원가입 토큰
      */
     @GetMapping("/{signup-token}")
-    public ResponseStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
+    public ResponseScrappedStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
         StudentInfo studentInfo = service.getStudentInfo(signupToken);
-        return ResponseStudentInfoDto.from(messageSource, studentInfo);
+        return ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
     }
 
 
