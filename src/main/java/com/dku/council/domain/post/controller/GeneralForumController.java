@@ -3,7 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.post.model.dto.page.SummarizedGeneralForumDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedGeneralForumDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;

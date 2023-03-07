@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.model.dto.page;
+package com.dku.council.domain.post.model.dto.list;
 
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
@@ -7,6 +7,7 @@ import lombok.Getter;
 
 import java.util.List;
 
+// TODO 작성자 추가
 @Getter
 public class SummarizedGenericPostDto {
 

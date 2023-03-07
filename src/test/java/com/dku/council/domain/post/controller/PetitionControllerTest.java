@@ -106,7 +106,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // then
         result.andExpect(status().isOk());
         assertThat(petition.getAnswer()).isEqualTo("hello good");
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.ANSWERED);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.ANSWERED);
     }
 
     @Test
@@ -185,7 +185,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // then
         result.andExpect(status().isOk());
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.WAITING);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
     }
 
     @Test
