@@ -1,6 +1,7 @@
 package com.dku.council.infra.bus.model.mapper;
 
 import com.dku.council.domain.bus.model.Bus;
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
 import com.dku.council.infra.bus.model.ResponseGGBusArrival;
@@ -8,7 +9,7 @@ import com.dku.council.infra.bus.model.ResponseKakaoBusApi;
 
 // todo Mapper Library를 사용해보는건 어떨까?
 public class BusResponseMapper {
-    public static BusArrival to(ResponseGGBusArrival.Body.BusArrival model) {
+    public static BusArrival to(ResponseGGBusArrival.Body.BusArrival model, BusStation station) {
         String routeId = model.getRouteId();
         Bus bus = Bus.of(routeId);
         if (bus == null) {
@@ -16,7 +17,7 @@ public class BusResponseMapper {
         }
 
         BusStatus state = getGGBusStateLabel(model.getFlag());
-        return new BusArrival(state,
+        return new BusArrival(state, station,
                 model.getLocationNo1(), model.getPredictTime1() * 60, model.getPlateNo1(),
                 model.getLocationNo2(), model.getPredictTime2() * 60, model.getPlateNo2(),
                 bus.getName());
@@ -35,10 +36,10 @@ public class BusResponseMapper {
         return BusStatus.RUN;
     }
 
-    public static BusArrival to(ResponseKakaoBusApi.BusLine model) {
+    public static BusArrival to(ResponseKakaoBusApi.BusLine model, BusStation station) {
         ResponseKakaoBusApi.BusLine.BusArrival arrival = model.getArrival();
         BusStatus state = getKakaoStateLabel(arrival.getVehicleState());
-        return new BusArrival(state,
+        return new BusArrival(state, station,
                 arrival.getBusStopCount(), arrival.getArrivalTime(), arrival.getVehicleNumber(),
                 arrival.getBusStopCount2(), arrival.getArrivalTime2(), arrival.getVehicleNumber2(),
                 model.getName());

@@ -45,6 +45,8 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("24"),
                 BusArrivalMock.create("101"),
                 BusArrivalMock.create("1234"),
+                BusArrivalMock.create("720-3", BusStation.DKU_GATE),
+                BusArrivalMock.create("720-3", BusStation.BEAR_STATUE),
                 BusArrivalMock.create("7007-1"),
                 BusArrivalMock.create("102")
         );
@@ -67,9 +69,9 @@ class OpenApiBusServiceTest {
         List<String> busNumbers = arrivals.stream()
                 .map(BusArrival::getBusNo)
                 .collect(Collectors.toList());
-        assertThat(arrivals.size()).isEqualTo(3);
+        assertThat(arrivals.size()).isEqualTo(4);
         assertThat(busNumbers).containsExactlyInAnyOrderElementsOf(
-                List.of("24", "102", "7007-1")
+                List.of("24", "102", "7007-1", "720-3")
         );
     }
 }
