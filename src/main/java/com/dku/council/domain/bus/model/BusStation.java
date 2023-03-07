@@ -12,7 +12,7 @@ public enum BusStation {
 
     private final String name;
     private final String ggNodeId;
-    private final String kakaoNodeId;
+    private final String townNodeId;
 
     /**
      * 이름으로 BusStation을 찾습니다.

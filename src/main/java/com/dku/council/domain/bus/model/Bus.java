@@ -7,13 +7,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum Bus {
-    GG102("102", "206000007"),
-    GG1101("1101", "234000879"),
-    GG1101N("1101N", "228000418"),
-    GG7007_1("7007-1", "228000393"),
-    GG8100("8100", "234000878"),
-    GG720_3("720-3", "234000068"),
-    K24("24", "B39979");
+    GG_102("102", "206000007"),
+    GG_1101("1101", "234000879"),
+    GG_1101N("1101N", "228000418"),
+    GG_7007_1("7007-1", "228000393"),
+    GG_8100("8100", "234000878"),
+    GG_720_3("720-3", "234000068"),
+    T_24("24", "B39979"),
+    DKU_SHUTTLE("Shuttle Bus", "");
 
     private final String name;
     private final String routeId;

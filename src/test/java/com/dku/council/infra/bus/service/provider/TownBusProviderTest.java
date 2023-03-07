@@ -1,5 +1,6 @@
-package com.dku.council.infra.bus.service.api;
+package com.dku.council.infra.bus.service.provider;
 
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
@@ -14,11 +15,11 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class KakaoBusServiceTest {
+class TownBusProviderTest {
 
     private static MockWebServer mockServer;
 
-    private KakaoBusService service;
+    private TownBusProvider service;
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -30,7 +31,7 @@ class KakaoBusServiceTest {
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new KakaoBusService(webClient, apiPath);
+        this.service = new TownBusProvider(webClient, apiPath);
     }
 
     @AfterAll
@@ -45,7 +46,7 @@ class KakaoBusServiceTest {
         ServerMock.json(mockServer, "/bus/kakao");
 
         // when
-        List<BusArrival> arrivals = service.retrieveBusArrival("111111");
+        List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
 
         // then
         assertThat(arrivals.size()).isEqualTo(2);
@@ -72,6 +73,6 @@ class KakaoBusServiceTest {
 
         // when & then
         Assertions.assertThrows(CannotGetBusArrivalException.class, () ->
-                service.retrieveBusArrival("111111"));
+                service.retrieveBusArrival(BusStation.DKU_GATE));
     }
 }

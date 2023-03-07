@@ -2,13 +2,14 @@ package com.dku.council.infra.bus.service;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.model.BusArrival;
-import com.dku.council.infra.bus.service.api.GGBusService;
-import com.dku.council.infra.bus.service.api.KakaoBusService;
+import com.dku.council.infra.bus.service.provider.BusArrivalProvider;
+import com.dku.council.infra.bus.service.provider.GGBusProvider;
+import com.dku.council.infra.bus.service.provider.TownBusProvider;
 import com.dku.council.mock.BusArrivalMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,19 +18,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 class OpenApiBusServiceTest {
     @Mock
-    private GGBusService ggBusService;
+    private GGBusProvider ggBusProvider;
 
     @Mock
-    private KakaoBusService kakaoBusService;
+    private TownBusProvider townBusProvider;
 
-    @InjectMocks
     private OpenApiBusService service;
 
+
+    @BeforeEach
+    public void setup() {
+        List<BusArrivalProvider> providers = List.of(ggBusProvider, townBusProvider);
+        service = new OpenApiBusService(providers);
+    }
 
     @Test
     @DisplayName("여러 API를 합쳐 잘 필터링 하는지")
@@ -43,10 +48,8 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("7007-1"),
                 BusArrivalMock.create("102")
         );
-        Mockito.when(ggBusService.retrieveBusArrival(station.getGgNodeId()))
-                .thenReturn(list1);
-        Mockito.when(ggBusService.getBusId(any()))
-                .thenAnswer(invo -> "GG" + invo.getArgument(0));
+        Mockito.when(ggBusProvider.retrieveBusArrival(station)).thenReturn(list1);
+        Mockito.when(ggBusProvider.getProviderPrefix()).thenReturn("GG");
 
         List<BusArrival> list2 = List.of(
                 BusArrivalMock.create("24"),
@@ -54,10 +57,8 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("7007-1"),
                 BusArrivalMock.create("102")
         );
-        Mockito.when(kakaoBusService.retrieveBusArrival(station.getKakaoNodeId()))
-                .thenReturn(list2);
-        Mockito.when(kakaoBusService.getBusId(any()))
-                .thenAnswer(invo -> "K" + invo.getArgument(0));
+        Mockito.when(townBusProvider.retrieveBusArrival(station)).thenReturn(list2);
+        Mockito.when(townBusProvider.getProviderPrefix()).thenReturn("T");
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(station);

@@ -1,5 +1,6 @@
-package com.dku.council.infra.bus.service.api;
+package com.dku.council.infra.bus.service.provider;
 
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
@@ -15,11 +16,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-class GGBusServiceTest {
+class GGBusProviderTest {
 
     private static MockWebServer mockServer;
 
-    private GGBusService service;
+    private GGBusProvider service;
 
     @BeforeAll
     static void beforeAll() throws IOException {
@@ -31,7 +32,7 @@ class GGBusServiceTest {
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new GGBusService(webClient, apiPath, "serviceKey");
+        this.service = new GGBusProvider(webClient, apiPath, "serviceKey");
     }
 
     @AfterAll
@@ -46,7 +47,7 @@ class GGBusServiceTest {
         ServerMock.xml(mockServer, "/bus/getBusArrivalList");
 
         // when
-        List<BusArrival> arrivals = service.retrieveBusArrival("111111");
+        List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
 
         // then
         assertThat(arrivals.size()).isEqualTo(2);
@@ -76,7 +77,7 @@ class GGBusServiceTest {
 
         try {
             // when
-            service.retrieveBusArrival("111111");
+            service.retrieveBusArrival(BusStation.DKU_GATE);
             fail("CannotGetBusArrivalException is not thrown.");
         } catch (CannotGetBusArrivalException e) {
             // then
@@ -91,7 +92,7 @@ class GGBusServiceTest {
         ServerMock.xml(mockServer, "/bus/getBusArrivalList-empty");
 
         // when
-        List<BusArrival> arrivals = service.retrieveBusArrival("111111");
+        List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
 
         // then
         assertThat(arrivals).isEmpty();
