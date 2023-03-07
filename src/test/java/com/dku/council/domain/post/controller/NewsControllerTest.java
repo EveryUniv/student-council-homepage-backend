@@ -3,14 +3,16 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.common.AbstractContainerRedisTest;
 import com.dku.council.common.MvcMockResponse;
 import com.dku.council.common.OnlyDevTest;
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.model.entity.Tag;
+import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
 import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +28,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -49,7 +53,10 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private UserRepository userRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private TagRepository tagRepository;
+
+    @Autowired
+    private TagService tagService;
 
     @Autowired
     private GenericPostRepository<News> postRepository;
@@ -77,12 +84,74 @@ class NewsControllerTest extends AbstractContainerRedisTest {
                 .andDo(print());
 
         // then
-        Integer[] ids = getIdArray(news, 10);
+        Integer[] ids = getIdArray(news);
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(ids)));
     }
 
-    private Integer[] getIdArray(List<News> news, int size) {
+    @Test
+    @DisplayName("News 리스트 가져오기 - 태그 명시")
+    void listWithTags() throws Exception {
+        // given
+        List<News> news1 = NewsMock.createList("news", user, 5);
+        postRepository.saveAll(news1);
+
+        Tag tag1 = TagMock.create();
+        List<News> news2 = createPostsWithTag(tag1, 6);
+
+        Tag tag2 = TagMock.create();
+        createPostsWithTag(tag2, 7);
+
+        // when
+        ResultActions result = mvc.perform(get("/post/news")
+                        .param("tagIds", tag1.getId().toString()))
+                .andDo(print());
+
+        // then
+        Integer[] tag1Ids = getIdArray(news2);
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(tag1Ids)));
+    }
+
+    @Test
+    @DisplayName("News 리스트 가져오기 - 여러 태그 명시")
+    void listWithMultipleTags() throws Exception {
+        // given
+        List<News> news1 = NewsMock.createList("news", user, 5);
+        postRepository.saveAll(news1);
+
+        Tag tag1 = TagMock.create();
+        List<News> news2 = createPostsWithTag(tag1, 6);
+
+        Tag tag2 = TagMock.create();
+        List<News> news3 = createPostsWithTag(tag2, 7);
+
+        // when
+        ResultActions result = mvc.perform(get("/post/news")
+                        .param("tagIds", tag1.getId().toString())
+                        .param("tagIds", tag2.getId().toString()))
+                .andDo(print());
+
+        // then
+        List<News> expected = Stream.concat(news2.stream(), news3.stream())
+                .collect(Collectors.toList());
+        Integer[] allIds = getIdArray(expected);
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(allIds)));
+    }
+
+    private List<News> createPostsWithTag(Tag tag, int size) {
+        List<News> newsList = NewsMock.createList("news-with-tag", user, size);
+        tag = tagRepository.save(tag);
+        newsList = postRepository.saveAll(newsList);
+        for (News news : newsList) {
+            tagService.addTagsToPost(news, List.of(tag.getId()));
+        }
+        return newsList;
+    }
+
+    private Integer[] getIdArray(List<News> news) {
+        int size = news.size();
         Integer[] ids = new Integer[size];
         for (int i = 0; i < size; i++) {
             ids[i] = (int) news.get(i).getId().longValue();
@@ -112,17 +181,20 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     }
 
     @Test
-    @DisplayName("News 생성 - 카테고리 명시")
-    void createWithCategory() throws Exception {
+    @DisplayName("News 생성 - 태그 명시")
+    void createWithTag() throws Exception {
         // given
-        Category category = new Category("category");
-        categoryRepository.save(category);
+        Tag tag = new Tag("tag");
+        tagRepository.save(tag);
+        Tag tag2 = new Tag("tag2");
+        tagRepository.save(tag2);
+        String[] tagIds = new String[]{tag.getId().toString(), tag2.getId().toString()};
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
                         .param("title", "제목")
                         .param("body", "본문")
-                        .param("categoryId", category.getId().toString()))
+                        .param("tagIds", tagIds))
                 .andDo(print());
 
         // then
@@ -135,7 +207,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
         assertThat(actualNews.getBody()).isEqualTo("본문");
-        assertThat(actualNews.getCategory().getId()).isEqualTo(category.getId());
+        assertThat(actualNews.getPostTags().get(0).getTag().getId()).isEqualTo(tag.getId());
+        assertThat(actualNews.getPostTags().get(1).getTag().getId()).isEqualTo(tag2.getId());
     }
 
     @Test

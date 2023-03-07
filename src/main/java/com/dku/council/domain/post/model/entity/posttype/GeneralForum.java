@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.category.model.entity.Category;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
@@ -24,7 +23,7 @@ public class GeneralForum extends Post {
     private GeneralForum(@NonNull User user,
                          @NonNull String title,
                          @NonNull String body,
-                         Category category, int views) {
-        super(user, title, body, category, views);
+                         int views) {
+        super(user, title, body, views);
     }
 }

@@ -1,15 +1,10 @@
 package com.dku.council.global.dto;
 
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class ResponseIdDto {
-    private Long id;
-
-    public ResponseIdDto(Long id) {
-        this.id = id;
-    }
+    private final Long id;
 }

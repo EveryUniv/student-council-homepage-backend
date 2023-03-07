@@ -1,13 +1,12 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.category.model.entity.Category;
-import com.dku.council.domain.category.repository.CategoryRepository;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
@@ -45,7 +44,7 @@ class GenericPostServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private CategoryRepository categoryRepository;
+    private TagService tagService;
 
     @Mock
     private ViewCountService viewCountService;
@@ -104,17 +103,16 @@ class GenericPostServiceTest {
     }
 
     @Test
-    @DisplayName("카테고리를 명시하며 생성하기")
-    public void createWithCategory() {
+    @DisplayName("태그를 명시하며 생성하기")
+    public void createWithTag() {
         // given
         User user = UserMock.create(99L);
         News news = NewsMock.create(user, 3L);
-        Category category = new Category("category");
+        List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
 
-        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", 2L, List.of());
+        RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", tagIds, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
-        when(categoryRepository.findById(any())).thenReturn(Optional.of(category));
 
         // when
         Long newsId = service.create(2L, dto);
@@ -124,9 +122,9 @@ class GenericPostServiceTest {
 
         verify(newsRepository).save(argThat(entity -> {
             assertThat(entity.getUser()).isEqualTo(user);
-            assertThat(entity.getCategory()).isEqualTo(category);
             return true;
         }));
+        verify(tagService).addTagsToPost(any(), eq(tagIds));
     }
 
     @Test
@@ -137,7 +135,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(UserNotFoundException.class, () ->
-                service.create(2L, new RequestCreateNewsDto("title", "body", 0L, List.of())));
+                service.create(2L, new RequestCreateNewsDto("title", "body", List.of(), List.of())));
     }
 
     @Test

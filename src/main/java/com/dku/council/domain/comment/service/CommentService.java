@@ -55,11 +55,10 @@ public class CommentService {
 
         Comment comment = Comment.builder()
                 .user(user)
-                .post(post)
                 .text(content)
                 .build();
 
-        post.getComments().add(comment);
+        comment.changePost(post);
         comment = commentRepository.save(comment);
         return comment.getId();
     }
@@ -104,6 +103,6 @@ public class CommentService {
     }
 
     public boolean isCommentedAlready(Long postId, Long userId) {
-        return commentRepository.findAllByPostIdAndUserId(postId, userId).isPresent();
+        return !commentRepository.findAllByPostIdAndUserId(postId, userId).isEmpty();
     }
 }

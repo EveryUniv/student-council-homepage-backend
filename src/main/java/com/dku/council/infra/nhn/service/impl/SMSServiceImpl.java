@@ -1,7 +1,7 @@
 package com.dku.council.infra.nhn.service.impl;
 
+import com.dku.council.global.error.exception.UnexpectedResponseException;
 import com.dku.council.infra.nhn.exception.CannotSendSMSException;
-import com.dku.council.infra.nhn.exception.UnexpectedResponseException;
 import com.dku.council.infra.nhn.model.dto.request.RequestNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.response.ResponseNHNCloudSMS;
 import com.dku.council.infra.nhn.model.dto.response.ResponseNHNCloudSMS.Body.Data.SendResult;

@@ -1,5 +1,6 @@
 package com.dku.council.global.config.swagger;
 
+import com.dku.council.global.auth.jwt.JwtProvider;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -20,13 +21,12 @@ import org.springframework.context.annotation.Configuration;
         }
 )
 @SecurityScheme(
-        name = SwaggerConfig.AUTHENTICATION,
+        name = JwtProvider.AUTHORIZATION,
         type = SecuritySchemeType.HTTP,
         scheme = "Bearer",
         bearerFormat = "JWT",
         in = SecuritySchemeIn.HEADER
 )
 public class SwaggerConfig {
-    public static final String AUTHENTICATION = "Authorization";
     public static final String API_VERSION = "v1.0.0";
 }

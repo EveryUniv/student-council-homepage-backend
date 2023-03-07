@@ -1,28 +1,24 @@
 package com.dku.council.infra.nhn.model.dto.response;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import static lombok.AccessLevel.PROTECTED;
 
 @Getter
-@NoArgsConstructor(access = PROTECTED)
+@RequiredArgsConstructor(access = PROTECTED)
 public class ResponseToken {
-    private Access access;
-
-    public String getTokenId() {
-        return access.token.id;
-    }
+    private final Access access;
 
     @Getter
-    @NoArgsConstructor(access = PROTECTED)
+    @RequiredArgsConstructor(access = PROTECTED)
     public static class Access {
-        private Token token;
+        private final Token token;
     }
 
     @Getter
-    @NoArgsConstructor(access = PROTECTED)
+    @RequiredArgsConstructor(access = PROTECTED)
     public static class Token {
-        private String id;
+        private final String id;
     }
 }
