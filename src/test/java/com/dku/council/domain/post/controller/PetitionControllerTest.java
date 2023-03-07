@@ -1,7 +1,5 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
@@ -16,6 +14,8 @@ import com.dku.council.mock.CommentMock;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
+import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

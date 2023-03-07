@@ -4,29 +4,21 @@ import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
-import com.dku.council.mock.ServerMock;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import com.dku.council.util.base.AbstractMockServerTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
-class GGBusProviderTest {
-
-    private static MockWebServer mockServer;
+class GGBusProviderTest extends AbstractMockServerTest {
 
     private GGBusProvider service;
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
 
     @BeforeEach
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -35,16 +27,11 @@ class GGBusProviderTest {
         this.service = new GGBusProvider(webClient, apiPath, "serviceKey");
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
-    }
-
     @Test
     @DisplayName("버스 정보 잘 가져오는지")
     public void retrieveBusArrival() {
         // given
-        ServerMock.xml(mockServer, "/bus/getBusArrivalList");
+        mockXml("/bus/getBusArrivalList");
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
@@ -73,7 +60,7 @@ class GGBusProviderTest {
     @DisplayName("실패 - 결과 없는 경우")
     public void failedRetrieveBusArrivalByNoResult() {
         // given
-        ServerMock.xml(mockServer, "/bus/getBusArrivalList-failed");
+        mockXml("/bus/getBusArrivalList-failed");
 
         try {
             // when
@@ -89,7 +76,7 @@ class GGBusProviderTest {
     @DisplayName("결과가 빈 경우")
     public void retrieveBusArrivalWithEmptyResult() {
         // given
-        ServerMock.xml(mockServer, "/bus/getBusArrivalList-empty");
+        mockXml("/bus/getBusArrivalList-empty");
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);

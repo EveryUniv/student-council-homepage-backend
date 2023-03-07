@@ -1,8 +1,5 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.MvcMockResponse;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
@@ -15,6 +12,9 @@ import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
+import com.dku.council.util.MvcMockResponse;
+import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -4,28 +4,21 @@ import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
-import com.dku.council.mock.ServerMock;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import com.dku.council.util.base.AbstractMockServerTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TownBusProviderTest {
-
-    private static MockWebServer mockServer;
+class TownBusProviderTest extends AbstractMockServerTest {
 
     private TownBusProvider service;
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
 
     @BeforeEach
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -34,16 +27,11 @@ class TownBusProviderTest {
         this.service = new TownBusProvider(webClient, apiPath);
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
-    }
-
     @Test
     @DisplayName("버스 정보 잘 가져오는지")
     public void retrieveBusArrival() {
         // given
-        ServerMock.json(mockServer, "/bus/kakao");
+        mockJson("/bus/kakao");
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
@@ -69,7 +57,7 @@ class TownBusProviderTest {
     @DisplayName("실패 - 정류장이 없는 경우")
     public void failedRetrieveBusArrivalByNoResult() {
         // given
-        ServerMock.json(mockServer, "/bus/kakao-failed");
+        mockJson("/bus/kakao-failed");
 
         // when & then
         Assertions.assertThrows(CannotGetBusArrivalException.class, () ->
