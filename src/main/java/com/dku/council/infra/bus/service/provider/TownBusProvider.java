@@ -1,5 +1,6 @@
-package com.dku.council.infra.bus.service.api;
+package com.dku.council.infra.bus.service.provider;
 
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.global.error.exception.UnexpectedResponseException;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.exception.InvalidBusStationException;
@@ -8,7 +9,7 @@ import com.dku.council.infra.bus.model.ResponseKakaoBusApi;
 import com.dku.council.infra.bus.model.mapper.BusResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -16,19 +17,19 @@ import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class KakaoBusService implements BusArrivalInfoService {
+public class TownBusProvider implements BusArrivalProvider {
 
     private final WebClient webClient;
 
     @Value("${bus.kakao.api-path}")
     private final String apiPath;
 
-
-    public List<BusArrival> retrieveBusArrival(String stationId) {
+    @Override
+    public List<BusArrival> retrieveBusArrival(BusStation station) {
         try {
-            ResponseKakaoBusApi response = request(stationId);
+            ResponseKakaoBusApi response = request(station.getTownNodeId());
 
             if (response == null) {
                 throw new UnexpectedResponseException("Failed response");
@@ -49,8 +50,8 @@ public class KakaoBusService implements BusArrivalInfoService {
     }
 
     @Override
-    public String getBusId(String busNo) {
-        return "K" + busNo;
+    public String getProviderPrefix() {
+        return "T_";
     }
 
     private ResponseKakaoBusApi request(String stationId) {

@@ -1,51 +1,40 @@
-package com.dku.council.infra.bus.service.api;
+package com.dku.council.infra.bus.service.provider;
 
+import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
-import com.dku.council.mock.ServerMock;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import com.dku.council.util.base.AbstractMockServerTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class KakaoBusServiceTest {
+class TownBusProviderTest extends AbstractMockServerTest {
 
-    private static MockWebServer mockServer;
-
-    private KakaoBusService service;
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
+    private TownBusProvider service;
 
     @BeforeEach
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new KakaoBusService(webClient, apiPath);
-    }
-
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
+        this.service = new TownBusProvider(webClient, apiPath);
     }
 
     @Test
     @DisplayName("버스 정보 잘 가져오는지")
     public void retrieveBusArrival() {
         // given
-        ServerMock.json(mockServer, "/bus/kakao");
+        mockJson("/bus/kakao");
 
         // when
-        List<BusArrival> arrivals = service.retrieveBusArrival("111111");
+        List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
 
         // then
         assertThat(arrivals.size()).isEqualTo(2);
@@ -68,10 +57,10 @@ class KakaoBusServiceTest {
     @DisplayName("실패 - 정류장이 없는 경우")
     public void failedRetrieveBusArrivalByNoResult() {
         // given
-        ServerMock.json(mockServer, "/bus/kakao-failed");
+        mockJson("/bus/kakao-failed");
 
         // when & then
         Assertions.assertThrows(CannotGetBusArrivalException.class, () ->
-                service.retrieveBusArrival("111111"));
+                service.retrieveBusArrival(BusStation.DKU_GATE));
     }
 }

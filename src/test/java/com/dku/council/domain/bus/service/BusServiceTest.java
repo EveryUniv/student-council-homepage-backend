@@ -7,6 +7,7 @@ import com.dku.council.domain.bus.repository.BusArrivalMemoryRepository;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.service.OpenApiBusService;
 import com.dku.council.mock.BusArrivalMock;
+import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class BusServiceTest {
 
-    private final Clock clock = Clock.fixed(Instant.ofEpochSecond(1_000_000_000), ZoneId.systemDefault());
+    private final Clock clock = ClockUtil.create();
     private BusService service;
 
     @Mock

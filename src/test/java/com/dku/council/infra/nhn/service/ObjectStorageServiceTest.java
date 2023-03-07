@@ -2,29 +2,23 @@ package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.InvalidAccessObjectStorageException;
 import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
-import com.dku.council.mock.ServerMock;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import com.dku.council.util.base.AbstractMockServerTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ObjectStorageServiceTest {
+class ObjectStorageServiceTest extends AbstractMockServerTest {
 
-    private static MockWebServer mockServer;
     private ObjectStorageService service;
     private String apiPath;
 
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
 
     @BeforeEach
     public void beforeEach() {
@@ -33,16 +27,11 @@ class ObjectStorageServiceTest {
         this.service = new ObjectStorageServiceImpl(webClient, apiPath);
     }
 
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
-    }
-
     @Test
     @DisplayName("이미있는 파일인 경우 잘 catch하는지")
     public void checkIfIsInStorage() {
         // given
-        ServerMock.status(mockServer, HttpStatus.OK);
+        mockWithStatus(HttpStatus.OK);
 
         // when
         boolean isIn = service.isInObject("object");
@@ -55,7 +44,7 @@ class ObjectStorageServiceTest {
     @DisplayName("존재하지않는 파일인 경우 false반환")
     public void checkIfIsNotInStorage() {
         // given
-        ServerMock.status(mockServer, HttpStatus.NOT_FOUND);
+        mockWithStatus(HttpStatus.NOT_FOUND);
 
         // when
         boolean isIn = service.isInObject("object");
@@ -78,8 +67,8 @@ class ObjectStorageServiceTest {
     @DisplayName("성공 응답 - Upload")
     public void uploadingSuccessResponse() {
         // given
-        ServerMock.status(mockServer, HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
-        ServerMock.status(mockServer, HttpStatus.OK);
+        mockWithStatus(HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
+        mockWithStatus(HttpStatus.OK);
 
         // when & then(no error)
         service.uploadObject("token", "object", InputStream.nullInputStream());
@@ -89,7 +78,7 @@ class ObjectStorageServiceTest {
     @DisplayName("성공 응답 - Delete")
     public void deletionSuccessResponse() {
         // given
-        ServerMock.status(mockServer, HttpStatus.OK);
+        mockWithStatus(HttpStatus.OK);
 
         // when & then(no error)
         service.deleteObject("token", "object");
@@ -99,8 +88,8 @@ class ObjectStorageServiceTest {
     @DisplayName("실패 응답 - Upload 실패 status code")
     public void failedUploadByFailedStatusCode() {
         // given
-        ServerMock.status(mockServer, HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
-        ServerMock.status(mockServer, HttpStatus.BAD_REQUEST);
+        mockWithStatus(HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
+        mockWithStatus(HttpStatus.BAD_REQUEST);
 
         // when & then(no error)
         Assertions.assertThrows(InvalidAccessObjectStorageException.class, () ->
@@ -111,7 +100,7 @@ class ObjectStorageServiceTest {
     @DisplayName("실패 응답 - Delete 실패 status code")
     public void failedDeleteByFailedStatusCode() {
         // given
-        ServerMock.status(mockServer, HttpStatus.BAD_REQUEST);
+        mockWithStatus(HttpStatus.BAD_REQUEST);
 
         // when & then(no error)
         Assertions.assertThrows(InvalidAccessObjectStorageException.class, () ->

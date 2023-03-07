@@ -4,9 +4,11 @@ import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
-import com.dku.council.mock.ServerMock;
-import okhttp3.mockwebserver.MockWebServer;
-import org.junit.jupiter.api.*;
+import com.dku.council.util.base.AbstractMockServerTest;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -16,37 +18,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DkuCrawlerServiceTest {
+class DkuCrawlerServiceTest extends AbstractMockServerTest {
 
     @Mock
     MessageSource messageSource;
 
-    private static MockWebServer mockServer;
     private DkuCrawlerService service;
-
-    @BeforeAll
-    static void beforeAll() throws IOException {
-        mockServer = new MockWebServer();
-        mockServer.start();
-    }
 
     @BeforeEach
     void beforeEach() {
         WebClient webClient = WebClient.create();
         this.service = new DkuCrawlerService(webClient, messageSource,
                 "http://localhost:" + mockServer.getPort());
-    }
-
-    @AfterAll
-    static void afterAll() throws IOException {
-        mockServer.shutdown();
     }
 
     @Test
@@ -60,7 +48,7 @@ class DkuCrawlerServiceTest {
                 return "모르는 학과";
             }
         });
-        ServerMock.html(mockServer, "dku/student-info-response");
+        mockHtml("dku/student-info-response");
 
         // when
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -77,7 +65,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 실패 status code")
     public void failedCrawlByInvalidStatusCode() {
         // given
-        ServerMock.status(mockServer, HttpStatus.NOT_FOUND);
+        mockWithStatus(HttpStatus.NOT_FOUND);
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -89,7 +77,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 학번정보가 누락된 response")
     public void failedCrawlByInvalidResponse1() {
         // given
-        ServerMock.html(mockServer, "dku/student-info-response-failed-1");
+        mockHtml("dku/student-info-response-failed-1");
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
@@ -101,7 +89,7 @@ class DkuCrawlerServiceTest {
     @DisplayName("실패 응답 - 없는 학과인 response")
     public void failedCrawlByInvalidResponse2() {
         // given
-        ServerMock.html(mockServer, "dku/student-info-response-failed-2");
+        mockHtml("dku/student-info-response-failed-2");
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());

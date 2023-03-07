@@ -1,4 +1,4 @@
-package com.dku.council.common;
+package com.dku.council.util;
 
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 

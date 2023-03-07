@@ -1,4 +1,4 @@
-package com.dku.council.common;
+package com.dku.council.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
