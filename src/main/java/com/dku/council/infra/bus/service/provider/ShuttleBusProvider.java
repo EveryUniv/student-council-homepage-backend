@@ -1,7 +1,6 @@
 package com.dku.council.infra.bus.service.provider;
 
 import com.dku.council.domain.bus.model.BusStation;
-import com.dku.council.infra.bus.exception.InvalidBusStationException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class ShuttleBusProvider implements BusArrivalProvider {
     @Override
     public List<BusArrival> retrieveBusArrival(BusStation station) {
         if (station != BusStation.DKU_GATE) {
-            throw new InvalidBusStationException();
+            return List.of();
         }
 
         LocalTime now = LocalTime.now(clock);
