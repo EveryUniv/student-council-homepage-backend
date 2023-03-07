@@ -58,6 +58,31 @@ public class VocController {
     }
 
     /**
+     * 내가 쓴 게시글 목록 조회
+     *
+     * @param keyword  제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
+     * @param tagIds   조회할 태그 목록. or 조건으로 검색된다. 지정하지않으면 모든 게시글 조회.
+     * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
+     * @param pageable 페이징 size, sort, page
+     * @return 페이징 된 VOC 목록
+     */
+    @GetMapping("/my")
+    @UserOnly
+    public ResponsePage<SummarizedVocDto> listMine(AppAuthentication auth,
+                                                   @RequestParam(required = false) String keyword,
+                                                   @RequestParam(required = false) List<Long> tagIds,
+                                                   @RequestParam(defaultValue = "50") int bodySize,
+                                                   @ParameterObject Pageable pageable) {
+        Long userId = auth.getUserId();
+        Specification<Voc> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        spec = spec.and(PostSpec.withAuthor(userId));
+
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
+                .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
+        return new ResponsePage<>(list);
+    }
+
+    /**
      * 게시글 등록
      *
      * @return 생성된 게시글 id

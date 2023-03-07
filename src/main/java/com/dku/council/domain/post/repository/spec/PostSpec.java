@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import javax.persistence.criteria.Join;
 import java.util.List;
 
+// TODO QueryDSL로 변경
 public class PostSpec {
 
     public static <T extends Post> Specification<T> createPostCondition() {
@@ -25,6 +26,11 @@ public class PostSpec {
             spec = spec.and(orSpec);
         }
         return spec;
+    }
+
+    public static <T extends Post> Specification<T> withAuthor(Long userId) {
+        return (root, query, builder) ->
+                builder.equal(root.get("user").get("id"), userId);
     }
 
     private static <T extends Post> Specification<T> withTitleOrBody(String keyword) {

@@ -75,7 +75,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Test
     @DisplayName("단건 조회")
-    void create() throws Exception {
+    void findOne() throws Exception {
         // when
         ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()))
                 .andDo(print());
