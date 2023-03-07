@@ -1,11 +1,9 @@
 package com.dku.council.infra.bus.service.provider;
 
 import com.dku.council.domain.bus.model.BusStation;
-import com.dku.council.infra.bus.exception.InvalidBusStationException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
 import com.dku.council.util.ClockUtil;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,14 +38,6 @@ class ShuttleBusProviderTest {
         provider = new ShuttleBusProvider(clock, table);
     }
 
-
-    @Test
-    @DisplayName("지원하지 않는 버스 정류소인 경우")
-    void failedRetrieveBusArrivalByInvalidBusStation() {
-        // when & then
-        Assertions.assertThrows(InvalidBusStationException.class, () ->
-                provider.retrieveBusArrival(BusStation.BEAR_STATUE));
-    }
 
     @Test
     @DisplayName("버스 없는 시간인 경우1")

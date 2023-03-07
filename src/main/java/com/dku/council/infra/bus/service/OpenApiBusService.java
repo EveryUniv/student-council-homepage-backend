@@ -7,9 +7,7 @@ import com.dku.council.infra.bus.service.provider.BusArrivalProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,20 +24,11 @@ public class OpenApiBusService {
      * @return 버스 도착정보 목록 (도착정보가 없는 버스는 List에 포함되지 않음)
      */
     public List<BusArrival> retrieveBusArrival(BusStation station) {
-        Set<String> busNameSet = Arrays.stream(Bus.values())
-                .map(Bus::name)
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
-
         Stream<BusArrival> stream = null;
         for (BusArrivalProvider provider : providers) {
             List<BusArrival> busArrivalList = provider.retrieveBusArrival(station);
             Stream<BusArrival> resultStream = busArrivalList.stream()
-                    .filter(b -> {
-                        String key = provider.getProviderPrefix() + b.getBusNo();
-                        key = key.replaceAll("-", "_").toLowerCase();
-                        return busNameSet.contains(key);
-                    });
+                    .filter(arrival -> filterBus(provider.getProviderPrefix(), arrival));
             if (stream == null) {
                 stream = resultStream;
             } else {
@@ -52,5 +41,20 @@ public class OpenApiBusService {
         }
 
         return stream.collect(Collectors.toList());
+    }
+
+    private static boolean filterBus(String providerPrefix, BusArrival arrival) {
+        String key = providerPrefix + arrival.getBusNo();
+        key = key.replaceAll("-", "_").toUpperCase();
+        Bus bus = Bus.ofEnumName(key);
+        if (bus != null) {
+            BusStation targetStation = bus.getStation();
+            if (targetStation != null) {
+                return arrival.getStation() == targetStation;
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 }
