@@ -33,7 +33,7 @@ class ShuttleBusProviderTest {
 
     @BeforeEach
     void defaultSetup() {
-        setup(ClockUtil.create());
+        setup(ClockUtil.create(LocalTime.of(13, 10)));
     }
 
     void setup(Clock clock) {
