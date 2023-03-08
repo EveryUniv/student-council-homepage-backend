@@ -33,10 +33,14 @@ public class UserMock {
     }
 
     public static User create(Long userId, PasswordEncoder passwordEncoder) {
-        return create(userId, UserRole.USER, passwordEncoder);
+        return create(userId, NAME, UserRole.USER, passwordEncoder);
     }
 
-    public static User create(Long userId, UserRole role, PasswordEncoder passwordEncoder) {
+    public static User createWithName(String username) {
+        return create(RandomGen.nextLong(), username, UserRole.USER, null);
+    }
+
+    public static User create(Long userId, String username, UserRole role, PasswordEncoder passwordEncoder) {
         String password = PASSWORD;
 
         if (passwordEncoder != null) {
@@ -46,7 +50,7 @@ public class UserMock {
         User user = User.builder()
                 .studentId(STUDENT_ID)
                 .password(password)
-                .name(NAME)
+                .name(username)
                 .role(role)
                 .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")

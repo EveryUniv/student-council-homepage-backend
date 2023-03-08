@@ -6,6 +6,11 @@ import com.dku.council.domain.rental.model.dto.RentalItemDto;
 import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestCreateRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestRentalItemDto;
+import com.dku.council.domain.rental.model.entity.Rental;
+import com.dku.council.domain.rental.model.entity.RentalItem;
+import com.dku.council.domain.rental.repository.spec.RentalSpec;
+import com.dku.council.domain.rental.service.RentalItemService;
+import com.dku.council.domain.rental.service.RentalService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
@@ -14,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,6 +30,8 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class RentalController {
 
+    private final RentalService rentalService;
+    private final RentalItemService rentalItemService;
 
     /**
      * 대여 신청 현황 조회. (Admin)
@@ -35,7 +43,10 @@ public class RentalController {
     @AdminOnly
     public ResponsePage<SummarizedRentalDto> list(@RequestParam(required = false) String keyword,
                                                   @ParameterObject Pageable pageable) {
-        return null;
+        Specification<Rental> spec = RentalSpec.withTitleOrBody(keyword);
+        spec = spec.or(RentalSpec.withUsername(keyword));
+        spec = spec.or(RentalSpec.withItemName(keyword));
+        return rentalService.list(spec, pageable);
     }
 
     /**
@@ -46,7 +57,8 @@ public class RentalController {
     @GetMapping("/item")
     public ResponsePage<RentalItemDto> listItem(@RequestParam(required = false) String keyword,
                                                 @ParameterObject Pageable pageable) {
-        return null;
+        Specification<RentalItem> spec = RentalSpec.withName(keyword);
+        return rentalItemService.list(spec, pageable);
     }
 
     /**
@@ -59,7 +71,10 @@ public class RentalController {
     public ResponsePage<SummarizedRentalDto> myList(AppAuthentication auth,
                                                     @RequestParam(required = false) String keyword,
                                                     @ParameterObject Pageable pageable) {
-        return null;
+        Specification<Rental> spec = RentalSpec.withTitleOrBody(keyword);
+        spec = spec.or(RentalSpec.withUser(auth.getUserId()));
+        spec = spec.or(RentalSpec.withItemName(keyword));
+        return rentalService.list(spec, pageable);
     }
 
     /**
@@ -72,7 +87,7 @@ public class RentalController {
     @GetMapping("/{id}")
     @UserOnly
     public RentalDto findOneItem(AppAuthentication auth, @PathVariable Long id) {
-        return null;
+        return rentalService.findOne(id, auth.isAdmin());
     }
 
     /**
@@ -81,7 +96,8 @@ public class RentalController {
     @PostMapping
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateRentalDto dto) {
-        return null;
+        Long id = rentalService.create(auth.getUserId(), dto);
+        return new ResponseIdDto(id);
     }
 
     /**
@@ -90,7 +106,8 @@ public class RentalController {
     @PostMapping("/item")
     @AdminOnly
     public ResponseIdDto addItem(@Valid @RequestBody RequestRentalItemDto dto) {
-        return null;
+        Long id = rentalItemService.create(dto);
+        return new ResponseIdDto(id);
     }
 
     /**
@@ -102,6 +119,7 @@ public class RentalController {
     @DeleteMapping("/item/{id}")
     @AdminOnly
     public ResponseIdDto deleteItem(@PathVariable Long id) {
+        rentalItemService.delete(id);
         return new ResponseIdDto(id);
     }
 
@@ -111,6 +129,7 @@ public class RentalController {
     @PatchMapping("/item/{id}")
     @AdminOnly
     public ResponseIdDto patchItem(@PathVariable Long id, @Valid @RequestBody RequestRentalItemDto dto) {
+        rentalItemService.patch(id, dto);
         return new ResponseIdDto(id);
     }
 }

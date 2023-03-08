@@ -12,7 +12,7 @@ public class RequestRentalItemDto {
 
     @NotNull
     @Schema(description = "물품 이름", example = "물품")
-    private final Long itemId;
+    private final String itemName;
 
     @NotNull
     @Schema(description = "대여 가능 개수")

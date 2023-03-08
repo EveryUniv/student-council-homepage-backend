@@ -4,7 +4,7 @@ public enum RentalUserClass {
     /**
      * 개인
      */
-    PERSONAL,
+    INDIVIDUAL,
 
     /**
      * 단과대 학생회

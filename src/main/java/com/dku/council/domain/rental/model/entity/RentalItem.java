@@ -25,5 +25,12 @@ public class RentalItem extends BaseEntity {
 
     private int remaining;
 
-    private boolean deleted;
+    private boolean isActive;
+
+
+    public RentalItem(String name, int remaining) {
+        this.name = name;
+        this.remaining = remaining;
+        this.isActive = true;
+    }
 }

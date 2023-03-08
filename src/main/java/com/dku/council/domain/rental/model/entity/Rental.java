@@ -3,6 +3,7 @@ package com.dku.council.domain.rental.model.entity;
 import com.dku.council.domain.rental.model.RentalUserClass;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,4 +43,15 @@ public class Rental extends BaseEntity {
 
     @Lob
     private String body;
+
+    @Builder
+    private Rental(User user, RentalItem item, RentalUserClass userClass, LocalDateTime rentalStart, LocalDateTime rentalEnd, String title, String body) {
+        this.user = user;
+        this.item = item;
+        this.userClass = userClass;
+        this.rentalStart = rentalStart;
+        this.rentalEnd = rentalEnd;
+        this.title = title;
+        this.body = body;
+    }
 }
