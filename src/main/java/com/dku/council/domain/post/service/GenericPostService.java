@@ -43,6 +43,7 @@ public class GenericPostService<E extends Post> {
 
     /**
      * 게시글 목록으로 조회
+     * todo active를 여기서 체크하기
      *
      * @param specification 검색 방법
      * @param pageable      페이징 방법

@@ -44,6 +44,9 @@ public class Rental extends BaseEntity {
     @Lob
     private String body;
 
+    private boolean isActive;
+
+
     @Builder
     private Rental(User user, RentalItem item, RentalUserClass userClass, LocalDateTime rentalStart, LocalDateTime rentalEnd, String title, String body) {
         this.user = user;
@@ -53,5 +56,9 @@ public class Rental extends BaseEntity {
         this.rentalEnd = rentalEnd;
         this.title = title;
         this.body = body;
+    }
+
+    public void markAsDeleted() {
+        this.isActive = false;
     }
 }

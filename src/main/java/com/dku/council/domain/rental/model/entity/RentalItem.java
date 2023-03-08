@@ -4,10 +4,9 @@ import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -27,10 +26,28 @@ public class RentalItem extends BaseEntity {
 
     private boolean isActive;
 
+    @OneToMany(mappedBy = "item")
+    private List<Rental> rentals = new ArrayList<>();
+
 
     public RentalItem(String name, int remaining) {
         this.name = name;
         this.remaining = remaining;
         this.isActive = true;
+    }
+
+    public void markAsDeleted() {
+        isActive = false;
+        for (Rental rental : rentals) {
+            rental.markAsDeleted();
+        }
+    }
+
+    public void updateItemName(String itemName) {
+        this.name = itemName;
+    }
+
+    public void updateAvailable(int available) {
+        this.remaining = available;
     }
 }

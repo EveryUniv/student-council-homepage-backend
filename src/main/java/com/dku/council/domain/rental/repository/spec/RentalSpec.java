@@ -32,9 +32,19 @@ public class RentalSpec {
                 builder.like(root.get("item").get("name"), pattern);
     }
 
+    public static Specification<Rental> withRentalActive() {
+        return (root, query, builder) ->
+                builder.equal(root.get("isActive"), true);
+    }
+
     public static Specification<RentalItem> withName(String name) {
         String pattern = "%" + name + "%";
         return (root, query, builder) ->
                 builder.like(root.get("name"), pattern);
+    }
+
+    public static Specification<RentalItem> withRentalItemActive() {
+        return (root, query, builder) ->
+                builder.equal(root.get("isActive"), true);
     }
 }

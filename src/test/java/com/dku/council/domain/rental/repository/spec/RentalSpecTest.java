@@ -8,7 +8,9 @@ import com.dku.council.domain.rental.repository.RentalRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.FieldInjector;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -42,18 +44,23 @@ class RentalSpecTest {
         User user2 = UserMock.createWithName("mamamam");
         user2 = userRepository.save(user2);
 
-        List<RentalItem> items = createItems("Item", 7);
-        List<RentalItem> items2 = createItems("RentalIT", 8);
+        List<RentalItem> items = createItems("Item", 7, true);
+        List<RentalItem> items2 = createItems("RentalIT", 8, true);
+        createItems("RentalIT", 8, false);
 
         createRentals(user2, items.get(0), "target", "body", 7);
         createRentals(user1, items2.get(0), "none", "target", 8);
         createRentals(user2, items.get(0), "none", "none", 9);
     }
 
-    private List<RentalItem> createItems(String prefix, int size) {
+    private List<RentalItem> createItems(String prefix, int size, boolean isActive) {
         List<RentalItem> items = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            items.add(new RentalItem(prefix + i, 20 + i));
+            RentalItem item = new RentalItem(prefix + i, 20 + i);
+            if (!isActive) {
+                FieldInjector.inject(RentalItem.class, item, "isActive", false);
+            }
+            items.add(item);
         }
         return rentalItemRepository.saveAll(items);
     }
@@ -77,6 +84,7 @@ class RentalSpecTest {
     }
 
     @Test
+    @DisplayName("userId로 rental 검색")
     void withUser() {
         // given
         Specification<Rental> spec = RentalSpec.withUser(user1.getId());
@@ -89,6 +97,7 @@ class RentalSpecTest {
     }
 
     @Test
+    @DisplayName("username으로 rental 검색")
     void withUsername() {
         // given
         String name = user1.getName();
@@ -103,6 +112,7 @@ class RentalSpecTest {
     }
 
     @Test
+    @DisplayName("keyword(title or body)로 rental 검색")
     void withTitleOrBody() {
         // given
         Specification<Rental> spec = RentalSpec.withTitleOrBody("target");
@@ -115,6 +125,7 @@ class RentalSpecTest {
     }
 
     @Test
+    @DisplayName("물품 이름으로 rental 검색")
     void withItemName() {
         // given
         Specification<Rental> spec = RentalSpec.withItemName("tem");
@@ -127,6 +138,7 @@ class RentalSpecTest {
     }
 
     @Test
+    @DisplayName("이름으로 rental item 검색")
     void withName() {
         // given
         Specification<RentalItem> spec = RentalSpec.withName("entalI");
@@ -136,5 +148,18 @@ class RentalSpecTest {
 
         // then
         assertThat(all.size()).isEqualTo(8);
+    }
+
+    @Test
+    @DisplayName("활성화된 rental item 검색")
+    void withActive() {
+        // given
+        Specification<RentalItem> spec = RentalSpec.withRentalItemActive();
+
+        // when
+        List<RentalItem> all = rentalItemRepository.findAll(spec);
+
+        // then
+        assertThat(all.size()).isEqualTo(15);
     }
 }
