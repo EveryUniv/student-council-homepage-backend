@@ -5,6 +5,7 @@ import com.dku.council.domain.post.model.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 // TODO 작성자 추가
@@ -21,7 +22,7 @@ public class SummarizedGenericPostDto {
     private final String body;
 
     @Schema(description = "생성 날짜", example = "2022-01-01")
-    private final String createdDate;
+    private final LocalDate createdDate;
 
     @Schema(description = "파일 목록")
     private final List<PostFileDto> files;
@@ -33,7 +34,7 @@ public class SummarizedGenericPostDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = slice(post.getBody(), bodySize);
-        this.createdDate = post.getCreatedDateText();
+        this.createdDate = post.getCreatedAt().toLocalDate();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
     }

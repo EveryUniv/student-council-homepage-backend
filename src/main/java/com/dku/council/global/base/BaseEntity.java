@@ -10,7 +10,6 @@ import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Slf4j
 @EntityListeners(AuditingEntityListener.class)
@@ -25,13 +24,4 @@ public class BaseEntity {
     @LastModifiedDate
     private LocalDateTime lastModifiedAt;
 
-
-    public String getCreatedDateText() {
-        LocalDateTime dateTime = createdAt;
-        if (dateTime == null) {
-            dateTime = LocalDateTime.MIN;
-            log.error("Created date is empty. (null) This is bug!");
-        }
-        return dateTime.format(DateTimeFormatter.ISO_DATE);
-    }
 }
