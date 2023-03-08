@@ -18,7 +18,7 @@ public class VocService {
 
 
     @Transactional(readOnly = true)
-    public ResponseVocDto findOnePetition(Long postId, Long userId, String remoteAddress) {
+    public ResponseVocDto findOne(Long postId, Long userId, String remoteAddress) {
         Voc post = postService.viewPost(postId, remoteAddress);
         return new ResponseVocDto(fileUploadService.getBaseURL(), userId, post);
     }

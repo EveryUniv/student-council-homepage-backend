@@ -105,7 +105,7 @@ public class VocController {
     public ResponseVocDto findOne(AppAuthentication auth,
                                   @PathVariable Long id,
                                   HttpServletRequest request) {
-        return vocService.findOnePetition(id, auth.getUserId(), request.getRemoteAddr());
+        return vocService.findOne(id, auth.getUserId(), request.getRemoteAddr());
     }
 
     /**
