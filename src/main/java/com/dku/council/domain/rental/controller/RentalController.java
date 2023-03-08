@@ -1,6 +1,5 @@
 package com.dku.council.domain.rental.controller;
 
-import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
@@ -9,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @Tag(name = "물품 대여", description = "학생회 물품 대여 관련 api")
 @RestController
@@ -58,7 +55,7 @@ public class RentalController {
      */
     @PostMapping
     @UserOnly
-    public void create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
+    public void create(AppAuthentication auth) {
     }
 
     /**
