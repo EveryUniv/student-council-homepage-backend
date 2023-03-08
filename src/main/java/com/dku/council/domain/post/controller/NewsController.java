@@ -34,8 +34,8 @@ public class NewsController {
     /**
      * 게시글 목록으로 조회
      *
-     * @param keyword 제목이나 내용에 포함된 검색어. 지정하지않으면 모든 게시글 조회.
-     * @param tagIds  조회할 태그 목록. or 조건으로 검색된다. 지정하지않으면 모든 게시글 조회.
+     * @param keyword  제목이나 내용에 포함된 검색어. 지정하지않으면 모든 게시글 조회.
+     * @param tagIds   조회할 태그 목록. or 조건으로 검색된다. 지정하지않으면 모든 게시글 조회.
      * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
      * @return 페이징된 총학 소식 목록
      */
@@ -44,7 +44,8 @@ public class NewsController {
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Specification<News> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<News> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withTags(tagIds));
         Page<SummarizedGenericPostDto> list = postService.list(spec, pageable)
                 .map(post -> new SummarizedGenericPostDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);

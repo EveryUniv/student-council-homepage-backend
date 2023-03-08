@@ -147,7 +147,7 @@ class RentalSpecTest {
         List<RentalItem> all = rentalItemRepository.findAll(spec);
 
         // then
-        assertThat(all.size()).isEqualTo(8);
+        assertThat(all.size()).isEqualTo(16);
     }
 
     @Test

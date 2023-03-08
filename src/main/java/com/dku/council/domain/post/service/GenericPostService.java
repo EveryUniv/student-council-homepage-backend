@@ -8,6 +8,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -43,15 +44,18 @@ public class GenericPostService<E extends Post> {
 
     /**
      * 게시글 목록으로 조회
-     * todo active를 여기서 체크하기
      *
-     * @param specification 검색 방법
-     * @param pageable      페이징 방법
+     * @param spec     검색 방법
+     * @param pageable 페이징 방법
      * @return 페이징된 목록
      */
     @Transactional(readOnly = true)
-    public Page<E> list(Specification<E> specification, Pageable pageable) {
-        return postRepository.findAll(specification, pageable);
+    public Page<E> list(Specification<E> spec, Pageable pageable) {
+        if (spec == null) {
+            spec = Specification.where(null);
+        }
+        spec = spec.and(PostSpec.withActive());
+        return postRepository.findAll(spec, pageable);
     }
 
     /**

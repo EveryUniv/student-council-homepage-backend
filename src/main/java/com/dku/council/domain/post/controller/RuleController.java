@@ -44,7 +44,7 @@ public class RuleController {
     public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Specification<Rule> spec = PostSpec.genericPostCondition(keyword, null);
+        Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
         Page<SummarizedRuleDto> list = postService.list(spec, pageable)
                 .map(post -> new SummarizedRuleDto(messageSource, postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);
