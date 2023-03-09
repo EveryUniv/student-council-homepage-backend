@@ -10,7 +10,6 @@ import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -22,7 +21,6 @@ public class DKUAuthService {
 
     private static final String DKU_AUTH_NAME = "dku";
 
-    private final MessageSource messageSource;
     private final DkuCrawlerService crawlerService;
     private final DkuAuthenticationService authenticationService;
     private final SignupAuthRepository dkuAuthRepository;
@@ -63,7 +61,7 @@ public class DKUAuthService {
 
         dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
 
-        ResponseScrappedStudentInfoDto studentInfoDto = ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
+        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
     }
 }

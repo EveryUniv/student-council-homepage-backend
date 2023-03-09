@@ -5,9 +5,12 @@ import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.tag.service.TagService;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
@@ -58,6 +61,9 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private TagService tagService;
 
     @Autowired
@@ -73,7 +79,9 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L);
+        Major major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(0L, major);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
 

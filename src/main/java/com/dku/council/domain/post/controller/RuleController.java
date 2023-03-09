@@ -46,7 +46,7 @@ public class RuleController {
                                                 @ParameterObject Pageable pageable) {
         Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
         Page<SummarizedRuleDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedRuleDto(messageSource, postService.getFileBaseUrl(), bodySize, post));
+                .map(post -> new SummarizedRuleDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);
     }
 

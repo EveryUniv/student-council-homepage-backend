@@ -42,10 +42,10 @@ class PostSpecTest {
 
     @BeforeEach
     void setup() {
-        user1 = UserMock.create();
+        user1 = UserMock.createDummyMajor();
         user1 = userRepository.save(user1);
 
-        User user2 = UserMock.create();
+        User user2 = UserMock.createDummyMajor();
         user2 = userRepository.save(user2);
 
         List<News> news1 = NewsMock.createList("news-1-", user1, 5);

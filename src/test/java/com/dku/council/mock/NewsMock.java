@@ -10,7 +10,7 @@ import java.util.List;
 
 public class NewsMock {
     public static List<News> createList(String prefix, int size) {
-        return createList(prefix, UserMock.create(), size);
+        return createList(prefix, UserMock.createDummyMajor(), size);
     }
 
     public static List<News> createList(String prefix, User user, int size) {
@@ -28,11 +28,11 @@ public class NewsMock {
     }
 
     public static News create() {
-        return create(UserMock.create(), RandomGen.nextLong());
+        return create(UserMock.createDummyMajor(), RandomGen.nextLong());
     }
 
     public static News create(Long newsId) {
-        return create(UserMock.create(), newsId);
+        return create(UserMock.createDummyMajor(), newsId);
     }
 
     public static News create(User user, Long newsId) {

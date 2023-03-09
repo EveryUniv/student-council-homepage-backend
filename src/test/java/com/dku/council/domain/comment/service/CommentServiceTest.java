@@ -46,7 +46,7 @@ class CommentServiceTest {
     void create() {
         // given
         Post post = NewsMock.create();
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
         Comment comment = CommentMock.createWithId(post, user);
         when(commentRepository.save(any())).thenReturn(comment);
         when(postRepository.findByIdAndActived(1L)).thenReturn(Optional.ofNullable(post));
@@ -63,7 +63,7 @@ class CommentServiceTest {
     @DisplayName("댓글 수정 - 내가 쓴거")
     void edit() {
         // given
-        User user = UserMock.create(10L);
+        User user = UserMock.createDummyMajor(10L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
 
@@ -79,7 +79,7 @@ class CommentServiceTest {
     @DisplayName("댓글 수정 실패 - 내가 쓴게 아닌경우")
     void failedEditByNotMine() {
         // given
-        User user = UserMock.create(11L);
+        User user = UserMock.createDummyMajor(11L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
 
@@ -92,7 +92,7 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 - 내가 쓴거")
     void deleteMine() {
         // given
-        User user = UserMock.create(10L);
+        User user = UserMock.createDummyMajor(10L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
@@ -108,7 +108,7 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 - 어드민")
     void deleteByAdmin() {
         // given
-        User user = UserMock.create(11L);
+        User user = UserMock.createDummyMajor(11L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 
@@ -124,7 +124,7 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 실패 - 권한 없는 경우")
     void failedDeleteByNotGranted() {
         // given
-        User user = UserMock.create(11L);
+        User user = UserMock.createDummyMajor(11L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(comment.getId())).thenReturn(Optional.of(comment));
 

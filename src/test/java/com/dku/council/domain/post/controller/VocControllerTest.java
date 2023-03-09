@@ -4,8 +4,11 @@ import com.dku.council.domain.post.model.VocStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Voc;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.VocMock;
 import com.dku.council.mock.user.UserAuth;
@@ -43,6 +46,9 @@ class VocControllerTest extends AbstractContainerRedisTest {
     private UserRepository userRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private GenericPostRepository<Voc> postRepository;
 
 
@@ -53,10 +59,12 @@ class VocControllerTest extends AbstractContainerRedisTest {
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(11L);
+        Major major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(11L, major);
         user = userRepository.save(user);
 
-        User user2 = UserMock.create(11L);
+        User user2 = UserMock.create(11L, major);
         user2 = userRepository.save(user2);
 
         voc = VocMock.create(user, "title", "body");
@@ -109,8 +117,8 @@ class VocControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/voc/reply/" + voc.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());

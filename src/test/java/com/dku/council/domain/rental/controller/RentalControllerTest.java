@@ -7,9 +7,12 @@ import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.RentalItemMock;
 import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
@@ -58,6 +61,9 @@ class RentalControllerTest extends AbstractContainerRedisTest {
     private RentalItemRepository rentalItemRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -70,11 +76,13 @@ class RentalControllerTest extends AbstractContainerRedisTest {
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L);
+        Major major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(0L, major);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
 
-        User user2 = UserMock.create(0L);
+        User user2 = UserMock.create(0L, major);
         user2 = userRepository.save(user2);
 
         rentalItems = RentalItemMock.createList(5);

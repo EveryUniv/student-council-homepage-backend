@@ -39,7 +39,7 @@ public class CommentService {
     public Page<CommentDto> list(Long postId, Pageable pageable) {
         postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
         return commentRepository.findAllByPostId(postId, pageable)
-                .map(ent -> new CommentDto(messageSource, ent));
+                .map(CommentDto::new);
     }
 
     /**

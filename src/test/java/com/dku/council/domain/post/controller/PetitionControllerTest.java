@@ -8,9 +8,12 @@ import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.CommentMock;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
@@ -52,6 +55,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     private CommentRepository commentRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private GenericPostRepository<Petition> postRepository;
 
     @Autowired
@@ -59,11 +65,14 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
     private Petition petition;
     private User user;
+    private Major major;
 
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(11L);
+        major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(11L, major);
         user = userRepository.save(user);
 
         petition = PetitionMock.create(user, "title", "body");
@@ -98,8 +107,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/reply/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -131,8 +140,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -153,8 +162,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isBadRequest());
@@ -164,7 +173,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     @DisplayName("동의 댓글 임계치 초과시 답변대기로 변경")
     void createCommentAndStateChanges() throws Exception {
         // given
-        List<User> users = UserMock.createList(150);
+        List<User> users = UserMock.createList(major, 150);
         users = userRepository.saveAll(users);
 
         List<Comment> comments = CommentMock.createList(petition, users, 150);
@@ -174,8 +183,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON));
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());

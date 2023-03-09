@@ -57,7 +57,7 @@ class RentalServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = UserMock.create(19L);
+        user = UserMock.createDummyMajor(19L);
         rentalItem = RentalItemMock.create(9L, "testItem", 19);
         rental = RentalMock.create(17L, user, rentalItem);
         createDto = new RequestCreateRentalDto(rentalItem.getId(), rental.getUserClass(),

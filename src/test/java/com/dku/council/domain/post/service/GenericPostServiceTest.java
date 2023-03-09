@@ -77,7 +77,7 @@ class GenericPostServiceTest {
     @DisplayName("새롭게 잘 생성되는지?")
     public void create() {
         // given
-        User user = UserMock.create(99L);
+        User user = UserMock.createDummyMajor(99L);
         News news = NewsMock.create(user, 3L);
 
         List<MultipartFile> files = MultipartFileMock.createList(10);
@@ -106,7 +106,7 @@ class GenericPostServiceTest {
     @DisplayName("태그를 명시하며 생성하기")
     public void createWithTag() {
         // given
-        User user = UserMock.create(99L);
+        User user = UserMock.createDummyMajor(99L);
         News news = NewsMock.create(user, 3L);
         List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
 

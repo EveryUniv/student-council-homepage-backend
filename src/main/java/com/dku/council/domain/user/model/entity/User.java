@@ -9,6 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.LAZY;
 
 @Entity
 @Table(name = "DKU_USER")
@@ -31,7 +32,8 @@ public class User extends BaseEntity {
     @Column(length = 20)
     private String name;
 
-    @Embedded
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "major_id")
     private Major major;
 
     private Integer yearOfAdmission;
@@ -63,9 +65,5 @@ public class User extends BaseEntity {
         this.yearOfAdmission = yearOfAdmission;
         this.status = status;
         this.userRole = role;
-    }
-
-    public Major getMajor() {
-        return major;
     }
 }
