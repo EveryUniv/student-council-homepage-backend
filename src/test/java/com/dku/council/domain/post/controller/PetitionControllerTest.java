@@ -75,7 +75,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Test
     @DisplayName("단건 조회")
-    void create() throws Exception {
+    void findOne() throws Exception {
         // when
         ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()))
                 .andDo(print());
@@ -106,7 +106,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // then
         result.andExpect(status().isOk());
         assertThat(petition.getAnswer()).isEqualTo("hello good");
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.ANSWERED);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.ANSWERED);
     }
 
     @Test
@@ -185,7 +185,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // then
         result.andExpect(status().isOk());
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.WAITING);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
     }
 
     @Test

@@ -36,31 +36,29 @@ class PostSpecTest {
     @Autowired
     private PostTagRepository postTagRepository;
 
-    private User user;
-    private List<News> news1;
-
+    private User user1;
+    private Tag tag1;
     private Tag tag2;
-    private List<News> news2;
-
-    private Tag tag3;
-    private List<News> news3;
 
     @BeforeEach
     void setup() {
-        user = UserMock.create();
-        user = userRepository.save(user);
+        user1 = UserMock.create();
+        user1 = userRepository.save(user1);
 
-        news1 = NewsMock.createList("news-1-", user, 5);
-        news1 = postRepository.saveAll(news1);
+        User user2 = UserMock.create();
+        user2 = userRepository.save(user2);
+
+        List<News> news1 = NewsMock.createList("news-1-", user1, 5);
+        postRepository.saveAll(news1);
+
+        tag1 = TagMock.create();
+        createPostsWithTag("news-2-", tag1, user1, 6);
 
         tag2 = TagMock.create();
-        news2 = createPostsWithTag("news-2-", tag2, 6);
-
-        tag3 = TagMock.create();
-        news3 = createPostsWithTag("news-3-", tag3, 7);
+        createPostsWithTag("news-3-", tag2, user2, 7);
     }
 
-    private List<News> createPostsWithTag(String prefix, Tag tag, int size) {
+    private void createPostsWithTag(String prefix, Tag tag, User user, int size) {
         List<News> newsList = NewsMock.createList(prefix, user, size);
         tag = tagRepository.save(tag);
         newsList = postRepository.saveAll(newsList);
@@ -70,8 +68,6 @@ class PostSpecTest {
             relation.changePost(news);
             postTagRepository.save(relation);
         }
-
-        return newsList;
     }
 
     @Test
@@ -89,7 +85,7 @@ class PostSpecTest {
     @Test
     void findBySingleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag2.getId()));
+        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag1.getId()));
 
         // when
         List<News> all = postRepository.findAll(spec);
@@ -101,12 +97,24 @@ class PostSpecTest {
     @Test
     void findByMultipleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag2.getId(), tag3.getId()));
+        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag1.getId(), tag2.getId()));
 
         // when
         List<News> all = postRepository.findAll(spec);
 
         // then
         assertThat(all.size()).isEqualTo(13);
+    }
+
+    @Test
+    void findByAuthor() {
+        // given
+        Specification<News> spec = PostSpec.withAuthor(user1.getId());
+
+        // when
+        List<News> all = postRepository.findAll(spec);
+
+        // then
+        assertThat(all.size()).isEqualTo(11);
     }
 }

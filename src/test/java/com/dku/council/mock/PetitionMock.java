@@ -16,7 +16,7 @@ public class PetitionMock {
                 .user(user)
                 .title(title)
                 .body(body)
-                .petitionStatus(PetitionStatus.ACTIVE)
+                .extraStatus(PetitionStatus.ACTIVE)
                 .build();
         FieldInjector.injectId(Post.class, petition, id);
         return petition;

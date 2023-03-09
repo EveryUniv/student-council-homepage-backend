@@ -22,6 +22,7 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "게시글 본문", example = "본문")
     private final String body;
 
+    // TODO 작성자 익명으로 변경
     @Schema(description = "작성자", example = "작성자")
     private final String author;
 

@@ -51,7 +51,7 @@ public class PetitionService {
             throw new DuplicateCommentException();
         }
 
-        if (post.getPetitionStatus() == PetitionStatus.ACTIVE && post.getComments().size() + 1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
+        if (post.getExtraStatus() == PetitionStatus.ACTIVE && post.getComments().size() + 1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
             post.updatePetitionStatus(PetitionStatus.WAITING);
         }
 

@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.model.dto.page;
+package com.dku.council.domain.post.model.dto.list;
 
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
@@ -16,7 +16,7 @@ public class SummarizedPetitionDto extends SummarizedGenericPostDto {
 
     public SummarizedPetitionDto(String baseFileUrl, Petition petition, int bodySize, int commentCount) {
         super(baseFileUrl, bodySize, petition);
-        this.status = petition.getPetitionStatus();
+        this.status = petition.getExtraStatus();
         this.commentCount = commentCount;
     }
 }

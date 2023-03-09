@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.model.entity.posttype;
 
-import com.dku.council.domain.post.model.PetitionStatus;
-import com.dku.council.domain.post.model.PostStatus;
+import com.dku.council.domain.post.model.VocStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Builder;
@@ -17,39 +16,38 @@ import static javax.persistence.EnumType.STRING;
 import static lombok.AccessLevel.PROTECTED;
 
 /**
- * 청원게시판 Entity.
- * Blind는 {@link PostStatus}로 대신한다. {@link PostStatus#DELETED_BY_ADMIN}이 Blind 상태를 의미한다.
+ * VOC게시판 Entity.
  */
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class Petition extends Post {
+public class Voc extends Post {
 
     @Enumerated(STRING)
-    private PetitionStatus extraStatus;
+    private VocStatus extraStatus;
 
     @Lob
     private String answer;
 
     @Builder
-    private Petition(@NonNull User user,
-                     @NonNull String title,
-                     @NonNull String body,
-                     int views, PetitionStatus extraStatus, String answer) {
+    private Voc(@NonNull User user,
+                @NonNull String title,
+                @NonNull String body,
+                int views, VocStatus extraStatus, String answer) {
         super(user, title, body, views);
         this.extraStatus = extraStatus;
         this.answer = answer;
     }
 
-    public static PetitionBuilder builder() {
-        return new PetitionBuilder().extraStatus(PetitionStatus.ACTIVE);
+    public static VocBuilder builder() {
+        return new VocBuilder().extraStatus(VocStatus.WAITING);
     }
 
     public void replyAnswer(String answer) {
         this.answer = answer;
     }
 
-    public void updatePetitionStatus(PetitionStatus status) {
+    public void updateVocStatus(VocStatus status) {
         this.extraStatus = status;
     }
 }

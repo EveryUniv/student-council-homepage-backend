@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.post.model.dto.page.SummarizedConferenceDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedConferenceDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
