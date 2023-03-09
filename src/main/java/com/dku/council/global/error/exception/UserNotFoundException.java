@@ -1,6 +1,5 @@
-package com.dku.council.domain.post.exception;
+package com.dku.council.global.error.exception;
 
-import com.dku.council.global.error.exception.LocalizedMessageException;
 import org.springframework.http.HttpStatus;
 
 public class UserNotFoundException extends LocalizedMessageException {

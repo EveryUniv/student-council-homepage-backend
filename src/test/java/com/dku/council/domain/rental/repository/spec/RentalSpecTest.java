@@ -38,10 +38,10 @@ class RentalSpecTest {
 
     @BeforeEach
     void setup() {
-        user1 = UserMock.createWithName("user1");
+        user1 = UserMock.create("user1");
         user1 = userRepository.save(user1);
 
-        User user2 = UserMock.createWithName("mamamam");
+        User user2 = UserMock.create("mamamam");
         user2 = userRepository.save(user2);
 
         List<RentalItem> items = createItems("Item", 7, true);

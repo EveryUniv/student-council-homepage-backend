@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RentalItemMock {
+    public static final String NAME = "testitem";
+    public static final int AVAILABLE = 17;
+
     public static List<RentalItem> createList(int size) {
         List<RentalItem> result = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -19,5 +22,9 @@ public class RentalItemMock {
         RentalItem item = new RentalItem(name, available);
         FieldInjector.injectId(RentalItem.class, item, id);
         return item;
+    }
+
+    public static RentalItem create(Long id) {
+        return create(id, NAME, AVAILABLE);
     }
 }

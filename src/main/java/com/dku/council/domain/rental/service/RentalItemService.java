@@ -21,21 +21,21 @@ public class RentalItemService {
 
     private final RentalItemRepository rentalItemRepository;
 
+
+    public RentalItem findRentalItem(Long id) {
+        RentalItem item = rentalItemRepository.findById(id).orElseThrow(RentalItemNotFoundException::new);
+        if (!item.isActive()) {
+            throw new RentalItemNotFoundException();
+        }
+        return item;
+    }
+
     @Transactional(readOnly = true)
     public ResponsePage<RentalItemDto> list(Specification<RentalItem> spec, Pageable pageable) {
         spec = RentalSpec.withRentalItemActive().and(spec);
         Page<RentalItemDto> page = rentalItemRepository.findAll(spec, pageable)
                 .map(RentalItemDto::new);
         return new ResponsePage<>(page);
-    }
-
-    public RentalItem findRentalItem(Long id) {
-        RentalItem item = rentalItemRepository.findById(id)
-                .orElseThrow(RentalItemNotFoundException::new);
-        if (!item.isActive()) {
-            throw new RentalItemNotFoundException();
-        }
-        return item;
     }
 
     public Long create(RequestRentalItemDto dto) {

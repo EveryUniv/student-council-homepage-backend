@@ -43,6 +43,10 @@ public class RentalItem extends BaseEntity {
         }
     }
 
+    public void increaseRemaining() {
+        this.remaining++;
+    }
+
     public void updateItemName(String itemName) {
         this.name = itemName;
     }

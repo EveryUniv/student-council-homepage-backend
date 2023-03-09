@@ -56,6 +56,7 @@ public class Rental extends BaseEntity {
         this.rentalEnd = rentalEnd;
         this.title = title;
         this.body = body;
+        this.isActive = true;
     }
 
     public void markAsDeleted() {

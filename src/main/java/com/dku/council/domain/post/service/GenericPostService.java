@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
-import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
@@ -13,6 +12,7 @@ import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;

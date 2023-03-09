@@ -87,7 +87,7 @@ public class RentalController {
     @GetMapping("/{id}")
     @UserOnly
     public RentalDto findOneItem(AppAuthentication auth, @PathVariable Long id) {
-        return rentalService.findOne(id, auth.isAdmin());
+        return rentalService.findOne(id, auth.getUserId(), auth.isAdmin());
     }
 
     /**
@@ -97,6 +97,17 @@ public class RentalController {
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody RequestCreateRentalDto dto) {
         Long id = rentalService.create(auth.getUserId(), dto);
+        return new ResponseIdDto(id);
+    }
+
+    /**
+     * 대여 반납 처리 (Admin)
+     * 대여되었던 물품을 반납으로 처리합니다. 대여 현황에서 삭제되고, 물품수가 1 올라갑니다.
+     */
+    @PostMapping("/return/{id}")
+    @AdminOnly
+    public ResponseIdDto returnItem(@PathVariable Long id) {
+        rentalService.returnItem(id);
         return new ResponseIdDto(id);
     }
 

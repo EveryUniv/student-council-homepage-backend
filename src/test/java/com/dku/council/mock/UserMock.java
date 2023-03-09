@@ -29,14 +29,14 @@ public class UserMock {
     }
 
     public static User create(Long userId) {
-        return create(userId, null);
+        return create(userId, NAME, UserRole.USER, null);
     }
 
     public static User create(Long userId, PasswordEncoder passwordEncoder) {
         return create(userId, NAME, UserRole.USER, passwordEncoder);
     }
 
-    public static User createWithName(String username) {
+    public static User create(String username) {
         return create(RandomGen.nextLong(), username, UserRole.USER, null);
     }
 
