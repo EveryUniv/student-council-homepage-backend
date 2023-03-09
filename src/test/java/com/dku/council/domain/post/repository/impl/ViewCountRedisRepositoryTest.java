@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.repository.impl;
 
 import com.dku.council.global.config.redis.RedisKeys;
-import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@OnlyDevTest
+@FullIntegrationTest
 class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired

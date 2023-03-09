@@ -7,10 +7,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.UnsupportedEncodingException;
 
 public class MvcMockResponse {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    public static <T> T getResponse(MvcResult result, Class<T> responseType) throws UnsupportedEncodingException, JsonProcessingException {
+    public static <T> T getResponse(ObjectMapper objectMapper, MvcResult result, Class<T> responseType) throws UnsupportedEncodingException, JsonProcessingException {
         String content = result.getResponse().getContentAsString();
-        return OBJECT_MAPPER.readValue(content, responseType);
+        return objectMapper.readValue(content, responseType);
     }
 }

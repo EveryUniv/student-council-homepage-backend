@@ -29,7 +29,7 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "태그 목록")
     private final List<TagDto> tag;
 
-    @Schema(description = "생성 시각", example = "2022-03-01T11:31:11.444")
+    @Schema(description = "생성 시각", example = "2022-03-01 11:31:11")
     private final LocalDateTime createdAt;
 
     @Schema(description = "파일 목록")

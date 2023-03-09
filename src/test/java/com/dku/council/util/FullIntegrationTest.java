@@ -12,5 +12,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @EnabledIfSystemProperty(named = "spring.profiles.active", matches = "dev")
-public @interface OnlyDevTest {
+public @interface FullIntegrationTest {
 }

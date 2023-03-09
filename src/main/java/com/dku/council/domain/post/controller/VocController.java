@@ -51,7 +51,8 @@ public class VocController {
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
-        Specification<Voc> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withTags(tagIds));
         Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
                 .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
         return new ResponsePage<>(list);
@@ -74,7 +75,8 @@ public class VocController {
                                                    @RequestParam(defaultValue = "50") int bodySize,
                                                    @ParameterObject Pageable pageable) {
         Long userId = auth.getUserId();
-        Specification<Voc> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withTags(tagIds));
         spec = spec.and(PostSpec.withAuthor(userId));
 
         Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)

@@ -50,7 +50,8 @@ public class GeneralForumController {
                                                         @RequestParam(required = false) List<Long> tagIds,
                                                         @RequestParam(defaultValue = "50") int bodySize,
                                                         @ParameterObject Pageable pageable) {
-        Specification<GeneralForum> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
+        spec = spec.and(PostSpec.withTitleOrBody(keyword));
         Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
                 .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);

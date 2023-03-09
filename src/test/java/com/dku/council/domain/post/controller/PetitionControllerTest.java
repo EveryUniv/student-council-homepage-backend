@@ -14,8 +14,9 @@ import com.dku.council.mock.CommentMock;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
-import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,21 +27,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@OnlyDevTest
+@FullIntegrationTest
 class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -55,8 +54,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     @Autowired
     private GenericPostRepository<Petition> postRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private Petition petition;
     private User user;
 
@@ -77,8 +77,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     @DisplayName("단건 조회")
     void findOne() throws Exception {
         // when
-        ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()));
 
         // then
         result.andExpect(status().isOk())
@@ -100,8 +99,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // when
         ResultActions result = mvc.perform(post("/post/petition/reply/" + petition.getId())
                         .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -117,8 +115,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         commentRepository.save(comment);
 
         // when
-        ResultActions result = mvc.perform(get("/post/petition/comment/" + petition.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/petition/comment/" + petition.getId()));
 
         // then
         result.andExpect(status().isOk())
@@ -135,8 +132,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
                         .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -158,8 +154,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
                         .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isBadRequest());
@@ -180,8 +175,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
                         .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -197,8 +191,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         comment = commentRepository.save(comment);
 
         // when
-        ResultActions result = mvc.perform(delete("/post/petition/comment/" + comment.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(delete("/post/petition/comment/" + comment.getId()));
 
         // then
         result.andExpect(status().isOk());

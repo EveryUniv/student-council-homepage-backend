@@ -73,7 +73,7 @@ class PostSpecTest {
     @Test
     void findByKeyword() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition("ews-1", null);
+        Specification<News> spec = PostSpec.withTitleOrBody("ews-1");
 
         // when
         List<News> all = postRepository.findAll(spec);
@@ -85,7 +85,7 @@ class PostSpecTest {
     @Test
     void findBySingleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag1.getId()));
+        Specification<News> spec = PostSpec.withTag(tag1.getId());
 
         // when
         List<News> all = postRepository.findAll(spec);
@@ -97,7 +97,7 @@ class PostSpecTest {
     @Test
     void findByMultipleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag1.getId(), tag2.getId()));
+        Specification<News> spec = PostSpec.withTags(List.of(tag1.getId(), tag2.getId()));
 
         // when
         List<News> all = postRepository.findAll(spec);

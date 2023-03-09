@@ -9,7 +9,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.VocMock;
 import com.dku.council.mock.user.UserAuth;
-import com.dku.council.util.OnlyDevTest;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,14 +27,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@OnlyDevTest
+@FullIntegrationTest
 class VocControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -74,8 +73,7 @@ class VocControllerTest extends AbstractContainerRedisTest {
     @DisplayName("단건 조회")
     void findOne() throws Exception {
         // when
-        ResultActions result = mvc.perform(get("/post/voc/" + voc.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/voc/" + voc.getId()));
 
         // then
         result.andExpect(status().isOk())
@@ -91,8 +89,7 @@ class VocControllerTest extends AbstractContainerRedisTest {
     @DisplayName("내 Voc보기")
     void listMine() throws Exception {
         // when
-        ResultActions result = mvc.perform(get("/post/voc/my"))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/voc/my"));
 
         // then
         result.andExpect(status().isOk())
@@ -113,8 +110,7 @@ class VocControllerTest extends AbstractContainerRedisTest {
         // when
         ResultActions result = mvc.perform(post("/post/voc/reply/" + voc.getId())
                         .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
