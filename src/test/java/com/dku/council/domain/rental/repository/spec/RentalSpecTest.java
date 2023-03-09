@@ -7,6 +7,7 @@ import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.util.FieldInjector;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,10 +74,11 @@ class RentalSpecTest {
                     .item(item)
                     .title(titlePrefix + i)
                     .body(bodyPrefix + i)
-                    .rentalStart(LocalDateTime.MIN)
-                    .rentalEnd(LocalDateTime.MAX)
+                    .rentalStart(RentalMock.RENTAL_START)
+                    .rentalEnd(RentalMock.RENTAL_END)
                     .userClass(RentalUserClass.INDIVIDUAL)
                     .build();
+            rental.changeItem(item);
             items.add(rental);
         }
         rentalRepository.saveAll(items);

@@ -1,6 +1,7 @@
 package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
+import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
 import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
@@ -60,6 +61,10 @@ public class RentalService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         RentalItem item = rentalItemService.findRentalItem(dto.getItemId());
 
+        if (item.getRemaining() == 0) {
+            throw new NotAvailableItemException();
+        }
+
         Rental rental = Rental.builder()
                 .user(user)
                 .item(item)
@@ -70,7 +75,9 @@ public class RentalService {
                 .body(dto.getBody())
                 .build();
 
+        rental.changeItem(item);
         rental = rentalRepository.save(rental);
+        item.decreaseRemaining();
         return rental.getId();
     }
 

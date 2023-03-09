@@ -2,6 +2,7 @@ package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.DummyPage;
+import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
 import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
@@ -138,13 +139,15 @@ class RentalServiceTest {
         // given
         when(rentalRepository.save(any())).thenReturn(rental);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(rental.getItem());
+        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(rentalItem);
 
         // when
+        int prevAvailable = rentalItem.getRemaining();
         Long id = service.create(user.getId(), createDto);
 
         // then
         assertThat(id).isEqualTo(rental.getId());
+        assertThat(rentalItem.getRemaining()).isEqualTo(prevAvailable - 1);
     }
 
     @Test
@@ -153,6 +156,19 @@ class RentalServiceTest {
         // when & then
         assertThrows(UserNotFoundException.class, () ->
                 service.create(10L, createDto));
+    }
+
+    @Test
+    @DisplayName("대여 신청 실패 - 대여할 수 있는 물품이 없는 경우")
+    void failedCreateByNotAvailable() {
+        // given
+        RentalItem item = new RentalItem("not-available", 0);
+        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(item);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // when & then
+        assertThrows(NotAvailableItemException.class, () ->
+                service.create(user.getId(), createDto));
     }
 
     @Test

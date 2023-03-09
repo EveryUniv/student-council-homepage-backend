@@ -4,7 +4,7 @@ import com.dku.council.domain.post.model.VocStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.Voc;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 
 public class VocMock {
     public static Voc create(User user, String title, String body) {
@@ -18,7 +18,7 @@ public class VocMock {
                 .body(body)
                 .extraStatus(VocStatus.WAITING)
                 .build();
-        FieldInjector.injectId(Post.class, voc, id);
+        EntityUtil.injectId(Post.class, voc, id);
         return voc;
     }
 }

@@ -12,8 +12,4 @@ public class FieldInjector {
             throw new RuntimeException(e);
         }
     }
-
-    public static <T> void injectId(Class<T> clazz, T obj, Long id) {
-        inject(clazz, obj, "id", id);
-    }
 }

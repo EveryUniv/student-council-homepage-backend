@@ -4,7 +4,7 @@ import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class UserMock {
                 .phone("010-1111-2222")
                 .build();
 
-        FieldInjector.injectId(User.class, user, userId);
+        EntityUtil.injectId(User.class, user, userId);
         return user;
     }
 }

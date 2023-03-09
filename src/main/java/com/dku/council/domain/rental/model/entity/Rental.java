@@ -59,6 +59,15 @@ public class Rental extends BaseEntity {
         this.isActive = true;
     }
 
+    public void changeItem(RentalItem item) {
+        if (this.item != null) {
+            this.item.getRentals().remove(this);
+        }
+
+        this.item = item;
+        this.item.getRentals().add(this);
+    }
+
     public void markAsDeleted() {
         this.isActive = false;
     }
