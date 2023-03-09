@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import org.springframework.context.MessageSource;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,12 +21,12 @@ public class CommentDto {
     private final String text;
 
     @Schema(name = "생성날짜", example = "2023-01-01")
-    private final String createdDate;
+    private final LocalDate createdDate;
 
     public CommentDto(MessageSource messageSource, Comment comment) {
         this.id = comment.getId();
         this.major = comment.getUser().getMajor().getDepartmentName(messageSource);
-        this.createdDate = comment.getCreatedDateText();
+        this.createdDate = comment.getCreatedAt().toLocalDate();
         this.text = comment.getText();
     }
 

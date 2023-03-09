@@ -2,7 +2,7 @@ package com.dku.council.domain.post.controller;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
-import com.dku.council.domain.post.model.dto.page.SummarizedPetitionDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -46,14 +46,15 @@ public class PetitionController {
      * @param tagIds   조회할 태그 목록. or 조건으로 검색된다. 지정하지않으면 모든 게시글 조회.
      * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
      * @param pageable 페이징 size, sort, page
-     * @return 페이징 된 회의록 목록
+     * @return 페이징 된 청원 목록
      */
     @GetMapping
     public ResponsePage<SummarizedPetitionDto> list(@RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) List<Long> tagIds,
                                                     @RequestParam(defaultValue = "50") int bodySize,
                                                     @ParameterObject Pageable pageable) {
-        Specification<Petition> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withTags(tagIds));
         Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
                 .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, bodySize, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);
@@ -75,7 +76,7 @@ public class PetitionController {
      * 게시글 단건 조회
      *
      * @param id 조회할 게시글 id
-     * @return 총학소식 게시글 정보
+     * @return 청원 게시글 정보
      */
     @GetMapping("/{id}")
     @UserOnly

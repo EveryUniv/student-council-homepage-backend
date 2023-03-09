@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.model.dto.request;
 
-import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.Getter;
@@ -20,7 +19,6 @@ public class RequestCreatePetitionDto extends RequestCreateGenericPostDto<Petiti
                 .body(getBody())
                 .title(getTitle())
                 .user(user)
-                .petitionStatus(PetitionStatus.ACTIVE)
                 .build();
     }
 }

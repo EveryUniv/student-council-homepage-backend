@@ -16,7 +16,7 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
 
     public ResponsePetitionDto(String baseFileUrl, Long userId, Petition post) {
         super(baseFileUrl, userId, post);
-        this.status = post.getPetitionStatus();
+        this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
     }
 }

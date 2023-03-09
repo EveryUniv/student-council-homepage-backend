@@ -3,7 +3,7 @@ package com.dku.council.mock;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class NewsMock {
             News news = News.builder()
                     .user(user)
                     .title(prefix + i)
-                    .body("")
+                    .body(Integer.toString(i))
                     .build();
             result.add(news);
         }
@@ -42,7 +42,7 @@ public class NewsMock {
                 .body("")
                 .build();
         if (newsId != null) {
-            FieldInjector.injectId(Post.class, news, newsId);
+            EntityUtil.injectId(Post.class, news, newsId);
         }
         return news;
     }

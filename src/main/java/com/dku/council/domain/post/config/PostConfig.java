@@ -22,6 +22,7 @@ public class PostConfig {
     private final FileUploadService fileUploadService;
     private final MessageSource messageSource;
 
+    // TODO 이거 좀 더 깔끔하게 하고싶다 (자동화)
     @Bean
     public GenericPostService<Conference> conferencePostService(ConferenceRepository repository) {
         return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, messageSource);
@@ -44,6 +45,11 @@ public class PostConfig {
 
     @Bean
     public GenericPostService<Petition> petitionPostService(PetitionRepository repository) {
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, messageSource);
+    }
+
+    @Bean
+    public GenericPostService<Voc> vocPostService(VocRepository repository) {
         return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, messageSource);
     }
 }

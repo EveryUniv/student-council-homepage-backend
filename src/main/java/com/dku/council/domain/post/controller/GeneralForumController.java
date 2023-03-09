@@ -3,7 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.post.model.dto.page.SummarizedGeneralForumDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedGeneralForumDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
@@ -50,7 +50,8 @@ public class GeneralForumController {
                                                         @RequestParam(required = false) List<Long> tagIds,
                                                         @RequestParam(defaultValue = "50") int bodySize,
                                                         @ParameterObject Pageable pageable) {
-        Specification<GeneralForum> spec = PostSpec.genericPostCondition(keyword, tagIds);
+        Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
+        spec = spec.and(PostSpec.withTitleOrBody(keyword));
         Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
                 .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);

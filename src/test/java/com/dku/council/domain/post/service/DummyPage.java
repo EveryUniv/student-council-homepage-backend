@@ -16,6 +16,11 @@ public class DummyPage<T> implements Page<T> {
     private final List<T> content = new ArrayList<>();
     private final int pageSize;
 
+    public DummyPage(List<T> content) {
+        this.pageSize = content.size();
+        this.content.addAll(content);
+    }
+
     public DummyPage(List<T> content, int pageSize) {
         this.pageSize = pageSize;
         this.content.addAll(content);

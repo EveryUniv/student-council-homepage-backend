@@ -4,7 +4,7 @@ import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 
 public class PetitionMock {
     public static Petition create(User user, String title, String body) {
@@ -16,9 +16,9 @@ public class PetitionMock {
                 .user(user)
                 .title(title)
                 .body(body)
-                .petitionStatus(PetitionStatus.ACTIVE)
+                .extraStatus(PetitionStatus.ACTIVE)
                 .build();
-        FieldInjector.injectId(Post.class, petition, id);
+        EntityUtil.injectId(Post.class, petition, id);
         return petition;
     }
 }

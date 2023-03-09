@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.post.model.dto.page.SummarizedConferenceDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedConferenceDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
@@ -40,8 +40,8 @@ public class ConferenceController {
     public ResponsePage<SummarizedConferenceDto> list(@RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "50") int bodySize,
                                                       @ParameterObject Pageable pageable) {
-        Specification<Conference> spec = PostSpec.genericPostCondition(keyword, null);
-        Page<SummarizedConferenceDto> list = postService.list(spec, pageable)
+        Specification<Conference> spec = PostSpec.withTitleOrBody(keyword);
+        Page<SummarizedConferenceDto> list = postService.list(spec, pageable) // TODO mapping을 여기서 하는게 맞나?
                 .map(post -> new SummarizedConferenceDto(postService.getFileBaseUrl(), bodySize, post));
         return new ResponsePage<>(list);
     }
