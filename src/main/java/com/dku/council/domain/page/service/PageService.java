@@ -7,9 +7,22 @@ import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 import java.util.List;
 
 public interface PageService {
+    /**
+     * 캐러셀 이미지 목록을 가져옵니다.
+     * @return
+     */
     List<CarouselImageResponse> getCarouselImages();
-    void addCarouselImage(CarouselImageRequestDto dto);
 
+    /**
+     * 캐러셀 이미지를 등록합니다.
+     * @param carouselImageRequestDto
+     */
+    void addCarouselImage(CarouselImageRequestDto carouselImageRequestDto);
+
+    /**
+     * 캐러셀 id 로 저장되어 있는 Object 를 삭제합니다.
+     * @param carouselId
+     */
     void deleteCarouselImage(Long carouselId);
     MainPageResponseDto getMainPage();
 }
