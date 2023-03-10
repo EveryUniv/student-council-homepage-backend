@@ -11,7 +11,6 @@ public interface MajorRepository extends JpaRepository<Major, Long> {
     @Query("select m from Major m where m.name=:name and m.department=:department and m.isActive=true")
     Optional<Major> findByName(String name, String department);
 
-    // TODO 이 방법으로 다른 find도 모두 변경
     @Query("select m from Major m where m.id=:id and m.isActive=true")
     Optional<Major> findById(Long id);
 

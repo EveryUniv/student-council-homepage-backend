@@ -45,11 +45,11 @@ class CommentServiceTest {
     @DisplayName("댓글 추가")
     void create() {
         // given
-        Post post = NewsMock.create();
+        Post post = NewsMock.createDummy();
         User user = UserMock.createDummyMajor();
         Comment comment = CommentMock.createWithId(post, user);
         when(commentRepository.save(any())).thenReturn(comment);
-        when(postRepository.findByIdAndActived(1L)).thenReturn(Optional.ofNullable(post));
+        when(postRepository.findById(1L)).thenReturn(Optional.ofNullable(post));
         when(userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
 
         // when

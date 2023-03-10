@@ -17,7 +17,7 @@ public class RentalMock {
     public static final LocalDateTime RENTAL_START = LocalDateTime.of(2023, 1, 1, 10, 0, 0);
     public static final LocalDateTime RENTAL_END = LocalDateTime.of(2023, 1, 5, 12, 0, 0);
 
-    public static List<Rental> createDisabledList(RentalItem item, int size) {
+    public static List<Rental> createDisabledListDummy(RentalItem item, int size) {
         return createDisabledList(item, UserMock.createDummyMajor(), size);
     }
 

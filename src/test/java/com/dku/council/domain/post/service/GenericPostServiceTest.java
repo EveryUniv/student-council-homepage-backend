@@ -60,7 +60,7 @@ class GenericPostServiceTest {
     @DisplayName("list가 잘 동작하는지?")
     public void list() {
         // given
-        List<News> allNewsList = NewsMock.createList("generic-", 20);
+        List<News> allNewsList = NewsMock.createListDummy("generic-", 20);
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
@@ -142,7 +142,7 @@ class GenericPostServiceTest {
     @DisplayName("단건 조회가 잘 동작하는지?")
     public void findOne() {
         // given
-        News news = NewsMock.create(4L);
+        News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when
@@ -183,7 +183,7 @@ class GenericPostServiceTest {
     @DisplayName("권한 없는 게시글 삭제시 오류")
     public void failedDeleteByAccessDenied() {
         // given
-        News news = NewsMock.create(4L);
+        News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when & then

@@ -2,12 +2,14 @@ package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.rental.exception.NotAvailableItemException;
+import com.dku.council.domain.rental.exception.RentalItemNotFoundException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
 import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestCreateRentalDto;
 import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
+import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
 import com.dku.council.domain.rental.repository.spec.RentalSpec;
 import com.dku.council.domain.user.model.entity.User;
@@ -27,17 +29,8 @@ public class RentalService {
 
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
-    private final RentalItemService rentalItemService;
+    private final RentalItemRepository rentalItemRepository;
 
-
-    // TODO 이 작업은 repository에서 하는 것이 적합
-    public Rental findRental(Long id) {
-        Rental rental = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
-        if (!rental.isActive()) {
-            throw new RentalNotFoundException();
-        }
-        return rental;
-    }
 
     public ResponsePage<SummarizedRentalDto> list(Specification<Rental> spec, Pageable pageable) {
         spec = RentalSpec.withRentalActive().and(spec);
@@ -47,7 +40,7 @@ public class RentalService {
     }
 
     public RentalDto findOne(Long id, Long userId, boolean admin) {
-        Rental rental = findRental(id);
+        Rental rental = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
 
         if (!admin && !rental.getUser().getId().equals(userId)) {
             throw new RentalNotFoundException();
@@ -59,7 +52,7 @@ public class RentalService {
     @Transactional
     public Long create(Long userId, RequestCreateRentalDto dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        RentalItem item = rentalItemService.findRentalItem(dto.getItemId());
+        RentalItem item = rentalItemRepository.findById(dto.getItemId()).orElseThrow(RentalItemNotFoundException::new);
 
         if (item.getRemaining() == 0) {
             throw new NotAvailableItemException();
@@ -83,7 +76,7 @@ public class RentalService {
 
     @Transactional
     public void returnItem(Long id) {
-        Rental rental = findRental(id);
+        Rental rental = rentalRepository.findById(id).orElseThrow(RentalNotFoundException::new);
         RentalItem item = rental.getItem();
         rental.markAsDeleted();
         item.increaseRemaining();

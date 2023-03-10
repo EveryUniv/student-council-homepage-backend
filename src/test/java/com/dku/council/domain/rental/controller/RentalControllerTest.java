@@ -87,6 +87,7 @@ class RentalControllerTest extends AbstractContainerRedisTest {
 
         rentalItems = RentalItemMock.createList(5);
         rentalItems = rentalItemRepository.saveAll(rentalItems);
+        rentalItemRepository.saveAll(RentalItemMock.createDisabledList(5));
 
         rentals = new ArrayList<>();
         targetRentals = RentalMock.createList(rentalItems.get(0), user, 3);
@@ -95,6 +96,8 @@ class RentalControllerTest extends AbstractContainerRedisTest {
             rentals.add(RentalMock.create(user2, rentalItems.get(i)));
         }
         rentals = rentalRepository.saveAll(rentals);
+
+        rentalRepository.saveAll(RentalMock.createDisabledList(rentalItems.get(0), user, 5));
     }
 
     @Test
