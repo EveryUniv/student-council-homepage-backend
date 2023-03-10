@@ -1,6 +1,7 @@
 package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
+import com.dku.council.domain.rental.exception.AlreadyRentalException;
 import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
@@ -60,6 +61,11 @@ public class RentalService {
     public Long create(Long userId, RequestCreateRentalDto dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         RentalItem item = rentalItemService.findRentalItem(dto.getItemId());
+        boolean isAlreadyRental = rentalRepository.findByUserAndItem(user, item).isPresent();
+
+        if (isAlreadyRental) {
+            throw new AlreadyRentalException();
+        }
 
         if (item.getRemaining() == 0) {
             throw new NotAvailableItemException();

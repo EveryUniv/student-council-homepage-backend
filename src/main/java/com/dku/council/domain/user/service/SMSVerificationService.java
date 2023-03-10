@@ -1,10 +1,14 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyPhoneException;
 import com.dku.council.domain.user.exception.NotSMSAuthorizedException;
 import com.dku.council.domain.user.exception.NotSMSSentException;
 import com.dku.council.domain.user.exception.WrongSMSCodeException;
 import com.dku.council.domain.user.model.SMSAuth;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
+import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +17,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Random;
 
 // TODO Test it
@@ -27,6 +32,7 @@ public class SMSVerificationService {
     private final MessageSource messageSource;
     private final DKUAuthService dkuAuthService;
     private final SMSService smsService;
+    private final UserRepository userRepository;
     private final SignupAuthRepository smsAuthRepository;
 
     @Value("${app.auth.sms.digit-count}")
@@ -67,7 +73,12 @@ public class SMSVerificationService {
      * @param phoneNumber 전화번호
      */
     public void sendSMSCode(String signupToken, String phoneNumber) {
-        dkuAuthService.getStudentInfo(signupToken);
+        StudentInfo info = dkuAuthService.getStudentInfo(signupToken);
+        Optional<User> alreadyUser = userRepository.findByPhone(info.getStudentId());
+
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyPhoneException();
+        }
 
         String code = generateDigitCode(digitCount);
         phoneNumber = phoneNumber.trim().replaceAll("-", "");

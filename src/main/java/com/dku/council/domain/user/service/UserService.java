@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.MajorData;
@@ -24,8 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 // TODO Test it
+// TODO Signup Service로 분리하면 좋을 것 같다.
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -45,6 +48,11 @@ public class UserService {
         StudentInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
         String phone = smsVerificationService.getPhoneNumber(signupToken);
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+        Optional<User> alreadyUser = userRepository.findByStudentId(studentInfo.getStudentId());
+
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
 
         User.UserBuilder userBuilder = User.builder()
                 .studentId(studentInfo.getStudentId())

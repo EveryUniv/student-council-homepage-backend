@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.exception.WrongEmailCodeException;
 import com.dku.council.domain.user.model.MajorData;
@@ -7,7 +8,9 @@ import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
+import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.util.TextTemplateEngine;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.NHNEmailService;
@@ -16,6 +19,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -24,8 +28,10 @@ import java.util.UUID;
 public class DkuEmailService {
     private static final String DKU_AUTH_NAME = "dku";
     private static final String EMAIL_AUTH_NAME = "email";
+
     private final NHNEmailService service;
     private final SignupAuthRepository dkuAuthRepository;
+    private final UserRepository userRepository;
     private final MessageSource messageSource;
 
 
@@ -37,6 +43,11 @@ public class DkuEmailService {
     public void sendEmailCode(RequestSendEmailCode dto) {
         String emailCode = UUID.randomUUID().toString().substring(0, 5);
         String studentId = dto.getStudentId();
+        Optional<User> alreadyUser = userRepository.findByStudentId(studentId);
+
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
 
         dkuAuthRepository.setAuthPayload(studentId, EMAIL_AUTH_NAME, emailCode);
 
