@@ -5,11 +5,13 @@ import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtAuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,21 +19,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
-    @Mock
-    private MessageSource messageSource;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -50,7 +47,7 @@ class UserServiceTest {
     @DisplayName("로그인")
     void login() {
         // given
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
         RequestLoginDto dto = new RequestLoginDto(user.getStudentId(), user.getPassword());
         AuthenticationToken auth = JwtAuthenticationToken.builder()
                 .accessToken("access")
@@ -88,7 +85,7 @@ class UserServiceTest {
     @DisplayName("로그인 실패 - 틀린 비밀번호")
     void failedLoginByWrongPwd() {
         // given
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
         RequestLoginDto dto = new RequestLoginDto(user.getStudentId(), user.getPassword());
 
         when(userRepository.findByStudentId(dto.getStudentId())).thenReturn(Optional.of(user));
@@ -123,15 +120,15 @@ class UserServiceTest {
     @DisplayName("내 정보 가져오기")
     void getUserInfo() {
         // given
-        User user = UserMock.create();
-        when(messageSource.getMessage(any(), any(), any())).thenReturn("Major");
+        Major major = MajorMock.create();
+        User user = UserMock.create(major);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
         ResponseUserInfoDto info = service.getUserInfo(user.getId());
 
         // then
-        assertThat(info.getMajor()).isEqualTo("Major");
+        assertThat(info.getMajor()).isEqualTo(major.getName());
         assertThat(info.getStudentName()).isEqualTo(user.getName());
         assertThat(info.getYearOfAdmission()).isEqualTo(user.getYearOfAdmission().toString());
     }

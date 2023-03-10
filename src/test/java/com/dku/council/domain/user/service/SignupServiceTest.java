@@ -2,10 +2,13 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.dku.model.StudentInfo;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +41,9 @@ class SignupServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private MajorRepository majorRepository;
+
     @InjectMocks
     private SignupService service;
 
@@ -46,7 +52,7 @@ class SignupServiceTest {
     private final String encodedPwd = "Encoded";
     private final String phone = "01011112222";
     private final String studentId = "id";
-    private final StudentInfo info = new StudentInfo("name", studentId, 0, "", "");
+    private final StudentInfo info = new StudentInfo("name", studentId, 0, "Major", "Department");
     private final RequestSignupDto dto = new RequestSignupDto("pwd");
 
 
@@ -54,10 +60,14 @@ class SignupServiceTest {
     @DisplayName("회원가입이 잘 되는가")
     void signup() {
         // given
+        Major major = MajorMock.create();
+
         when(userRepository.findByStudentId(studentId)).thenReturn(Optional.empty());
         when(dkuAuthService.getStudentInfo(token)).thenReturn(info);
         when(passwordEncoder.encode(dto.getPassword())).thenReturn(encodedPwd);
         when(smsVerificationService.getPhoneNumber(token)).thenReturn(phone);
+        when(majorRepository.findByName("Major", "Department"))
+                .thenReturn(Optional.of(major));
 
         // when
         service.signup(dto, token);
@@ -70,6 +80,7 @@ class SignupServiceTest {
             assertThat(user.getPhone()).isEqualTo(phone);
             assertThat(user.getYearOfAdmission()).isEqualTo(0);
             assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
+            assertThat(user.getMajor()).isEqualTo(major);
             return true;
         }));
         verify(dkuAuthService).deleteStudentAuth(token);
@@ -80,7 +91,7 @@ class SignupServiceTest {
     @DisplayName("회원가입 실패 - 이미 있는 회원인 경우")
     void failedSignupByAlreadyUser() {
         // given
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
 
         when(dkuAuthService.getStudentInfo(token)).thenReturn(info);
         when(userRepository.findByStudentId(studentId)).thenReturn(Optional.of(user));

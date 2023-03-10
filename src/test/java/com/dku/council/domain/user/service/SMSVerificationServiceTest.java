@@ -52,6 +52,7 @@ class SMSVerificationServiceTest {
     private final int count = 6;
     private final String phone = "12-12-12";
 
+
     @BeforeEach
     public void setup() {
         service = new SMSVerificationService(messageSource, dkuAuthService, smsService,
@@ -121,7 +122,9 @@ class SMSVerificationServiceTest {
     void sendSMSCode() {
         // given
         String actualPhone = phone.replaceAll("-", "");
+        String authMessage = "Auth Message";
         when(userRepository.findByPhone(phone)).thenReturn(Optional.empty());
+        when(messageSource.getMessage(eq("sms.auth-message"), any(), any())).thenReturn(authMessage);
 
         // when
         service.sendSMSCode(token, phone);
@@ -135,14 +138,14 @@ class SMSVerificationServiceTest {
                     return true;
                 }));
         verify(dkuAuthService).getStudentInfo(token);
-        verify(smsService).sendSMS(eq(actualPhone), any());
+        verify(smsService).sendSMS(actualPhone, authMessage);
     }
 
     @Test
     @DisplayName("SMS Code 전송 실패 - 이미 존재하는 번호")
     void failedSendSMSCodeByAlreadyUser() {
         // given
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
         when(userRepository.findByPhone(phone)).thenReturn(Optional.of(user));
 
         // when

@@ -18,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.util.LinkedMultiValueMap;
 
 import java.util.Optional;
@@ -33,9 +32,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DKUAuthServiceTest {
-
-    @Mock
-    private MessageSource messageSource;
 
     @Mock
     private DkuCrawlerService crawlerService;
@@ -127,7 +123,7 @@ class DKUAuthServiceTest {
         String id = "id";
         String pwd = "pwd";
         RequestVerifyStudentDto dto = new RequestVerifyStudentDto(id, pwd);
-        User user = UserMock.create();
+        User user = UserMock.createDummyMajor();
 
         when(userRepository.findByStudentId(id)).thenReturn(Optional.of(user));
 

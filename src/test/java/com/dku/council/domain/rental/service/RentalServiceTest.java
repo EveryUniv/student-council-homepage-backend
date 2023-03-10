@@ -158,7 +158,7 @@ class RentalServiceTest {
         // given
         when(rentalRepository.save(any())).thenReturn(rental);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(rentalItem);
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.of(rentalItem));
         when(rentalRepository.findByUserAndItem(user, rentalItem)).thenReturn(Optional.empty());
 
         // when
@@ -197,7 +197,7 @@ class RentalServiceTest {
     void failedCreateByAlreadyRental() {
         // given
         RentalItem item = new RentalItem("not-available", 0);
-        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(item);
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.of(item));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(rentalRepository.findByUserAndItem(user, item)).thenReturn(Optional.of(rental));
 
