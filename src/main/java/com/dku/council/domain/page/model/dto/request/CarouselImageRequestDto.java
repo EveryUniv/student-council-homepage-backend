@@ -1,4 +1,4 @@
-package com.dku.council.domain.page.model.dto;
+package com.dku.council.domain.page.model.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

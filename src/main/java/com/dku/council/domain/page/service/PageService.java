@@ -1,12 +1,9 @@
 package com.dku.council.domain.page.service;
 
-import com.dku.council.domain.page.model.dto.CarouselImageRequestDto;
-import com.dku.council.domain.page.model.dto.CarouselImageResponse;
-import com.dku.council.domain.page.model.dto.MainPageResponseDto;
-import com.dku.council.domain.page.model.dto.PostSummary;
-import com.dku.council.infra.nhn.model.UploadedFile;
+import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface PageService {

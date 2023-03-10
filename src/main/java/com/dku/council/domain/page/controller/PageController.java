@@ -1,8 +1,8 @@
 package com.dku.council.domain.page.controller;
 
-import com.dku.council.domain.page.model.dto.CarouselImageRequestDto;
-import com.dku.council.domain.page.model.dto.CarouselImageResponse;
-import com.dku.council.domain.page.model.dto.MainPageResponseDto;
+import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 import com.dku.council.domain.page.service.PageService;
 import com.dku.council.global.auth.role.AdminOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;

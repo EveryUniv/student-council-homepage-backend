@@ -1,4 +1,4 @@
-package com.dku.council.domain.page.model.dto;
+package com.dku.council.domain.page.model.dto.response;
 
 import com.dku.council.domain.page.model.CarouselImage;
 import com.dku.council.infra.nhn.service.ObjectStorageService;

@@ -2,10 +2,10 @@ package com.dku.council.domain.page.service;
 
 import com.dku.council.domain.page.exception.CarouselNotFoundException;
 import com.dku.council.domain.page.model.CarouselImage;
-import com.dku.council.domain.page.model.dto.CarouselImageRequestDto;
-import com.dku.council.domain.page.model.dto.CarouselImageResponse;
-import com.dku.council.domain.page.model.dto.MainPageResponseDto;
-import com.dku.council.domain.page.model.repository.CarouselImageRepository;
+import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
+import com.dku.council.domain.page.repository.CarouselImageRepository;
 import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
