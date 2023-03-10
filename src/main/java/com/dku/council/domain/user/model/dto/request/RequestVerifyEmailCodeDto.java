@@ -18,8 +18,8 @@ public class RequestVerifyEmailCodeDto {
     @NotBlank(message = "이름을 입력해주세요")
     private final String studentName;
 
-    @NotEmpty(message = "학과를 입력해주세요")
-    private final String majorData;
+    @NotEmpty(message = "학과 ID를 입력해주세요")
+    private final Long majorId;
 
     private final int yearOfAdmission = 23;
 

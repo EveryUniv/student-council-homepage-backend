@@ -1,7 +1,6 @@
 package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
-import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
@@ -107,23 +106,18 @@ public class GenericPostService<E extends Post> {
     }
 
     /**
-     * post를 가져옵니다. deletion처리를 위해 repository에서 직접 가져오지말고 이걸 사용해야합니다.
+     * post를 가져옵니다.
      *
      * @param postId 조회할 게시글 id
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
     public E findPost(Long postId) {
-        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        if (post.getStatus() != PostStatus.ACTIVE) {
-            throw new PostNotFoundException();
-        }
-        return post;
+        return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 
     /**
      * 게시글 삭제. 실제 DB에서 삭제처리되지 않고 표시만 해둔다.
-     * todo 배치처리를 통해 12개월이 지난 게시글은 삭제처리
      *
      * @param postId      게시글 id
      * @param userId      삭제하는 사용자 id

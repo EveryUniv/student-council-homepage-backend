@@ -19,7 +19,7 @@ public class CommentMock {
     }
 
     public static Comment createWithId(User user) {
-        return createWithId(NewsMock.create(), user);
+        return createWithId(NewsMock.createDummy(), user);
     }
 
     public static Comment createWithId(Post post, User user) {

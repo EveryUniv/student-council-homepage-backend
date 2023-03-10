@@ -9,6 +9,7 @@ import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestCreateRentalDto;
 import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
+import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -45,7 +46,7 @@ class RentalServiceTest {
     private RentalRepository rentalRepository;
 
     @Mock
-    private RentalItemService rentalItemService;
+    private RentalItemRepository rentalItemRepository;
 
     @InjectMocks
     private RentalService service;
@@ -57,7 +58,7 @@ class RentalServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = UserMock.create(19L);
+        user = UserMock.createDummyMajor(19L);
         rentalItem = RentalItemMock.create(9L, "testItem", 19);
         rental = RentalMock.create(17L, user, rentalItem);
         createDto = new RequestCreateRentalDto(rentalItem.getId(), rental.getUserClass(),
@@ -70,7 +71,7 @@ class RentalServiceTest {
         // given
         RentalItem item = RentalItemMock.create(5L, "item", 10);
         List<Rental> itemList = RentalMock.createList(item, 15);
-        itemList.addAll(RentalMock.createDisabledList(item, 5));
+        itemList.addAll(RentalMock.createDisabledListDummy(item, 5));
 
         Page<Rental> rentals = new DummyPage<>(itemList);
         when(rentalRepository.findAll((Specification<Rental>) any(), (Pageable) any()))
@@ -139,7 +140,7 @@ class RentalServiceTest {
         // given
         when(rentalRepository.save(any())).thenReturn(rental);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(rentalItem);
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.ofNullable(rentalItem));
 
         // when
         int prevAvailable = rentalItem.getRemaining();
@@ -163,7 +164,7 @@ class RentalServiceTest {
     void failedCreateByNotAvailable() {
         // given
         RentalItem item = new RentalItem("not-available", 0);
-        when(rentalItemService.findRentalItem(rentalItem.getId())).thenReturn(item);
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.of(item));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when & then

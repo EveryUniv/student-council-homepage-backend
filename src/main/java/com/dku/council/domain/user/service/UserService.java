@@ -2,15 +2,16 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
-import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
+import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
@@ -18,12 +19,13 @@ import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.dku.model.StudentInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO Test it
 @Service
@@ -32,11 +34,11 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserService {
 
-    private final MessageSource messageSource;
     private final SMSVerificationService smsVerificationService;
     private final DKUAuthService dkuAuthService;
-    private final PasswordEncoder passwordEncoder;
+    private final MajorRepository majorRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
 
@@ -45,25 +47,30 @@ public class UserService {
         StudentInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
         String phone = smsVerificationService.getPhoneNumber(signupToken);
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+        Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
 
-        User.UserBuilder userBuilder = User.builder()
+        User user = User.builder()
                 .studentId(studentInfo.getStudentId())
                 .password(encryptedPassword)
                 .name(studentInfo.getStudentName())
                 .phone(phone)
+                .major(major)
                 .yearOfAdmission(studentInfo.getYearOfAdmission())
                 .status(UserStatus.ACTIVE)
-                .role(UserRole.USER);
+                .role(UserRole.USER)
+                .build();
 
-        MajorData majorData = studentInfo.getMajorData();
-        if (majorData.isEmpty()) {
-            userBuilder.major(new Major(studentInfo.getNotRecognizedMajor(), studentInfo.getNotRecognizedDepartment()));
-        } else {
-            userBuilder.major(new Major(majorData));
-        }
-
-        userRepository.save(userBuilder.build());
+        userRepository.save(user);
         deleteSignupAuths(signupToken);
+    }
+
+    private Major retrieveMajor(String majorName, String departmentName) {
+        return majorRepository.findByName(majorName, departmentName)
+                .orElseGet(() -> {
+                    Major entity = new Major(majorName, departmentName);
+                    entity = majorRepository.save(entity);
+                    return entity;
+                });
     }
 
     private void deleteSignupAuths(String signupToken) {
@@ -82,7 +89,7 @@ public class UserService {
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             UserRole role = user.getUserRole();
             AuthenticationToken token = jwtProvider.issue(user);
-            return new ResponseLoginDto(messageSource, token, role, user);
+            return new ResponseLoginDto(token, role, user);
         } else {
             throw new WrongPasswordException();
         }
@@ -99,7 +106,13 @@ public class UserService {
                 .orElseThrow(LoginUserNotFoundException::new);
 
         String year = user.getYearOfAdmission().toString();
-        String major = user.getMajor().getMajorName(messageSource);
+        String major = user.getMajor().getName();
         return new ResponseUserInfoDto(user.getName(), year, major);
+    }
+
+    public List<ResponseMajorDto> getAllMajors() {
+        return majorRepository.findAll().stream()
+                .map(ResponseMajorDto::new)
+                .collect(Collectors.toList());
     }
 }
