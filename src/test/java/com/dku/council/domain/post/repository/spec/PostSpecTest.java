@@ -6,8 +6,11 @@ import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.PostTagRepository;
 import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
@@ -34,6 +37,9 @@ class PostSpecTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private PostTagRepository postTagRepository;
 
     private User user1;
@@ -42,10 +48,12 @@ class PostSpecTest {
 
     @BeforeEach
     void setup() {
-        user1 = UserMock.createDummyMajor();
+        Major major = majorRepository.save(MajorMock.create());
+
+        user1 = UserMock.create(major);
         user1 = userRepository.save(user1);
 
-        User user2 = UserMock.createDummyMajor();
+        User user2 = UserMock.create(major);
         user2 = userRepository.save(user2);
 
         List<News> news1 = NewsMock.createList("news-1-", user1, 5);

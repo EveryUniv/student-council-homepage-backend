@@ -57,14 +57,15 @@ public class DkuCrawlerService {
     private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
 
-        String studentName = getElementValueOrNull(doc, "nm");
-        String studentId = getElementValueOrNull(doc, "stuid");
+        String studentName = getElementValueOrThrow(doc, "nm");
+        String studentId = getElementValueOrThrow(doc, "stuid");
 
         String major, department = "";
         int yearOfAdmission;
 
         try {
-            major = getElementValueOrNull(doc, "pstnOrgzNm");
+            // 사회과학대학 정치외교학과
+            major = getElementValueOrThrow(doc, "pstnOrgzNm");
             major = major.trim();
 
             int spaceIdx = major.lastIndexOf(' ');
@@ -73,7 +74,7 @@ public class DkuCrawlerService {
                 major = major.substring(spaceIdx + 1);
             }
 
-            String etrsYy = getElementValueOrNull(doc, "etrsYy");
+            String etrsYy = getElementValueOrThrow(doc, "etrsYy");
             yearOfAdmission = Integer.parseInt(etrsYy);
         } catch (Throwable t) {
             throw new DkuFailedCrawlingException(t);
@@ -82,9 +83,13 @@ public class DkuCrawlerService {
         return new StudentInfo(studentName, studentId, yearOfAdmission, major, department);
     }
 
-    private String getElementValueOrNull(Document doc, String id) {
-        return Optional.ofNullable(doc.getElementById(id))
+    private String getElementValueOrThrow(Document doc, String id) {
+        String value = Optional.ofNullable(doc.getElementById(id))
                 .map(Element::val)
                 .orElseThrow(() -> new DkuFailedCrawlingException(new NullPointerException(id)));
+        if (value.isBlank()) {
+            throw new DkuFailedCrawlingException(new NullPointerException(id));
+        }
+        return value;
     }
 }

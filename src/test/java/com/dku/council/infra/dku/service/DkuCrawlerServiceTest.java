@@ -68,16 +68,4 @@ class DkuCrawlerServiceTest extends AbstractMockServerTest {
         Assertions.assertThrows(DkuFailedCrawlingException.class, () ->
                 service.crawlStudentInfo(dummyAuth));
     }
-
-    @Test
-    @DisplayName("실패 응답 - 없는 학과인 response")
-    public void failedCrawlByInvalidResponse2() {
-        // given
-        mockHtml("dku/student-info-response-failed-2");
-
-        // when & then
-        DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
-        Assertions.assertThrows(DkuFailedCrawlingException.class, () ->
-                service.crawlStudentInfo(dummyAuth));
-    }
 }

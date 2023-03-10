@@ -10,6 +10,6 @@ public class StudentInfo {
     private final String studentId;
     private final int yearOfAdmission;
 
-    private final String departmentName;
     private final String majorName;
+    private final String departmentName;
 }
