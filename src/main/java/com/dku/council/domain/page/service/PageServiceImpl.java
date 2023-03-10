@@ -2,7 +2,7 @@ package com.dku.council.domain.page.service;
 
 import com.dku.council.domain.page.exception.CarouselNotFoundException;
 import com.dku.council.domain.page.model.CarouselImage;
-import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
 import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
 import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 import com.dku.council.domain.page.repository.CarouselImageRepository;
@@ -32,7 +32,7 @@ public class PageServiceImpl implements PageService{
 
     @Override
     @Transactional
-    public void addCarouselImage(CarouselImageRequestDto dto) {
+    public void addCarouselImage(RequestCarouselImageDto dto) {
         MultipartFile file = dto.getImageFile();
         String redirectUrl = dto.getRedirectUrl();
         String originalFilename = file.getOriginalFilename();

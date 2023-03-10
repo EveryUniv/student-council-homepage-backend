@@ -1,6 +1,6 @@
 package com.dku.council.domain.page.controller;
 
-import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
 import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
 import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 import com.dku.council.domain.page.service.PageService;
@@ -30,7 +30,7 @@ public class PageController {
      */
     @PostMapping("/carousel")
     @AdminOnly
-    public void uploadCarouselImage(@Valid @ModelAttribute CarouselImageRequestDto dto) {
+    public void uploadCarouselImage(@Valid @ModelAttribute RequestCarouselImageDto dto) {
         pageService.addCarouselImage(dto);
     }
 

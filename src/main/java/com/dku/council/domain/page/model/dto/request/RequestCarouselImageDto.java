@@ -5,14 +5,13 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Getter
 @RequiredArgsConstructor
-public class CarouselImageRequestDto {
+public class RequestCarouselImageDto {
 
     @NotNull(message = "파일을 등록해주세요")
     @Schema(description = "이미지 파일 등록", example = "myImage.png")

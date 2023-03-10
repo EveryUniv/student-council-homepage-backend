@@ -1,6 +1,6 @@
 package com.dku.council.domain.page.service;
 
-import com.dku.council.domain.page.model.dto.request.CarouselImageRequestDto;
+import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
 import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
 import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
 
@@ -15,9 +15,9 @@ public interface PageService {
 
     /**
      * 캐러셀 이미지를 등록합니다.
-     * @param carouselImageRequestDto
+     * @param requestCarouselImageDto
      */
-    void addCarouselImage(CarouselImageRequestDto carouselImageRequestDto);
+    void addCarouselImage(RequestCarouselImageDto requestCarouselImageDto);
 
     /**
      * 캐러셀 id 로 저장되어 있는 Object 를 삭제합니다.
