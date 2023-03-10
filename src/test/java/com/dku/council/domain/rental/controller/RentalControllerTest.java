@@ -18,7 +18,6 @@ import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.MvcMockResponse;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@FullIntegrationTest
+//@FullIntegrationTest
 class RentalControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -85,7 +84,7 @@ class RentalControllerTest extends AbstractContainerRedisTest {
         User user2 = UserMock.create(0L, major);
         user2 = userRepository.save(user2);
 
-        rentalItems = RentalItemMock.createList(5);
+        rentalItems = RentalItemMock.createList(10);
         rentalItems = rentalItemRepository.saveAll(rentalItems);
         rentalItemRepository.saveAll(RentalItemMock.createDisabledList(5));
 
@@ -164,6 +163,7 @@ class RentalControllerTest extends AbstractContainerRedisTest {
     @DisplayName("대여 신청")
     void create() throws Exception {
         // given
+        rentalRepository.deleteAll();
         RentalItem item = rentalItems.get(0);
         RequestCreateRentalDto dto = new RequestCreateRentalDto(item.getId(), RentalUserClass.INDIVIDUAL,
                 RentalMock.RENTAL_START, RentalMock.RENTAL_END, "title", "body");

@@ -1,6 +1,7 @@
 package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
+import com.dku.council.domain.rental.exception.AlreadyRentalException;
 import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalItemNotFoundException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,8 @@ public class RentalService {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         RentalItem item = rentalItemRepository.findById(dto.getItemId()).orElseThrow(RentalItemNotFoundException::new);
 
+        checkAlreadyRental(user, item);
+
         if (item.getRemaining() == 0) {
             throw new NotAvailableItemException();
         }
@@ -72,6 +77,13 @@ public class RentalService {
         rental = rentalRepository.save(rental);
         item.decreaseRemaining();
         return rental.getId();
+    }
+
+    private void checkAlreadyRental(User user, RentalItem item) {
+        Optional<Rental> alreadyRental = rentalRepository.findByUserAndItem(user, item);
+        if (alreadyRental.isPresent()) {
+            throw new AlreadyRentalException();
+        }
     }
 
     @Transactional

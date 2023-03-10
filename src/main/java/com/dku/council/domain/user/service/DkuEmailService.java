@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.MajorNotFoundException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.exception.WrongEmailCodeException;
@@ -8,8 +9,10 @@ import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.model.entity.Major;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
+import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.util.TextTemplateEngine;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.NHNEmailService;
@@ -17,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -25,9 +29,11 @@ import java.util.UUID;
 public class DkuEmailService {
     private static final String DKU_AUTH_NAME = "dku";
     private static final String EMAIL_AUTH_NAME = "email";
+
     private final NHNEmailService service;
     private final SignupAuthRepository dkuAuthRepository;
     private final MajorRepository majorRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -39,6 +45,7 @@ public class DkuEmailService {
         String emailCode = UUID.randomUUID().toString().substring(0, 5);
         String studentId = dto.getStudentId();
 
+        checkAlreadyStudentId(studentId);
         dkuAuthRepository.setAuthPayload(studentId, EMAIL_AUTH_NAME, emailCode);
 
         String text = makeTemplatedEmail(
@@ -47,6 +54,13 @@ public class DkuEmailService {
         );
 
         service.sendMessage(dto.getStudentId(), "단국대 학생 인증", text);
+    }
+
+    private void checkAlreadyStudentId(String studentId) {
+        Optional<User> alreadyUser = userRepository.findByStudentId(studentId);
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
     }
 
     /**

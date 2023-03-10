@@ -56,6 +56,7 @@ public class UserMock {
                 .password(password)
                 .name(username)
                 .role(role)
+                .yearOfAdmission(2017)
                 .major(major)
                 .phone("010-1111-2222")
                 .build();

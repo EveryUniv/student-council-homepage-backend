@@ -2,6 +2,7 @@ package com.dku.council.domain.rental.service;
 
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.DummyPage;
+import com.dku.council.domain.rental.exception.AlreadyRentalException;
 import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
@@ -152,6 +153,25 @@ class RentalServiceTest {
     }
 
     @Test
+    @DisplayName("대여 신청 - 서로 다른 물품으로 2회 대여")
+    void createWithOtherProducts() {
+        // given
+        when(rentalRepository.save(any())).thenReturn(rental);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.of(rentalItem));
+        when(rentalRepository.findByUserAndItem(user, rentalItem)).thenReturn(Optional.empty());
+
+        // when
+        int prevAvailable = rentalItem.getRemaining();
+        service.create(user.getId(), createDto);
+        Long id = service.create(user.getId(), createDto);
+
+        // then
+        assertThat(id).isEqualTo(rental.getId());
+        assertThat(rentalItem.getRemaining()).isEqualTo(prevAvailable - 2);
+    }
+
+    @Test
     @DisplayName("대여 신청 실패 - 찾을 수 없는 유저인 경우")
     void failedCreateByNotFoundUser() {
         // when & then
@@ -169,6 +189,20 @@ class RentalServiceTest {
 
         // when & then
         assertThrows(NotAvailableItemException.class, () ->
+                service.create(user.getId(), createDto));
+    }
+
+    @Test
+    @DisplayName("대여 신청 실패 - 같은 물품을 이미 대여한 경우")
+    void failedCreateByAlreadyRental() {
+        // given
+        RentalItem item = new RentalItem("not-available", 0);
+        when(rentalItemRepository.findById(rentalItem.getId())).thenReturn(Optional.of(item));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(rentalRepository.findByUserAndItem(user, item)).thenReturn(Optional.of(rental));
+
+        // when & then
+        assertThrows(AlreadyRentalException.class, () ->
                 service.create(user.getId(), createDto));
     }
 

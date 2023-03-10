@@ -7,6 +7,7 @@ import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -26,7 +27,8 @@ import java.util.List;
 public class UserController {
 
     private final MessageSource messageSource;
-    private final UserService service;
+    private final UserService userService;
+    private final SignupService signupService;
 
 
     /**
@@ -37,7 +39,7 @@ public class UserController {
     @GetMapping
     @UserOnly
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
-        return service.getUserInfo(auth.getUserId());
+        return userService.getUserInfo(auth.getUserId());
     }
 
     /**
@@ -50,7 +52,7 @@ public class UserController {
     @PostMapping("/{signup-token}")
     public void signup(@Valid @RequestBody RequestSignupDto dto,
                        @PathVariable("signup-token") String signupToken) {
-        service.signup(dto, signupToken);
+        signupService.signup(dto, signupToken);
     }
 
     /**
@@ -61,7 +63,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseLoginDto login(@Valid @RequestBody RequestLoginDto dto) {
-        return service.login(dto);
+        return userService.login(dto);
     }
 
     /**
@@ -83,7 +85,7 @@ public class UserController {
     @UserOnly
     public ResponseRefreshTokenDto refreshToken(HttpServletRequest request,
                                                 @Valid @RequestBody RequestRefreshTokenDto dto) {
-        return service.refreshToken(request, dto.getRefreshToken());
+        return userService.refreshToken(request, dto.getRefreshToken());
     }
 
     /**
@@ -91,7 +93,7 @@ public class UserController {
      */
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
-        return service.getAllMajors();
+        return userService.getAllMajors();
     }
 
     /**
