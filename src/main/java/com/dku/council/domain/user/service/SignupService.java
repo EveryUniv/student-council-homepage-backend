@@ -1,11 +1,11 @@
 package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
-import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.dku.model.StudentInfo;
@@ -27,33 +27,40 @@ public class SignupService {
     private final DKUAuthService dkuAuthService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final MajorRepository majorRepository;
 
     @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
         StudentInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
-        String phone = smsVerificationService.getPhoneNumber(signupToken);
-        String encryptedPassword = passwordEncoder.encode(dto.getPassword());
 
         checkAlreadyStudentId(studentInfo.getStudentId());
 
-        User.UserBuilder userBuilder = User.builder()
+        String phone = smsVerificationService.getPhoneNumber(signupToken);
+        String encryptedPassword = passwordEncoder.encode(dto.getPassword());
+        Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
+
+        User user = User.builder()
                 .studentId(studentInfo.getStudentId())
                 .password(encryptedPassword)
                 .name(studentInfo.getStudentName())
                 .phone(phone)
+                .major(major)
                 .yearOfAdmission(studentInfo.getYearOfAdmission())
                 .status(UserStatus.ACTIVE)
-                .role(UserRole.USER);
+                .role(UserRole.USER)
+                .build();
 
-        MajorData majorData = studentInfo.getMajorData();
-        if (majorData.isEmpty()) {
-            userBuilder.major(new Major(studentInfo.getNotRecognizedMajor(), studentInfo.getNotRecognizedDepartment()));
-        } else {
-            userBuilder.major(new Major(majorData));
-        }
-
-        userRepository.save(userBuilder.build());
+        userRepository.save(user);
         deleteSignupAuths(signupToken);
+    }
+
+    private Major retrieveMajor(String majorName, String departmentName) {
+        return majorRepository.findByName(majorName, departmentName)
+                .orElseGet(() -> {
+                    Major entity = new Major(majorName, departmentName);
+                    entity = majorRepository.save(entity);
+                    return entity;
+                });
     }
 
     private void deleteSignupAuths(String signupToken) {

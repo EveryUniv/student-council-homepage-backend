@@ -5,9 +5,12 @@ import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.tag.service.TagService;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
@@ -58,6 +61,9 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private TagService tagService;
 
     @Autowired
@@ -66,14 +72,16 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private Major major;
     private User user;
     private List<News> allNews;
     private List<News> news1;
-    private List<News> news2;
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L);
+        major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(0L, major);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
 
@@ -82,10 +90,11 @@ class NewsControllerTest extends AbstractContainerRedisTest {
         news1 = NewsMock.createList("news", user, 3);
         allNews.addAll(news1);
 
-        news2 = NewsMock.createList("test", user, 2);
+        List<News> news2 = NewsMock.createList("test", user, 2);
         allNews.addAll(news2);
 
         postRepository.saveAll(allNews);
+        postRepository.saveAll(NewsMock.createList("ews", user, 3, false));
     }
 
 
@@ -106,7 +115,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     void listWithKeyword() throws Exception {
         // when
         ResultActions result = mvc.perform(get("/post/news")
-                        .param("keyword", "ews"));
+                .param("keyword", "ews"));
 
         // then
         Integer[] ids = EntityUtil.getIdArray(news1);
@@ -126,7 +135,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(get("/post/news")
-                        .param("tagIds", tag1.getId().toString()));
+                .param("tagIds", tag1.getId().toString()));
 
         // then
         Integer[] tag1Ids = EntityUtil.getIdArray(news2);
@@ -146,8 +155,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(get("/post/news")
-                        .param("tagIds", tag1.getId().toString())
-                        .param("tagIds", tag2.getId().toString()));
+                .param("tagIds", tag1.getId().toString())
+                .param("tagIds", tag2.getId().toString()));
 
         // then
         List<News> expected = Stream.concat(news2.stream(), news3.stream())
@@ -172,8 +181,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     void create() throws Exception {
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
-                        .param("title", "제목")
-                        .param("body", "본문"));
+                .param("title", "제목")
+                .param("body", "본문"));
 
         // then
         MvcResult response = result.andExpect(status().isOk())
@@ -199,9 +208,9 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
-                        .param("title", "제목")
-                        .param("body", "본문")
-                        .param("tagIds", tagIds));
+                .param("title", "제목")
+                .param("body", "본문")
+                .param("tagIds", tagIds));
 
         // then
         MvcResult response = result.andExpect(status().isOk())
@@ -253,7 +262,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     void deleteByAdmin() throws Exception {
         // given
         UserAuth.withAdmin(user.getId());
-        News news = NewsMock.create();
+        News news = NewsMock.create(user);
         news = postRepository.save(news);
 
         // when
@@ -267,7 +276,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 삭제 실패 - 권한 없음")
     void failedDeleteByAccessDenied() throws Exception {
         // given
-        News news = NewsMock.create();
+        News news = NewsMock.create(userRepository.save(UserMock.create(0L, major)));
         news = postRepository.save(news);
 
         // when

@@ -4,7 +4,6 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.role.UserRole;
 import lombok.Getter;
-import org.springframework.context.MessageSource;
 
 @Getter
 public class ResponseLoginDto {
@@ -16,13 +15,13 @@ public class ResponseLoginDto {
     private final String major;
     private final String department;
 
-    public ResponseLoginDto(MessageSource messageSource, AuthenticationToken token, UserRole role, User user) {
+    public ResponseLoginDto(AuthenticationToken token, UserRole role, User user) {
         this.accessToken = token.getAccessToken();
         this.refreshToken = token.getRefreshToken();
         this.isAdmin = role.isAdmin();
         this.userName = user.getName();
         this.studentId = user.getStudentId();
-        this.major = user.getMajor().getMajorName(messageSource);
-        this.department = user.getMajor().getDepartmentName(messageSource);
+        this.major = user.getMajor().getName();
+        this.department = user.getMajor().getDepartment();
     }
 }

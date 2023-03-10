@@ -7,7 +7,6 @@ import com.dku.council.domain.user.service.DKUAuthService;
 import com.dku.council.infra.dku.model.StudentInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -18,7 +17,6 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class DKUController {
 
-    private final MessageSource messageSource;
     private final DKUAuthService service;
 
     /**
@@ -42,6 +40,6 @@ public class DKUController {
     @GetMapping("/{signup-token}")
     public ResponseScrappedStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
         StudentInfo studentInfo = service.getStudentInfo(signupToken);
-        return ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
+        return new ResponseScrappedStudentInfoDto(studentInfo);
     }
 }

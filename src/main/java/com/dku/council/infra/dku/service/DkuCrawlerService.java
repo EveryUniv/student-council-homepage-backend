@@ -1,6 +1,5 @@
 package com.dku.council.infra.dku.service;
 
-import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.global.config.qualifier.ChromeAgentWebClient;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -11,7 +10,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -24,8 +22,6 @@ public class DkuCrawlerService {
 
     @ChromeAgentWebClient
     private final WebClient webClient;
-
-    private final MessageSource messageSource;
 
     @Value("${dku.student-info.api-path}")
     private final String studentInfoApiPath;
@@ -61,41 +57,39 @@ public class DkuCrawlerService {
     private StudentInfo parseHtml(String html) {
         Document doc = Jsoup.parse(html);
 
-        String studentName = getElementValueOrNull(doc, "nm");
-        String studentId = getElementValueOrNull(doc, "stuid");
+        String studentName = getElementValueOrThrow(doc, "nm");
+        String studentId = getElementValueOrThrow(doc, "stuid");
 
         String major, department = "";
-        MajorData majorData;
         int yearOfAdmission;
 
         try {
-            String pstnOrgzNm = getElementValueOrNull(doc, "pstnOrgzNm");
-            String[] orgToken = pstnOrgzNm.trim().split(" ");
+            // 사회과학대학 정치외교학과
+            major = getElementValueOrThrow(doc, "pstnOrgzNm");
+            major = major.trim();
 
-            major = orgToken[orgToken.length - 1];
-            if (orgToken.length > 1) {
-                department = orgToken[orgToken.length - 2];
+            int spaceIdx = major.lastIndexOf(' ');
+            if (spaceIdx >= 0) {
+                department = major.substring(0, spaceIdx);
+                major = major.substring(spaceIdx + 1);
             }
 
-            majorData = MajorData.of(messageSource, major);
-
-            String etrsYy = getElementValueOrNull(doc, "etrsYy");
+            String etrsYy = getElementValueOrThrow(doc, "etrsYy");
             yearOfAdmission = Integer.parseInt(etrsYy);
         } catch (Throwable t) {
             throw new DkuFailedCrawlingException(t);
         }
 
-        if (majorData == null) {
-            log.error("Unexpected major name: {} {}. It will be treated as {}", department, major, MajorData.NO_DATA.name());
-            return new StudentInfo(studentName, studentId, yearOfAdmission, major, department);
-        } else {
-            return new StudentInfo(studentName, studentId, yearOfAdmission, majorData);
-        }
+        return new StudentInfo(studentName, studentId, yearOfAdmission, major, department);
     }
 
-    private String getElementValueOrNull(Document doc, String id) {
-        return Optional.ofNullable(doc.getElementById(id))
+    private String getElementValueOrThrow(Document doc, String id) {
+        String value = Optional.ofNullable(doc.getElementById(id))
                 .map(Element::val)
                 .orElseThrow(() -> new DkuFailedCrawlingException(new NullPointerException(id)));
+        if (value.isBlank()) {
+            throw new DkuFailedCrawlingException(new NullPointerException(id));
+        }
+        return value;
     }
 }
