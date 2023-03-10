@@ -74,11 +74,7 @@ public class SMSVerificationService {
      */
     public void sendSMSCode(String signupToken, String phoneNumber) {
         StudentInfo info = dkuAuthService.getStudentInfo(signupToken);
-        Optional<User> alreadyUser = userRepository.findByPhone(info.getStudentId());
-
-        if (alreadyUser.isPresent()) {
-            throw new AlreadyPhoneException();
-        }
+        checkAlreadyStudentId(info.getStudentId());
 
         String code = generateDigitCode(digitCount);
         phoneNumber = phoneNumber.trim().replaceAll("-", "");
@@ -87,6 +83,13 @@ public class SMSVerificationService {
 
         Locale locale = LocaleContextHolder.getLocale();
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.auth-message", new Object[]{code}, locale));
+    }
+
+    private void checkAlreadyStudentId(String studentId) {
+        Optional<User> alreadyUser = userRepository.findByPhone(studentId);
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyPhoneException();
+        }
     }
 
     /**

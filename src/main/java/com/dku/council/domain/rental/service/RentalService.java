@@ -21,6 +21,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -61,11 +63,8 @@ public class RentalService {
     public Long create(Long userId, RequestCreateRentalDto dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         RentalItem item = rentalItemService.findRentalItem(dto.getItemId());
-        boolean isAlreadyRental = rentalRepository.findByUserAndItem(user, item).isPresent();
 
-        if (isAlreadyRental) {
-            throw new AlreadyRentalException();
-        }
+        checkAlreadyRental(user, item);
 
         if (item.getRemaining() == 0) {
             throw new NotAvailableItemException();
@@ -85,6 +84,13 @@ public class RentalService {
         rental = rentalRepository.save(rental);
         item.decreaseRemaining();
         return rental.getId();
+    }
+
+    private void checkAlreadyRental(User user, RentalItem item) {
+        Optional<Rental> alreadyRental = rentalRepository.findByUserAndItem(user, item);
+        if (alreadyRental.isPresent()) {
+            throw new AlreadyRentalException();
+        }
     }
 
     @Transactional
