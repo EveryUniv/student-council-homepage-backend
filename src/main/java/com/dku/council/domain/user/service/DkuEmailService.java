@@ -43,12 +43,8 @@ public class DkuEmailService {
     public void sendEmailCode(RequestSendEmailCode dto) {
         String emailCode = UUID.randomUUID().toString().substring(0, 5);
         String studentId = dto.getStudentId();
-        Optional<User> alreadyUser = userRepository.findByStudentId(studentId);
 
-        if (alreadyUser.isPresent()) {
-            throw new AlreadyStudentIdException();
-        }
-
+        checkAlreadyStudentId(studentId);
         dkuAuthRepository.setAuthPayload(studentId, EMAIL_AUTH_NAME, emailCode);
 
         String text = makeTemplatedEmail(
@@ -57,6 +53,13 @@ public class DkuEmailService {
         );
 
         service.sendMessage(dto.getStudentId(), "단국대 학생 인증", text);
+    }
+
+    private void checkAlreadyStudentId(String studentId) {
+        Optional<User> alreadyUser = userRepository.findByStudentId(studentId);
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
     }
 
     /**

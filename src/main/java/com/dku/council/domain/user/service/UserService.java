@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 
-// TODO Test it
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor

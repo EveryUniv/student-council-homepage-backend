@@ -52,6 +52,7 @@ public class UserMock {
                 .password(password)
                 .name(username)
                 .role(role)
+                .yearOfAdmission(2017)
                 .major(new Major(MajorData.ADMIN))
                 .phone("010-1111-2222")
                 .build();

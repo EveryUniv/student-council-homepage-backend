@@ -19,12 +19,11 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class DKUAuthService {
 
-    private static final String DKU_AUTH_NAME = "dku";
+    public static final String DKU_AUTH_NAME = "dku";
 
     private final MessageSource messageSource;
     private final DkuCrawlerService crawlerService;
@@ -62,11 +61,7 @@ public class DKUAuthService {
      */
     public ResponseVerifyStudentDto verifyStudent(RequestVerifyStudentDto dto) {
         String signupToken = UUID.randomUUID().toString();
-        Optional<User> alreadyUser = userRepository.findByStudentId(dto.getDkuStudentId());
-        
-        if (alreadyUser.isPresent()) {
-            throw new AlreadyStudentIdException();
-        }
+        checkAlreadyStudentId(dto);
 
         DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
@@ -75,5 +70,12 @@ public class DKUAuthService {
 
         ResponseScrappedStudentInfoDto studentInfoDto = ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
+    }
+
+    private void checkAlreadyStudentId(RequestVerifyStudentDto dto) {
+        Optional<User> alreadyUser = userRepository.findByStudentId(dto.getDkuStudentId());
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
     }
 }

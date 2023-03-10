@@ -8,7 +8,6 @@ import com.dku.council.domain.user.model.SMSAuth;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
-import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,13 +19,12 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class SMSVerificationService {
 
-    private static final String SMS_AUTH_NAME = "sms";
-    private static final String SMS_AUTH_COMPLETE_SIGN = "OK";
+    public static final String SMS_AUTH_NAME = "sms";
+    public static final String SMS_AUTH_COMPLETE_SIGN = "OK";
     private static final Random RANDOM = new Random();
 
     private final MessageSource messageSource;
@@ -36,7 +34,7 @@ public class SMSVerificationService {
     private final SignupAuthRepository smsAuthRepository;
 
     @Value("${app.auth.sms.digit-count}")
-    private int digitCount;
+    private final int digitCount;
 
     /**
      * 회원가입 토큰을 기반으로 인증된 휴대폰 정보를 가져옵니다. 휴대폰 인증이 되어있지 않으면 Exception이 발생합니다.
@@ -73,8 +71,8 @@ public class SMSVerificationService {
      * @param phoneNumber 전화번호
      */
     public void sendSMSCode(String signupToken, String phoneNumber) {
-        StudentInfo info = dkuAuthService.getStudentInfo(signupToken);
-        checkAlreadyStudentId(info.getStudentId());
+        dkuAuthService.getStudentInfo(signupToken);
+        checkAlreadyPhone(phoneNumber);
 
         String code = generateDigitCode(digitCount);
         phoneNumber = phoneNumber.trim().replaceAll("-", "");
@@ -85,8 +83,8 @@ public class SMSVerificationService {
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.auth-message", new Object[]{code}, locale));
     }
 
-    private void checkAlreadyStudentId(String studentId) {
-        Optional<User> alreadyUser = userRepository.findByPhone(studentId);
+    private void checkAlreadyPhone(String phone) {
+        Optional<User> alreadyUser = userRepository.findByPhone(phone);
         if (alreadyUser.isPresent()) {
             throw new AlreadyPhoneException();
         }
