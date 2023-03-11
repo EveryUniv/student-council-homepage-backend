@@ -17,7 +17,15 @@ public class BusArrivalMock {
     }
 
     public static BusArrival create(String busNo, int stationOrder) {
-        return new BusArrival(BusStatus.RUN, stationOrder,
+        return create(busNo, stationOrder, BusStatus.RUN);
+    }
+
+    public static BusArrival create(String busNo, BusStatus status) {
+        return create(busNo, 0, status);
+    }
+
+    public static BusArrival create(String busNo, int stationOrder, BusStatus status) {
+        return new BusArrival(status, stationOrder,
                 5, 10, "경기16바5555",
                 7, 15, "경기16바1111",
                 busNo);

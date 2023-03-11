@@ -7,7 +7,7 @@ import java.util.List;
 public class EntityUtil {
 
     public static <T> void injectId(Class<T> clazz, T obj, Long id) {
-        FieldInjector.inject(clazz, obj, "id", id);
+        FieldReflector.inject(clazz, obj, "id", id);
     }
 
     public static <T extends BaseEntity> Integer[] getIdArray(List<T> entities) {

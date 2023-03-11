@@ -2,6 +2,7 @@ package com.dku.council.infra.bus.predict.impl;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.predict.BusArrivalPredictService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -12,12 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class BusTimeTablePredictService implements BusArrivalPredictService {
 
     public static final long FIRST_TIME_HOUR_OFFSET = 1;
     private final Map<String, TimeTable> busTimeTables = new HashMap<>();
-    private final TimeTableParser timeTableParser = new TimeTableParser();
+    private final TimeTableParser timeTableParser;
 
     /**
      * 시간표를 기준으로 남은 시간을 예측합니다.

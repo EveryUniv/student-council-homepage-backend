@@ -39,6 +39,10 @@ public class GGBusProvider implements BusArrivalProvider {
             }
 
             ResponseGGBusArrival.Header header = response.getMsgHeader();
+            if (header == null) {
+                return List.of();
+            }
+
             Integer code = header.getResultCode();
 
             if (code == 4) {

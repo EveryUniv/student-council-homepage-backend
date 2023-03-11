@@ -63,10 +63,8 @@ public class TimeTableParser {
 
         if (line.startsWith("@")) {
             String[] token = line.substring(1).split(" ");
-            switch (token[0].toLowerCase()) {
-                case "offset":
-                    this.offset = Duration.parse(token[1]);
-                    break;
+            if (token[0].equalsIgnoreCase("offset")) {
+                this.offset = Duration.parse(token[1]);
             }
             return;
         }

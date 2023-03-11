@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +35,8 @@ public class OpenApiBusService {
         Stream<BusArrival> stream = null;
         for (BusArrivalProvider provider : providers) {
             List<BusArrival> busArrivalList = provider.retrieveBusArrival(station);
-            
+            busArrivalList = new ArrayList<>(busArrivalList);
+
             appendOtherArrivals(provider, busArrivalList, station);
 
             Stream<BusArrival> resultStream = busArrivalList.stream()

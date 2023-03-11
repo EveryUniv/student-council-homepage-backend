@@ -5,7 +5,7 @@ import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class NewsMock {
                     .body(Integer.toString(i))
                     .build();
             if (!enabled) {
-                FieldInjector.inject(Post.class, news, "status", PostStatus.DELETED);
+                FieldReflector.inject(Post.class, news, "status", PostStatus.DELETED);
             }
             result.add(news);
         }
