@@ -1,6 +1,5 @@
 package com.dku.council.mock;
 
-import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.BusStatus;
 
@@ -14,11 +13,11 @@ public class BusArrivalMock {
     }
 
     public static BusArrival create(String busNo) {
-        return create(busNo, BusStation.DKU_GATE);
+        return create(busNo, 0);
     }
 
-    public static BusArrival create(String busNo, BusStation station) {
-        return new BusArrival(BusStatus.RUN, station,
+    public static BusArrival create(String busNo, int stationOrder) {
+        return new BusArrival(BusStatus.RUN, stationOrder,
                 5, 10, "경기16바5555",
                 7, 15, "경기16바1111",
                 busNo);

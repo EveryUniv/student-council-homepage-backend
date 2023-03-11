@@ -1,4 +1,4 @@
-package com.dku.council.infra.bus.service.provider;
+package com.dku.council.infra.bus.provider;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;

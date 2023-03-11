@@ -1,4 +1,4 @@
-package com.dku.council.infra.bus.service.provider;
+package com.dku.council.infra.bus.provider;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.model.BusArrival;
@@ -9,9 +9,10 @@ public interface BusArrivalProvider {
 
     /**
      * 버스 정류소에 도착할 예정인 버스들을 가져옵니다.
+     * 도착 정보가 없는 버스는 자동으로 예측됩니다.
      *
      * @param station 정류소
-     * @return 도착 예정 버스 목록
+     * @return 도착 예정 버스 목록.
      */
     List<BusArrival> retrieveBusArrival(BusStation station);
 

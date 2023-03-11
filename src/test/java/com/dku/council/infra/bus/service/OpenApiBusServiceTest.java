@@ -2,10 +2,12 @@ package com.dku.council.infra.bus.service;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.model.BusArrival;
-import com.dku.council.infra.bus.service.provider.BusArrivalProvider;
-import com.dku.council.infra.bus.service.provider.GGBusProvider;
-import com.dku.council.infra.bus.service.provider.TownBusProvider;
+import com.dku.council.infra.bus.predict.BusArrivalPredictService;
+import com.dku.council.infra.bus.provider.BusArrivalProvider;
+import com.dku.council.infra.bus.provider.GGBusProvider;
+import com.dku.council.infra.bus.provider.TownBusProvider;
 import com.dku.council.mock.BusArrivalMock;
+import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,11 +24,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class OpenApiBusServiceTest {
+
+    private final Clock clock = ClockUtil.create();
+
     @Mock
     private GGBusProvider ggBusProvider;
 
     @Mock
     private TownBusProvider townBusProvider;
+
+    @Mock
+    private BusArrivalPredictService predictService;
 
     private OpenApiBusService service;
 
@@ -33,7 +42,7 @@ class OpenApiBusServiceTest {
     @BeforeEach
     public void setup() {
         List<BusArrivalProvider> providers = List.of(ggBusProvider, townBusProvider);
-        service = new OpenApiBusService(providers);
+        service = new OpenApiBusService(clock, predictService, providers);
     }
 
     @Test
@@ -45,8 +54,8 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("24"),
                 BusArrivalMock.create("101"),
                 BusArrivalMock.create("1234"),
-                BusArrivalMock.create("720-3", BusStation.DKU_GATE),
-                BusArrivalMock.create("720-3", BusStation.BEAR_STATUE),
+                BusArrivalMock.create("720-3", 5),
+                BusArrivalMock.create("720-3", 150),
                 BusArrivalMock.create("7007-1"),
                 BusArrivalMock.create("102")
         );

@@ -30,6 +30,7 @@ public class ResponseKakaoBusApi {
             private final int busStopCount2;
             private final String vehicleNumber2;
             private final String vehicleState2;
+            private final int order;
         }
     }
 }
