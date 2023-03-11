@@ -1,14 +1,14 @@
-package com.dku.council.infra.bus.service.provider;
+package com.dku.council.infra.bus.provider;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.global.error.exception.UnexpectedResponseException;
 import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
+import com.dku.council.infra.bus.exception.InvalidBusStationException;
 import com.dku.council.infra.bus.model.BusArrival;
-import com.dku.council.infra.bus.model.ResponseGGBusArrival;
+import com.dku.council.infra.bus.model.ResponseKakaoBusApi;
 import com.dku.council.infra.bus.model.mapper.BusResponseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,38 +19,30 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class GGBusProvider implements BusArrivalProvider {
+public class TownBusProvider implements BusArrivalProvider {
 
     private final WebClient webClient;
 
-    @Value("${bus.ggbus.api-path}")
+    @Value("${bus.town.api-path}")
     private final String apiPath;
 
-    @Value("${bus.ggbus.key}")
-    private final String serviceKey;
-
-
+    @Override
     public List<BusArrival> retrieveBusArrival(BusStation station) {
         try {
-            ResponseGGBusArrival response = request(station.getGgNodeId());
+            ResponseKakaoBusApi response = request(station.getTownNodeId());
 
             if (response == null) {
                 throw new UnexpectedResponseException("Failed response");
             }
 
-            ResponseGGBusArrival.Header header = response.getMsgHeader();
-            Integer code = header.getResultCode();
-
-            if (code == 4) {
-                return List.of();
+            String name = response.getName();
+            if (name == null) {
+                throw new InvalidBusStationException();
             }
 
-            if (code != 0) {
-                throw new UnexpectedResponseException(header.getResultMessage());
-            }
-
-            return response.getMsgBody().getBusArrivalList().stream()
-                    .map(model -> BusResponseMapper.to(model, station))
+            return response.getLines().stream()
+                    .filter(ResponseKakaoBusApi.BusLine::isRunning)
+                    .map(BusResponseMapper::to)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             throw new CannotGetBusArrivalException(e);
@@ -59,22 +51,22 @@ public class GGBusProvider implements BusArrivalProvider {
 
     @Override
     public String getProviderPrefix() {
-        return "GG_";
+        return "T_";
     }
 
-    private ResponseGGBusArrival request(String stationId) {
+    private ResponseKakaoBusApi request(String stationId) {
         URI uri = UriComponentsBuilder.fromHttpUrl(apiPath)
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("stationId", stationId)
+                .queryParam("busstopid", stationId)
                 .build()
                 .toUri();
 
-        // TODO 비동기 방식으로 처리해보기
-        return webClient.get()
+        return webClient.mutate()
+                .build().get()
                 .uri(uri)
-                .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)
+                .header("Referer", "https://map.kakao.com/")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36")
                 .retrieve()
-                .bodyToMono(ResponseGGBusArrival.class)
+                .bodyToMono(ResponseKakaoBusApi.class)
                 .block();
     }
 }

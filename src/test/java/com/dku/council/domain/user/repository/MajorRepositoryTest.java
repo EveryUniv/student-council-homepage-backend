@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.repository;
 
 import com.dku.council.domain.user.model.entity.Major;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class MajorRepositoryTest {
         for (int i = 0; i < 20; i++) {
             Major major = new Major("MAJOR" + i, "DEP" + (i / 2));
             if (i >= 10) {
-                FieldInjector.inject(Major.class, major, "isActive", false);
+                FieldReflector.inject(Major.class, major, "isActive", false);
             }
             majors.add(major);
         }

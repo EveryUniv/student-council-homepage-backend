@@ -10,7 +10,7 @@ import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.mock.RentalItemMock;
 import com.dku.council.mock.RentalMock;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +78,7 @@ class RentalItemServiceTest {
         // given
         RentalItem item = RentalItemMock.create(11L, "name", 15);
         List<Rental> rentals = RentalMock.createList(item, 10);
-        FieldInjector.inject(RentalItem.class, item, "rentals", rentals);
+        FieldReflector.inject(RentalItem.class, item, "rentals", rentals);
 
         when(rentalItemRepository.findById(11L)).thenReturn(Optional.of(item));
 

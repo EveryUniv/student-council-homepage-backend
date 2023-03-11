@@ -63,6 +63,9 @@ public class ResponseGGBusArrival {
 
             @XmlElement(name = "routeId")
             private String routeId;
+
+            @XmlElement(name = "staOrder")
+            private Integer staOrder;
         }
     }
 }

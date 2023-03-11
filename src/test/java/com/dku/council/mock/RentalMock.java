@@ -5,7 +5,7 @@ import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class RentalMock {
     public static List<Rental> createDisabledList(RentalItem item, User user, int size) {
         List<Rental> list = createList(item, user, size);
         for (Rental rental : list) {
-            FieldInjector.inject(Rental.class, rental, "isActive", false);
+            FieldReflector.inject(Rental.class, rental, "isActive", false);
         }
         return list;
     }

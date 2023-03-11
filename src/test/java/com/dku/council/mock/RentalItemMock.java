@@ -2,7 +2,7 @@ package com.dku.council.mock;
 
 import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class RentalItemMock {
         for (int i = 0; i < size; i++) {
             RentalItem item = new RentalItem("item" + i, i + 10);
             if (!enabled) {
-                FieldInjector.inject(RentalItem.class, item, "isActive", false);
+                FieldReflector.inject(RentalItem.class, item, "isActive", false);
             }
             result.add(item);
         }
