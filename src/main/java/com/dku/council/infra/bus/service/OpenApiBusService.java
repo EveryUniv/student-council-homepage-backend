@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Duration;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,7 +67,7 @@ public class OpenApiBusService {
                 ))
                 .collect(Collectors.toList());
 
-        LocalTime now = LocalTime.now(clock);
+        LocalDateTime now = LocalDateTime.now(clock);
         for (Bus bus : busList) {
             Duration remaining = predictService.remainingNextBusArrival(bus.getName(), station, now);
             BusArrival arrival;

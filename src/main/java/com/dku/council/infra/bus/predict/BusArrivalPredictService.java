@@ -4,9 +4,9 @@ import com.dku.council.domain.bus.model.BusStation;
 import org.springframework.lang.Nullable;
 
 import java.time.Duration;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public interface BusArrivalPredictService {
     @Nullable
-    Duration remainingNextBusArrival(String busNo, BusStation station, LocalTime now);
+    Duration remainingNextBusArrival(String busNo, BusStation station, LocalDateTime now);
 }

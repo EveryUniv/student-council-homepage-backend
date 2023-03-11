@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,20 +33,33 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
      * @return 예측된 남은 시간.
      */
     @Nullable
-    public Duration remainingNextBusArrival(String busNo, BusStation station, LocalTime now) {
+    public Duration remainingNextBusArrival(String busNo, BusStation station, LocalDateTime now) {
         TimeTable table = busTimeTables.get(busNo);
         String stationDirName = station.name().replaceAll("_", "").toLowerCase();
+        LocalTime nowTime = now.toLocalTime();
+        String weekType = getWeekDayName(now);
 
         if (table == null) {
-            table = timeTableParser.parse(String.format("/bustable/%s/%s.table", stationDirName, busNo));
+            table = timeTableParser.parse(String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo));
             busTimeTables.put(busNo, table);
         }
 
-        if (isOutbound(table, now)) {
+        if (isOutbound(table, nowTime)) {
             return null;
         }
 
-        return table.remainingNextBusArrival(now);
+        return table.remainingNextBusArrival(nowTime);
+    }
+
+    private static String getWeekDayName(LocalDateTime dateTime) {
+        DayOfWeek week = dateTime.getDayOfWeek();
+        switch (week) {
+            case SATURDAY:
+            case SUNDAY:
+                return "weekend";
+            default:
+                return "weekday";
+        }
     }
 
     private static boolean isOutbound(TimeTable table, LocalTime now) {
