@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.MajorData;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
@@ -8,6 +7,7 @@ import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "사용자", description = "사용자 인증 및 정보 관련 api")
 @RestController
@@ -29,7 +27,8 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final MessageSource messageSource;
-    private final UserService service;
+    private final UserService userService;
+    private final SignupService signupService;
 
 
     /**
@@ -40,7 +39,7 @@ public class UserController {
     @GetMapping
     @UserOnly
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
-        return service.getUserInfo(auth.getUserId());
+        return userService.getUserInfo(auth.getUserId());
     }
 
     /**
@@ -53,7 +52,7 @@ public class UserController {
     @PostMapping("/{signup-token}")
     public void signup(@Valid @RequestBody RequestSignupDto dto,
                        @PathVariable("signup-token") String signupToken) {
-        service.signup(dto, signupToken);
+        signupService.signup(dto, signupToken);
     }
 
     /**
@@ -64,7 +63,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseLoginDto login(@Valid @RequestBody RequestLoginDto dto) {
-        return service.login(dto);
+        return userService.login(dto);
     }
 
     /**
@@ -86,7 +85,7 @@ public class UserController {
     @UserOnly
     public ResponseRefreshTokenDto refreshToken(HttpServletRequest request,
                                                 @Valid @RequestBody RequestRefreshTokenDto dto) {
-        return service.refreshToken(request, dto.getRefreshToken());
+        return userService.refreshToken(request, dto.getRefreshToken());
     }
 
     /**
@@ -94,11 +93,7 @@ public class UserController {
      */
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
-        // TODO Test it
-        return Arrays.stream(MajorData.values())
-                .filter(m -> !m.isSpecial())
-                .map(m -> new ResponseMajorDto(m.name(), m.getName(messageSource)))
-                .collect(Collectors.toList());
+        return userService.getAllMajors();
     }
 
     /**

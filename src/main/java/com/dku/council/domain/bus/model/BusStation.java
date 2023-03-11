@@ -4,15 +4,24 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum BusStation {
-    DKU_GATE("단국대정문", "228001978", "BS83664"),
-    BEAR_STATUE("곰상", "228001980", "BS130194");
+    DKU_GATE("단국대정문", "228001978", "BS83664", Set.of(
+            Bus.GG_102, Bus.GG_1101, Bus.GG_1101N,
+            Bus.GG_7007_1, Bus.GG_8100, Bus.GG_720_3,
+            Bus.T_24, Bus.DKU_SHUTTLE_BUS
+    )),
+    BEAR_STATUE("곰상", "228001980", "BS130194", Set.of(
+            Bus.GG_720_3, Bus.T_24, Bus.DKU_SHUTTLE_BUS
+    ));
 
     private final String name;
     private final String ggNodeId;
     private final String townNodeId;
+    private final Set<Bus> busSet;
 
     /**
      * 이름으로 BusStation을 찾습니다.

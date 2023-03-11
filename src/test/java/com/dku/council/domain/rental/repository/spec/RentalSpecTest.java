@@ -5,11 +5,14 @@ import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.FieldReflector;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,16 +35,21 @@ class RentalSpecTest {
     private RentalItemRepository rentalItemRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     private User user1;
 
     @BeforeEach
     void setup() {
-        user1 = UserMock.create("user1");
+        Major major = majorRepository.save(MajorMock.create());
+
+        user1 = UserMock.create("user1", major);
         user1 = userRepository.save(user1);
 
-        User user2 = UserMock.create("mamamam");
+        User user2 = UserMock.create("mamamam", major);
         user2 = userRepository.save(user2);
 
         List<RentalItem> items = createItems("Item", 7, true);
@@ -58,7 +66,7 @@ class RentalSpecTest {
         for (int i = 0; i < size; i++) {
             RentalItem item = new RentalItem(prefix + i, 20 + i);
             if (!isActive) {
-                FieldInjector.inject(RentalItem.class, item, "isActive", false);
+                FieldReflector.inject(RentalItem.class, item, "isActive", false);
             }
             items.add(item);
         }

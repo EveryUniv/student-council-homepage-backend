@@ -1,30 +1,32 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
+import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
-// TODO Test it
 @Service
 @RequiredArgsConstructor
 public class DKUAuthService {
 
-    private static final String DKU_AUTH_NAME = "dku";
+    public static final String DKU_AUTH_NAME = "dku";
 
-    private final MessageSource messageSource;
     private final DkuCrawlerService crawlerService;
     private final DkuAuthenticationService authenticationService;
+    private final UserRepository userRepository;
     private final SignupAuthRepository dkuAuthRepository;
 
     /**
@@ -57,13 +59,21 @@ public class DKUAuthService {
      */
     public ResponseVerifyStudentDto verifyStudent(RequestVerifyStudentDto dto) {
         String signupToken = UUID.randomUUID().toString();
+        checkAlreadyStudentId(dto);
 
         DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
 
         dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
 
-        ResponseScrappedStudentInfoDto studentInfoDto = ResponseScrappedStudentInfoDto.from(messageSource, studentInfo);
+        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
+    }
+
+    private void checkAlreadyStudentId(RequestVerifyStudentDto dto) {
+        Optional<User> alreadyUser = userRepository.findByStudentId(dto.getDkuStudentId());
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
     }
 }

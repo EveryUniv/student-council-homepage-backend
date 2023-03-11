@@ -7,15 +7,17 @@ import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
 import com.dku.council.domain.rental.repository.RentalItemRepository;
 import com.dku.council.domain.rental.repository.RentalRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.RentalItemMock;
 import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.MvcMockResponse;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@FullIntegrationTest
+//@FullIntegrationTest
 class RentalControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -56,6 +58,9 @@ class RentalControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
     private RentalItemRepository rentalItemRepository;
+
+    @Autowired
+    private MajorRepository majorRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -70,15 +75,18 @@ class RentalControllerTest extends AbstractContainerRedisTest {
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L);
+        Major major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(0L, major);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
 
-        User user2 = UserMock.create(0L);
+        User user2 = UserMock.create(0L, major);
         user2 = userRepository.save(user2);
 
-        rentalItems = RentalItemMock.createList(5);
+        rentalItems = RentalItemMock.createList(10);
         rentalItems = rentalItemRepository.saveAll(rentalItems);
+        rentalItemRepository.saveAll(RentalItemMock.createDisabledList(5));
 
         rentals = new ArrayList<>();
         targetRentals = RentalMock.createList(rentalItems.get(0), user, 3);
@@ -87,6 +95,8 @@ class RentalControllerTest extends AbstractContainerRedisTest {
             rentals.add(RentalMock.create(user2, rentalItems.get(i)));
         }
         rentals = rentalRepository.saveAll(rentals);
+
+        rentalRepository.saveAll(RentalMock.createDisabledList(rentalItems.get(0), user, 5));
     }
 
     @Test
@@ -153,6 +163,7 @@ class RentalControllerTest extends AbstractContainerRedisTest {
     @DisplayName("대여 신청")
     void create() throws Exception {
         // given
+        rentalRepository.deleteAll();
         RentalItem item = rentalItems.get(0);
         RequestCreateRentalDto dto = new RequestCreateRentalDto(item.getId(), RentalUserClass.INDIVIDUAL,
                 RentalMock.RENTAL_START, RentalMock.RENTAL_END, "title", "body");

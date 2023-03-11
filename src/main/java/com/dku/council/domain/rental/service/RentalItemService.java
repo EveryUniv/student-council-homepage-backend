@@ -22,14 +22,6 @@ public class RentalItemService {
     private final RentalItemRepository rentalItemRepository;
 
 
-    public RentalItem findRentalItem(Long id) {
-        RentalItem item = rentalItemRepository.findById(id).orElseThrow(RentalItemNotFoundException::new);
-        if (!item.isActive()) {
-            throw new RentalItemNotFoundException();
-        }
-        return item;
-    }
-
     @Transactional(readOnly = true)
     public ResponsePage<RentalItemDto> list(Specification<RentalItem> spec, Pageable pageable) {
         spec = RentalSpec.withRentalItemActive().and(spec);
@@ -45,12 +37,12 @@ public class RentalItemService {
     }
 
     public void delete(Long id) {
-        RentalItem item = findRentalItem(id);
+        RentalItem item = rentalItemRepository.findById(id).orElseThrow(RentalItemNotFoundException::new);
         item.markAsDeleted();
     }
 
     public void patch(Long id, RequestRentalItemDto dto) {
-        RentalItem item = findRentalItem(id);
+        RentalItem item = rentalItemRepository.findById(id).orElseThrow(RentalItemNotFoundException::new);
         if (dto.getItemName() != null) {
             item.updateItemName(dto.getItemName());
         }

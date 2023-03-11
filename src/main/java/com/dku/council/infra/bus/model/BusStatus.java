@@ -12,6 +12,11 @@ public enum BusStatus {
     WAITING,
 
     /**
+     * 예측된 시각
+     */
+    PREDICT,
+
+    /**
      * 운행 종료
      */
     STOP

@@ -13,7 +13,6 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,6 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
-    private final MessageSource messageSource;
 
 
     /**
@@ -37,9 +35,9 @@ public class CommentService {
      * @return 페이징된 댓글 목록
      */
     public Page<CommentDto> list(Long postId, Pageable pageable) {
-        postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
+        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         return commentRepository.findAllByPostId(postId, pageable)
-                .map(ent -> new CommentDto(messageSource, ent));
+                .map(CommentDto::new);
     }
 
     /**
@@ -50,7 +48,7 @@ public class CommentService {
      * @param content 댓글 내용
      */
     public Long create(Long postId, Long userId, String content) {
-        Post post = postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         Comment comment = Comment.builder()

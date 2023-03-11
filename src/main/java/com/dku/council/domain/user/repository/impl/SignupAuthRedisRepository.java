@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-// TODO Test it
 @Repository
 @RequiredArgsConstructor
 public class SignupAuthRedisRepository implements SignupAuthRepository {

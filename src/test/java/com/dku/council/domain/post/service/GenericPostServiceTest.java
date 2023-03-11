@@ -60,7 +60,7 @@ class GenericPostServiceTest {
     @DisplayName("list가 잘 동작하는지?")
     public void list() {
         // given
-        List<News> allNewsList = NewsMock.createList("generic-", 20);
+        List<News> allNewsList = NewsMock.createListDummy("generic-", 20);
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
@@ -77,7 +77,7 @@ class GenericPostServiceTest {
     @DisplayName("새롭게 잘 생성되는지?")
     public void create() {
         // given
-        User user = UserMock.create(99L);
+        User user = UserMock.createDummyMajor(99L);
         News news = NewsMock.create(user, 3L);
 
         List<MultipartFile> files = MultipartFileMock.createList(10);
@@ -106,7 +106,7 @@ class GenericPostServiceTest {
     @DisplayName("태그를 명시하며 생성하기")
     public void createWithTag() {
         // given
-        User user = UserMock.create(99L);
+        User user = UserMock.createDummyMajor(99L);
         News news = NewsMock.create(user, 3L);
         List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
 
@@ -142,7 +142,7 @@ class GenericPostServiceTest {
     @DisplayName("단건 조회가 잘 동작하는지?")
     public void findOne() {
         // given
-        News news = NewsMock.create(4L);
+        News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when
@@ -183,7 +183,7 @@ class GenericPostServiceTest {
     @DisplayName("권한 없는 게시글 삭제시 오류")
     public void failedDeleteByAccessDenied() {
         // given
-        News news = NewsMock.create(4L);
+        News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when & then

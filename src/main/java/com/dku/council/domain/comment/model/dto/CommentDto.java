@@ -3,11 +3,8 @@ package com.dku.council.domain.comment.model.dto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import org.springframework.context.MessageSource;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class CommentDto {
@@ -23,16 +20,10 @@ public class CommentDto {
     @Schema(name = "생성날짜", example = "2023-01-01")
     private final LocalDate createdDate;
 
-    public CommentDto(MessageSource messageSource, Comment comment) {
+    public CommentDto(Comment comment) {
         this.id = comment.getId();
-        this.major = comment.getUser().getMajor().getDepartmentName(messageSource);
+        this.major = comment.getUser().getMajor().getDepartment();
         this.createdDate = comment.getCreatedAt().toLocalDate();
         this.text = comment.getText();
-    }
-
-    public static List<CommentDto> listOf(MessageSource messageSource, List<Comment> entities) {
-        return entities.stream()
-                .map(ent -> new CommentDto(messageSource, ent))
-                .collect(Collectors.toList());
     }
 }
