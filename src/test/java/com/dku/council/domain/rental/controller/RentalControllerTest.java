@@ -18,6 +18,7 @@ import com.dku.council.mock.RentalMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.EntityUtil;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.MvcMockResponse;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-//@FullIntegrationTest
+@FullIntegrationTest
 class RentalControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
