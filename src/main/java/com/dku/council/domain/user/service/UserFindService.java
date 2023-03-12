@@ -27,44 +27,17 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class UserFindService {
 
-    private final MajorRepository majorRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtProvider jwtProvider;
+    public void sendSMSId(String phone) {
 
-    public ResponseLoginDto login(RequestLoginDto dto) {
-        User user = userRepository.findByStudentId(dto.getStudentId())
-                .orElseThrow(LoginUserNotFoundException::new);
-
-        if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            UserRole role = user.getUserRole();
-            AuthenticationToken token = jwtProvider.issue(user);
-            return new ResponseLoginDto(token, role, user);
-        } else {
-            throw new WrongPasswordException();
-        }
     }
 
-    public ResponseRefreshTokenDto refreshToken(HttpServletRequest request, String refreshToken) {
-        String accessToken = jwtProvider.getAccessTokenFromHeader(request);
-        AuthenticationToken token = jwtProvider.reissue(accessToken, refreshToken);
-        return new ResponseRefreshTokenDto(token);
+    public void sendPwdSMSCode(String phone) {
+
     }
 
-    public ResponseUserInfoDto getUserInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(LoginUserNotFoundException::new);
+    public void verifyPwdSMSCode(String phone, String code) {
 
-        String year = user.getYearOfAdmission().toString();
-        String major = user.getMajor().getName();
-        return new ResponseUserInfoDto(user.getName(), year, major);
-    }
-
-    public List<ResponseMajorDto> getAllMajors() {
-        return majorRepository.findAll().stream()
-                .map(ResponseMajorDto::new)
-                .collect(Collectors.toList());
     }
 }
