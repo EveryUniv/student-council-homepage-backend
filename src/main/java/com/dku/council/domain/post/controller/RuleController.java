@@ -31,7 +31,6 @@ import javax.validation.Valid;
 public class RuleController {
 
     private final GenericPostService<Rule> postService;
-    private final MessageSource messageSource;
 
     /**
      * 게시글 목록으로 조회
