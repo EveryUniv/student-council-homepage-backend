@@ -1,6 +1,7 @@
 package com.dku.council.infra.bus.predict.impl;
 
 import com.dku.council.domain.bus.model.BusStation;
+import com.dku.council.infra.bus.exception.CannotGetTimeTable;
 import com.dku.council.infra.bus.predict.BusArrivalPredictService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,12 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
         String weekType = getWeekDayName(now);
 
         if (table == null) {
-            table = timeTableParser.parse(String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo));
+            try {
+                table = timeTableParser.parse(String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo));
+            } catch (CannotGetTimeTable e) {
+                log.warn("Cannot parse time table", e);
+                return null;
+            }
             busTimeTables.put(busNo, table);
         }
 
