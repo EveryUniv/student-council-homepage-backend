@@ -10,6 +10,7 @@ import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.SMSService;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 
+import java.time.Clock;
 import java.util.Optional;
 
 import static com.dku.council.domain.user.service.SMSVerificationService.SMS_AUTH_COMPLETE_SIGN;
@@ -48,6 +50,7 @@ class SMSVerificationServiceTest {
 
     private SMSVerificationService service;
 
+    private final Clock clock = ClockUtil.create();
     private final String token = "token";
     private final int count = 6;
     private final String phone = "12-12-12";
@@ -55,7 +58,7 @@ class SMSVerificationServiceTest {
 
     @BeforeEach
     public void setup() {
-        service = new SMSVerificationService(messageSource, dkuAuthService, smsService,
+        service = new SMSVerificationService(clock, messageSource, dkuAuthService, smsService,
                 userRepository, smsAuthRepository, count);
     }
 
@@ -66,7 +69,7 @@ class SMSVerificationServiceTest {
         // given
         SMSAuth auth = new SMSAuth(phone, SMS_AUTH_COMPLETE_SIGN);
         when(smsAuthRepository.getAuthPayload(token,
-                SMS_AUTH_NAME, SMSAuth.class))
+                SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.of(auth));
 
         // when
@@ -81,7 +84,7 @@ class SMSVerificationServiceTest {
     void failedGetPhoneNumberByNotFound() {
         // given
         when(smsAuthRepository.getAuthPayload(token,
-                SMS_AUTH_NAME, SMSAuth.class))
+                SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -95,7 +98,7 @@ class SMSVerificationServiceTest {
         // given
         SMSAuth auth = new SMSAuth(phone, "CODE");
         when(smsAuthRepository.getAuthPayload(token,
-                SMS_AUTH_NAME, SMSAuth.class))
+                SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.of(auth));
 
         // when & then
@@ -136,7 +139,7 @@ class SMSVerificationServiceTest {
                     assertThat(auth.getPhone()).isEqualTo(actualPhone);
                     assertThat(auth.getCode().length()).isEqualTo(count);
                     return true;
-                }));
+                }), any());
         verify(dkuAuthService).getStudentInfo(token);
         verify(smsService).sendSMS(actualPhone, authMessage);
     }
@@ -159,7 +162,7 @@ class SMSVerificationServiceTest {
         // given
         String code = "121314";
         SMSAuth auth = new SMSAuth(phone, code);
-        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class))
+        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.of(auth));
 
         // then
@@ -172,7 +175,7 @@ class SMSVerificationServiceTest {
                     assertThat(au.getPhone()).isEqualTo(phone);
                     assertThat(au.getCode()).isEqualTo(SMS_AUTH_COMPLETE_SIGN);
                     return true;
-                }));
+                }), any());
     }
 
     @Test
@@ -181,7 +184,7 @@ class SMSVerificationServiceTest {
         // given
         String code = "121314";
         SMSAuth auth = new SMSAuth(phone, code);
-        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class))
+        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.of(auth));
 
         // then
@@ -193,7 +196,7 @@ class SMSVerificationServiceTest {
     @DisplayName("SMS 인증 실패 - 인증 요청을 보내지 않은 경우")
     void failedVerifySMSCodeByNotFound() {
         // given
-        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class))
+        when(smsAuthRepository.getAuthPayload(token, SMS_AUTH_NAME, SMSAuth.class, any()))
                 .thenReturn(Optional.empty());
 
         // then
