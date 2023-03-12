@@ -19,6 +19,10 @@ import java.util.List;
 public class PageController {
     private final PageService pageService;
 
+    /**
+     * 메인 페이지 화면 데이터. 캐러셀이미지 & 총학소식 & 청원 & 회의록
+     * @return 총학소식, 청원, 회의록 최신 5개의 데이터를 반환합니다.
+     */
     @GetMapping("/main")
     public MainPageResponseDto index(){
         return pageService.getMainPage();
