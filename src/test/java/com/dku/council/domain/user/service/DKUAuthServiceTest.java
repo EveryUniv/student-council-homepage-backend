@@ -55,7 +55,7 @@ class DKUAuthServiceTest {
         // given
         StudentInfo info = new StudentInfo("", "", 1, "", "");
         when(dkuAuthRepository.getAuthPayload(any(),
-                eq(DKU_AUTH_NAME), eq(StudentInfo.class)))
+                eq(DKU_AUTH_NAME), eq(StudentInfo.class), any()))
                 .thenReturn(Optional.of(info));
 
         // when
@@ -70,7 +70,7 @@ class DKUAuthServiceTest {
     void getStudentInfoWhenNotFound() {
         // given
         when(dkuAuthRepository.getAuthPayload(any(),
-                eq(DKU_AUTH_NAME), eq(StudentInfo.class)))
+                eq(DKU_AUTH_NAME), eq(StudentInfo.class), any()))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -113,7 +113,7 @@ class DKUAuthServiceTest {
         // then
         assertThat(response.getStudent().getStudentId()).isEqualTo("1212");
         assertThat(response.getStudent().getStudentName()).isEqualTo("name");
-        verify(dkuAuthRepository).setAuthPayload(any(), eq(DKU_AUTH_NAME), eq(info));
+        verify(dkuAuthRepository).setAuthPayload(any(), eq(DKU_AUTH_NAME), eq(info), any());
     }
 
     @Test
