@@ -14,6 +14,7 @@ public class UserMock {
     public static final String STUDENT_ID = "12345678";
     public static final String PASSWORD = "abcdabab";
     public static final String NAME = "username";
+    public static final String NICKNAME = "nickname";
     public static final Major MAJOR = MajorMock.create();
 
     public static List<User> createList(Major major, int size) {
@@ -56,6 +57,7 @@ public class UserMock {
                 .password(password)
                 .name(username)
                 .role(role)
+                .nickname(NICKNAME)
                 .yearOfAdmission(2017)
                 .major(major)
                 .phone("010-1111-2222")

@@ -1,5 +1,6 @@
 package com.dku.council.infra.bus.predict.impl;
 
+import com.dku.council.infra.bus.exception.CannotGetTimeTable;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -40,7 +41,7 @@ public class TimeTableParser {
             }
 
             if (timeTables.isEmpty()) {
-                throw new RuntimeException("시간표를 불러올 수 없습니다: " + path);
+                throw new CannotGetTimeTable("시간표를 불러올 수 없습니다: " + path);
             }
 
             if (offset != Duration.ZERO) {
@@ -50,8 +51,8 @@ public class TimeTableParser {
             }
 
             return new TimeTable(timeTables);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | NullPointerException e) {
+            throw new CannotGetTimeTable(e);
         }
     }
 
