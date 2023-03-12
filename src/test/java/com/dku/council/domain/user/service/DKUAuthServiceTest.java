@@ -12,6 +12,8 @@ import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.ClockUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.LinkedMultiValueMap;
 
+import java.time.Clock;
 import java.util.Optional;
 
 import static com.dku.council.domain.user.service.DKUAuthService.DKU_AUTH_NAME;
@@ -45,8 +48,14 @@ class DKUAuthServiceTest {
     @Mock
     private SignupAuthRepository dkuAuthRepository;
 
-    @InjectMocks
+    private final Clock clock = ClockUtil.create();
     private DKUAuthService service;
+
+    @BeforeEach
+    public void setup(){
+        this.service = new DKUAuthService(clock, crawlerService,
+                authenticationService, userRepository, dkuAuthRepository);
+    }
 
 
     @Test

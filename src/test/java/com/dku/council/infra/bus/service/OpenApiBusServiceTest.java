@@ -72,7 +72,7 @@ class OpenApiBusServiceTest {
         when(shuttleBusProvider.getProviderPrefix()).thenReturn("DKU_");
 
         when(predictService.remainingNextBusArrival(any(), eq(station), any())).thenReturn(Duration.ofSeconds(50));
-        when(predictService.remainingNextBusArrival(eq("1101N"), eq(station), any())).thenReturn(null);
+        when(predictService.remainingNextBusArrival(eq("7007-1"), eq(station), any())).thenReturn(null);
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(station);
@@ -95,8 +95,7 @@ class OpenApiBusServiceTest {
         HashMap<String, BusStatus> statusMap = new HashMap<>();
         statusMap.put("102", BusStatus.RUN);
         statusMap.put("1101", BusStatus.PREDICT);
-        statusMap.put("1101N", BusStatus.STOP);
-        statusMap.put("7007-1", BusStatus.PREDICT);
+        statusMap.put("7007-1", BusStatus.STOP);
         statusMap.put("8100", BusStatus.PREDICT);
         statusMap.put("720-3", BusStatus.RUN);
         statusMap.put("24", BusStatus.RUN);
