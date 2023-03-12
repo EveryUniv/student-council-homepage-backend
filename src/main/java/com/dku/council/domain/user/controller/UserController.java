@@ -26,7 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final MessageSource messageSource;
     private final UserService userService;
     private final SignupService signupService;
 

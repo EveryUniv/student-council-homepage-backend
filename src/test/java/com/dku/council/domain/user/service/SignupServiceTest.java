@@ -53,7 +53,7 @@ class SignupServiceTest {
     private final String phone = "01011112222";
     private final String studentId = "id";
     private final StudentInfo info = new StudentInfo("name", studentId, 0, "Major", "Department");
-    private final RequestSignupDto dto = new RequestSignupDto("pwd");
+    private final RequestSignupDto dto = new RequestSignupDto("nickname", "pwd");
 
 
     @Test

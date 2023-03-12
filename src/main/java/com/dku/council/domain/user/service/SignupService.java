@@ -43,6 +43,7 @@ public class SignupService {
                 .studentId(studentInfo.getStudentId())
                 .password(encryptedPassword)
                 .name(studentInfo.getStudentName())
+                .nickname(dto.getNickname())
                 .phone(phone)
                 .major(major)
                 .yearOfAdmission(studentInfo.getYearOfAdmission())

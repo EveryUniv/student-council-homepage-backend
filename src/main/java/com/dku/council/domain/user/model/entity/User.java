@@ -32,6 +32,10 @@ public class User extends BaseEntity {
     @Column(length = 20)
     private String name;
 
+    @NotNull
+    @Column(length = 20)
+    private String nickname;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "major_id")
     private Major major;
@@ -54,6 +58,7 @@ public class User extends BaseEntity {
                  @NonNull String name,
                  @NonNull Major major,
                  @NonNull String phone,
+                 @NonNull String nickname,
                  Integer yearOfAdmission,
                  UserStatus status,
                  UserRole role) {
@@ -62,6 +67,7 @@ public class User extends BaseEntity {
         this.name = name;
         this.major = major;
         this.phone = phone;
+        this.nickname = nickname;
         this.yearOfAdmission = yearOfAdmission;
         this.status = status;
         this.userRole = role;
