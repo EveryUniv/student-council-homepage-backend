@@ -43,7 +43,7 @@ public class TownBusProvider implements BusArrivalProvider {
             return response.getLines().stream()
                     .filter(ResponseKakaoBusApi.BusLine::isRunning)
                     .map(BusResponseMapper::to)
-                    .filter(this::filter24Bus)
+                    .filter(TownBusProvider::filter24Bus)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             throw new CannotGetBusArrivalException(e);
@@ -56,7 +56,7 @@ public class TownBusProvider implements BusArrivalProvider {
     }
 
     // 곰상에 정차중인 24번 버스는 제외
-    private boolean filter24Bus(BusArrival busArrival) {
+    private static boolean filter24Bus(BusArrival busArrival) {
         if (busArrival.getBusNo().equals("24")) {
             return busArrival.getLocationNo1() != 2;
         }

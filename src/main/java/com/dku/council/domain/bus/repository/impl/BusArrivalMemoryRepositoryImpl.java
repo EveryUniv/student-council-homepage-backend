@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+// TODO 다른 클래스들과 일반화하기
 @Repository
 @RequiredArgsConstructor
 public class BusArrivalMemoryRepositoryImpl implements BusArrivalMemoryRepository {

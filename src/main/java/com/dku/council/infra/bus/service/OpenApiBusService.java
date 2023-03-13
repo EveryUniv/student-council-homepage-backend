@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class OpenApiBusService {
 
-    public static final int PREDICTION_LOWER_BOUND = 60;
+    public static final int PREDICTION_LOWER_BOUND = 90;
 
     private final Clock clock;
     private final BusArrivalPredictService predictService;

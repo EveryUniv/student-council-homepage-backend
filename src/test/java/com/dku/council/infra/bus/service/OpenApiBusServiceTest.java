@@ -133,8 +133,8 @@ class OpenApiBusServiceTest {
 
         // when & then
         when(predictService.remainingNextBusArrival(any(), any(), any())).thenReturn(null);
-        whenPrediction1101(80);
-        checkBusArrival(station, BusStatus.PREDICT, 80);
+        whenPrediction1101(PREDICTION_LOWER_BOUND + 10);
+        checkBusArrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND + 10);
 
         whenPrediction1101(PREDICTION_LOWER_BOUND - 1);
         checkBusArrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
