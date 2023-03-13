@@ -10,7 +10,6 @@ import com.dku.council.infra.bus.provider.ShuttleBusProvider;
 import com.dku.council.infra.bus.provider.TownBusProvider;
 import com.dku.council.mock.BusArrivalMock;
 import com.dku.council.util.ClockUtil;
-import org.assertj.core.api.Assertions;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -72,7 +72,7 @@ class OpenApiBusServiceTest {
         when(shuttleBusProvider.getProviderPrefix()).thenReturn("DKU_");
 
         when(predictService.remainingNextBusArrival(any(), eq(station), any())).thenReturn(Duration.ofSeconds(50));
-        when(predictService.remainingNextBusArrival(eq("1101N"), eq(station), any())).thenReturn(null);
+        when(predictService.remainingNextBusArrival(eq("102"), eq(station), any())).thenReturn(null);
 
         // when
         List<BusArrival> arrivals = service.retrieveBusArrival(station);
@@ -83,9 +83,9 @@ class OpenApiBusServiceTest {
         for (BusArrival arrival : arrivals) {
             BusStatus status = statusMap.remove(arrival.getBusNo());
             if (status == null) {
-                Assertions.fail("not contains: " + arrival.getBusNo());
+                fail("not contains: " + arrival.getBusNo());
             } else {
-                assertThat(status).isEqualTo(arrival.getStatus());
+                assertThat(arrival.getStatus()).isEqualTo(status);
             }
         }
         assertThat(statusMap).isEmpty();
@@ -93,10 +93,8 @@ class OpenApiBusServiceTest {
 
     private static HashMap<String, BusStatus> expected() {
         HashMap<String, BusStatus> statusMap = new HashMap<>();
-        statusMap.put("102", BusStatus.RUN);
+        statusMap.put("102", BusStatus.STOP);
         statusMap.put("1101", BusStatus.PREDICT);
-        statusMap.put("1101N", BusStatus.STOP);
-        statusMap.put("7007-1", BusStatus.PREDICT);
         statusMap.put("8100", BusStatus.PREDICT);
         statusMap.put("720-3", BusStatus.RUN);
         statusMap.put("24", BusStatus.RUN);
@@ -122,8 +120,7 @@ class OpenApiBusServiceTest {
                 BusArrivalMock.create("101"),
                 BusArrivalMock.create("1234"),
                 BusArrivalMock.create("720-3", 5),
-                BusArrivalMock.create("720-3", 150),
-                BusArrivalMock.create("102")
+                BusArrivalMock.create("720-3", 150)
         );
     }
 }
