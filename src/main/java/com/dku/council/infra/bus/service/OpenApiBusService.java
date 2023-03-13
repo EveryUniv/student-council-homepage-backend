@@ -73,7 +73,7 @@ public class OpenApiBusService {
             BusArrival arrival;
             if (remaining != null) {
                 arrival = new BusArrival(BusStatus.PREDICT, 0,
-                        1, (int) remaining.getSeconds(), "",
+                        bus.getPredictionStationOrder(), (int) remaining.getSeconds(), "",
                         0, 0, "", bus.getName());
             } else {
                 arrival = BusArrival.stopped(bus.getName());
