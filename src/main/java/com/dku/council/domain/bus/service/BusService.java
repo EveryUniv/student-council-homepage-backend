@@ -30,13 +30,20 @@ public class BusService {
         CachedBusArrivals cached = memoryRepository.getArrivals(stationName, now);
 
         if (cached == null) {
-            List<BusArrival> arrivals = openApiBusService.retrieveBusArrival(station);
-            cached = memoryRepository.cacheArrivals(stationName, arrivals, now);
+            cached = cacheBusArrival(station);
         }
 
         List<BusArrivalDto> busArrivalDtos = cached.getArrivals().stream()
                 .map(BusArrivalDto::new)
                 .collect(Collectors.toList());
         return new ResponseBusArrivalDto(cached.getCapturedAt(), busArrivalDtos);
+    }
+
+    public CachedBusArrivals cacheBusArrival(BusStation station) {
+        Instant now = Instant.now(clock);
+        String stationName = station.name();
+
+        List<BusArrival> arrivals = openApiBusService.retrieveBusArrival(station);
+        return memoryRepository.cacheArrivals(stationName, arrivals, now);
     }
 }
