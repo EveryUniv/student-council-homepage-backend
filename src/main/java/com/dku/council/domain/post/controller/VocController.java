@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.controller;
 
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedVocDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateVocDto;
@@ -34,6 +35,7 @@ public class VocController {
 
     private final VocService vocService;
     private final GenericPostService<Voc> vocPostService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록으로 조회
@@ -141,5 +143,27 @@ public class VocController {
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
         vocService.reply(postId, dto.getAnswer());
+    }
+
+    /**
+     * 게시글에 좋아요 표시
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }

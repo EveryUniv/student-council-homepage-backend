@@ -180,15 +180,6 @@ public class GenericPostService<E extends Post> {
         post.blind();
     }
 
-    /**
-     * 첨부파일의 Base URL을 가져옵니다.
-     *
-     * @return 첨부파일 Base URL
-     */
-    public String getFileBaseUrl() {
-        return fileUploadService.getBaseURL();
-    }
-
     @FunctionalInterface
     public interface PostResultMapper<T, D, E extends Post> {
         T map(D dto, E post);

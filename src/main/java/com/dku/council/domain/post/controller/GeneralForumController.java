@@ -3,6 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGeneralForumDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -35,6 +36,7 @@ public class GeneralForumController {
 
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록 및 태그 조회
@@ -161,5 +163,27 @@ public class GeneralForumController {
     public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
         Long deleteId = commentService.delete(id, auth.getUserId(), auth.isAdmin());
         return new ResponseIdDto(deleteId);
+    }
+
+    /**
+     * 게시글에 좋아요 표시
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }
