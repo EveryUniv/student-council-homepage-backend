@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Repository
 @RequiredArgsConstructor
@@ -33,9 +33,9 @@ public class ViewCountRedisRepository implements ViewCountMemoryRepository {
     }
 
     @Override
-    public void put(Long postId, String userIdentifier, long expiresAfter, Instant now) {
+    public void put(Long postId, String userIdentifier, Duration expiresAfter, Instant now) {
         String key = makeEntryKey(postId, userIdentifier);
-        long expiresAt = now.plus(expiresAfter, ChronoUnit.MINUTES).getEpochSecond();
+        long expiresAt = now.plus(expiresAfter).getEpochSecond();
         redisTemplate.opsForHash().put(RedisKeys.POST_VIEW_COUNT_SET_KEY, key, String.valueOf(expiresAt));
     }
 

@@ -17,7 +17,7 @@ public class SignupAuthRedisRepository extends AbstractKeyValueCacheRepository i
 
     protected SignupAuthRedisRepository(StringRedisTemplate redisTemplate,
                                         ObjectMapper objectMapper,
-                                        @Value("${app.auth.signup-expiration-minutes}") Duration cacheDuration) {
+                                        @Value("${app.auth.signup-expires}") Duration cacheDuration) {
         super(redisTemplate, objectMapper, cacheDuration, RedisKeys.SIGNUP_AUTH_KEY);
     }
 

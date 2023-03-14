@@ -17,8 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,8 +34,8 @@ class SignupAuthRedisRepositoryTest extends AbstractContainerRedisTest {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Value("${app.auth.signup-expiration-minutes}")
-    private Long expires;
+    @Value("${app.auth.signup-expires}")
+    private Duration expires;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -107,7 +107,7 @@ class SignupAuthRedisRepositoryTest extends AbstractContainerRedisTest {
 
         // when
         Optional<TestClass> result = repository.getAuthPayload(token, auth, TestClass.class,
-                now.plus(expires + 1, ChronoUnit.MINUTES));
+                now.plus(expires).plusSeconds(60));
 
         // then
         assertThat(result.isEmpty()).isTrue();
