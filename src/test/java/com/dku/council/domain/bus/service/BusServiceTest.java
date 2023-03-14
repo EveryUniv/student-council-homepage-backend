@@ -1,9 +1,9 @@
 package com.dku.council.domain.bus.service;
 
 import com.dku.council.domain.bus.model.BusStation;
+import com.dku.council.domain.bus.model.CachedBusArrivals;
 import com.dku.council.domain.bus.model.dto.ResponseBusArrivalDto;
-import com.dku.council.domain.bus.model.repository.CachedBusArrivals;
-import com.dku.council.domain.bus.repository.BusArrivalMemoryRepository;
+import com.dku.council.domain.bus.repository.BusArrivalRepository;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.service.OpenApiBusService;
 import com.dku.council.mock.BusArrivalMock;
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,7 +36,7 @@ class BusServiceTest {
     private OpenApiBusService openApiBusService;
 
     @Mock
-    private BusArrivalMemoryRepository memoryRepository;
+    private BusArrivalRepository memoryRepository;
 
     @BeforeEach
     public void setup() {
@@ -69,7 +70,7 @@ class BusServiceTest {
         Instant now = Instant.now(clock);
         List<BusArrival> arrivals = BusArrivalMock.createList(5);
         CachedBusArrivals cached = new CachedBusArrivals(now, arrivals);
-        when(memoryRepository.getArrivals(station.name(), now)).thenReturn(cached);
+        when(memoryRepository.getArrivals(station.name(), now)).thenReturn(Optional.of(cached));
 
         // when
         ResponseBusArrivalDto dto = service.listBusArrival(BusStation.DKU_GATE);
