@@ -122,7 +122,9 @@ public class GenericPostService<E extends Post> {
 
     private ResponseSingleGenericPostDto makePostDto(Long userId, E post) {
         int likes = postLikeService.getCountOfLikes(post.getId());
-        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), userId, likes, post);
+        boolean isMine = post.getUser().getId().equals(userId);
+        boolean isLiked = postLikeService.isPostLiked(post.getId(), userId);
+        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), likes, isMine, isLiked, post);
     }
 
     /**

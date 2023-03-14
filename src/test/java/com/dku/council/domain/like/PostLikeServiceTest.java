@@ -48,8 +48,8 @@ class PostLikeServiceTest {
     @DisplayName("좋아요 - 캐시에 count가 없는 경우")
     void likeNoCached() {
         // given
-        when(memoryRepository.getCachedLikeCount(any())).thenReturn(-1);
-        when(persistenceRepository.countByPostId(any())).thenReturn(5);
+        when(memoryRepository.getCachedLikeCount(10L)).thenReturn(-1);
+        when(persistenceRepository.countByPostId(10L)).thenReturn(5);
 
         // when
         service.like(10L, 10L);
@@ -63,7 +63,7 @@ class PostLikeServiceTest {
     @DisplayName("좋아요 - 캐시에 count가 있는 경우")
     void likeCached() {
         // given
-        when(memoryRepository.getCachedLikeCount(any())).thenReturn(5);
+        when(memoryRepository.getCachedLikeCount(10L)).thenReturn(5);
 
         // when
         service.like(10L, 10L);
@@ -74,11 +74,26 @@ class PostLikeServiceTest {
     }
 
     @Test
+    @DisplayName("좋아요 - 이미 좋아요한 경우 무시")
+    void likeAlready() {
+        // given
+        when(memoryRepository.isPostLiked(10L, 10L)).thenReturn(true);
+
+        // when
+        service.like(10L, 10L);
+
+        // then
+        verify(memoryRepository, never()).addPostLike(10L, 10L);
+        verify(memoryRepository, never()).setLikeCount(any(), eq(5));
+    }
+
+    @Test
     @DisplayName("좋아요 취소 - 캐시에 count가 없는 경우")
     void cancelLikeNoCached() {
         // given
         when(memoryRepository.getCachedLikeCount(any())).thenReturn(-1);
         when(persistenceRepository.countByPostId(any())).thenReturn(5);
+        when(memoryRepository.isPostLiked(10L, 10L)).thenReturn(true);
 
         // when
         service.cancelLike(10L, 10L);
@@ -93,6 +108,7 @@ class PostLikeServiceTest {
     void cancelLikeCached() {
         // given
         when(memoryRepository.getCachedLikeCount(any())).thenReturn(5);
+        when(memoryRepository.isPostLiked(10L, 10L)).thenReturn(true);
 
         // when
         service.cancelLike(10L, 10L);
@@ -100,6 +116,20 @@ class PostLikeServiceTest {
         // then
         verify(memoryRepository).removePostLike(10L, 10L);
         verify(memoryRepository).setLikeCount(any(), eq(4));
+    }
+
+    @Test
+    @DisplayName("좋아요 - 좋아요를 안한경우 무시")
+    void cancelLikeAlready() {
+        // given
+        when(memoryRepository.isPostLiked(10L, 10L)).thenReturn(false);
+
+        // when
+        service.cancelLike(10L, 10L);
+
+        // then
+        verify(memoryRepository, never()).removePostLike(10L, 10L);
+        verify(memoryRepository, never()).setLikeCount(any(), eq(5));
     }
 
     @Test

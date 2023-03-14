@@ -68,7 +68,7 @@ class GenericPostServiceTest {
     private GenericPostService<Petition> petitionService;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         newsService = new GenericPostService<>(newsRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
         petitionService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
     }
@@ -201,9 +201,10 @@ class GenericPostServiceTest {
         // given
         News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
+        when(postLikeService.isPostLiked(any(), any())).thenReturn(false);
 
         // when
-        ResponseSingleGenericPostDto dto = newsService.findOne(4L, 5L, "Addr");
+        ResponseSingleGenericPostDto dto = newsService.findOne(4L, news.getUser().getId(), "Addr");
 
         // then
         verify(viewCountService).increasePostViews(argThat(post -> {
@@ -212,6 +213,8 @@ class GenericPostServiceTest {
         }), eq("Addr"));
 
         assertThat(dto.getId()).isEqualTo(4L);
+        assertThat(dto.isLiked()).isEqualTo(false);
+        assertThat(dto.isMine()).isEqualTo(true);
     }
 
     @Test
@@ -220,14 +223,17 @@ class GenericPostServiceTest {
         // given
         Petition petition = PetitionMock.createWithDummy();
         when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
+        when(postLikeService.isPostLiked(any(), any())).thenReturn(true);
 
         // when
-        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 5L, "Addr", ResponsePetitionDto::new);
+        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", ResponsePetitionDto::new);
 
         // then
         assertThat(dto.getId()).isEqualTo(petition.getId());
         assertThat(dto.getViews()).isEqualTo(petition.getViews());
         assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
+        assertThat(dto.isLiked()).isEqualTo(true);
+        assertThat(dto.isMine()).isEqualTo(false);
     }
 
     @Test

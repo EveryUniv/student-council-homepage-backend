@@ -166,7 +166,8 @@ public class GeneralForumController {
     }
 
     /**
-     * 게시글에 좋아요 표시
+     * 게시글에 좋아요 표시.
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
      *
      * @param id 게시글 id
      */
@@ -178,6 +179,7 @@ public class GeneralForumController {
 
     /**
      * 좋아요 취소
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
      *
      * @param id 게시글 id
      */
