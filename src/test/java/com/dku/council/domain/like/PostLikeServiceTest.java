@@ -185,7 +185,7 @@ class PostLikeServiceTest {
 
         when(memoryRepository.getAllPostLikes()).thenReturn(likes);
         when(userRepository.getReferenceById(any()))
-                .thenAnswer(inv -> UserMock.createDummyMajor((Long) inv.getArgument(0)));
+                .thenAnswer(inv -> UserMock.createDummyMajor(inv.getArgument(0)));
         when(postRepository.getReferenceById(any()))
                 .thenAnswer(inv -> NewsMock.createDummy(inv.getArgument(0)));
 
