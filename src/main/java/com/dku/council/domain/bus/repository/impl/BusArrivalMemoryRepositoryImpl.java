@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class BusArrivalMemoryRepositoryImpl implements BusArrivalMemoryRepositor
     private final ObjectMapper objectMapper;
 
     @Value("${bus.cache-time}")
-    private final Long busCacheTime;
+    private final Duration busCacheTime;
 
     @Override
     public CachedBusArrivals getArrivals(String stationId, Instant now) {
@@ -39,7 +40,7 @@ public class BusArrivalMemoryRepositoryImpl implements BusArrivalMemoryRepositor
         }
 
         Instant capturedAt = cachedData.getCapturedAt();
-        if (now.isAfter(capturedAt.plusSeconds(busCacheTime))) {
+        if (now.isAfter(capturedAt.plus(busCacheTime))) {
             redisTemplate.opsForHash().delete(RedisKeys.BUS_ARRIVAL_KEY, stationId);
             return null;
         }
