@@ -13,7 +13,6 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -35,7 +34,6 @@ public class VocController {
 
     private final VocService vocService;
     private final GenericPostService<Voc> vocPostService;
-    private final FileUploadService fileUploadService;
 
     /**
      * 게시글 목록으로 조회
@@ -53,8 +51,7 @@ public class VocController {
                                                @ParameterObject Pageable pageable) {
         Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
-                .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -79,8 +76,7 @@ public class VocController {
         spec = spec.and(PostSpec.withTags(tagIds));
         spec = spec.and(PostSpec.withAuthor(userId));
 
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
-                .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 

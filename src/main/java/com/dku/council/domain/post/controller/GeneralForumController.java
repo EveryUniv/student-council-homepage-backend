@@ -52,8 +52,7 @@ public class GeneralForumController {
                                                         @ParameterObject Pageable pageable) {
         Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
         spec = spec.and(PostSpec.withTitleOrBody(keyword));
-        Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), bodySize, post));
+        Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable, bodySize, SummarizedGeneralForumDto::new);
         return new ResponsePage<>(list);
     }
 

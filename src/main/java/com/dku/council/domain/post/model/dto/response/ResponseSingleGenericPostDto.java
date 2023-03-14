@@ -35,10 +35,16 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "파일 목록")
     private final List<PostFileDto> files;
 
+    @Schema(description = "좋아요 수", example = "16")
+    private final int likes;
+
+    @Schema(description = "조회수", example = "55")
+    private final int views;
+
     @Schema(description = "내가 쓴 게시물인지?", example = "true")
     private final boolean isMine;
 
-    public ResponseSingleGenericPostDto(String baseFileUrl, Long userId, Post post) {
+    public ResponseSingleGenericPostDto(String baseFileUrl, Long userId, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
@@ -47,8 +53,23 @@ public class ResponseSingleGenericPostDto {
         this.tag = post.getPostTags().stream()
                 .map(e -> new TagDto(e.getTag()))
                 .collect(Collectors.toList());
+        this.likes = likes;
+        this.views = post.getViews();
         this.createdAt = post.getCreatedAt();
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.isMine = post.getUser().getId().equals(userId);
+    }
+
+    public ResponseSingleGenericPostDto(ResponseSingleGenericPostDto copy) {
+        this.id = copy.id;
+        this.title = copy.title;
+        this.body = copy.body;
+        this.author = copy.author;
+        this.tag = copy.tag;
+        this.likes = copy.likes;
+        this.views = copy.views;
+        this.createdAt = copy.createdAt;
+        this.files = copy.files;
+        this.isMine = copy.isMine;
     }
 }

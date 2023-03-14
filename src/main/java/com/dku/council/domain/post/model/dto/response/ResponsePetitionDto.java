@@ -14,8 +14,8 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
     @Schema(description = "운영진 답변", example = "안녕하세요", nullable = true)
     private final String answer;
 
-    public ResponsePetitionDto(String baseFileUrl, Long userId, Petition post) {
-        super(baseFileUrl, userId, post);
+    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post) {
+        super(dto);
         this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
     }

@@ -15,7 +15,6 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -37,7 +36,6 @@ public class PetitionController {
 
     private final PetitionService petitionService;
     private final GenericPostService<Petition> petitionPostService;
-    private final FileUploadService fileUploadService;
 
     /**
      * 게시글 목록으로 조회
@@ -55,8 +53,8 @@ public class PetitionController {
                                                     @ParameterObject Pageable pageable) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
-                .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, bodySize, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
+        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable, bodySize, (dto, post) ->
+                new SummarizedPetitionDto(dto, post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);
     }
 

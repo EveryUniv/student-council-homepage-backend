@@ -46,8 +46,7 @@ public class NewsController {
                                                        @ParameterObject Pageable pageable) {
         Specification<News> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGenericPostDto(postService.getFileBaseUrl(), bodySize, post));
+        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

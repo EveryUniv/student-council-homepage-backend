@@ -1,9 +1,14 @@
 package com.dku.council.domain.post.service;
 
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
+import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.News;
+import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
@@ -13,11 +18,12 @@ import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.mock.MultipartFileMock;
 import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.UserMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -41,6 +47,9 @@ class GenericPostServiceTest {
     private GenericPostRepository<News> newsRepository;
 
     @Mock
+    private GenericPostRepository<Petition> petitionRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     @Mock
@@ -52,8 +61,17 @@ class GenericPostServiceTest {
     @Mock
     private FileUploadService fileUploadService;
 
-    @InjectMocks
-    private GenericPostService<News> service;
+    @Mock
+    private PostLikeService postLikeService;
+
+    private GenericPostService<News> newsService;
+    private GenericPostService<Petition> petitionService;
+
+    @BeforeEach
+    public void setup(){
+        newsService = new GenericPostService<>(newsRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        petitionService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+    }
 
 
     @Test
@@ -64,13 +82,52 @@ class GenericPostServiceTest {
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
+        when(postLikeService.getCountOfLikes(any())).thenReturn(15);
 
         // when
-        Page<News> allPage = service.list(null, Pageable.unpaged());
+        Page<SummarizedGenericPostDto> allPage = newsService.list(null, Pageable.unpaged(), 500);
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
-        assertThat(allPage.getContent()).containsExactlyInAnyOrderElementsOf(allNewsList);
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedGenericPostDto dto = allPage.getContent().get(i);
+            News news = allNewsList.get(i);
+            assertThat(dto.getId()).isEqualTo(news.getId());
+            assertThat(dto.getTitle()).isEqualTo(news.getTitle());
+            assertThat(dto.getBody()).isEqualTo(news.getBody());
+            assertThat(dto.getLikes()).isEqualTo(15);
+            assertThat(dto.getViews()).isEqualTo(news.getViews());
+        }
+    }
+
+    @Test
+    @DisplayName("list와 mapper가 잘 동작하는지?")
+    public void listWithMapper() {
+        // given
+        List<Petition> allPostList = PetitionMock.createListDummy("generic-", 20);
+        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
+
+        when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
+        when(postLikeService.getCountOfLikes(any())).thenReturn(15);
+
+        // when
+        Page<SummarizedPetitionDto> allPage = petitionService.list(null, Pageable.unpaged(), 500,
+                (dto, post) -> new SummarizedPetitionDto(dto, post, post.getComments().size()));
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedPetitionDto dto = allPage.getContent().get(i);
+            Petition post = allPostList.get(i);
+            assertThat(dto.getId()).isEqualTo(post.getId());
+            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
+            assertThat(dto.getBody()).isEqualTo(post.getBody());
+            assertThat(dto.getCommentCount()).isEqualTo(post.getComments().size());
+            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
+            assertThat(dto.getCreatedDate()).isEqualTo(post.getCreatedAt().toLocalDate());
+            assertThat(dto.getLikes()).isEqualTo(15);
+            assertThat(dto.getViews()).isEqualTo(post.getViews());
+        }
     }
 
     @Test
@@ -86,7 +143,7 @@ class GenericPostServiceTest {
         when(newsRepository.save(any())).thenReturn(news);
 
         // when
-        Long newsId = service.create(2L, dto);
+        Long newsId = newsService.create(2L, dto);
 
         // then
         assertThat(newsId).isEqualTo(3L);
@@ -115,7 +172,7 @@ class GenericPostServiceTest {
         when(newsRepository.save(any())).thenReturn(news);
 
         // when
-        Long newsId = service.create(2L, dto);
+        Long newsId = newsService.create(2L, dto);
 
         // then
         assertThat(newsId).isEqualTo(3L);
@@ -135,7 +192,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(UserNotFoundException.class, () ->
-                service.create(2L, new RequestCreateNewsDto("title", "body", List.of(), List.of())));
+                newsService.create(2L, new RequestCreateNewsDto("title", "body", List.of(), List.of())));
     }
 
     @Test
@@ -146,7 +203,7 @@ class GenericPostServiceTest {
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
 
         // when
-        ResponseSingleGenericPostDto dto = service.findOne(4L, 5L, "Addr");
+        ResponseSingleGenericPostDto dto = newsService.findOne(4L, 5L, "Addr");
 
         // then
         verify(viewCountService).increasePostViews(argThat(post -> {
@@ -158,6 +215,22 @@ class GenericPostServiceTest {
     }
 
     @Test
+    @DisplayName("Mapper와 함깨 단건 조회가 잘 동작하는지?")
+    public void findOneWithMapper() {
+        // given
+        Petition petition = PetitionMock.createWithDummy();
+        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
+
+        // when
+        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 5L, "Addr", ResponsePetitionDto::new);
+
+        // then
+        assertThat(dto.getId()).isEqualTo(petition.getId());
+        assertThat(dto.getViews()).isEqualTo(petition.getViews());
+        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
+    }
+
+    @Test
     @DisplayName("없는 게시글 단건 조회시 오류")
     public void failedFindOneByNotFound() {
         // given
@@ -165,7 +238,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                service.findOne(0L, 4L, "Addr"));
+                newsService.findOne(0L, 4L, "Addr"));
     }
 
     @Test
@@ -176,7 +249,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                service.delete(0L, 0L, false));
+                newsService.delete(0L, 0L, false));
     }
 
     @Test
@@ -188,6 +261,6 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(NotGrantedException.class, () ->
-                service.delete(0L, 0L, false));
+                newsService.delete(0L, 0L, false));
     }
 }
