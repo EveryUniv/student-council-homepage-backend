@@ -14,7 +14,7 @@ import java.util.List;
 
 @Tag(name = "메인 페이지", description = "메인 페이지 관련 api")
 @RestController
-@RequestMapping("/page")
+@RequestMapping("/main")
 @RequiredArgsConstructor
 public class PageController {
     private final PageService pageService;
@@ -23,7 +23,7 @@ public class PageController {
      * 메인 페이지 화면 데이터. 캐러셀이미지 & 총학소식 & 청원 & 회의록
      * @return 총학소식, 청원, 회의록 최신 5개의 데이터를 반환합니다.
      */
-    @GetMapping("/main")
+    @GetMapping
     public MainPageResponseDto index(){
         return pageService.getMainPage();
     }
