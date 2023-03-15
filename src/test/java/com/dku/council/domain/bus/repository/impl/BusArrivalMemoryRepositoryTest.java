@@ -1,14 +1,17 @@
 package com.dku.council.domain.bus.repository.impl;
 
-import com.dku.council.domain.bus.model.repository.CachedBusArrivals;
-import com.dku.council.domain.bus.repository.BusArrivalMemoryRepository;
+import com.dku.council.domain.bus.model.CachedBusArrivals;
+import com.dku.council.domain.bus.repository.BusArrivalRepository;
+import com.dku.council.global.component.model.CacheObject;
 import com.dku.council.global.config.redis.RedisKeys;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.mock.BusArrivalMock;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
-    private BusArrivalMemoryRepository repository;
+    private BusArrivalRepository repository;
 
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -35,7 +40,7 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
     private ObjectMapper objectMapper;
 
     @Value("${bus.cache-time}")
-    private Long busCacheTime;
+    private Duration busCacheTime;
 
 
     @Test
@@ -48,7 +53,7 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
         put(stationId, arrivals, now);
 
         // when
-        CachedBusArrivals cached = repository.getArrivals(stationId, now);
+        CachedBusArrivals cached = repository.getArrivals(stationId, now).orElseThrow();
 
         // then
         assertThat(cached.getCapturedAt().getEpochSecond()).isEqualTo(now.getEpochSecond());
@@ -63,10 +68,10 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
         Instant now = Instant.now();
 
         // when
-        CachedBusArrivals cached = repository.getArrivals(stationId, now);
+        Optional<CachedBusArrivals> cached = repository.getArrivals(stationId, now);
 
         // then
-        assertThat(cached).isNull();
+        assertThat(cached).isEmpty();
     }
 
     @Test
@@ -76,13 +81,13 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
         String stationId = "stationId";
         Instant now = Instant.now();
         List<BusArrival> arrivals = BusArrivalMock.createList(5);
-        put(stationId, arrivals, now.minusSeconds(busCacheTime + 1));
+        put(stationId, arrivals, now.minusSeconds(busCacheTime.getSeconds() + 1));
 
         // when
-        CachedBusArrivals cached = repository.getArrivals(stationId, now);
+        Optional<CachedBusArrivals> cached = repository.getArrivals(stationId, now);
 
         // then
-        assertThat(cached).isNull();
+        assertThat(cached).isEmpty();
     }
 
     @Test
@@ -105,7 +110,13 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
     public CachedBusArrivals get(String stationId) {
         try {
             Object value = redisTemplate.opsForHash().get(RedisKeys.BUS_ARRIVAL_KEY, stationId);
-            return objectMapper.readValue((String) value, CachedBusArrivals.class);
+            TypeFactory typeFactory = objectMapper.getTypeFactory();
+
+            JavaType collectionType = typeFactory.constructCollectionType(List.class, BusArrival.class);
+            JavaType type = typeFactory.constructParametricType(CacheObject.class, collectionType);
+
+            CacheObject<List<BusArrival>> cacheObject = objectMapper.readValue((String) value, type);
+            return new CachedBusArrivals(cacheObject, busCacheTime);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -113,7 +124,8 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
 
     public void put(String stationId, List<BusArrival> cache, Instant now) {
         try {
-            String value = objectMapper.writeValueAsString(new CachedBusArrivals(now, cache));
+            CacheObject<List<BusArrival>> obj = new CacheObject<>(now.plus(busCacheTime), cache);
+            String value = objectMapper.writeValueAsString(obj);
             redisTemplate.opsForHash().put(RedisKeys.BUS_ARRIVAL_KEY, stationId, value);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

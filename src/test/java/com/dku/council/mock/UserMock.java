@@ -60,7 +60,7 @@ public class UserMock {
                 .nickname(NICKNAME)
                 .yearOfAdmission(2017)
                 .major(major)
-                .phone("010-1111-2222")
+                .phone("01011112222")
                 .build();
 
         EntityUtil.injectId(User.class, user, userId);

@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -30,7 +32,7 @@ class ViewCountServiceTest {
 
     @BeforeEach
     public void setup() {
-        this.service = new ViewCountService(memoryRepository, clock, 10);
+        this.service = new ViewCountService(memoryRepository, clock, Duration.of(10, ChronoUnit.MINUTES));
     }
 
     @Test

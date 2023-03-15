@@ -8,15 +8,18 @@ import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class DKUAuthService {
 
     public static final String DKU_AUTH_NAME = "dku";
 
+    private final Clock clock;
     private final DkuCrawlerService crawlerService;
     private final DkuAuthenticationService authenticationService;
     private final UserRepository userRepository;
@@ -37,7 +41,8 @@ public class DKUAuthService {
      * @throws NotDKUAuthorizedException 학생 인증을 하지 않았을 경우
      */
     public StudentInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class)
+        Instant now = Instant.now(clock);
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 
@@ -57,14 +62,16 @@ public class DKUAuthService {
      * @param dto 요청 dto
      * @return 학생 인증 결과 dto
      */
+    @Transactional(readOnly = true)
     public ResponseVerifyStudentDto verifyStudent(RequestVerifyStudentDto dto) {
-        String signupToken = UUID.randomUUID().toString();
+        String signupToken = CodeGenerator.generateUUIDCode();
         checkAlreadyStudentId(dto);
 
         DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
 
-        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
+        Instant now = Instant.now(clock);
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo, now);
 
         ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);

@@ -8,16 +8,19 @@ import com.dku.council.domain.user.model.SMSAuth;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +28,8 @@ public class SMSVerificationService {
 
     public static final String SMS_AUTH_NAME = "sms";
     public static final String SMS_AUTH_COMPLETE_SIGN = "OK";
-    private static final Random RANDOM = new Random();
 
+    private final Clock clock;
     private final MessageSource messageSource;
     private final DKUAuthService dkuAuthService;
     private final SMSService smsService;
@@ -44,7 +47,8 @@ public class SMSVerificationService {
      * @throws NotSMSAuthorizedException 휴대폰 인증을 하지 않았을 경우
      */
     public String getPhoneNumber(String signupToken) throws NotSMSAuthorizedException {
-        SMSAuth authObj = smsAuthRepository.getAuthPayload(signupToken, SMS_AUTH_NAME, SMSAuth.class)
+        Instant now = Instant.now(clock);
+        SMSAuth authObj = smsAuthRepository.getAuthPayload(signupToken, SMS_AUTH_NAME, SMSAuth.class, now)
                 .orElseThrow(NotSMSSentException::new);
 
         if (!authObj.getCode().equals(SMS_AUTH_COMPLETE_SIGN)) {
@@ -70,14 +74,16 @@ public class SMSVerificationService {
      * @param signupToken 회원가입 토큰
      * @param phoneNumber 전화번호
      */
+    @Transactional(readOnly = true)
     public void sendSMSCode(String signupToken, String phoneNumber) {
         dkuAuthService.getStudentInfo(signupToken);
         checkAlreadyPhone(phoneNumber);
 
-        String code = generateDigitCode(digitCount);
+        String code = CodeGenerator.generateDigitCode(digitCount);
         phoneNumber = phoneNumber.trim().replaceAll("-", "");
 
-        smsAuthRepository.setAuthPayload(signupToken, SMS_AUTH_NAME, new SMSAuth(phoneNumber, code));
+        Instant now = Instant.now(clock);
+        smsAuthRepository.setAuthPayload(signupToken, SMS_AUTH_NAME, new SMSAuth(phoneNumber, code), now);
 
         Locale locale = LocaleContextHolder.getLocale();
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.auth-message", new Object[]{code}, locale));
@@ -97,7 +103,8 @@ public class SMSVerificationService {
      * @param code        받은 SMS 코드
      */
     public void verifySMSCode(String signupToken, String code) {
-        SMSAuth authObj = smsAuthRepository.getAuthPayload(signupToken, SMS_AUTH_NAME, SMSAuth.class)
+        Instant now = Instant.now(clock);
+        SMSAuth authObj = smsAuthRepository.getAuthPayload(signupToken, SMS_AUTH_NAME, SMSAuth.class, now)
                 .orElseThrow(NotSMSSentException::new);
 
         if (!authObj.getCode().equals(code.trim())) {
@@ -105,14 +112,6 @@ public class SMSVerificationService {
         }
 
         SMSAuth newAuthObj = new SMSAuth(authObj.getPhone(), SMS_AUTH_COMPLETE_SIGN);
-        smsAuthRepository.setAuthPayload(signupToken, SMS_AUTH_NAME, newAuthObj);
-    }
-
-    public static String generateDigitCode(int digitCount) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < digitCount; i++) {
-            sb.append(RANDOM.nextInt(10));
-        }
-        return sb.toString();
+        smsAuthRepository.setAuthPayload(signupToken, SMS_AUTH_NAME, newAuthObj, now);
     }
 }

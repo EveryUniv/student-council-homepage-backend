@@ -1,5 +1,6 @@
 package com.dku.council.infra.nhn.service.impl;
 
+import com.dku.council.infra.nhn.exception.InvalidAccessObjectStorageException;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
@@ -43,12 +44,36 @@ public class FileUploadServiceImpl implements FileUploadService {
         return postFiles;
     }
 
+    @Override
+    public String uploadFile(MultipartFile file, String prefix) {
+        String token = nhnAuthService.requestToken();
+        String originName = file.getOriginalFilename();
+        if(originName == null) originName = "";
+
+        String ext = originName.substring(originName.lastIndexOf(".") + 1);
+        String fileId = prefix + "-" + UUID.randomUUID() + "." + ext;
+
+        try{
+            s3service.uploadObject(token, fileId, file.getInputStream());
+            return fileId;
+        }catch (Throwable e){
+            throw new InvalidAccessObjectStorageException(e);
+        }
+    }
+
     public void deletePostFiles(List<UploadedFile> files) {
         String token = nhnAuthService.requestToken();
         for (UploadedFile file : files) {
             s3service.deleteObject(token, file.getFileId());
         }
     }
+
+    @Override
+    public void deleteFile(String fileId) {
+        String token = nhnAuthService.requestToken();
+        s3service.deleteObject(token, fileId);
+    }
+
 
     @Override
     public String getBaseURL() {

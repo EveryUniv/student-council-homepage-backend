@@ -10,7 +10,11 @@ import javax.validation.constraints.Pattern;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestSendSMSCodeDto {
+public class RequestSendPasswordFindCodeDto {
+
+    @NotBlank
+    @Schema(description = "학번", example = "32111111")
+    private final String studentId;
 
     @NotBlank
     @Pattern(regexp = "\\d{3}-*\\d{4}-*\\d{4}")

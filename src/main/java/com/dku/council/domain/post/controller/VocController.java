@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.controller;
 
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedVocDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateVocDto;
@@ -13,7 +14,6 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -35,7 +35,7 @@ public class VocController {
 
     private final VocService vocService;
     private final GenericPostService<Voc> vocPostService;
-    private final FileUploadService fileUploadService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록으로 조회
@@ -53,8 +53,7 @@ public class VocController {
                                                @ParameterObject Pageable pageable) {
         Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
-                .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -79,8 +78,7 @@ public class VocController {
         spec = spec.and(PostSpec.withTags(tagIds));
         spec = spec.and(PostSpec.withAuthor(userId));
 
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable)
-                .map(post -> new SummarizedVocDto(fileUploadService.getBaseURL(), post, bodySize));
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -145,5 +143,29 @@ public class VocController {
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
         vocService.reply(postId, dto.getAnswer());
+    }
+
+    /**
+     * 게시글에 좋아요 표시
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }

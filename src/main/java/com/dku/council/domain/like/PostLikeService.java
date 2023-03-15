@@ -29,8 +29,10 @@ public class PostLikeService {
      * @param userId 사용자 ID
      */
     public void like(Long postId, Long userId) {
-        memoryRepository.addPostLike(postId, userId);
-        memoryRepository.setLikeCount(postId, getCountOfLikes(postId) + 1);
+        if (!isPostLiked(postId, userId)) {
+            memoryRepository.addPostLike(postId, userId);
+            memoryRepository.setLikeCount(postId, getCountOfLikes(postId) + 1);
+        }
     }
 
     /**
@@ -40,8 +42,10 @@ public class PostLikeService {
      * @param userId 사용자 ID
      */
     public void cancelLike(Long postId, Long userId) {
-        memoryRepository.removePostLike(postId, userId);
-        memoryRepository.setLikeCount(postId, getCountOfLikes(postId) - 1);
+        if (isPostLiked(postId, userId)) {
+            memoryRepository.removePostLike(postId, userId);
+            memoryRepository.setLikeCount(postId, getCountOfLikes(postId) - 1);
+        }
     }
 
     /**

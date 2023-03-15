@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.controller;
 
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -30,6 +31,7 @@ import java.util.List;
 public class NewsController {
 
     private final GenericPostService<News> postService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록으로 조회
@@ -46,8 +48,7 @@ public class NewsController {
                                                        @ParameterObject Pageable pageable) {
         Specification<News> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGenericPostDto(postService.getFileBaseUrl(), bodySize, post));
+        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 
@@ -84,5 +85,29 @@ public class NewsController {
     @UserOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
+    }
+
+    /**
+     * 게시글에 좋아요 표시
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }

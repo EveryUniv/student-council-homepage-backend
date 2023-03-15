@@ -13,13 +13,17 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.global.util.TextTemplateEngine;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.NHNEmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,23 +34,28 @@ public class DkuEmailService {
     private static final String DKU_AUTH_NAME = "dku";
     private static final String EMAIL_AUTH_NAME = "email";
 
+    private final Clock clock;
     private final NHNEmailService service;
     private final SignupAuthRepository dkuAuthRepository;
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
 
+    @Value("${app.auth.email.code-length}")
+    private final int codeLength;
 
     /**
      * 학번으로 이메일 인증 발송.
      *
      * @param dto 학번(8자리)
      */
+    @Transactional(readOnly = true)
     public void sendEmailCode(RequestSendEmailCode dto) {
-        String emailCode = UUID.randomUUID().toString().substring(0, 5);
+        String emailCode = CodeGenerator.generateHexCode(codeLength);
         String studentId = dto.getStudentId();
+        Instant now = Instant.now(clock);
 
         checkAlreadyStudentId(studentId);
-        dkuAuthRepository.setAuthPayload(studentId, EMAIL_AUTH_NAME, emailCode);
+        dkuAuthRepository.setAuthPayload(studentId, EMAIL_AUTH_NAME, emailCode, now);
 
         String text = makeTemplatedEmail(
                 dto.getStudentId(),
@@ -68,15 +77,15 @@ public class DkuEmailService {
      * 사용자의 정보를 redis에 저장합니다.
      *
      * @param dto Major 를 String 으로 받습니다.
-     * @return
      */
     public ResponseVerifyStudentDto validateEmailCode(RequestVerifyEmailCodeDto dto) {
         String signupToken = UUID.randomUUID().toString();
 
-        String emailCode = dkuAuthRepository.getAuthPayload(dto.getStudentId(), EMAIL_AUTH_NAME, String.class)
+        Instant now = Instant.now(clock);
+        String emailCode = dkuAuthRepository.getAuthPayload(dto.getStudentId(), EMAIL_AUTH_NAME, String.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
 
-        if (!Objects.equals(emailCode, dto.getEmailCode())) {
+        if (!emailCode.equalsIgnoreCase(dto.getEmailCode())) {
             throw new WrongEmailCodeException();
         }
 
@@ -85,7 +94,7 @@ public class DkuEmailService {
         StudentInfo studentInfo = new StudentInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
                 major.getName(), major.getDepartment());
 
-        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo);
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo, now);
 
         ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
@@ -96,10 +105,10 @@ public class DkuEmailService {
      *
      * @param signupToken 학생인증 토큰
      * @return 학생정보
-     * @throws NotDKUAuthorizedException
      */
     public StudentInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class)
+        Instant now = Instant.now(clock);
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 

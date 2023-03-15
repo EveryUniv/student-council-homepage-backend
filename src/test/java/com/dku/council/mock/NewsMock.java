@@ -4,9 +4,11 @@ import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.global.base.BaseEntity;
 import com.dku.council.util.EntityUtil;
 import com.dku.council.util.FieldReflector;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class NewsMock {
             if (!enabled) {
                 FieldReflector.inject(Post.class, news, "status", PostStatus.DELETED);
             }
+            FieldReflector.inject(BaseEntity.class, news, "createdAt", LocalDateTime.of(2022, 3, 3, 3, 3));
             result.add(news);
         }
 

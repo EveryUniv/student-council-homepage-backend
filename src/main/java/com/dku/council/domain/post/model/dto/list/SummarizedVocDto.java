@@ -11,8 +11,8 @@ public class SummarizedVocDto extends SummarizedGenericPostDto {
     @Schema(description = "VOC 상태", example = "WAITING")
     private final VocStatus status;
 
-    public SummarizedVocDto(String baseFileUrl, Voc voc, int bodySize) {
-        super(baseFileUrl, bodySize, voc);
+    public SummarizedVocDto(SummarizedGenericPostDto dto, Voc voc) {
+        super(dto);
         this.status = voc.getExtraStatus();
     }
 }
