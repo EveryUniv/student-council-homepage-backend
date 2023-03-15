@@ -57,7 +57,10 @@ class UserFindRedisRepositoryTest {
         // given
         Instant now = Instant.now(clock);
         when(redisTemplate.opsForHash()).thenReturn(ops);
-        when(objectMapper.writeValueAsString(any())).thenReturn("json");
+        when(objectMapper.writeValueAsString(argThat(arg -> {
+            SMSAuth auth = ((CacheObject<SMSAuth>) arg).getValue();
+            return auth.getCode().equals("code") && auth.getPhone().equals("phone");
+        }))).thenReturn("json");
 
         // when
         repository.setPwdAuthCode("token", "code", "phone", now);
