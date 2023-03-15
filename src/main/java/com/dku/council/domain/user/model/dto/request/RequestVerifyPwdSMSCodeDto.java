@@ -9,7 +9,11 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestVerifySMSCodeDto {
+public class RequestVerifyPwdSMSCodeDto {
+
+    @NotBlank
+    @Schema(description = "비밀번호 재설정 토큰", example = "token")
+    private final String token;
 
     @NotBlank
     @Schema(description = "인증 코드", example = "123456")

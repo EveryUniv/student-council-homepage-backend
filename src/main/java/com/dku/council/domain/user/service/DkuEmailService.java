@@ -13,15 +13,17 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.global.util.TextTemplateEngine;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.nhn.service.NHNEmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,14 +40,17 @@ public class DkuEmailService {
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
 
+    @Value("${app.auth.email.code-length}")
+    private final int codeLength;
 
     /**
      * 학번으로 이메일 인증 발송.
      *
      * @param dto 학번(8자리)
      */
+    @Transactional(readOnly = true)
     public void sendEmailCode(RequestSendEmailCode dto) {
-        String emailCode = UUID.randomUUID().toString().substring(0, 5);
+        String emailCode = CodeGenerator.generateHexCode(codeLength);
         String studentId = dto.getStudentId();
         Instant now = Instant.now(clock);
 
@@ -80,7 +85,7 @@ public class DkuEmailService {
         String emailCode = dkuAuthRepository.getAuthPayload(dto.getStudentId(), EMAIL_AUTH_NAME, String.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
 
-        if (!Objects.equals(emailCode, dto.getEmailCode())) {
+        if (!emailCode.equalsIgnoreCase(dto.getEmailCode())) {
             throw new WrongEmailCodeException();
         }
 

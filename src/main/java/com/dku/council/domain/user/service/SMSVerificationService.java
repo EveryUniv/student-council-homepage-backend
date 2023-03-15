@@ -8,18 +8,19 @@ import com.dku.council.domain.user.model.SMSAuth;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +28,6 @@ public class SMSVerificationService {
 
     public static final String SMS_AUTH_NAME = "sms";
     public static final String SMS_AUTH_COMPLETE_SIGN = "OK";
-    private static final Random RANDOM = new Random();
 
     private final Clock clock;
     private final MessageSource messageSource;
@@ -74,11 +74,12 @@ public class SMSVerificationService {
      * @param signupToken 회원가입 토큰
      * @param phoneNumber 전화번호
      */
+    @Transactional(readOnly = true)
     public void sendSMSCode(String signupToken, String phoneNumber) {
         dkuAuthService.getStudentInfo(signupToken);
         checkAlreadyPhone(phoneNumber);
 
-        String code = generateDigitCode(digitCount);
+        String code = CodeGenerator.generateDigitCode(digitCount);
         phoneNumber = phoneNumber.trim().replaceAll("-", "");
 
         Instant now = Instant.now(clock);
@@ -112,13 +113,5 @@ public class SMSVerificationService {
 
         SMSAuth newAuthObj = new SMSAuth(authObj.getPhone(), SMS_AUTH_COMPLETE_SIGN);
         smsAuthRepository.setAuthPayload(signupToken, SMS_AUTH_NAME, newAuthObj, now);
-    }
-
-    public static String generateDigitCode(int digitCount) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < digitCount; i++) {
-            sb.append(RANDOM.nextInt(10));
-        }
-        return sb.toString();
     }
 }

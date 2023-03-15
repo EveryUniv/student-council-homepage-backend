@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.dto.request.RequestSendSMSCodeDto;
 import com.dku.council.domain.user.model.dto.request.RequestVerifySMSCodeDto;
+import com.dku.council.domain.user.model.dto.request.RequestWithPhoneNumberDto;
 import com.dku.council.domain.user.service.SMSVerificationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class SMSController {
      * @param signupToken 회원가입 토큰
      */
     @PostMapping("/{signup-token}")
-    public void sendVerificationSMS(@Valid @RequestBody RequestSendSMSCodeDto dto,
+    public void sendVerificationSMS(@Valid @RequestBody RequestWithPhoneNumberDto dto,
                                     @PathVariable("signup-token") String signupToken) {
         service.sendSMSCode(signupToken, dto.getPhoneNumber());
     }

@@ -4,6 +4,7 @@ import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -71,5 +72,14 @@ public class User extends BaseEntity {
         this.yearOfAdmission = yearOfAdmission;
         this.status = status;
         this.userRole = role;
+    }
+
+    /**
+     * 비밀번호를 변경합니다. {@link PasswordEncoder}로 인코딩된 비밀번호를 넣어야 합니다.
+     *
+     * @param encodedPassword 인코딩된 비밀번호
+     */
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
     }
 }
