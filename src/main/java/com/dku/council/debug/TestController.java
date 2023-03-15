@@ -23,7 +23,8 @@ public class TestController {
     private final UserRepository userRepository;
 
     /**
-     * 학번으로 유저 삭제
+     * 학번으로 유저 삭제.
+     * 이 유저로 작성한 게시글, 댓글 등이 있는 경우에는 삭제되지 않습니다. 모두 삭제하고 유저를 삭제하세요.
      *
      * @param studentId 학번
      */

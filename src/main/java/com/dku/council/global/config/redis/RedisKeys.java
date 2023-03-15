@@ -10,4 +10,5 @@ public class RedisKeys {
     public static final String BUS_ARRIVAL_KEY = "BusArrival";
 
     public static final String SIGNUP_AUTH_KEY = "SignupAuth";
+    public static final String USER_FIND_AUTH_KEY = "UserFindAuth";
 }
