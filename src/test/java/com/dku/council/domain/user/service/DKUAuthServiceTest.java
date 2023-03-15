@@ -51,10 +51,10 @@ class DKUAuthServiceTest {
 
     private DKUAuthService service;
 
-
     @BeforeEach
-    public void setup(){
-        service = new DKUAuthService(clock, crawlerService, authenticationService, userRepository, dkuAuthRepository);
+    public void setup() {
+        this.service = new DKUAuthService(clock, crawlerService,
+                authenticationService, userRepository, dkuAuthRepository);
     }
 
 

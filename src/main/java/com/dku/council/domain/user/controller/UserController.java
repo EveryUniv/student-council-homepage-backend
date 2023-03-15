@@ -84,6 +84,18 @@ public class UserController {
     }
 
     /**
+     * 닉네임이 이미 존재하는지 검증.
+     * 닉네임이 이미 존재하는지 검증합니다. 만약 존재하지 않으면 OK를 반환하고,
+     * 이미 사용중인 경우에는 BAD_REQUEST 오류가 발생합니다.
+     *
+     * @param nickname 닉네임
+     */
+    @GetMapping("/valid")
+    public void validNickname(@RequestParam String nickname) {
+        signupService.checkAlreadyNickname(nickname);
+    }
+
+    /**
      * 로그인
      *
      * @param dto 요청 body

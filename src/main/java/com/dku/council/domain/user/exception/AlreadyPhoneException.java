@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class AlreadyPhoneException extends LocalizedMessageException {
     public AlreadyPhoneException() {
-        super(HttpStatus.NOT_FOUND, "already.phone");
+        super(HttpStatus.BAD_REQUEST, "already.phone");
     }
 }
