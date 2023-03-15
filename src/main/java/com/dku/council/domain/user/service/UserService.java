@@ -2,6 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
+import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,5 +75,16 @@ public class UserService {
     public void changeNickName(Long userId, RequestNickNameChangeDto dto) {
         User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
         user.changeNickName(dto.getNickname());
+    }
+
+    @Transactional
+    public void changePassword(Long userId, RequestExistPasswordChangeDto dto) {
+        User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
+        if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+            user.changePassword(encodedPassword);
+        } else {
+            throw new WrongPasswordException();
+        }
     }
 }
