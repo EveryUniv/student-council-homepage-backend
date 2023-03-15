@@ -81,6 +81,18 @@ public class UserController {
     }
 
     /**
+     * 닉네임 변경.
+     *
+     * @param auth
+     * @param dto
+     */
+    @PatchMapping("/change/nickname")
+    @UserOnly
+    public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto){
+        userService.changeNickName(auth.getUserId(), dto);
+    }
+
+    /**
      * 회원가입
      *
      * @param dto         요청 Body

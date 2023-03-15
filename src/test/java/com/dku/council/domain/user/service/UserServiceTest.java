@@ -3,6 +3,7 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
+import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.model.entity.Major;
@@ -143,4 +144,19 @@ class UserServiceTest {
         assertThrows(LoginUserNotFoundException.class, () ->
                 service.getUserInfo(0L));
     }
+
+    @Test
+    @DisplayName("닉네임 변경")
+    void changeUserNickName() {
+        //given
+        User user = UserMock.createDummyMajor();
+        RequestNickNameChangeDto dto = new RequestNickNameChangeDto("바꾸는 이름");
+
+        //when & then
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        service.changeNickName(user.getId(), dto);
+        assertThat(user.getNickname()).isEqualTo(dto.getNickname());
+    }
+
 }
