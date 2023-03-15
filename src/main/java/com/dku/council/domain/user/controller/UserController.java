@@ -83,14 +83,23 @@ public class UserController {
     /**
      * 닉네임 변경.
      *
-     * @param auth
-     * @param dto
+     * @param dto 요청 body
      */
     @PatchMapping("/change/nickname")
     @UserOnly
     public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto){
         userService.changeNickName(auth.getUserId(), dto);
     }
+
+    /**
+     * 비밀번호 변경 - 기존 비밀번호를 알고 있는 경우
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/password")
+    public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto){
+        userService.changePassword(auth.getUserId(), dto);
+    }
+
 
     /**
      * 회원가입
