@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 @Repository
 public class UserFindRedisRepository extends AbstractKeyValueCacheRepository implements UserFindRepository {
@@ -23,16 +24,17 @@ public class UserFindRedisRepository extends AbstractKeyValueCacheRepository imp
 
     @Override
     public void setPwdAuthCode(String token, String code, String phone, Instant now) {
-
+        SMSAuth data = new SMSAuth(code, phone);
+        set(token, data, now);
     }
 
     @Override
-    public SMSAuth getPwdAuthCode(String token, Instant now) {
-        return null;
+    public Optional<SMSAuth> getPwdAuthCode(String token, Instant now) {
+        return get(token, SMSAuth.class, now);
     }
 
     @Override
     public void deletePwdAuthCode(String token) {
-
+        remove(token);
     }
 }

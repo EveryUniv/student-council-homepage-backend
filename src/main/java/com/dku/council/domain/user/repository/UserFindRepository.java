@@ -3,6 +3,7 @@ package com.dku.council.domain.user.repository;
 import com.dku.council.domain.user.model.SMSAuth;
 
 import java.time.Instant;
+import java.util.Optional;
 
 public interface UserFindRepository {
 
@@ -21,7 +22,7 @@ public interface UserFindRepository {
      * @param token 토큰
      * @param now   현재 시각
      */
-    SMSAuth getPwdAuthCode(String token, Instant now);
+    Optional<SMSAuth> getPwdAuthCode(String token, Instant now);
 
     /**
      * 저장된 인증 코드를 삭제합니다.

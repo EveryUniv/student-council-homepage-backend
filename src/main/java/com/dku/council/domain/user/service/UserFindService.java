@@ -69,10 +69,10 @@ public class UserFindService {
     public void verifyPwdCode(String token, String code) {
         Instant now = Instant.now(clock);
 
-        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now);
-        if (auth == null) {
-            throw new NotSMSSentException();
-        } else if (!auth.getCode().equals(code)) {
+        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now)
+                .orElseThrow(NotSMSSentException::new);
+
+        if (!auth.getCode().equals(code)) {
             throw new WrongSMSCodeException();
         }
 
@@ -82,7 +82,8 @@ public class UserFindService {
     @Transactional
     public void changePassword(String token, String password) {
         Instant now = Instant.now(clock);
-        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now);
+        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now)
+                .orElseThrow(NotSMSSentException::new);
 
         if (!auth.getCode().equals(CODE_AUTH_COMPLETED)) {
             throw new NotSMSAuthorizedException();
