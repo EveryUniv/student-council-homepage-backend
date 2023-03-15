@@ -42,21 +42,21 @@ public class UserController {
      *
      * @param dto 요청 body
      */
-    @GetMapping("/find/id")
+    @PostMapping("/find/id")
     public void sendIdBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
         userFindService.sendIdBySMS(dto.getPhoneNumber());
     }
 
     /**
-     * 비밀번호 재설정.
+     * 비밀번호 재설정 코드 전송.
      * SMS인증 코드 전송 -> 인증 코드 확인(응답으로 비번 변경 토큰) -> 비밀번호 변경 순으로 흘러갑니다.
      *
      * @param dto 요청 body
      * @return 비밀번호 재설정 토큰
      */
-    @GetMapping("/find/pwd")
+    @PostMapping("/find/pwd")
     public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestSendPasswordFindCodeDto dto) {
-        return userFindService.sendPwdCodeBySMS(dto.getStudentId(), dto.getStudentId());
+        return userFindService.sendPwdCodeBySMS(dto.getStudentId(), dto.getPhoneNumber());
     }
 
     /**
@@ -64,9 +64,9 @@ public class UserController {
      *
      * @param dto 요청 body
      */
-    @GetMapping("/find/pwd/verify")
+    @PostMapping("/find/pwd/verify")
     public void verifyPwdCodeBySMS(@Valid @RequestBody RequestVerifyPwdSMSCodeDto dto) {
-        userFindService.verifyPwdCode(dto.getPhoneNumber(), dto.getCode());
+        userFindService.verifyPwdCode(dto.getToken(), dto.getCode());
     }
 
     /**

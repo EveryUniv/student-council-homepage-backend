@@ -24,7 +24,7 @@ public class UserFindRedisRepository extends AbstractKeyValueCacheRepository imp
 
     @Override
     public void setPwdAuthCode(String token, String code, String phone, Instant now) {
-        SMSAuth data = new SMSAuth(code, phone);
+        SMSAuth data = new SMSAuth(phone, code);
         set(token, data, now);
     }
 
