@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,6 +35,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class DKUAuthServiceTest {
 
+    private final Clock clock = ClockUtil.create();
+
     @Mock
     private DkuCrawlerService crawlerService;
 
@@ -48,11 +49,10 @@ class DKUAuthServiceTest {
     @Mock
     private SignupAuthRepository dkuAuthRepository;
 
-    private final Clock clock = ClockUtil.create();
     private DKUAuthService service;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         this.service = new DKUAuthService(clock, crawlerService,
                 authenticationService, userRepository, dkuAuthRepository);
     }

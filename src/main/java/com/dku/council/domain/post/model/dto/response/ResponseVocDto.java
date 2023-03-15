@@ -14,8 +14,8 @@ public class ResponseVocDto extends ResponseSingleGenericPostDto {
     @Schema(description = "운영진 답변", example = "안녕하세요", nullable = true)
     private final String answer;
 
-    public ResponseVocDto(String baseFileUrl, Long userId, Voc post) {
-        super(baseFileUrl, userId, post);
+    public ResponseVocDto(ResponseSingleGenericPostDto dto, Voc post) {
+        super(dto);
         this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
     }

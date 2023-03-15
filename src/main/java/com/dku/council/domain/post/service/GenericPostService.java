@@ -1,6 +1,8 @@
 package com.dku.council.domain.post.service;
 
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
@@ -14,7 +16,6 @@ import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -26,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
  * 왠만한 게시판들은 이 서비스로 커버가 가능합니다. 복잡한 조회, 생성, 비즈니스 로직이 포함된 게시판은
  * 이걸 사용하지말고 따로 만드는 게 낫습니다.
  * 이걸 사용하려면, 반드시 Bean에 등록되어있어야 합니다. (PostConfig)
- * todo 의존성을 좀 줄여보자
  *
  * @param <E> Entity 타입
  */
@@ -38,8 +38,7 @@ public class GenericPostService<E extends Post> {
     protected final TagService tagService;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
-    protected final MessageSource messageSource;
-
+    protected final PostLikeService postLikeService;
 
     /**
      * 게시글 목록으로 조회
@@ -49,12 +48,34 @@ public class GenericPostService<E extends Post> {
      * @return 페이징된 목록
      */
     @Transactional(readOnly = true)
-    public Page<E> list(Specification<E> spec, Pageable pageable) {
+    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize) {
+        Page<E> result = list(spec, pageable);
+        return result.map((post) -> makeListDto(bodySize, post));
+    }
+
+    @Transactional(readOnly = true)
+    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize,
+                            PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
+        Page<E> result = list(spec, pageable);
+
+        return result.map((post) -> {
+            SummarizedGenericPostDto dto = makeListDto(bodySize, post);
+            return mapper.map(dto, post);
+        });
+    }
+
+    private Page<E> list(Specification<E> spec, Pageable pageable) {
         if (spec == null) {
             spec = Specification.where(null);
         }
+
         spec = spec.and(PostSpec.withActive());
         return postRepository.findAll(spec, pageable);
+    }
+
+    private SummarizedGenericPostDto makeListDto(int bodySize, E post) {
+        int likes = postLikeService.getCountOfLikes(post.getId());
+        return new SummarizedGenericPostDto(fileUploadService.getBaseURL(), bodySize, likes, post);
     }
 
     /**
@@ -88,7 +109,22 @@ public class GenericPostService<E extends Post> {
     @Transactional(readOnly = true)
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
         E post = viewPost(postId, remoteAddress);
-        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), userId, post);
+        return makePostDto(userId, post);
+    }
+
+    @Transactional(readOnly = true)
+    public <T> T findOne(Long postId, Long userId, String remoteAddress,
+                         PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
+        E post = viewPost(postId, remoteAddress);
+        ResponseSingleGenericPostDto dto = makePostDto(userId, post);
+        return mapper.map(dto, post);
+    }
+
+    private ResponseSingleGenericPostDto makePostDto(Long userId, E post) {
+        int likes = postLikeService.getCountOfLikes(post.getId());
+        boolean isMine = post.getUser().getId().equals(userId);
+        boolean isLiked = postLikeService.isPostLiked(post.getId(), userId);
+        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), likes, isMine, isLiked, post);
     }
 
     /**
@@ -146,12 +182,8 @@ public class GenericPostService<E extends Post> {
         post.blind();
     }
 
-    /**
-     * 첨부파일의 Base URL을 가져옵니다.
-     *
-     * @return 첨부파일 Base URL
-     */
-    public String getFileBaseUrl() {
-        return fileUploadService.getBaseURL();
+    @FunctionalInterface
+    public interface PostResultMapper<T, D, E extends Post> {
+        T map(D dto, E post);
     }
 }

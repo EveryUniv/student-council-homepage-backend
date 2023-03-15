@@ -8,6 +8,7 @@ import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
 import com.dku.council.domain.user.service.SignupService;
+import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -26,6 +27,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserFindService userFindService;
     private final SignupService signupService;
 
 
@@ -38,6 +40,35 @@ public class UserController {
     @UserOnly
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
         return userService.getUserInfo(auth.getUserId());
+    }
+
+    /**
+     * 아이디(학번) 찾기
+     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
+     */
+    @GetMapping("/find/id/{phone}")
+    public void sendIdBySMS(@PathVariable("phone") String phone) {
+        userFindService.sendIdBySMS(phone);
+    }
+
+    /**
+     * 비밀번호 찾기
+     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
+     */
+    @GetMapping("/find/pwd/{phone}")
+    public void sendPwdCodeBySMS(@PathVariable("phone") String phone) {
+        userFindService.sendPwdCodeBySMS(phone);
+    }
+
+    /**
+     * 비밀번호 찾기 인증 코드 확인
+     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
+     * @param code 인증 코드
+     */
+    @GetMapping("/find/pwd/verify")
+    public void verifyPwdCodeBySMS(@RequestParam("phone") String phone,
+                                   @RequestParam("code") String code) {
+        userFindService.verifyPwdCode(phone, code);
     }
 
     /**

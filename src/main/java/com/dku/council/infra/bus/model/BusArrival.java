@@ -4,10 +4,12 @@ import com.dku.council.domain.bus.model.Bus;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
+@ToString
 public class BusArrival {
     private final BusStatus status;
     private final Integer stationOrder;

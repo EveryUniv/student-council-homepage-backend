@@ -13,8 +13,8 @@ public class SummarizedConferenceDto extends SummarizedGenericPostDto {
     @Schema(description = "개최 일자", example = "2022-01-08")
     private final String date;
 
-    public SummarizedConferenceDto(String baseFileUrl, int bodySize, Conference conference) {
-        super(baseFileUrl, bodySize, conference);
+    public SummarizedConferenceDto(SummarizedGenericPostDto dto, Conference conference) {
+        super(dto);
         this.round = conference.getRound();
         this.date = conference.getDate().toString();
     }

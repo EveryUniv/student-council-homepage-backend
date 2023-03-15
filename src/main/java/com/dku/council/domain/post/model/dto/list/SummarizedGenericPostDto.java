@@ -27,16 +27,30 @@ public class SummarizedGenericPostDto {
     @Schema(description = "파일 목록")
     private final List<PostFileDto> files;
 
+    @Schema(description = "좋아요 수", example = "26")
+    private final int likes;
+
     @Schema(description = "조회수", example = "16")
     private final int views;
 
-    public SummarizedGenericPostDto(String baseFileUrl, int bodySize, Post post) {
+    public SummarizedGenericPostDto(String baseFileUrl, int bodySize, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = slice(post.getBody(), bodySize);
         this.createdDate = post.getCreatedAt().toLocalDate();
+        this.likes = likes;
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
+    }
+
+    public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
+        this.id = copy.getId();
+        this.title = copy.getTitle();
+        this.body = copy.getBody();
+        this.createdDate = copy.getCreatedDate();
+        this.likes = copy.getLikes();
+        this.files = copy.getFiles();
+        this.views = copy.getViews();
     }
 
     private static String slice(String text, int maxLen) {

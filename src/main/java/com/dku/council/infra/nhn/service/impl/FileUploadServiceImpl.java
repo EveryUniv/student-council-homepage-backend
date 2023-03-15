@@ -4,7 +4,6 @@ import com.dku.council.infra.nhn.exception.InvalidAccessObjectStorageException;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.event.spi.PreInsertEventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

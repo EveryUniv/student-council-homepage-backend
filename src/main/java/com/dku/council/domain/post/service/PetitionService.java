@@ -6,7 +6,6 @@ import com.dku.council.domain.post.exception.DuplicateCommentException;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,7 +20,6 @@ public class PetitionService {
 
     private final GenericPostService<Petition> postService;
     private final CommentService commentService;
-    private final FileUploadService fileUploadService;
 
     @Value("${app.post.petition.threshold-comment-count}")
     private final int thresholdCommentCount;
@@ -29,8 +27,7 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
-        Petition post = postService.viewPost(postId, remoteAddress);
-        return new ResponsePetitionDto(fileUploadService.getBaseURL(), userId, post);
+        return postService.findOne(postId, userId, remoteAddress, ResponsePetitionDto::new);
     }
 
     public void reply(Long postId, String answer) {

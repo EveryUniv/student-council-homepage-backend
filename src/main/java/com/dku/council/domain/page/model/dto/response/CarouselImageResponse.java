@@ -1,7 +1,6 @@
 package com.dku.council.domain.page.model.dto.response;
 
 import com.dku.council.domain.page.model.CarouselImage;
-import com.dku.council.infra.nhn.service.ObjectStorageService;
 import lombok.Getter;
 
 import java.net.URI;

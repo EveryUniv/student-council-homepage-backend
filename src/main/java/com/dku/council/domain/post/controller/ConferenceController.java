@@ -41,8 +41,7 @@ public class ConferenceController {
                                                       @RequestParam(defaultValue = "50") int bodySize,
                                                       @ParameterObject Pageable pageable) {
         Specification<Conference> spec = PostSpec.withTitleOrBody(keyword);
-        Page<SummarizedConferenceDto> list = postService.list(spec, pageable) // TODO mapping을 여기서 하는게 맞나?
-                .map(post -> new SummarizedConferenceDto(postService.getFileBaseUrl(), bodySize, post));
+        Page<SummarizedConferenceDto> list = postService.list(spec, pageable, bodySize, SummarizedConferenceDto::new);
         return new ResponsePage<>(list);
     }
 

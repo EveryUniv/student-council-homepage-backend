@@ -2,6 +2,7 @@ package com.dku.council.domain.post.controller;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
+import com.dku.council.domain.like.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
@@ -15,7 +16,6 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
-import com.dku.council.infra.nhn.service.FileUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -37,7 +37,7 @@ public class PetitionController {
 
     private final PetitionService petitionService;
     private final GenericPostService<Petition> petitionPostService;
-    private final FileUploadService fileUploadService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록으로 조회
@@ -55,8 +55,8 @@ public class PetitionController {
                                                     @ParameterObject Pageable pageable) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable)
-                .map(post -> new SummarizedPetitionDto(fileUploadService.getBaseURL(), post, bodySize, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
+        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable, bodySize, (dto, post) ->
+                new SummarizedPetitionDto(dto, post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
         return new ResponsePage<>(list);
     }
 
@@ -160,5 +160,29 @@ public class PetitionController {
     public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
         Long deleteId = petitionService.deleteComment(id, auth.getUserId());
         return new ResponseIdDto(deleteId);
+    }
+
+    /**
+     * 게시글에 좋아요 표시
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }

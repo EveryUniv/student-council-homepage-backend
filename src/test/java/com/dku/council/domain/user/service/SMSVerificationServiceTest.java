@@ -83,8 +83,8 @@ class SMSVerificationServiceTest {
     @DisplayName("가져오기 실패 - 휴대폰 정보가 없으면 오류")
     void failedGetPhoneNumberByNotFound() {
         // given
-        when(smsAuthRepository.getAuthPayload(eq(token), eq(SMS_AUTH_NAME),
-                eq(SMSAuth.class), any()))
+        when(smsAuthRepository.getAuthPayload(eq(token),
+                eq(SMS_AUTH_NAME), eq(SMSAuth.class), any()))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -97,8 +97,8 @@ class SMSVerificationServiceTest {
     void failedGetPhoneNumberByNotAuthorized() {
         // given
         SMSAuth auth = new SMSAuth(phone, "CODE");
-        when(smsAuthRepository.getAuthPayload(eq(token), eq(SMS_AUTH_NAME),
-                eq(SMSAuth.class), any()))
+        when(smsAuthRepository.getAuthPayload(eq(token),
+                eq(SMS_AUTH_NAME), eq(SMSAuth.class), any()))
                 .thenReturn(Optional.of(auth));
 
         // when & then
@@ -162,8 +162,8 @@ class SMSVerificationServiceTest {
         // given
         String code = "121314";
         SMSAuth auth = new SMSAuth(phone, code);
-        when(smsAuthRepository.getAuthPayload(eq(token), eq(SMS_AUTH_NAME),
-                eq(SMSAuth.class), any()))
+        when(smsAuthRepository.getAuthPayload(eq(token),
+                eq(SMS_AUTH_NAME), eq(SMSAuth.class), any()))
                 .thenReturn(Optional.of(auth));
 
         // then
@@ -185,8 +185,8 @@ class SMSVerificationServiceTest {
         // given
         String code = "121314";
         SMSAuth auth = new SMSAuth(phone, code);
-        when(smsAuthRepository.getAuthPayload(eq(token), eq(SMS_AUTH_NAME),
-                eq(SMSAuth.class), any()))
+        when(smsAuthRepository.getAuthPayload(eq(token),
+                eq(SMS_AUTH_NAME), eq(SMSAuth.class), any()))
                 .thenReturn(Optional.of(auth));
 
         // then
@@ -198,8 +198,8 @@ class SMSVerificationServiceTest {
     @DisplayName("SMS 인증 실패 - 인증 요청을 보내지 않은 경우")
     void failedVerifySMSCodeByNotFound() {
         // given
-        when(smsAuthRepository.getAuthPayload(eq(token), eq(SMS_AUTH_NAME),
-                eq(SMSAuth.class), any()))
+        when(smsAuthRepository.getAuthPayload(eq(token),
+                eq(SMS_AUTH_NAME), eq(SMSAuth.class), any()))
                 .thenReturn(Optional.empty());
 
         // then
