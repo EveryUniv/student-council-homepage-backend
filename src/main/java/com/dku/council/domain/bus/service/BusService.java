@@ -38,4 +38,12 @@ public class BusService {
                 .collect(Collectors.toList());
         return new ResponseBusArrivalDto(cached.getCapturedAt(), busArrivalDtos);
     }
+
+    public void cacheBusArrival(BusStation station) {
+        Instant now = Instant.now(clock);
+        String stationName = station.name();
+
+        List<BusArrival> arrivals = openApiBusService.retrieveBusArrival(station);
+        memoryRepository.cacheArrivals(stationName, arrivals, now);
+    }
 }
