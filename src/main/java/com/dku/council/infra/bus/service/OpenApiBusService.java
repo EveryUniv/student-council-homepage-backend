@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class OpenApiBusService {
 
-    public static final int PREDICTION_LOWER_BOUND = 90;
+    public static final int PREDICTION_LOWER_BOUND = 60;
 
     private final Clock clock;
     private final BusArrivalPredictService predictService;
@@ -73,7 +73,8 @@ public class OpenApiBusService {
 
         for (BusArrival arrival : arrivals) {
             String busKey = arrival.getBusNo() + station.name();
-            if (arrival.getStatus() == BusStatus.RUN) {
+            BusStatus status = arrival.getStatus();
+            if (status == BusStatus.RUN) {
                 freezingPredictionBusSet.remove(busKey);
             }
         }
@@ -81,22 +82,22 @@ public class OpenApiBusService {
         LocalDateTime now = LocalDateTime.now(clock);
         for (Bus bus : busList) {
             String busKey = bus.getName() + station.name();
-            BusArrival arrival;
+            Duration remaining = predictService.remainingNextBusArrival(bus.getName(), station, now);
 
-            if (freezingPredictionBusSet.contains(busKey)) {
-                arrival = BusArrival.predict(bus, PREDICTION_LOWER_BOUND);
-            } else {
-                Duration remaining = predictService.remainingNextBusArrival(bus.getName(), station, now);
-                if (remaining != null) {
+            BusArrival arrival;
+            if (remaining != null) {
+                if (freezingPredictionBusSet.contains(busKey)) {
+                    arrival = BusArrival.predict(bus, PREDICTION_LOWER_BOUND);
+                } else {
                     int prediction = (int) remaining.getSeconds();
                     if (remaining.getSeconds() < PREDICTION_LOWER_BOUND) {
                         prediction = PREDICTION_LOWER_BOUND;
                         freezingPredictionBusSet.add(busKey);
                     }
                     arrival = BusArrival.predict(bus, prediction);
-                } else {
-                    arrival = BusArrival.stopped(bus.getName());
                 }
+            } else {
+                arrival = BusArrival.stopped(bus.getName());
             }
             arrivals.add(arrival);
         }
