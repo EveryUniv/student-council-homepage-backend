@@ -1,17 +1,20 @@
 package com.dku.council.domain.user.model.dto.request;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public class RequestVerifySMSCodeDto {
+public class RequestPasswordChangeDto {
 
     @NotBlank
-    @Schema(description = "인증 코드", example = "123456")
-    private final String code;
+    private final String token;
+
+    @NotBlank
+    @Size(min = 3, max = 200)
+    private final String password;
 }

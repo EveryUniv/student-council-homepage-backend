@@ -206,20 +206,4 @@ class SMSVerificationServiceTest {
         assertThrows(NotSMSSentException.class, () ->
                 service.verifySMSCode(token, ""));
     }
-
-    @Test
-    @DisplayName("코드가 숫자에 정확한 자리수로 잘 생성되는지")
-    void generateDigitCode() {
-        // given
-        int count = 10;
-
-        // when
-        String code = SMSVerificationService.generateDigitCode(count);
-
-        // then
-        assertThat(code.length()).isEqualTo(count);
-        for (char c : code.toCharArray()) {
-            assertThat(Character.isDigit(c)).isTrue();
-        }
-    }
 }

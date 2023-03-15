@@ -1,12 +1,7 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
-import com.dku.council.domain.user.model.dto.request.RequestRefreshTokenDto;
-import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
-import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
-import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
-import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
-import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.model.dto.request.*;
+import com.dku.council.domain.user.model.dto.response.*;
 import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
@@ -44,31 +39,45 @@ public class UserController {
 
     /**
      * 아이디(학번) 찾기
-     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
+     *
+     * @param dto 요청 body
      */
-    @GetMapping("/find/id/{phone}")
-    public void sendIdBySMS(@PathVariable("phone") String phone) {
-        userFindService.sendIdBySMS(phone);
+    @GetMapping("/find/id")
+    public void sendIdBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
+        userFindService.sendIdBySMS(dto.getPhoneNumber());
     }
 
     /**
-     * 비밀번호 찾기
-     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
+     * 비밀번호 재설정.
+     * SMS인증 코드 전송 -> 인증 코드 확인(응답으로 비번 변경 토큰) -> 비밀번호 변경 순으로 흘러갑니다.
+     *
+     * @param dto 요청 body
+     * @return 비밀번호 재설정 토큰
      */
-    @GetMapping("/find/pwd/{phone}")
-    public void sendPwdCodeBySMS(@PathVariable("phone") String phone) {
-        userFindService.sendPwdCodeBySMS(phone);
+    @GetMapping("/find/pwd")
+    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestSendPasswordFindCodeDto dto) {
+        return userFindService.sendPwdCodeBySMS(dto.getStudentId(), dto.getStudentId());
     }
 
     /**
-     * 비밀번호 찾기 인증 코드 확인
-     * @param phone 휴대폰 번호 (하이픈 여부 상관 없음)
-     * @param code 인증 코드
+     * 비밀번호 재설정 인증 코드 확인
+     *
+     * @param dto 요청 body
      */
     @GetMapping("/find/pwd/verify")
-    public void verifyPwdCodeBySMS(@RequestParam("phone") String phone,
-                                   @RequestParam("code") String code) {
-        userFindService.verifyPwdCode(phone, code);
+    public void verifyPwdCodeBySMS(@Valid @RequestBody RequestVerifyPwdSMSCodeDto dto) {
+        userFindService.verifyPwdCode(dto.getPhoneNumber(), dto.getCode());
+    }
+
+    /**
+     * 비밀번호 변경.
+     * 변경 전에 재설정 인증 코드 확인을 해야 합니다.
+     *
+     * @param dto 요청 body
+     */
+    @PatchMapping("/find/pwd/reset")
+    public void changePassword(@Valid @RequestBody RequestPasswordChangeDto dto) {
+        userFindService.changePassword(dto.getToken(), dto.getPassword());
     }
 
     /**
@@ -122,13 +131,5 @@ public class UserController {
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
         return userService.getAllMajors();
-    }
-
-    /**
-     * 비밀번호 변경 (현재 동작 안함)
-     */
-    @PatchMapping("/password")
-    public void changePassword() {
-        // TODO Implementation
     }
 }

@@ -8,17 +8,18 @@ import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -61,8 +62,9 @@ public class DKUAuthService {
      * @param dto 요청 dto
      * @return 학생 인증 결과 dto
      */
+    @Transactional(readOnly = true)
     public ResponseVerifyStudentDto verifyStudent(RequestVerifyStudentDto dto) {
-        String signupToken = UUID.randomUUID().toString();
+        String signupToken = CodeGenerator.generateUUIDCode();
         checkAlreadyStudentId(dto);
 
         DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
