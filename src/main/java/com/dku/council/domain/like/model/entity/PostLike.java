@@ -1,4 +1,4 @@
-package com.dku.council.domain.like;
+package com.dku.council.domain.like.model.entity;
 
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;

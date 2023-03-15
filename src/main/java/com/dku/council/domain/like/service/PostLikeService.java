@@ -1,7 +1,8 @@
-package com.dku.council.domain.like;
+package com.dku.council.domain.like.service;
 
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
+import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
 import com.dku.council.domain.post.model.entity.Post;

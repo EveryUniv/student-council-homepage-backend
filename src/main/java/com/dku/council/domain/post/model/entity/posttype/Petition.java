@@ -35,7 +35,9 @@ public class Petition extends Post {
     private Petition(@NonNull User user,
                      @NonNull String title,
                      @NonNull String body,
-                     int views, PetitionStatus extraStatus, String answer) {
+                     int views,
+                     PetitionStatus extraStatus,
+                     String answer) {
         super(user, title, body, views);
         this.extraStatus = extraStatus;
         this.answer = answer;

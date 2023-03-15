@@ -1,6 +1,7 @@
-package com.dku.council.domain.bus.service;
+package com.dku.council.domain.bus.scheduler;
 
 import com.dku.council.domain.bus.model.BusStation;
+import com.dku.council.domain.bus.service.BusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.config;
 
-import com.dku.council.domain.like.PostLikeService;
+import com.dku.council.domain.like.service.PostLikeService;
 import com.dku.council.domain.post.model.entity.posttype.*;
 import com.dku.council.domain.post.repository.*;
 import com.dku.council.domain.post.service.GenericPostService;
