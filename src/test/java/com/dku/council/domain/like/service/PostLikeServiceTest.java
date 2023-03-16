@@ -1,7 +1,8 @@
-package com.dku.council.domain.like;
+package com.dku.council.domain.like.service;
 
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
+import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
 import com.dku.council.domain.post.repository.PostRepository;
@@ -164,7 +165,7 @@ class PostLikeServiceTest {
     @DisplayName("좋아요 확인 - 캐시에 좋아요가 등록안되었고 DB에는 있는 경우")
     void isPostLikedNoCached() {
         // given
-        Optional<PostLike> result = Optional.of(new PostLike());
+        Optional<PostLike> result = Optional.of(new PostLike(UserMock.createDummyMajor(), NewsMock.createDummy()));
         when(memoryRepository.isPostLiked(any(), any())).thenReturn(null);
         when(persistenceRepository.findByPostIdAndUserId(any(), any())).thenReturn(result);
 

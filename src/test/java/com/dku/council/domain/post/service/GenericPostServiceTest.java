@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.like.PostLikeService;
+import com.dku.council.domain.like.service.PostLikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;

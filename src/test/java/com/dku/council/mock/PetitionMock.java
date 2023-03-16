@@ -17,6 +17,12 @@ public class PetitionMock {
         return create(UserMock.createDummyMajor(), "Title", "Body", RandomGen.nextLong());
     }
 
+    public static Petition create(User user, LocalDateTime createdAt) {
+        Petition petition = create(user, "Title", "Body", RandomGen.nextLong());
+        FieldReflector.inject(BaseEntity.class, petition, "createdAt", createdAt);
+        return petition;
+    }
+
     public static Petition create(User user, String title, String body) {
         return create(user, title, body, RandomGen.nextLong());
     }
