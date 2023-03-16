@@ -134,21 +134,42 @@ class OpenApiBusServiceTest {
         // when & then
         when(predictService.remainingNextBusArrival(any(), any(), any())).thenReturn(null);
         whenPrediction1101(PREDICTION_LOWER_BOUND + 10);
-        checkBusArrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND + 10);
+        check1101Arrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND + 10);
 
         whenPrediction1101(PREDICTION_LOWER_BOUND - 1);
-        checkBusArrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
+        check1101Arrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
 
         whenPrediction1101(500);
-        checkBusArrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
+        check1101Arrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
 
         when(ggBusProvider.retrieveBusArrival(station)).thenReturn(List.of(
                 BusArrivalMock.create("1101")
         ));
-        checkBusArrival(station, BusStatus.RUN, BusArrivalMock.PREDICT_TIME_SEC1);
+        check1101Arrival(station, BusStatus.RUN, BusArrivalMock.PREDICT_TIME_SEC1);
 
         when(ggBusProvider.retrieveBusArrival(station)).thenReturn(List.of());
-        checkBusArrival(station, BusStatus.PREDICT, 500);
+        check1101Arrival(station, BusStatus.PREDICT, 500);
+    }
+
+    @Test
+    @DisplayName("예측 시간이 60초 이하이고, 다음 버스가 막차인 경우에는 STOP 상태로 표시")
+    public void retrieveBusArrivalWhenNextBusStop() {
+        // given
+        BusStation station = BusStation.DKU_GATE;
+        when(ggBusProvider.retrieveBusArrival(station)).thenReturn(List.of());
+        when(townBusProvider.retrieveBusArrival(station)).thenReturn(List.of());
+        when(shuttleBusProvider.retrieveBusArrival(station)).thenReturn(List.of());
+
+        // when & then
+        when(predictService.remainingNextBusArrival(any(), any(), any())).thenReturn(null);
+        whenPrediction1101(PREDICTION_LOWER_BOUND + 10);
+        check1101Arrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND + 10);
+
+        whenPrediction1101(PREDICTION_LOWER_BOUND - 1);
+        check1101Arrival(station, BusStatus.PREDICT, PREDICTION_LOWER_BOUND);
+
+        whenStopped1101();
+        check1101Arrival(station, BusStatus.STOP, null);
     }
 
     private void whenPrediction1101(int predictSeconds) {
@@ -156,7 +177,12 @@ class OpenApiBusServiceTest {
                 .thenReturn(Duration.ofSeconds(predictSeconds));
     }
 
-    private void checkBusArrival(BusStation station, BusStatus status, int predictTime) {
+    private void whenStopped1101() {
+        when(predictService.remainingNextBusArrival(eq("1101"), eq(BusStation.DKU_GATE), any()))
+                .thenReturn(null);
+    }
+
+    private void check1101Arrival(BusStation station, BusStatus status, Integer predictTime) {
         List<BusArrival> arrivals = service.retrieveBusArrival(station);
         BusArrival arrival = getArrivalBus(arrivals, "1101");
         assertThat(arrival.getStatus()).isEqualTo(status);

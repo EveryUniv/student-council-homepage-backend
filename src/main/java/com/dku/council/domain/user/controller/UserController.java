@@ -38,7 +38,8 @@ public class UserController {
     }
 
     /**
-     * 아이디(학번) 찾기
+     * 아이디(학번) 찾기.
+     * 휴대폰 번호를 보내면 SMS로 학번 전송
      *
      * @param dto 요청 body
      */
@@ -48,8 +49,9 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 재설정 코드 전송.
-     * SMS인증 코드 전송 -> 인증 코드 확인(응답으로 비번 변경 토큰) -> 비밀번호 변경 순으로 흘러갑니다.
+     * 비밀번호 재설정 인증 코드 전송 (1)
+     * <p>재설정 코드(6자리) SMS로 전송 -> 재설정 토큰(UUID) 응답.</p> 비밀번호 재설정 플로우는 SMS인증 코드 전송 ->
+     * 인증 코드 확인 -> 비밀번호 변경 순으로 흘러갑니다.
      *
      * @param dto 요청 body
      * @return 비밀번호 재설정 토큰
@@ -60,7 +62,8 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 재설정 인증 코드 확인
+     * 비밀번호 재설정 인증 코드 확인 (2)
+     * <p>재설정 토큰과 재설정 코드로 본인 인증을 합니다.</p>
      *
      * @param dto 요청 body
      */
@@ -70,8 +73,9 @@ public class UserController {
     }
 
     /**
-     * 비밀번호 변경.
-     * 변경 전에 재설정 인증 코드 확인을 해야 합니다.
+     * 비밀번호 변경 (3)
+     * <p>재설정 토큰과 새로운 비밀번호 -> 비밀번호 변경 완료.</p>
+     * 변경 전에 반드시 '재설정 인증 코드 확인'을 해야 합니다.
      *
      * @param dto 요청 body
      */
@@ -79,6 +83,27 @@ public class UserController {
     public void changePassword(@Valid @RequestBody RequestPasswordChangeDto dto) {
         userFindService.changePassword(dto.getToken(), dto.getPassword());
     }
+
+    /**
+     * 닉네임 변경.
+     *
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/nickname")
+    @UserOnly
+    public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto){
+        userService.changeNickName(auth.getUserId(), dto);
+    }
+
+    /**
+     * 비밀번호 변경 - 기존 비밀번호를 알고 있는 경우
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/password")
+    public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto){
+        userService.changePassword(auth.getUserId(), dto);
+    }
+
 
     /**
      * 회원가입

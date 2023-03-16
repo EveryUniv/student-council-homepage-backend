@@ -1,5 +1,6 @@
-package com.dku.council.domain.like;
+package com.dku.council.domain.like.scheduler;
 
+import com.dku.council.domain.like.service.PostLikeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
