@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.like.PostLikeService;
+import com.dku.council.domain.like.service.PostLikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedVocDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateVocDto;

@@ -2,7 +2,7 @@ package com.dku.council.domain.post.controller;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
-import com.dku.council.domain.like.PostLikeService;
+import com.dku.council.domain.like.service.PostLikeService;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
