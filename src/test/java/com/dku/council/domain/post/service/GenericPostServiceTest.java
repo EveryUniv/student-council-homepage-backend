@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,13 +107,14 @@ class GenericPostServiceTest {
         // given
         List<Petition> allPostList = PetitionMock.createListDummy("generic-", 20);
         Page<Petition> allPost = new DummyPage<>(allPostList, 20);
+        Duration expiresTime = Duration.ofDays(5);
 
         when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
         when(postLikeService.getCountOfLikes(any())).thenReturn(15);
 
         // when
         Page<SummarizedPetitionDto> allPage = petitionService.list(null, Pageable.unpaged(), 500,
-                (dto, post) -> new SummarizedPetitionDto(dto, post, post.getComments().size()));
+                (dto, post) -> new SummarizedPetitionDto(dto, post, expiresTime, post.getComments().size()));
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
@@ -226,7 +228,8 @@ class GenericPostServiceTest {
         when(postLikeService.isPostLiked(any(), any())).thenReturn(true);
 
         // when
-        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", ResponsePetitionDto::new);
+        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
+                new ResponsePetitionDto(d, post, Duration.ofDays(30)));
 
         // then
         assertThat(dto.getId()).isEqualTo(petition.getId());
@@ -234,6 +237,7 @@ class GenericPostServiceTest {
         assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
         assertThat(dto.isLiked()).isEqualTo(true);
         assertThat(dto.isMine()).isEqualTo(false);
+        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
     }
 
     @Test
