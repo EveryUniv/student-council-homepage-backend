@@ -18,12 +18,12 @@ public class CommentDto {
     private final String text;
 
     @Schema(name = "생성날짜", example = "2023-01-01")
-    private final LocalDate createdDate;
+    private final LocalDate createdAt;
 
     public CommentDto(Comment comment) {
         this.id = comment.getId();
         this.major = comment.getUser().getMajor().getDepartment();
-        this.createdDate = comment.getCreatedAt().toLocalDate();
+        this.createdAt = comment.getCreatedAt().toLocalDate();
         this.text = comment.getText();
     }
 }
