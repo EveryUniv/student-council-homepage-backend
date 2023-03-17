@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.repository.spec;
 
+import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.tag.model.entity.PostTag;
@@ -18,6 +19,15 @@ public class PostSpec {
 
         return (root, query, builder) ->
                 builder.equal(root.get("user").get("id"), userId);
+    }
+
+    public static <T extends Post> Specification<T> withPetitionStatus(PetitionStatus status) {
+        if (status == null) {
+            return Specification.where(null);
+        }
+
+        return (root, query, builder) ->
+                builder.equal(root.get("extraStatus"), status);
     }
 
     public static <T extends Post> Specification<T> withTitleOrBody(String keyword) {

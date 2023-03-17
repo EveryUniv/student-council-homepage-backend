@@ -21,7 +21,7 @@ public class SummarizedGenericPostDto {
     @Schema(description = "본문", example = "게시글 본문")
     private final String body;
 
-    @Schema(description = "생성 날짜", example = "2022-01-01")
+    @Schema(description = "생성 날짜")
     private final LocalDate createdAt;
 
     @Schema(description = "파일 목록")

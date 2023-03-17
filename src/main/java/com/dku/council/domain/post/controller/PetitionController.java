@@ -3,6 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
@@ -44,6 +45,7 @@ public class PetitionController {
      *
      * @param keyword  제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
      * @param tagIds   조회할 태그 목록. or 조건으로 검색된다. 지정하지않으면 모든 게시글 조회.
+     * @param status   조회할 청원 상태. 지정하지 않으면 모든 게시글 조회.
      * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
      * @param pageable 페이징 size, sort, page
      * @return 페이징 된 청원 목록
@@ -51,12 +53,13 @@ public class PetitionController {
     @GetMapping
     public ResponsePage<SummarizedPetitionDto> list(@RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) List<Long> tagIds,
+                                                    @RequestParam(required = false) PetitionStatus status,
                                                     @RequestParam(defaultValue = "50") int bodySize,
                                                     @ParameterObject Pageable pageable) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionPostService.list(spec, pageable, bodySize, (dto, post) ->
-                new SummarizedPetitionDto(dto, post, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
+        Page<SummarizedPetitionDto> list = petitionService.listPetition(spec, bodySize, pageable);
         return new ResponsePage<>(list);
     }
 

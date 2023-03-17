@@ -13,9 +13,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,13 +21,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class OpenApiBusService {
 
-    public static final int PREDICTION_LOWER_BOUND = 60;
-
     private final Clock clock;
     private final BusArrivalPredictService predictService;
     private final List<BusArrivalProvider> providers;
-
-    private final Set<String> freezingPredictionBusSet = new HashSet<>();
 
     /**
      * 버스 도착 정보를 OpenAPI를 통해 가져옵니다.
@@ -68,45 +62,24 @@ public class OpenApiBusService {
     private void appendOtherArrivals(BusArrivalProvider provider, List<BusArrival> arrivals, BusStation station) {
         List<Bus> busList = station.getBusSet().stream()
                 .filter(b -> b.name().startsWith(provider.getProviderPrefix()))
-                .filter(b -> notContainsSameBus(arrivals, b))
+                .filter(b -> arrivals.stream().noneMatch(a ->
+                        a.getBusNo().equals(b.getName()) && b.filterStationOrder(a.getStationOrder())
+                ))
                 .collect(Collectors.toList());
-
-        for (BusArrival arrival : arrivals) {
-            String busKey = arrival.getBusNo() + station.name();
-            BusStatus status = arrival.getStatus();
-            if (status == BusStatus.RUN) {
-                freezingPredictionBusSet.remove(busKey);
-            }
-        }
 
         LocalDateTime now = LocalDateTime.now(clock);
         for (Bus bus : busList) {
-            String busKey = bus.getName() + station.name();
             Duration remaining = predictService.remainingNextBusArrival(bus.getName(), station, now);
-
             BusArrival arrival;
             if (remaining != null) {
-                if (freezingPredictionBusSet.contains(busKey)) {
-                    arrival = BusArrival.predict(bus, PREDICTION_LOWER_BOUND);
-                } else {
-                    int prediction = (int) remaining.getSeconds();
-                    if (remaining.getSeconds() < PREDICTION_LOWER_BOUND) {
-                        prediction = PREDICTION_LOWER_BOUND;
-                        freezingPredictionBusSet.add(busKey);
-                    }
-                    arrival = BusArrival.predict(bus, prediction);
-                }
+                arrival = new BusArrival(BusStatus.PREDICT, 0,
+                        bus.getPredictionStationOrder(), (int) remaining.getSeconds(), "",
+                        0, 0, "", bus.getName());
             } else {
                 arrival = BusArrival.stopped(bus.getName());
             }
             arrivals.add(arrival);
         }
-    }
-
-    private static boolean notContainsSameBus(List<BusArrival> arrivals, Bus b) {
-        return arrivals.stream().noneMatch(a ->
-                a.getBusNo().equals(b.getName()) && b.filterStationOrder(a.getStationOrder())
-        );
     }
 
     /**

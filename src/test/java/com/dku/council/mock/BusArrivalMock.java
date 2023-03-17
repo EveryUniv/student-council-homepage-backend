@@ -8,10 +8,15 @@ import java.util.List;
 
 public class BusArrivalMock {
 
-    public static final int PREDICT_TIME_SEC1 = 10;
+    public static final int PREDICT_TIME_SEC1 = 30;
+    public static final int PREDICT_TIME_SEC2 = 60;
 
     public static BusArrival create() {
         return create("24");
+    }
+
+    public static BusArrival create(int predict1, int predict2) {
+        return create("24", 0, predict1, predict2, BusStatus.RUN);
     }
 
     public static BusArrival create(String busNo) {
@@ -27,9 +32,13 @@ public class BusArrivalMock {
     }
 
     public static BusArrival create(String busNo, int stationOrder, BusStatus status) {
+        return create(busNo, stationOrder, PREDICT_TIME_SEC1, PREDICT_TIME_SEC2, status);
+    }
+
+    public static BusArrival create(String busNo, int stationOrder, int predict1, int predict2, BusStatus status) {
         return new BusArrival(status, stationOrder,
-                5, PREDICT_TIME_SEC1, "경기16바5555",
-                7, 15, "경기16바1111",
+                5, predict1, "경기16바5555",
+                7, predict2, "경기16바1111",
                 busNo);
     }
 
