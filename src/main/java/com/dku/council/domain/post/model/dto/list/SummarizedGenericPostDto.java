@@ -22,7 +22,7 @@ public class SummarizedGenericPostDto {
     private final String body;
 
     @Schema(description = "생성 날짜")
-    private final LocalDate createdDate;
+    private final LocalDate createdAt;
 
     @Schema(description = "파일 목록")
     private final List<PostFileDto> files;
@@ -37,7 +37,7 @@ public class SummarizedGenericPostDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = slice(post.getBody(), bodySize);
-        this.createdDate = post.getCreatedAt().toLocalDate();
+        this.createdAt = post.getCreatedAt().toLocalDate();
         this.likes = likes;
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
@@ -47,7 +47,7 @@ public class SummarizedGenericPostDto {
         this.id = copy.getId();
         this.title = copy.getTitle();
         this.body = copy.getBody();
-        this.createdDate = copy.getCreatedDate();
+        this.createdAt = copy.getCreatedAt();
         this.likes = copy.getLikes();
         this.files = copy.getFiles();
         this.views = copy.getViews();

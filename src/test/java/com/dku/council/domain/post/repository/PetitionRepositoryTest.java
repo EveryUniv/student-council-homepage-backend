@@ -35,7 +35,6 @@ class PetitionRepositoryTest {
     private PetitionRepository repository;
 
     private final LocalDateTime baseTime = LocalDateTime.of(2022, 2, 2, 2, 2);
-    private List<Petition> petitions;
 
     @BeforeEach
     public void setup() {
@@ -45,25 +44,14 @@ class PetitionRepositoryTest {
         User user = UserMock.create(major);
         user = userRepository.save(user);
 
-        petitions = new ArrayList<>();
+        List<Petition> petitions = new ArrayList<>();
         LocalDateTime now = baseTime;
         for (int i = 0; i < 20; i++) {
             now = now.plus(Duration.ofDays(2));
             Petition petition = PetitionMock.create(user, now);
             petitions.add(petition);
         }
-        petitions = repository.saveAll(petitions);
-    }
-
-    @Test
-    @DisplayName("최근 5개의 청원을 잘 가져오는가")
-    void findTop5ByOrderByCreatedAtDesc() {
-        // when
-        List<Petition> result = repository.findTop5ByOrderByCreatedAtDesc();
-
-        // then
-        assertThat(result.size()).isEqualTo(5);
-        assertThat(result).containsExactlyInAnyOrderElementsOf(petitions.subList(15, 20));
+        repository.saveAll(petitions);
     }
 
     @Test

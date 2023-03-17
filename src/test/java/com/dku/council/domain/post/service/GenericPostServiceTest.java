@@ -126,7 +126,7 @@ class GenericPostServiceTest {
             assertThat(dto.getBody()).isEqualTo(post.getBody());
             assertThat(dto.getCommentCount()).isEqualTo(post.getComments().size());
             assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
-            assertThat(dto.getCreatedDate()).isEqualTo(post.getCreatedAt().toLocalDate());
+            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt().toLocalDate());
             assertThat(dto.getLikes()).isEqualTo(15);
             assertThat(dto.getViews()).isEqualTo(post.getViews());
         }
