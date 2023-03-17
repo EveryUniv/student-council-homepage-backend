@@ -8,16 +8,16 @@ import java.time.LocalDate;
 
 @Getter
 public class CommentDto {
-    @Schema(name = "댓글 아이디", example = "2")
+    @Schema(description = "댓글 아이디", example = "2")
     private final Long id;
 
-    @Schema(name = "작성자 소속대학", example = "공과대학")
+    @Schema(description = "작성자 소속대학", example = "공과대학")
     private final String major;
 
-    @Schema(name = "댓글 본문", example = "이것은 댓글입니다.")
+    @Schema(description = "댓글 본문", example = "이것은 댓글입니다.")
     private final String text;
 
-    @Schema(name = "생성날짜", example = "2023-01-01")
+    @Schema(description = "생성날짜", example = "2023-01-01")
     private final LocalDate createdAt;
 
     public CommentDto(Comment comment) {

@@ -44,7 +44,7 @@ class BusServiceTest {
     }
 
     @Test
-    @DisplayName("버스 도착 목록이 잘 반환되는지 - 최근에 조회한 적 없는 경우")
+    @DisplayName("버스 도착 목록이 잘 반환되는지 - 캐싱 안된 경우")
     void listBusArrivalNoCached() {
         // given
         BusStation station = BusStation.DKU_GATE;
@@ -63,7 +63,7 @@ class BusServiceTest {
     }
 
     @Test
-    @DisplayName("버스 도착 목록이 잘 반환되는지 - 최근에 조회한 적 있는 경우")
+    @DisplayName("버스 도착 목록이 잘 반환되는지 - 캐싱된 경우")
     void listBusArrivalCached() {
         // given
         BusStation station = BusStation.DKU_GATE;
@@ -78,5 +78,30 @@ class BusServiceTest {
         // then
         assertThat(dto.getCapturedAt().getEpochSecond()).isEqualTo(now.getEpochSecond());
         assertThat(dto.getBusArrivalList().size()).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("버스 도착 목록이 잘 반환되는지 - 선형 보간 적용")
+    void listBusArrivalCachedWithInterpolation() {
+        // given
+        BusStation station = BusStation.DKU_GATE;
+        Instant now = Instant.now(clock);
+        List<BusArrival> arrivals = List.of(
+                BusArrivalMock.create(30, 60),
+                BusArrivalMock.create(5, 8)
+        );
+        CachedBusArrivals cached = new CachedBusArrivals(now.minusSeconds(10), arrivals);
+        when(memoryRepository.getArrivals(station.name(), now)).thenReturn(Optional.of(cached));
+
+        // when
+        ResponseBusArrivalDto dto = service.listBusArrival(BusStation.DKU_GATE);
+
+        // then
+        assertThat(dto.getCapturedAt().getEpochSecond()).isEqualTo(now.getEpochSecond() - 10);
+        assertThat(dto.getBusArrivalList().size()).isEqualTo(2);
+        assertThat(dto.getBusArrivalList().get(0).getPredictTime1()).isEqualTo(arrivals.get(0).getPredictTimeSec1() - 10);
+        assertThat(dto.getBusArrivalList().get(0).getPredictTime2()).isEqualTo(arrivals.get(0).getPredictTimeSec2() - 10);
+        assertThat(dto.getBusArrivalList().get(1).getPredictTime1()).isEqualTo(0);
+        assertThat(dto.getBusArrivalList().get(1).getPredictTime2()).isEqualTo(0);
     }
 }
