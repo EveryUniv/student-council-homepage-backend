@@ -2,6 +2,8 @@ package com.dku.council.domain.post.model.dto.response;
 
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.model.entity.posttype.Conference;
+import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.tag.model.dto.TagDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -51,7 +53,7 @@ public class ResponseSingleGenericPostDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
-        this.author = post.getUser().getName();
+        this.author = post.getDisplayingUsername();
         // TODO 쿼리 확인해보기. 일괄쿼리로 나가는지?
         this.tag = post.getPostTags().stream()
                 .map(e -> new TagDto(e.getTag()))
@@ -77,4 +79,5 @@ public class ResponseSingleGenericPostDto {
         this.isMine = copy.isMine;
         this.isLiked = copy.isLiked;
     }
+
 }
