@@ -32,7 +32,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Inheritance(strategy = SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = PROTECTED)
-public class Post extends BaseEntity {
+public abstract class Post extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -86,4 +86,7 @@ public class Post extends BaseEntity {
     public void blind() {
         this.status = PostStatus.BLINDED;
     }
+
+
+    public abstract String getDisplayingUsername();
 }

@@ -26,4 +26,9 @@ public class GeneralForum extends Post {
                          int views) {
         super(user, title, body, views);
     }
+
+    @Override
+    public String getDisplayingUsername() {
+        return getUser().getMajor().getDepartment() + " " + getUser().getNickname();
+    }
 }

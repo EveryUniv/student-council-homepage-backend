@@ -54,4 +54,9 @@ public class Petition extends Post {
     public void updatePetitionStatus(PetitionStatus status) {
         this.extraStatus = status;
     }
+
+    @Override
+    public String getDisplayingUsername() {
+        return getUser().getMajor().getDepartment();
+    }
 }

@@ -26,4 +26,8 @@ public class News extends Post {
                  int views) {
         super(user, title, body, views);
     }
+    @Override
+    public String getDisplayingUsername() {
+        return "anonymity";
+    }
 }

@@ -41,4 +41,9 @@ public class Conference extends Post {
         this.round = round;
         this.date = date;
     }
+
+    @Override
+    public String getDisplayingUsername() {
+        return "anonymity";
+    }
 }

@@ -50,4 +50,9 @@ public class Voc extends Post {
     public void updateVocStatus(VocStatus status) {
         this.extraStatus = status;
     }
+
+    @Override
+    public String getDisplayingUsername() {
+        return getUser().getNickname().substring(0, 1) + "*******";
+    }
 }

@@ -184,6 +184,7 @@ class GenericPostServiceTest {
         verify(tagService).addTagsToPost(any(), eq(tagIds));
     }
 
+
     @Test
     @DisplayName("생성할 때 유저가 없으면 오류")
     public void failedCreateByNotFoundUser() {
