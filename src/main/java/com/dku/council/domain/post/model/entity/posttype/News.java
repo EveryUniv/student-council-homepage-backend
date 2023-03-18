@@ -28,6 +28,6 @@ public class News extends Post {
     }
     @Override
     public String getDisplayingUsername() {
-        return "anonymity";
+        return Post.ANONYMITY;
     }
 }
