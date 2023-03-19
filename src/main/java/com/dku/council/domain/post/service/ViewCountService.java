@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 
 @Service
@@ -19,7 +20,7 @@ public class ViewCountService {
     private final Clock clock;
 
     @Value("${app.post.view-counting-expires}")
-    private final long expiresAfter;
+    private final Duration expiresAfter;
 
     // TODO 조회수 자체 처리도 캐싱하면 좋을 듯! (현재는 동일인물 구분에만 사용)
 

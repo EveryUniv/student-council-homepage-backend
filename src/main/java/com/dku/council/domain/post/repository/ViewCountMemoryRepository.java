@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.repository;
 
+import java.time.Duration;
 import java.time.Instant;
 
 public interface ViewCountMemoryRepository {
@@ -19,8 +20,8 @@ public interface ViewCountMemoryRepository {
      *
      * @param postId         게시글 ID
      * @param userIdentifier 유저 식별자(remoteAddress, Id 등..)
-     * @param expiresAfter   캐시 유지시간. 분 단위로 입력한다.
+     * @param expiresAfter   캐시 유지시간.
      * @param now            현재 시각
      */
-    void put(Long postId, String userIdentifier, long expiresAfter, Instant now);
+    void put(Long postId, String userIdentifier, Duration expiresAfter, Instant now);
 }

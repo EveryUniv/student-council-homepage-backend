@@ -1,7 +1,7 @@
 package com.dku.council.mock;
 
 import com.dku.council.domain.tag.model.entity.Tag;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class TagMock {
 
     public static Tag create(Long id) {
         Tag tag = new Tag(RandomGen.nextUUID());
-        FieldInjector.injectId(Tag.class, tag, id);
+        EntityUtil.injectId(Tag.class, tag, id);
         return tag;
     }
 

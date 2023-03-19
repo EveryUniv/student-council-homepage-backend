@@ -1,6 +1,6 @@
 package com.dku.council.domain.like.repository;
 
-import com.dku.council.domain.like.PostLike;
+import com.dku.council.domain.like.model.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

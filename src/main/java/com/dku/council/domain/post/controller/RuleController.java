@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.post.model.dto.page.SummarizedRuleDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedRuleDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateRuleDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
@@ -14,7 +14,6 @@ import com.dku.council.global.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,29 +23,27 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@Tag(name = "총학 회칙", description = "총학 회칙 관련 api")
+@Tag(name = "회칙", description = "회칙 관련 api")
 @RestController
 @RequestMapping("/post/rule")
 @RequiredArgsConstructor
 public class RuleController {
 
     private final GenericPostService<Rule> postService;
-    private final MessageSource messageSource;
 
     /**
      * 게시글 목록으로 조회
      *
-     * @param keyword 제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
+     * @param keyword  제목이나 내용에 포함된 검색어. 지정하지 않으면 모든 게시글 조회.
      * @param bodySize 게시글 본문 길이. (글자 단위) 지정하지 않으면 50 글자.
-     * @return 페이징된 총학 회칙 목록
+     * @return 페이징된 회칙 목록
      */
     @GetMapping
     public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Specification<Rule> spec = PostSpec.genericPostCondition(keyword, null);
-        Page<SummarizedRuleDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedRuleDto(messageSource, postService.getFileBaseUrl(), bodySize, post));
+        Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
+        Page<SummarizedRuleDto> list = postService.list(spec, pageable, bodySize, SummarizedRuleDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -66,7 +63,7 @@ public class RuleController {
      * 게시글 단건 조회
      *
      * @param id 조회할 게시글 id
-     * @return 총학 회칙 게시글 정보
+     * @return 회칙 게시글 정보
      */
     @GetMapping("/{id}")
     @UserOnly

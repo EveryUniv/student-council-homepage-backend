@@ -16,7 +16,7 @@ public class BusResponseMapper {
         }
 
         BusStatus state = getGGBusStateLabel(model.getFlag());
-        return new BusArrival(state,
+        return new BusArrival(state, model.getStaOrder(),
                 model.getLocationNo1(), model.getPredictTime1() * 60, model.getPlateNo1(),
                 model.getLocationNo2(), model.getPredictTime2() * 60, model.getPlateNo2(),
                 bus.getName());
@@ -38,7 +38,7 @@ public class BusResponseMapper {
     public static BusArrival to(ResponseKakaoBusApi.BusLine model) {
         ResponseKakaoBusApi.BusLine.BusArrival arrival = model.getArrival();
         BusStatus state = getKakaoStateLabel(arrival.getVehicleState());
-        return new BusArrival(state,
+        return new BusArrival(state, model.getArrival().getOrder(),
                 arrival.getBusStopCount(), arrival.getArrivalTime(), arrival.getVehicleNumber(),
                 arrival.getBusStopCount2(), arrival.getArrivalTime2(), arrival.getVehicleNumber2(),
                 model.getName());

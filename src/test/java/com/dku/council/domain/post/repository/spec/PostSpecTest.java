@@ -6,8 +6,11 @@ import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.PostTagRepository;
 import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
@@ -34,33 +37,36 @@ class PostSpecTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private PostTagRepository postTagRepository;
 
-    private User user;
-    private List<News> news1;
-
+    private User user1;
+    private Tag tag1;
     private Tag tag2;
-    private List<News> news2;
-
-    private Tag tag3;
-    private List<News> news3;
 
     @BeforeEach
     void setup() {
-        user = UserMock.create();
-        user = userRepository.save(user);
+        Major major = majorRepository.save(MajorMock.create());
 
-        news1 = NewsMock.createList("news-1-", user, 5);
-        news1 = postRepository.saveAll(news1);
+        user1 = UserMock.create(major);
+        user1 = userRepository.save(user1);
+
+        User user2 = UserMock.create(major);
+        user2 = userRepository.save(user2);
+
+        List<News> news1 = NewsMock.createList("news-1-", user1, 5);
+        postRepository.saveAll(news1);
+
+        tag1 = TagMock.create();
+        createPostsWithTag("news-2-", tag1, user1, 6);
 
         tag2 = TagMock.create();
-        news2 = createPostsWithTag("news-2-", tag2, 6);
-
-        tag3 = TagMock.create();
-        news3 = createPostsWithTag("news-3-", tag3, 7);
+        createPostsWithTag("news-3-", tag2, user2, 7);
     }
 
-    private List<News> createPostsWithTag(String prefix, Tag tag, int size) {
+    private void createPostsWithTag(String prefix, Tag tag, User user, int size) {
         List<News> newsList = NewsMock.createList(prefix, user, size);
         tag = tagRepository.save(tag);
         newsList = postRepository.saveAll(newsList);
@@ -70,14 +76,12 @@ class PostSpecTest {
             relation.changePost(news);
             postTagRepository.save(relation);
         }
-
-        return newsList;
     }
 
     @Test
     void findByKeyword() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition("ews-1", null);
+        Specification<News> spec = PostSpec.withTitleOrBody("ews-1");
 
         // when
         List<News> all = postRepository.findAll(spec);
@@ -89,7 +93,7 @@ class PostSpecTest {
     @Test
     void findBySingleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag2.getId()));
+        Specification<News> spec = PostSpec.withTag(tag1.getId());
 
         // when
         List<News> all = postRepository.findAll(spec);
@@ -101,12 +105,24 @@ class PostSpecTest {
     @Test
     void findByMultipleTags() {
         // given
-        Specification<News> spec = PostSpec.genericPostCondition(null, List.of(tag2.getId(), tag3.getId()));
+        Specification<News> spec = PostSpec.withTags(List.of(tag1.getId(), tag2.getId()));
 
         // when
         List<News> all = postRepository.findAll(spec);
 
         // then
         assertThat(all.size()).isEqualTo(13);
+    }
+
+    @Test
+    void findByAuthor() {
+        // given
+        Specification<News> spec = PostSpec.withAuthor(user1.getId());
+
+        // when
+        List<News> all = postRepository.findAll(spec);
+
+        // then
+        assertThat(all.size()).isEqualTo(11);
     }
 }

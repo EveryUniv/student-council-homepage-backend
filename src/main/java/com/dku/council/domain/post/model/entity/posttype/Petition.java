@@ -26,7 +26,7 @@ import static lombok.AccessLevel.PROTECTED;
 public class Petition extends Post {
 
     @Enumerated(STRING)
-    private PetitionStatus petitionStatus;
+    private PetitionStatus extraStatus;
 
     @Lob
     private String answer;
@@ -35,14 +35,16 @@ public class Petition extends Post {
     private Petition(@NonNull User user,
                      @NonNull String title,
                      @NonNull String body,
-                     int views, PetitionStatus petitionStatus, String answer) {
+                     int views,
+                     PetitionStatus extraStatus,
+                     String answer) {
         super(user, title, body, views);
-        this.petitionStatus = petitionStatus;
+        this.extraStatus = extraStatus;
         this.answer = answer;
     }
 
     public static PetitionBuilder builder() {
-        return new PetitionBuilder().petitionStatus(PetitionStatus.ACTIVE);
+        return new PetitionBuilder().extraStatus(PetitionStatus.ACTIVE);
     }
 
     public void replyAnswer(String answer) {
@@ -50,6 +52,6 @@ public class Petition extends Post {
     }
 
     public void updatePetitionStatus(PetitionStatus status) {
-        this.petitionStatus = status;
+        this.extraStatus = status;
     }
 }

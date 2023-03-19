@@ -1,20 +1,25 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.MvcMockResponse;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.tag.service.TagService;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
+import com.dku.council.util.EntityUtil;
+import com.dku.council.util.FullIntegrationTest;
+import com.dku.council.util.MvcMockResponse;
+import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,6 +32,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,14 +42,13 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@OnlyDevTest
+@FullIntegrationTest
 class NewsControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -56,35 +61,64 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     private TagRepository tagRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private TagService tagService;
 
     @Autowired
     private GenericPostRepository<News> postRepository;
 
-    private User user;
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    private Major major;
+    private User user;
+    private List<News> allNews;
+    private List<News> news1;
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(0L);
+        major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(0L, major);
         user = userRepository.save(user);
         UserAuth.withUser(user.getId());
+
+        allNews = new ArrayList<>();
+
+        news1 = NewsMock.createList("news", user, 3);
+        allNews.addAll(news1);
+
+        List<News> news2 = NewsMock.createList("test", user, 2);
+        allNews.addAll(news2);
+
+        postRepository.saveAll(allNews);
+        postRepository.saveAll(NewsMock.createList("ews", user, 3, false));
     }
 
 
     @Test
     @DisplayName("News 리스트 가져오기")
     void list() throws Exception {
-        // given
-        List<News> news = NewsMock.createList("news", user, 10);
-        postRepository.saveAll(news);
-
         // when
-        ResultActions result = mvc.perform(get("/post/news"))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/news"));
 
         // then
-        Integer[] ids = getIdArray(news);
+        Integer[] ids = EntityUtil.getIdArray(allNews);
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(ids)));
+    }
+
+    @Test
+    @DisplayName("News 리스트 가져오기 - 키워드 명시")
+    void listWithKeyword() throws Exception {
+        // when
+        ResultActions result = mvc.perform(get("/post/news")
+                .param("keyword", "ews"));
+
+        // then
+        Integer[] ids = EntityUtil.getIdArray(news1);
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(ids)));
     }
@@ -93,9 +127,6 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 리스트 가져오기 - 태그 명시")
     void listWithTags() throws Exception {
         // given
-        List<News> news1 = NewsMock.createList("news", user, 5);
-        postRepository.saveAll(news1);
-
         Tag tag1 = TagMock.create();
         List<News> news2 = createPostsWithTag(tag1, 6);
 
@@ -104,11 +135,10 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(get("/post/news")
-                        .param("tagIds", tag1.getId().toString()))
-                .andDo(print());
+                .param("tagIds", tag1.getId().toString()));
 
         // then
-        Integer[] tag1Ids = getIdArray(news2);
+        Integer[] tag1Ids = EntityUtil.getIdArray(news2);
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(tag1Ids)));
     }
@@ -117,9 +147,6 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 리스트 가져오기 - 여러 태그 명시")
     void listWithMultipleTags() throws Exception {
         // given
-        List<News> news1 = NewsMock.createList("news", user, 5);
-        postRepository.saveAll(news1);
-
         Tag tag1 = TagMock.create();
         List<News> news2 = createPostsWithTag(tag1, 6);
 
@@ -128,14 +155,13 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(get("/post/news")
-                        .param("tagIds", tag1.getId().toString())
-                        .param("tagIds", tag2.getId().toString()))
-                .andDo(print());
+                .param("tagIds", tag1.getId().toString())
+                .param("tagIds", tag2.getId().toString()));
 
         // then
         List<News> expected = Stream.concat(news2.stream(), news3.stream())
                 .collect(Collectors.toList());
-        Integer[] allIds = getIdArray(expected);
+        Integer[] allIds = EntityUtil.getIdArray(expected);
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(allIds)));
     }
@@ -150,30 +176,20 @@ class NewsControllerTest extends AbstractContainerRedisTest {
         return newsList;
     }
 
-    private Integer[] getIdArray(List<News> news) {
-        int size = news.size();
-        Integer[] ids = new Integer[size];
-        for (int i = 0; i < size; i++) {
-            ids[i] = (int) news.get(i).getId().longValue();
-        }
-        return ids;
-    }
-
     @Test
     @DisplayName("News 생성")
     void create() throws Exception {
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
-                        .param("title", "제목")
-                        .param("body", "본문"))
-                .andDo(print());
+                .param("title", "제목")
+                .param("body", "본문"));
 
         // then
         MvcResult response = result.andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andReturn();
 
-        ResponseIdDto dto = MvcMockResponse.getResponse(response, ResponseIdDto.class);
+        ResponseIdDto dto = MvcMockResponse.getResponse(objectMapper, response, ResponseIdDto.class);
         News actualNews = postRepository.findById(dto.getId()).orElseThrow();
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
@@ -192,17 +208,16 @@ class NewsControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(multipart("/post/news")
-                        .param("title", "제목")
-                        .param("body", "본문")
-                        .param("tagIds", tagIds))
-                .andDo(print());
+                .param("title", "제목")
+                .param("body", "본문")
+                .param("tagIds", tagIds));
 
         // then
         MvcResult response = result.andExpect(status().isOk())
                 .andExpect(jsonPath("id").exists())
                 .andReturn();
 
-        ResponseIdDto dto = MvcMockResponse.getResponse(response, ResponseIdDto.class);
+        ResponseIdDto dto = MvcMockResponse.getResponse(objectMapper, response, ResponseIdDto.class);
         News actualNews = postRepository.findById(dto.getId()).orElseThrow();
 
         assertThat(actualNews.getTitle()).isEqualTo("제목");
@@ -215,19 +230,16 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 단건조회")
     void findOne() throws Exception {
         // given
-        News news = News.builder()
-                .title("제목").body("본문").user(user).build();
-        news = postRepository.save(news);
+        News news = allNews.get(0);
 
         // when
-        ResultActions result = mvc.perform(get("/post/news/" + news.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/news/" + news.getId()));
 
         // then
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("id", is(news.getId().intValue())))
-                .andExpect(jsonPath("title", is("제목")))
-                .andExpect(jsonPath("body", is("본문")))
+                .andExpect(jsonPath("title", is("news0")))
+                .andExpect(jsonPath("body", is("0")))
                 .andExpect(jsonPath("author", is(UserMock.NAME)))
                 .andExpect(jsonPath("mine", is(true)));
     }
@@ -236,12 +248,10 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 삭제")
     void delete() throws Exception {
         // given
-        News news = NewsMock.create(user, null);
-        news = postRepository.save(news);
+        News news = allNews.get(0);
 
         // when
-        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()));
 
         // then
         result.andExpect(status().isOk());
@@ -252,12 +262,11 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     void deleteByAdmin() throws Exception {
         // given
         UserAuth.withAdmin(user.getId());
-        News news = NewsMock.create();
+        News news = NewsMock.create(user);
         news = postRepository.save(news);
 
         // when
-        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()));
 
         // then
         result.andExpect(status().isOk());
@@ -267,12 +276,11 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 삭제 실패 - 권한 없음")
     void failedDeleteByAccessDenied() throws Exception {
         // given
-        News news = NewsMock.create();
+        News news = NewsMock.create(userRepository.save(UserMock.create(0L, major)));
         news = postRepository.save(news);
 
         // when
-        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(MockMvcRequestBuilders.delete("/post/news/" + news.getId()));
 
         // then
         result.andExpect(status().isForbidden());

@@ -2,78 +2,40 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
-import com.dku.council.domain.user.model.MajorData;
-import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
-import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
+import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
+import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
-import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.UserRole;
-import com.dku.council.infra.dku.model.StudentInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
-// TODO Test it
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
-    private final MessageSource messageSource;
-    private final SMSVerificationService smsVerificationService;
-    private final DKUAuthService dkuAuthService;
-    private final PasswordEncoder passwordEncoder;
+    private final MajorRepository majorRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
-
-
-    @Transactional
-    public void signup(RequestSignupDto dto, String signupToken) {
-        StudentInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
-        String phone = smsVerificationService.getPhoneNumber(signupToken);
-        String encryptedPassword = passwordEncoder.encode(dto.getPassword());
-
-        User.UserBuilder userBuilder = User.builder()
-                .studentId(studentInfo.getStudentId())
-                .password(encryptedPassword)
-                .name(studentInfo.getStudentName())
-                .phone(phone)
-                .yearOfAdmission(studentInfo.getYearOfAdmission())
-                .status(UserStatus.ACTIVE)
-                .role(UserRole.USER);
-
-        MajorData majorData = studentInfo.getMajorData();
-        if (majorData.isEmpty()) {
-            userBuilder.major(new Major(studentInfo.getNotRecognizedMajor(), studentInfo.getNotRecognizedDepartment()));
-        } else {
-            userBuilder.major(new Major(majorData));
-        }
-
-        userRepository.save(userBuilder.build());
-        deleteSignupAuths(signupToken);
-    }
-
-    private void deleteSignupAuths(String signupToken) {
-        if (!dkuAuthService.deleteStudentAuth(signupToken)) {
-            log.error("Can't delete user signup authentication: dku student auth");
-        }
-        if (!smsVerificationService.deleteSMSAuth(signupToken)) {
-            log.error("Can't delete user signup authentication: sms auth");
-        }
-    }
 
     public ResponseLoginDto login(RequestLoginDto dto) {
         User user = userRepository.findByStudentId(dto.getStudentId())
@@ -82,7 +44,7 @@ public class UserService {
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             UserRole role = user.getUserRole();
             AuthenticationToken token = jwtProvider.issue(user);
-            return new ResponseLoginDto(messageSource, token, role, user);
+            return new ResponseLoginDto(token, role, user);
         } else {
             throw new WrongPasswordException();
         }
@@ -99,7 +61,30 @@ public class UserService {
                 .orElseThrow(LoginUserNotFoundException::new);
 
         String year = user.getYearOfAdmission().toString();
-        String major = user.getMajor().getMajorName(messageSource);
+        String major = user.getMajor().getName();
         return new ResponseUserInfoDto(user.getName(), year, major);
+    }
+
+    public List<ResponseMajorDto> getAllMajors() {
+        return majorRepository.findAll().stream()
+                .map(ResponseMajorDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void changeNickName(Long userId, RequestNickNameChangeDto dto) {
+        User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
+        user.changeNickName(dto.getNickname());
+    }
+
+    @Transactional
+    public void changePassword(Long userId, RequestExistPasswordChangeDto dto) {
+        User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
+        if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
+            user.changePassword(encodedPassword);
+        } else {
+            throw new WrongPasswordException();
+        }
     }
 }

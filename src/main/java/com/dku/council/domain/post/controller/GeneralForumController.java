@@ -3,7 +3,8 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.post.model.dto.page.SummarizedGeneralForumDto;
+import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.post.model.dto.list.SummarizedGeneralForumDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
@@ -35,6 +36,7 @@ public class GeneralForumController {
 
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
+    private final PostLikeService postLikeService;
 
     /**
      * 게시글 목록 및 태그 조회
@@ -50,9 +52,9 @@ public class GeneralForumController {
                                                         @RequestParam(required = false) List<Long> tagIds,
                                                         @RequestParam(defaultValue = "50") int bodySize,
                                                         @ParameterObject Pageable pageable) {
-        Specification<GeneralForum> spec = PostSpec.genericPostCondition(keyword, tagIds);
-        Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable)
-                .map(post -> new SummarizedGeneralForumDto(postService.getFileBaseUrl(), bodySize, post));
+        Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
+        spec = spec.and(PostSpec.withTitleOrBody(keyword));
+        Page<SummarizedGeneralForumDto> list = postService.list(spec, pageable, bodySize, SummarizedGeneralForumDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -161,5 +163,29 @@ public class GeneralForumController {
     public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
         Long deleteId = commentService.delete(id, auth.getUserId(), auth.isAdmin());
         return new ResponseIdDto(deleteId);
+    }
+
+    /**
+     * 게시글에 좋아요 표시.
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/{id}")
+    @UserOnly
+    public void like(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/{id}")
+    @UserOnly
+    public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
+        postLikeService.cancelLike(id, auth.getUserId());
     }
 }

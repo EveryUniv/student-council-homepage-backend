@@ -5,6 +5,9 @@ import com.dku.council.domain.post.model.entity.posttype.Petition;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.time.Duration;
+import java.time.LocalDate;
+
 @Getter
 public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
 
@@ -14,9 +17,13 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
     @Schema(description = "운영진 답변", example = "안녕하세요", nullable = true)
     private final String answer;
 
-    public ResponsePetitionDto(String baseFileUrl, Long userId, Petition post) {
-        super(baseFileUrl, userId, post);
-        this.status = post.getPetitionStatus();
+    @Schema(description = "청원 마감일")
+    private final LocalDate expiresAt;
+
+    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime) {
+        super(dto);
+        this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
+        this.expiresAt = post.getCreatedAt().plus(expiresTime).toLocalDate();
     }
 }
