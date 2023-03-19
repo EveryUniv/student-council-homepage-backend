@@ -3,7 +3,7 @@ package com.dku.council.infra.dku.service;
 import com.dku.council.global.config.webclient.ChromeAgentWebClient;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
-import com.dku.council.infra.dku.model.Schedule;
+import com.dku.council.infra.dku.model.ScheduleInfo;
 import com.dku.council.infra.dku.model.ScheduleResponse;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
@@ -38,7 +38,7 @@ public class DkuScheduleService {
      * @param auth 인증 토큰
      * @return 학사 일정
      */
-    public List<Schedule> crawlSchedule(DkuAuth auth) {
+    public List<ScheduleInfo> crawlSchedule(DkuAuth auth) {
         ScheduleResponse response = request(auth);
         try {
             return parse(response.getData());
@@ -72,8 +72,8 @@ public class DkuScheduleService {
         return result;
     }
 
-    private List<Schedule> parse(String data) throws ParseException {
-        List<Schedule> result = new ArrayList<>();
+    private List<ScheduleInfo> parse(String data) throws ParseException {
+        List<ScheduleInfo> result = new ArrayList<>();
         JSONParser parser = new JSONParser();
 
         // parse 'data'
@@ -94,10 +94,10 @@ public class DkuScheduleService {
         return result;
     }
 
-    private static Schedule parseSchedule(JSONObject obj) {
+    private static ScheduleInfo parseSchedule(JSONObject obj) {
         String title = obj.get("taskName").toString();
         LocalDate fromDate = LocalDate.parse(obj.get("startDt").toString(), SCHEDULE_DATE_FORMAT);
         LocalDate toDate = LocalDate.parse(obj.get("endDt").toString(), SCHEDULE_DATE_FORMAT);
-        return new Schedule(title, fromDate, toDate);
+        return new ScheduleInfo(title, fromDate, toDate);
     }
 }

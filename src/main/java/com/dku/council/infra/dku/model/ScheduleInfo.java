@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class Schedule {
+public class ScheduleInfo {
     private final String title;
     private final LocalDate fromDate;
     private final LocalDate toDate;

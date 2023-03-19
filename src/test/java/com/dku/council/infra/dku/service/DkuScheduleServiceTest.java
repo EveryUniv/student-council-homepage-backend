@@ -2,7 +2,7 @@ package com.dku.council.infra.dku.service;
 
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
-import com.dku.council.infra.dku.model.Schedule;
+import com.dku.council.infra.dku.model.ScheduleInfo;
 import com.dku.council.util.base.AbstractMockServerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,35 +30,35 @@ class DkuScheduleServiceTest extends AbstractMockServerTest {
     void crawlSchedule() {
         // given
         mockJson("dku/schedule-response");
-        List<Schedule> expected = List.of(
-                new Schedule("2022학년도 2학기 기말고사 성적 입력 및 제출 기간",
+        List<ScheduleInfo> expected = List.of(
+                new ScheduleInfo("2022학년도 2학기 기말고사 성적 입력 및 제출 기간",
                         LocalDate.of(2022, 12, 13),
                         LocalDate.of(2023, 1, 4)),
-                new Schedule("2022학년도 계절(동계)학기 수업기간",
+                new ScheduleInfo("2022학년도 계절(동계)학기 수업기간",
                         LocalDate.of(2022, 12, 26),
                         LocalDate.of(2023, 1, 13)),
-                new Schedule("2023학년도 1학기 Web 휴학원서제출",
+                new ScheduleInfo("2023학년도 1학기 Web 휴학원서제출",
                         LocalDate.of(2022, 12, 26),
                         LocalDate.of(2023, 2, 28)),
-                new Schedule("2022학년도 2학기 기말고사 성적확인 및 공시기간",
+                new ScheduleInfo("2022학년도 2학기 기말고사 성적확인 및 공시기간",
                         LocalDate.of(2022, 12, 28),
                         LocalDate.of(2023, 1, 3)),
-                new Schedule("2022학년도 계절(동계)학기 수업일수 5-8일",
+                new ScheduleInfo("2022학년도 계절(동계)학기 수업일수 5-8일",
                         LocalDate.of(2022, 12, 30),
                         LocalDate.of(2023, 1, 4)),
-                new Schedule("2022 하반기  천안시 대학생 학자금 대출이자 지원",
+                new ScheduleInfo("2022 하반기  천안시 대학생 학자금 대출이자 지원",
                         LocalDate.of(2022, 12, 30),
                         LocalDate.of(2023, 1, 20))
         );
 
         // when
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
-        List<Schedule> schedules = service.crawlSchedule(dummyAuth);
+        List<ScheduleInfo> schedules = service.crawlSchedule(dummyAuth);
 
         // then
         for (int i = 0; i < expected.size(); i++) {
-            Schedule expectedResult = expected.get(i);
-            Schedule actual = schedules.get(i);
+            ScheduleInfo expectedResult = expected.get(i);
+            ScheduleInfo actual = schedules.get(i);
             assertThat(actual.getTitle()).isEqualTo(expectedResult.getTitle());
             assertThat(actual.getToDate()).isEqualTo(expectedResult.getToDate());
             assertThat(actual.getFromDate()).isEqualTo(expectedResult.getFromDate());
