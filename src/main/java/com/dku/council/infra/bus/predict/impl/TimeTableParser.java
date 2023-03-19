@@ -1,7 +1,6 @@
 package com.dku.council.infra.bus.predict.impl;
 
 import com.dku.council.infra.bus.exception.CannotGetTimeTable;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 public class TimeTableParser {
 
     private static final DateTimeFormatter LOCAL_TIME_FORMATTER = DateTimeFormatter.ofPattern("H:mm");
