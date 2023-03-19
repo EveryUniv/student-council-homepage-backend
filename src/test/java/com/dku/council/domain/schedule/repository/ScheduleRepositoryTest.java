@@ -1,6 +1,7 @@
 package com.dku.council.domain.schedule.repository;
 
-import com.dku.council.domain.schedule.model.Schedule;
+import com.dku.council.domain.mainpage.model.entity.Schedule;
+import com.dku.council.domain.mainpage.repository.ScheduleRepository;
 import com.dku.council.mock.ScheduleMock;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

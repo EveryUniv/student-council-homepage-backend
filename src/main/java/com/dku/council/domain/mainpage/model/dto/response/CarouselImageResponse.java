@@ -1,6 +1,6 @@
-package com.dku.council.domain.page.model.dto.response;
+package com.dku.council.domain.mainpage.model.dto.response;
 
-import com.dku.council.domain.page.model.CarouselImage;
+import com.dku.council.domain.mainpage.model.entity.CarouselImage;
 import lombok.Getter;
 
 import java.net.URI;

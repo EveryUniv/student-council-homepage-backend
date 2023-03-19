@@ -1,4 +1,4 @@
-package com.dku.council.domain.page.model.dto;
+package com.dku.council.domain.mainpage.model.dto;
 
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import lombok.Getter;

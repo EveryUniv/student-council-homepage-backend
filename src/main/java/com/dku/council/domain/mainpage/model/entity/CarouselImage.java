@@ -1,4 +1,4 @@
-package com.dku.council.domain.page.model;
+package com.dku.council.domain.mainpage.model.entity;
 
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;

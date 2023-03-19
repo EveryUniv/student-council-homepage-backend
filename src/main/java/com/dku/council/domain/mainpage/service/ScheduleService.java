@@ -1,7 +1,7 @@
-package com.dku.council.domain.schedule.service;
+package com.dku.council.domain.mainpage.service;
 
-import com.dku.council.domain.schedule.model.ScheduleDto;
-import com.dku.council.domain.schedule.repository.ScheduleRepository;
+import com.dku.council.domain.mainpage.model.dto.response.ScheduleResponseDto;
+import com.dku.council.domain.mainpage.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
 
-    public List<ScheduleDto> getSchedules(LocalDate from, LocalDate to) {
+    public List<ScheduleResponseDto> getSchedules(LocalDate from, LocalDate to) {
         return scheduleRepository.findAllOverlapped(from, to).stream()
-                .map(ScheduleDto::new)
+                .map(ScheduleResponseDto::new)
                 .collect(Collectors.toList());
     }
 }

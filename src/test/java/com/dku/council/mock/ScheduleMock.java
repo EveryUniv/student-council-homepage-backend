@@ -1,6 +1,6 @@
 package com.dku.council.mock;
 
-import com.dku.council.domain.schedule.model.Schedule;
+import com.dku.council.domain.mainpage.model.entity.Schedule;
 
 import java.time.LocalDate;
 import java.time.Period;

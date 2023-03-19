@@ -1,8 +1,9 @@
 package com.dku.council.domain.schedule.service;
 
-import com.dku.council.domain.schedule.model.Schedule;
-import com.dku.council.domain.schedule.model.ScheduleDto;
-import com.dku.council.domain.schedule.repository.ScheduleRepository;
+import com.dku.council.domain.mainpage.model.dto.response.ScheduleResponseDto;
+import com.dku.council.domain.mainpage.model.entity.Schedule;
+import com.dku.council.domain.mainpage.repository.ScheduleRepository;
+import com.dku.council.domain.mainpage.service.ScheduleService;
 import com.dku.council.mock.ScheduleMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ class ScheduleServiceTest {
                 .thenReturn(schedules);
 
         // when
-        List<ScheduleDto> expected = service.getSchedules(begin, end);
+        List<ScheduleResponseDto> expected = service.getSchedules(begin, end);
 
         // then
         assertThat(expected).hasSize(5);

@@ -1,10 +1,10 @@
-package com.dku.council.domain.page.service;
+package com.dku.council.domain.mainpage.service;
 
-import com.dku.council.domain.page.exception.CarouselNotFoundException;
-import com.dku.council.domain.page.model.CarouselImage;
-import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
-import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
-import com.dku.council.domain.page.repository.CarouselImageRepository;
+import com.dku.council.domain.mainpage.exception.CarouselNotFoundException;
+import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
+import com.dku.council.domain.mainpage.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.mainpage.model.entity.CarouselImage;
+import com.dku.council.domain.mainpage.repository.CarouselImageRepository;
 import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.mock.MultipartFileMock;
@@ -25,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PageServiceTest {
+public class MainPageServiceTest {
 
     @Mock
     private CarouselImageRepository carouselImageRepository;
@@ -34,7 +34,7 @@ public class PageServiceTest {
     private FileUploadService fileUploadService;
 
     @InjectMocks
-    private PageServiceImpl service;
+    private MainPageServiceImpl service;
 
     @Test
     @DisplayName("확장자 실패 - jpg | jpeg ...")

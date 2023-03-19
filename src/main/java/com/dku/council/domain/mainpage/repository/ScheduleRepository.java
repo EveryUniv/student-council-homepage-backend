@@ -1,6 +1,6 @@
-package com.dku.council.domain.schedule.repository;
+package com.dku.council.domain.mainpage.repository;
 
-import com.dku.council.domain.schedule.model.Schedule;
+import com.dku.council.domain.mainpage.model.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

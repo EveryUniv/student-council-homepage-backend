@@ -21,8 +21,8 @@ import java.time.format.DateTimeFormatter;
 @Component
 public class JacksonDateTimeFormatter implements JacksonFormatConfigurer {
 
-    private static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
-    private static final String DATE_TIME_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+    public static final String DATE_TIME_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN);

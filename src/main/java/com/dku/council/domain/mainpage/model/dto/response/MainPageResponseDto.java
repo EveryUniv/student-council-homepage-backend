@@ -1,7 +1,7 @@
-package com.dku.council.domain.page.model.dto.response;
+package com.dku.council.domain.mainpage.model.dto.response;
 
-import com.dku.council.domain.page.model.dto.PetitionSummary;
-import com.dku.council.domain.page.model.dto.PostSummary;
+import com.dku.council.domain.mainpage.model.dto.PetitionSummary;
+import com.dku.council.domain.mainpage.model.dto.PostSummary;
 import lombok.Getter;
 
 import java.util.List;

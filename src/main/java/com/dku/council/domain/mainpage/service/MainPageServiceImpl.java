@@ -1,13 +1,13 @@
-package com.dku.council.domain.page.service;
+package com.dku.council.domain.mainpage.service;
 
-import com.dku.council.domain.page.exception.CarouselNotFoundException;
-import com.dku.council.domain.page.model.CarouselImage;
-import com.dku.council.domain.page.model.dto.PetitionSummary;
-import com.dku.council.domain.page.model.dto.PostSummary;
-import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
-import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
-import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
-import com.dku.council.domain.page.repository.CarouselImageRepository;
+import com.dku.council.domain.mainpage.exception.CarouselNotFoundException;
+import com.dku.council.domain.mainpage.model.dto.PetitionSummary;
+import com.dku.council.domain.mainpage.model.dto.PostSummary;
+import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
+import com.dku.council.domain.mainpage.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.mainpage.model.dto.response.MainPageResponseDto;
+import com.dku.council.domain.mainpage.model.entity.CarouselImage;
+import com.dku.council.domain.mainpage.repository.CarouselImageRepository;
 import com.dku.council.domain.post.repository.ConferenceRepository;
 import com.dku.council.domain.post.repository.NewsRepository;
 import com.dku.council.domain.post.repository.PetitionRepository;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PageServiceImpl implements PageService{
+public class MainPageServiceImpl implements MainPageService {
     private final FileUploadService fileUploadService;
     private final CarouselImageRepository carouselImageRepository;
     private final PetitionRepository petitionRepository;

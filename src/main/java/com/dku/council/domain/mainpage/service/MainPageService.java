@@ -1,12 +1,12 @@
-package com.dku.council.domain.page.service;
+package com.dku.council.domain.mainpage.service;
 
-import com.dku.council.domain.page.model.dto.request.RequestCarouselImageDto;
-import com.dku.council.domain.page.model.dto.response.CarouselImageResponse;
-import com.dku.council.domain.page.model.dto.response.MainPageResponseDto;
+import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
+import com.dku.council.domain.mainpage.model.dto.response.CarouselImageResponse;
+import com.dku.council.domain.mainpage.model.dto.response.MainPageResponseDto;
 
 import java.util.List;
 
-public interface PageService {
+public interface MainPageService {
     /**
      * 캐러셀 이미지 목록을 가져옵니다.
      * @return
