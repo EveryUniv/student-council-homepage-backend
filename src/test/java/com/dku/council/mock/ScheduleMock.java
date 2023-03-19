@@ -14,8 +14,8 @@ public class ScheduleMock {
             LocalDate startDate = start.plus(gap);
             Schedule schedule = Schedule.builder()
                     .title("title" + i)
-                    .startDateTime(startDate)
-                    .endDateTime(startDate.plus(gap))
+                    .startDate(startDate)
+                    .endDate(startDate.plus(gap))
                     .build();
             result.add(schedule);
             start = startDate.plus(gap);

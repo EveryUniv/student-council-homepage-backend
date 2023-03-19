@@ -7,14 +7,14 @@ import java.time.LocalDate;
 
 @Getter
 @RequiredArgsConstructor
-public class ScheduleResponseDto {
+public class ScheduleDto {
     private final String title;
     private final LocalDate start;
     private final LocalDate end;
 
-    public ScheduleResponseDto(Schedule entity) {
+    public ScheduleDto(Schedule entity) {
         this.title = entity.getTitle();
-        this.start = entity.getStartDateTime();
-        this.end = entity.getEndDateTime();
+        this.start = entity.getStartDate();
+        this.end = entity.getEndDate();
     }
 }

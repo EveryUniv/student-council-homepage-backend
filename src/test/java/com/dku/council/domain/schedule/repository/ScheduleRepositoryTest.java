@@ -4,6 +4,7 @@ import com.dku.council.domain.schedule.model.Schedule;
 import com.dku.council.mock.ScheduleMock;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -27,6 +28,7 @@ class ScheduleRepositoryTest {
     }
 
     @Test
+    @DisplayName("일정을 시작일과 종료일로 조회한다.")
     void findAllOverlapped() {
         List<Schedule> list1 = scheduleRepository.findAllOverlapped(
                 LocalDate.of(2022, 2, 1),

@@ -20,16 +20,16 @@ public class Schedule extends BaseEntity {
     @Column(name = "schedule_id")
     private Long id;
 
-    private LocalDate startDateTime;
+    private LocalDate startDate;
 
-    private LocalDate endDateTime;
+    private LocalDate endDate;
 
     private String title;
 
     @Builder
-    private Schedule(String title, LocalDate startDateTime, LocalDate endDateTime) {
+    private Schedule(String title, LocalDate startDate, LocalDate endDate) {
         this.title = title;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 }
