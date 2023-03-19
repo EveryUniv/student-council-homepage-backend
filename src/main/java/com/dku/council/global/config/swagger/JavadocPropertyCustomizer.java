@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.springdoc.core.providers.JavadocProvider;
 import org.springdoc.core.providers.ObjectMapperProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
+@ConditionalOnExpression("${springdoc.api-docs.enabled:true}")
 @RequiredArgsConstructor
 public class JavadocPropertyCustomizer implements ModelConverter {
 
