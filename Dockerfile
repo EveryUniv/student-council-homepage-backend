@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM won983212/pinpoint-agent-jdk-11
 
 WORKDIR /usr/app/
 
