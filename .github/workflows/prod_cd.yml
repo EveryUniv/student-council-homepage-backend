@@ -46,7 +46,7 @@ jobs:
           USERNAME: ${{ secrets.DOCKER_USERNAME }}
           REPO: ${{ secrets.DOCKER_REPO }}
         run: |
-          docker build -t $USERNAME/$REPO:${GITHUB_SHA::7}  -t $USERNAME/$REPO:latest .
+          docker build -t $USERNAME/$REPO:${GITHUB_SHA::7} -t $USERNAME/$REPO:latest --build-arg AGENT_NAME=dku-council-back .
 
       - name: Docker push
         env:
