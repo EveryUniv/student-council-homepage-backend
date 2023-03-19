@@ -38,7 +38,7 @@ public class PetitionService {
                 new SummarizedPetitionDto(dto, post, expiresTime, post.getComments().size())); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         return postService.findOne(postId, userId, remoteAddress, (dto, post) ->
                 new ResponsePetitionDto(dto, post, expiresTime));
