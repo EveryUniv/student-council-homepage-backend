@@ -8,7 +8,6 @@ import lombok.Getter;
 import java.time.LocalDate;
 import java.util.List;
 
-// TODO 작성자 추가
 @Getter
 public class SummarizedGenericPostDto {
 
@@ -17,6 +16,9 @@ public class SummarizedGenericPostDto {
 
     @Schema(description = "제목", example = "게시글 제목")
     private final String title;
+
+    @Schema(description = "작성자", example = "익명")
+    private final String author;
 
     @Schema(description = "본문", example = "게시글 본문")
     private final String body;
@@ -33,24 +35,31 @@ public class SummarizedGenericPostDto {
     @Schema(description = "조회수", example = "16")
     private final int views;
 
+    @Schema(description = "댓글 개수", example = "2")
+    private final int commentCount;
+
     public SummarizedGenericPostDto(String baseFileUrl, int bodySize, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
+        this.author = post.getDisplayingUsername();
         this.body = slice(post.getBody(), bodySize);
         this.createdAt = post.getCreatedAt().toLocalDate();
         this.likes = likes;
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
+        this.commentCount = post.getComments().size(); // 댓글 개수 캐싱 필요
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
         this.id = copy.getId();
         this.title = copy.getTitle();
+        this.author = copy.getAuthor();
         this.body = copy.getBody();
         this.createdAt = copy.getCreatedAt();
         this.likes = copy.getLikes();
         this.files = copy.getFiles();
         this.views = copy.getViews();
+        this.commentCount = copy.getCommentCount();
     }
 
     private static String slice(String text, int maxLen) {
