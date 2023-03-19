@@ -240,7 +240,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("id", is(news.getId().intValue())))
                 .andExpect(jsonPath("title", is("news0")))
                 .andExpect(jsonPath("body", is("0")))
-                .andExpect(jsonPath("author", is(UserMock.NAME)))
+                .andExpect(jsonPath("author", is(news.getDisplayingUsername())))
                 .andExpect(jsonPath("mine", is(true)));
     }
 
