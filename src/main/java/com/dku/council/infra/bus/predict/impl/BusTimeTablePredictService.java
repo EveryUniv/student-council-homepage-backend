@@ -41,10 +41,13 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
         String weekType = getWeekDayName(now);
 
         if (table == null) {
+            String tableFileName = String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo);
             try {
-                table = timeTableParser.parse(String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo));
+                table = timeTableParser.parse(tableFileName);
             } catch (CannotGetTimeTable e) {
-                log.warn("Cannot parse time table", e);
+                if (!(e.getCause() instanceof NullPointerException)) {
+                    log.warn("Cannot parse time table", e);
+                }
                 return null;
             }
             busTimeTables.put(busNo, table);
