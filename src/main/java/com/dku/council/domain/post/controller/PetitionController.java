@@ -17,6 +17,7 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -86,7 +87,7 @@ public class PetitionController {
     public ResponsePetitionDto findOne(AppAuthentication auth,
                                        @PathVariable Long id,
                                        HttpServletRequest request) {
-        return petitionService.findOnePetition(id, auth.getUserId(), request.getRemoteAddr());
+        return petitionService.findOnePetition(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**

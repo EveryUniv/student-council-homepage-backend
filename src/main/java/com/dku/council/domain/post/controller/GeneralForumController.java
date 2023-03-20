@@ -15,6 +15,7 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -80,7 +81,7 @@ public class GeneralForumController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), request.getRemoteAddr());
+        return postService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
