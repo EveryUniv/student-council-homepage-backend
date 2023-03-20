@@ -112,7 +112,7 @@ class DKUAuthServiceTest {
         StudentInfo info = new StudentInfo("name", "1212", 0, "", "");
         RequestVerifyStudentDto dto = new RequestVerifyStudentDto(id, pwd);
 
-        when(authenticationService.login(id, pwd)).thenReturn(auth);
+        when(authenticationService.loginWebInfo(id, pwd)).thenReturn(auth);
         when(crawlerService.crawlStudentInfo(auth)).thenReturn(info);
         when(userRepository.findByStudentId(id)).thenReturn(Optional.empty());
 

@@ -13,7 +13,7 @@ public class PostLikeDumpScheduler {
 
     private final PostLikeService service;
 
-    @Scheduled(fixedDelayString = "${app.post.dump-time}")
+    @Scheduled(fixedDelayString = "${app.post.like-dump-delay}")
     public void dumpToDB() {
         if (service.dumpToDB() > 0) {
             log.info("PostLikes in memory dump to DB.");
