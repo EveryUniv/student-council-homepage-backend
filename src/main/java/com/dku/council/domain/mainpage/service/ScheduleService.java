@@ -47,7 +47,7 @@ public class ScheduleService {
         LocalDate start = YearMonth.from(now.minus(halfRange)).atDay(1);
         LocalDate end = YearMonth.from(now.plus(halfRange)).atEndOfMonth();
 
-        DkuAuth auth = dkuAuthenticationService.login(id, password);
+        DkuAuth auth = dkuAuthenticationService.loginPortal(id, password);
         List<ScheduleInfo> schedules = dkuScheduleService.crawlSchedule(auth, start, end);
 
         List<Schedule> entities = schedules.stream()

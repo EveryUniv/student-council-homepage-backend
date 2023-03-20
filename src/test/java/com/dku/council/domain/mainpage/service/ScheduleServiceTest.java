@@ -82,7 +82,7 @@ class ScheduleServiceTest {
             scheduleInfos.add(new ScheduleInfo("title" + i, start.plusDays(i * 2), end.plusDays(i * 2 + 1)));
         }
 
-        when(dkuAuthenticationService.login("id", "password")).thenReturn(auth);
+        when(dkuAuthenticationService.loginPortal("id", "password")).thenReturn(auth);
         when(dkuScheduleService.crawlSchedule(auth, start, end)).thenReturn(scheduleInfos);
 
         // when

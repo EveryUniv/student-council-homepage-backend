@@ -20,7 +20,7 @@ public class PetitionStatusScheduler {
     private final Duration petitionExpires;
 
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${app.post.petition.expires-cron}")
     @Transactional
     public void schedule() {
         LocalDateTime time = LocalDateTime.now().minus(petitionExpires);

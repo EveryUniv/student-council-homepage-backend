@@ -15,7 +15,7 @@ public class ScheduleInfoScheduler {
     private final Clock clock;
     private final ScheduleService service;
 
-    @Scheduled(fixedDelayString = "${dku.schedule.schedule}")
+    @Scheduled(cron = "${dku.schedule.cron}")
     public void loadToDB() {
         LocalDate now = LocalDate.now(clock);
         service.loadSchedulesYear(now);
