@@ -88,7 +88,7 @@ class VocControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("id", is(voc.getId().intValue())))
                 .andExpect(jsonPath("title", is("title")))
                 .andExpect(jsonPath("body", is("body")))
-                .andExpect(jsonPath("author", is(user.getName())))
+                .andExpect(jsonPath("author", is(voc.getDisplayingUsername())))
                 .andExpect(jsonPath("mine", is(true)))
                 .andExpect(jsonPath("status", is(VocStatus.WAITING.name())));
     }

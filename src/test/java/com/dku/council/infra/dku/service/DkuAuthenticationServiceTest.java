@@ -23,7 +23,8 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
     @BeforeEach
     void beforeEach() {
         WebClient webClient = WebClient.create();
-        this.service = new DkuAuthenticationService(webClient, "http://localhost:" + mockServer.getPort());
+        String url = "http://localhost:" + mockServer.getPort();
+        this.service = new DkuAuthenticationService(webClient, url, url);
     }
 
     @Test
@@ -42,7 +43,7 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
                 .addHeader("Set-Cookie", "cookie4=value4"));
 
         // when
-        DkuAuth auth = service.login("32111111", "pwd");
+        DkuAuth auth = service.loginWebInfo("32111111", "pwd");
         MultiValueMap<String, String> actualCookies = new LinkedMultiValueMap<>();
         auth.authCookies().accept(actualCookies);
 
@@ -63,7 +64,7 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
 
         // when & then
         assertThrows(DkuFailedLoginException.class, () ->
-                service.login("32111111", "pwd"));
+                service.loginWebInfo("32111111", "pwd"));
     }
 
     @Test
@@ -74,7 +75,7 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
 
         try {
             // when
-            service.login("32111111", "pwd");
+            service.loginWebInfo("32111111", "pwd");
         } catch (DkuFailedLoginException e) {
             // then
             assertThat(e.getMessage()).isEqualTo("회원 아이디 또는 비밀번호가 일치하지 않습니다.");
@@ -91,6 +92,6 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
 
         // when & then
         assertThrows(DkuFailedLoginException.class, () ->
-                service.login("32111111", "pwd"));
+                service.loginWebInfo("32111111", "pwd"));
     }
 }

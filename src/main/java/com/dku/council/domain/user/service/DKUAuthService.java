@@ -67,7 +67,7 @@ public class DKUAuthService {
         String signupToken = CodeGenerator.generateUUIDCode();
         checkAlreadyStudentId(dto);
 
-        DkuAuth auth = authenticationService.login(dto.getDkuStudentId(), dto.getDkuPassword());
+        DkuAuth auth = authenticationService.loginWebInfo(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
 
         Instant now = Instant.now(clock);
