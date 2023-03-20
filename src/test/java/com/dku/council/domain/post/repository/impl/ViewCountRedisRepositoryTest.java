@@ -85,7 +85,11 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         repository.put(10L, userIdentifier, expiresAfter, now);
         boolean result = repository.isAlreadyContains(10L, userIdentifier, now.plus(expiresAfter).plusSeconds(60));
 
+        String key = repository.makeEntryKey(10L, userIdentifier);
+        Object obj = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
+
         // then
         assertThat(result).isEqualTo(false);
+        assertThat(obj).isNull();
     }
 }

@@ -131,7 +131,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("id", is(petition.getId().intValue())))
                 .andExpect(jsonPath("title", is("title")))
                 .andExpect(jsonPath("body", is("body")))
-                .andExpect(jsonPath("author", is(user.getName())))
+                .andExpect(jsonPath("author", is(petition.getDisplayingUsername())))
                 .andExpect(jsonPath("mine", is(true)))
                 .andExpect(jsonPath("expiresAt", is(expiresAt)))
                 .andExpect(jsonPath("status", is(PetitionStatus.ACTIVE.name())));

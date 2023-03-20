@@ -1,18 +1,18 @@
 package com.dku.council.domain.post.model.dto.list;
 
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
 public class SummarizedGeneralForumDto extends SummarizedGenericPostDto {
 
-    // TODO 댓글수 캐싱
-    @Schema(description = "댓글수", example = "5")
-    private final int comments;
+    @Schema(hidden = true)
+    @JsonIgnore
+    private final int likes = 0;
 
-    public SummarizedGeneralForumDto(SummarizedGenericPostDto dto, GeneralForum generalForum) {
+    public SummarizedGeneralForumDto(SummarizedGenericPostDto dto, GeneralForum post) {
         super(dto);
-        this.comments = generalForum.getComments().size();
     }
 }
