@@ -29,6 +29,9 @@ class DkuScheduleServiceTest extends AbstractMockServerTest {
     @DisplayName("응답 json으로부터 일정 정보가 잘 parsing되는지?")
     void crawlSchedule() {
         // given
+        LocalDate from = LocalDate.of(2022, 12, 13);
+        LocalDate to = LocalDate.of(2023, 1, 31);
+
         mockJson("dku/schedule-response");
         List<ScheduleInfo> expected = List.of(
                 new ScheduleInfo("2022학년도 2학기 기말고사 성적 입력 및 제출 기간",
@@ -53,7 +56,7 @@ class DkuScheduleServiceTest extends AbstractMockServerTest {
 
         // when
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
-        List<ScheduleInfo> schedules = service.crawlSchedule(dummyAuth);
+        List<ScheduleInfo> schedules = service.crawlSchedule(dummyAuth, from, to);
 
         // then
         for (int i = 0; i < expected.size(); i++) {
@@ -69,12 +72,14 @@ class DkuScheduleServiceTest extends AbstractMockServerTest {
     @DisplayName("실패 응답 - not successful")
     public void failedCrawlByNotSuccessfulCode() {
         // given
+        LocalDate from = LocalDate.of(2022, 12, 13);
+        LocalDate to = LocalDate.of(2023, 1, 31);
         mockJson("dku/schedule-response-failed");
 
         // when & then
         DkuAuth dummyAuth = new DkuAuth(new LinkedMultiValueMap<>());
         try {
-            service.crawlSchedule(dummyAuth);
+            service.crawlSchedule(dummyAuth, from, to);
         } catch (DkuFailedCrawlingException e) {
             assertThat(e.getMessage()).isEqualTo("데이터를 찾을 수 없습니다.");
         }

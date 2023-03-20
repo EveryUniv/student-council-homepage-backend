@@ -2,6 +2,7 @@ package com.dku.council.domain.mainpage.repository;
 
 import com.dku.council.domain.mainpage.model.entity.Schedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
@@ -12,4 +13,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "where s.startDate between :startDate and :endDate or " +
             "s.endDate between :startDate and :endDate")
     List<Schedule> findAllOverlapped(LocalDate startDate, LocalDate endDate);
+
+    @Modifying
+    @Query("delete from Schedule s " +
+            "where s.startDate between :startDate and :endDate or " +
+            "s.endDate between :startDate and :endDate")
+    void deleteAllOverlapped(LocalDate startDate, LocalDate endDate);
 }

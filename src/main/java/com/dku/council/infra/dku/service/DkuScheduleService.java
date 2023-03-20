@@ -38,8 +38,8 @@ public class DkuScheduleService {
      * @param auth 인증 토큰
      * @return 학사 일정
      */
-    public List<ScheduleInfo> crawlSchedule(DkuAuth auth) {
-        ScheduleResponse response = request(auth);
+    public List<ScheduleInfo> crawlSchedule(DkuAuth auth, LocalDate from, LocalDate to) {
+        ScheduleResponse response = request(auth, from, to);
         try {
             return parse(response.getData());
         } catch (Throwable e) {
@@ -47,11 +47,13 @@ public class DkuScheduleService {
         }
     }
 
-    private ScheduleResponse request(DkuAuth auth) {
+    private ScheduleResponse request(DkuAuth auth, LocalDate from, LocalDate to) {
         ScheduleResponse result;
         try {
             result = webClient.post()
-                    .uri(scheduleApiPath)
+                    .uri(String.format(scheduleApiPath,
+                            SCHEDULE_DATE_FORMAT.format(from),
+                            SCHEDULE_DATE_FORMAT.format(to)))
                     .cookies(auth.authCookies())
                     .header("Referer", "https://portal.dankook.ac.kr/p/S01/")
                     .retrieve()
