@@ -11,6 +11,7 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,6 +57,7 @@ public class PostLikeService {
      * @param userId 사용자 ID
      * @return 좋아요를 했었는지 반환
      */
+    @Transactional(readOnly = true)
     public boolean isPostLiked(Long postId, Long userId) {
         Boolean liked = memoryRepository.isPostLiked(postId, userId);
         if (liked == null) {
@@ -76,6 +78,7 @@ public class PostLikeService {
      * @param postId 게시글 ID
      * @return 좋아요 개수
      */
+    @Transactional(readOnly = true)
     public int getCountOfLikes(Long postId) {
         int count = memoryRepository.getCachedLikeCount(postId);
         if (count == -1) {
@@ -90,6 +93,7 @@ public class PostLikeService {
      *
      * @return 처리한 entity 개수
      */
+    @Transactional
     public long dumpToDB() {
         List<LikeEntry> allLikes = memoryRepository.getAllPostLikes();
         for (LikeEntry ent : allLikes) {
