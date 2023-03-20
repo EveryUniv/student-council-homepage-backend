@@ -22,7 +22,6 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "게시글 본문", example = "본문")
     private final String body;
 
-    // TODO 작성자 익명으로 변경
     @Schema(description = "작성자", example = "작성자")
     private final String author;
 
@@ -51,7 +50,7 @@ public class ResponseSingleGenericPostDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
-        this.author = post.getUser().getName();
+        this.author = post.getDisplayingUsername();
         // TODO 쿼리 확인해보기. 일괄쿼리로 나가는지?
         this.tag = post.getPostTags().stream()
                 .map(e -> new TagDto(e.getTag()))
@@ -77,4 +76,5 @@ public class ResponseSingleGenericPostDto {
         this.isMine = copy.isMine;
         this.isLiked = copy.isLiked;
     }
+
 }

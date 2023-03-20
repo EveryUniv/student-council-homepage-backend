@@ -26,4 +26,9 @@ public class Rule extends Post {
                  int views) {
         super(user, title, body, views);
     }
+
+    @Override
+    public String getDisplayingUsername() {
+        return Post.ANONYMITY;
+    }
 }

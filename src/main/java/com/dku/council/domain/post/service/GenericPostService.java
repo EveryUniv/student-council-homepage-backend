@@ -106,13 +106,13 @@ public class GenericPostService<E extends Post> {
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 게시글 정보
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
         E post = viewPost(postId, remoteAddress);
         return makePostDto(userId, post);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public <T> T findOne(Long postId, Long userId, String remoteAddress,
                          PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
         E post = viewPost(postId, remoteAddress);

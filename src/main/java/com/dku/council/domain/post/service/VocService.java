@@ -15,7 +15,7 @@ public class VocService {
     private final GenericPostService<Voc> postService;
 
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponseVocDto findOne(Long postId, Long userId, String remoteAddress) {
         return postService.findOne(postId, userId, remoteAddress, ResponseVocDto::new);
     }
