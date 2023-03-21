@@ -1,10 +1,12 @@
 package com.dku.council.domain.comment.service;
 
+import com.dku.council.domain.comment.CommentLogRepository;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.comment.model.entity.CommentLog;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
@@ -28,6 +30,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final MessageSource messageSource;
+    private final CommentLogRepository commentLogRepository;
 
 
     /**
@@ -72,10 +75,19 @@ public class CommentService {
      */
     public Long edit(Long commentId, Long userId, String content) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(CommentNotFoundException::new);
+        Post post = comment.getPost();
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         if (!comment.getUser().getId().equals(userId)) {
             throw new NotGrantedException();
         }
+        CommentLog commentLog = CommentLog.builder()
+                .post(post)
+                .user(user)
+                .text(content)
+                .build();
+
+        commentLogRepository.save(commentLog);
 
         comment.updateText(content);
         return commentId;
