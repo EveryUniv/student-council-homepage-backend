@@ -84,7 +84,7 @@ public class CommentService {
         CommentLog commentLog = CommentLog.builder()
                 .post(post)
                 .user(user)
-                .text(content)
+                .text(comment.getText())
                 .build();
 
         commentLogRepository.save(commentLog);
