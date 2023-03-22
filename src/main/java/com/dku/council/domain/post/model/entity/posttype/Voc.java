@@ -53,6 +53,6 @@ public class Voc extends Post {
 
     @Override
     public String getDisplayingUsername() {
-        return getUser().getNickname().substring(0, 1) + "*******";
+        return getUser().getNickname().charAt(0) + "*******";
     }
 }
