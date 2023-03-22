@@ -35,13 +35,14 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
      */
     @Nullable
     public Duration remainingNextBusArrival(String busNo, BusStation station, LocalDateTime now) {
-        TimeTable table = busTimeTables.get(busNo);
-        String stationDirName = station.name().replaceAll("_", "").toLowerCase();
-        LocalTime nowTime = now.toLocalTime();
         String weekType = getWeekDayName(now);
+        String stationDirName = station.name().replaceAll("_", "").toLowerCase();
+        String tableFileName = String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo);
+
+        TimeTable table = busTimeTables.get(tableFileName);
+        LocalTime nowTime = now.toLocalTime();
 
         if (table == null) {
-            String tableFileName = String.format("/bustable/%s/%s/%s.table", weekType, stationDirName, busNo);
             try {
                 table = timeTableParser.parse(tableFileName);
             } catch (CannotGetTimeTable e) {
