@@ -1,5 +1,6 @@
 package com.dku.council.domain.comment.service;
 
+import com.dku.council.domain.comment.CommentLogRepository;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
@@ -7,7 +8,6 @@ import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.comment.model.entity.CommentLog;
 import com.dku.council.domain.post.exception.PostNotFoundException;
-import com.dku.council.domain.post.exception.UserNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.model.entity.User;
@@ -15,7 +15,6 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
-    private final MessageSource messageSource;
     private final CommentLogRepository commentLogRepository;
 
 

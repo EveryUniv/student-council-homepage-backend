@@ -1,5 +1,6 @@
 package com.dku.council.domain.comment.service;
 
+import com.dku.council.domain.comment.CommentLogRepository;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
@@ -40,6 +41,9 @@ class CommentServiceTest {
     @InjectMocks
     private CommentService service;
 
+    @Mock
+    private CommentLogRepository commentLogRepository;
+
 
     @Test
     @DisplayName("댓글 추가")
@@ -66,6 +70,7 @@ class CommentServiceTest {
         User user = UserMock.createDummyMajor(10L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
         Long edited = service.edit(10L, 10L, "new text");
@@ -82,6 +87,7 @@ class CommentServiceTest {
         User user = UserMock.createDummyMajor(11L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 
         // when & then
         assertThrows(NotGrantedException.class,
