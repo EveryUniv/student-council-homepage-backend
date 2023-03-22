@@ -27,7 +27,7 @@ public class RentalItem extends BaseEntity {
     private boolean isActive;
 
     @OneToMany(mappedBy = "item")
-    private List<Rental> rentals = new ArrayList<>();
+    private final List<Rental> rentals = new ArrayList<>();
 
 
     public RentalItem(String name, int remaining) {

@@ -9,7 +9,6 @@ import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,7 +21,6 @@ public class PostConfig {
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
     private final PostLikeService postLikeService;
-    private final MessageSource messageSource;
 
     // TODO 이거 좀 더 깔끔하게 하고싶다 (자동화)
     @Bean

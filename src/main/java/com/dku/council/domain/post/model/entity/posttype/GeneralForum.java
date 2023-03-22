@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -28,6 +29,7 @@ public class GeneralForum extends Post {
     }
 
     @Override
+    @Transient
     public String getDisplayingUsername() {
         return getUser().getMajor().getDepartment() + " " + getUser().getNickname();
     }

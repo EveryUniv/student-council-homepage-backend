@@ -51,8 +51,8 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CommentDto> listComment(Long postId, Pageable pageable) {
-        return commentService.list(postId, pageable);
+    public Page<CommentDto> listComment(Long postId, Long userId, Pageable pageable) {
+        return commentService.list(postId, userId, pageable, (e) -> e.getUser().getMajor().getDepartment());
     }
 
     public Long createComment(Long postId, Long userId, String text, boolean isAdmin) {
