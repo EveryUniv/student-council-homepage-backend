@@ -134,8 +134,10 @@ public class PetitionController {
      */
     @GetMapping("/comment/{postId}")
     @UserOnly
-    public ResponsePage<CommentDto> listComment(@PathVariable Long postId, @ParameterObject Pageable pageable) {
-        Page<CommentDto> comments = petitionService.listComment(postId, pageable);
+    public ResponsePage<CommentDto> listComment(AppAuthentication auth,
+                                                @PathVariable Long postId,
+                                                @ParameterObject Pageable pageable) {
+        Page<CommentDto> comments = petitionService.listComment(postId, auth.getUserId(), pageable);
         return new ResponsePage<>(comments);
     }
 

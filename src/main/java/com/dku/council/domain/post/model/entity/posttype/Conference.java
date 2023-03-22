@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 import java.time.LocalDate;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -43,6 +44,7 @@ public class Conference extends Post {
     }
 
     @Override
+    @Transient
     public String getDisplayingUsername() {
         return Post.ANONYMITY;
     }

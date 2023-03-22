@@ -10,7 +10,7 @@ import java.util.List;
 public interface PetitionRepository extends GenericPostRepository<Petition> {
     List<Petition> findTop5ByOrderByCreatedAtDesc();
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update Petition p set p.extraStatus = 'EXPIRED' " +
             "where p.extraStatus = 'ACTIVE' " +
             "and p.createdAt <= :lessThanCreatedAt")
