@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -26,7 +27,9 @@ public class News extends Post {
                  int views) {
         super(user, title, body, views);
     }
+
     @Override
+    @Transient
     public String getDisplayingUsername() {
         return Post.ANONYMITY;
     }
