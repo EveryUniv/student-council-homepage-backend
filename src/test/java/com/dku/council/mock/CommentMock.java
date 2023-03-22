@@ -3,7 +3,7 @@ package com.dku.council.mock;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.util.FieldInjector;
+import com.dku.council.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class CommentMock {
     }
 
     public static Comment createWithId(User user) {
-        return createWithId(NewsMock.create(), user);
+        return createWithId(NewsMock.createDummy(), user);
     }
 
     public static Comment createWithId(Post post, User user) {
@@ -37,7 +37,7 @@ public class CommentMock {
                 .build();
         comment.changePost(post);
         if (id != null) {
-            FieldInjector.injectId(Comment.class, comment, id);
+            EntityUtil.injectId(Comment.class, comment, id);
         }
         return comment;
     }

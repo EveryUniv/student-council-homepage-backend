@@ -1,6 +1,6 @@
 package com.dku.council.infra.dku.service;
 
-import com.dku.council.global.config.qualifier.ChromeAgentWebClient;
+import com.dku.council.global.config.webclient.ChromeAgentWebClient;
 import com.dku.council.global.util.WebUtil;
 import com.dku.council.infra.dku.exception.DkuFailedLoginException;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -31,8 +31,11 @@ public class DkuAuthenticationService {
     @ChromeAgentWebClient
     private final WebClient webClient;
 
-    @Value("${dku.login.api-path}")
-    private final String loginApiPath;
+    @Value("${dku.login.webinfo-api-path}")
+    private final String webinfoLoginApiPath;
+
+    @Value("${dku.login.portal-api-path}")
+    private final String portalLoginApiPath;
 
     /**
      * 단국대학교 웹정보 시스템에 로그인합니다.
@@ -41,15 +44,36 @@ public class DkuAuthenticationService {
      * @param password 비밀번호
      * @return 토큰 쿠키가 포함된 DkuAuth
      */
-    public DkuAuth login(String classId, String password) {
+    public DkuAuth loginWebInfo(String classId, String password) {
+        String param = String.format("username=%s&password=%s&tabIndex=0", classId, password);
+        return login(param, webinfoLoginApiPath,
+                "https://webinfo.dankook.ac.kr",
+                "https://webinfo.dankook.ac.kr/member/logon.do?returnurl=http://webinfo.dankook.ac.kr:80/main.do&sso=ok");
+    }
+
+    /**
+     * 단국대학교 포털 사이트에 로그인합니다.
+     *
+     * @param classId  아이디 (학번)
+     * @param password 비밀번호
+     * @return 토큰 쿠키가 포함된 DkuAuth
+     */
+    public DkuAuth loginPortal(String classId, String password) {
+        String param = String.format("user_id=%s&user_password=%s&auto_login=N&returnurl=https://portal.dankook.ac.kr", classId, password);
+        return login(param, portalLoginApiPath,
+                "https://portal.dankook.ac.kr",
+                "https://portal.dankook.ac.kr/login.jsp");
+    }
+
+    private DkuAuth login(String param, String uri, String origin, String referer) {
         MultiValueMap<String, String> cookies = new LinkedMultiValueMap<>();
 
-        ResponseEntity<String> response = tryLogin(classId, password);
+        ResponseEntity<String> response = tryLogin(param, uri, origin, referer);
         HttpHeaders headers = response.getHeaders();
         addMappedCookies(cookies, headers);
 
         URI ssoLocation = headers.getLocation();
-        response = trySSOAuth(ssoLocation, cookies);
+        response = trySSOAuth(ssoLocation, cookies, origin);
         addMappedCookies(cookies, response.getHeaders());
 
         return new DkuAuth(cookies);
@@ -62,15 +86,14 @@ public class DkuAuthenticationService {
         }
     }
 
-    private ResponseEntity<String> tryLogin(String classId, String password) {
-        String param = String.format("username=%s&password=%s&tabIndex=0", classId, password);
+    private ResponseEntity<String> tryLogin(String param, String uri, String origin, String referer) {
 
         ResponseEntity<String> response;
         try {
             response = webClient.post()
-                    .uri(loginApiPath)
-                    .header("Origin", "https://webinfo.dankook.ac.kr")
-                    .header("Referer", "https://webinfo.dankook.ac.kr/member/logon.do?returnurl=http://webinfo.dankook.ac.kr:80/main.do&sso=ok")
+                    .uri(uri)
+                    .header("Origin", origin)
+                    .header("Referer", referer)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromValue(param))
                     .retrieve()
@@ -91,14 +114,14 @@ public class DkuAuthenticationService {
         return response;
     }
 
-    private ResponseEntity<String> trySSOAuth(URI ssoURI, MultiValueMap<String, String> cookies) {
+    private ResponseEntity<String> trySSOAuth(URI ssoURI, MultiValueMap<String, String> cookies, String referer) {
         ResponseEntity<String> response;
 
         try {
             response = webClient.post()
                     .uri(ssoURI)
                     .cookies(map -> map.addAll(cookies))
-                    .header("Referer", "https://webinfo.dankook.ac.kr/")
+                    .header("Referer", referer)
                     .retrieve()
                     .toEntity(String.class)
                     .block();

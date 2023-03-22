@@ -1,21 +1,22 @@
 package com.dku.council.domain.post.repository.impl;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.util.FullIntegrationTest;
+import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@OnlyDevTest
+@FullIntegrationTest
 class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -32,13 +33,14 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         String userIdentifier = "User";
         String key = repository.makeEntryKey(10L, userIdentifier);
         Instant now = Instant.now();
+        Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 
         // when
-        repository.put(10L, userIdentifier, 100, now);
+        repository.put(10L, userIdentifier, expiresAfter, now);
 
         // then
         Object value = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
-        long expectedEpoch = now.plus(100, ChronoUnit.MINUTES).getEpochSecond();
+        long expectedEpoch = now.plus(expiresAfter).getEpochSecond();
         assertThat(value).isEqualTo(String.valueOf(expectedEpoch));
     }
 
@@ -64,7 +66,7 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         Instant now = Instant.now();
 
         // when
-        repository.put(10L, userIdentifier, 10, now);
+        repository.put(10L, userIdentifier, Duration.of(10, ChronoUnit.MINUTES), now);
         boolean result = repository.isAlreadyContains(10L, userIdentifier, now);
 
         // then
@@ -77,12 +79,17 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         // given
         String userIdentifier = "User";
         Instant now = Instant.now();
+        Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 
         // when
-        repository.put(10L, userIdentifier, 10, now);
-        boolean result = repository.isAlreadyContains(10L, userIdentifier, now.plus(11, ChronoUnit.MINUTES));
+        repository.put(10L, userIdentifier, expiresAfter, now);
+        boolean result = repository.isAlreadyContains(10L, userIdentifier, now.plus(expiresAfter).plusSeconds(60));
+
+        String key = repository.makeEntryKey(10L, userIdentifier);
+        Object obj = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
 
         // then
         assertThat(result).isEqualTo(false);
+        assertThat(obj).isNull();
     }
 }

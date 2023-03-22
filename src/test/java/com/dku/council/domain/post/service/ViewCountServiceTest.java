@@ -2,6 +2,7 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.ViewCountMemoryRepository;
+import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -19,7 +20,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ViewCountServiceTest {
 
-    private final Clock clock = Clock.fixed(Instant.ofEpochSecond(1_000_000_000), ZoneId.systemDefault());
+    private final Clock clock = ClockUtil.create();
     private ViewCountService service;
 
     @Mock
@@ -31,7 +32,7 @@ class ViewCountServiceTest {
 
     @BeforeEach
     public void setup() {
-        this.service = new ViewCountService(memoryRepository, clock, 10);
+        this.service = new ViewCountService(memoryRepository, clock, Duration.of(10, ChronoUnit.MINUTES));
     }
 
     @Test

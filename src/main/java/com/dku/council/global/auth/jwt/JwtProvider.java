@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,10 +26,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
     public static final String AUTHORIZATION = "Authorization";
 
     @Value("${app.auth.jwt.access-expiration}")
-    private final long accessExpiration;
+    private final Duration accessExpiration;
 
     @Value("${app.auth.jwt.refresh-expiration}")
-    private final long refreshExpiration;
+    private final Duration refreshExpiration;
 
     @Value("${app.auth.jwt.secret-key}")
     private final String secretKey;
@@ -89,7 +89,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     private String createAccessToken(String userId, UserRole role) {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime validity = now.plus(accessExpiration, ChronoUnit.HOURS);
+        LocalDateTime validity = now.plus(accessExpiration);
 
         Map<String, Object> payloads = new HashMap<>();
         payloads.put("userId", userId);
@@ -106,7 +106,7 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     private String createRefreshToken() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime validity = now.plus(refreshExpiration, ChronoUnit.DAYS);
+        LocalDateTime validity = now.plus(refreshExpiration);
         return Jwts.builder()
                 .setIssuedAt(Date.from(now.atZone(ZoneId.systemDefault()).toInstant()))
                 .setExpiration(Date.from(validity.atZone(ZoneId.systemDefault()).toInstant()))

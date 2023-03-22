@@ -1,7 +1,5 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.common.AbstractContainerRedisTest;
-import com.dku.council.common.OnlyDevTest;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
@@ -10,37 +8,44 @@ import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.CommentMock;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
+import com.dku.council.util.FieldReflector;
+import com.dku.council.util.FullIntegrationTest;
+import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@OnlyDevTest
+@FullIntegrationTest
 class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -53,17 +58,27 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     private CommentRepository commentRepository;
 
     @Autowired
+    private MajorRepository majorRepository;
+
+    @Autowired
     private GenericPostRepository<Petition> postRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Value("${app.post.petition.expires}")
+    private Duration expiresTime;
+
     private Petition petition;
     private User user;
+    private Major major;
 
 
     @BeforeEach
     void setupUser() {
-        user = UserMock.create(11L);
+        major = majorRepository.save(MajorMock.create());
+
+        user = UserMock.create(11L, major);
         user = userRepository.save(user);
 
         petition = PetitionMock.create(user, "title", "body");
@@ -74,19 +89,51 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
 
     @Test
-    @DisplayName("단건 조회")
-    void create() throws Exception {
+    @DisplayName("청원 상태로 리스트 조회")
+    void listWithState() throws Exception {
+        // given
+        Petition target = null;
+        for (PetitionStatus status : PetitionStatus.values()) {
+            String name = status.name();
+            Petition petition = PetitionMock.create(user, "title" + name, "body" + name);
+            FieldReflector.inject(Petition.class, petition, "extraStatus", status);
+            petition = postRepository.save(petition);
+            if (status == PetitionStatus.WAITING) {
+                target = petition;
+            }
+        }
+
         // when
-        ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()))
-                .andDo(print());
+        String waitingName = PetitionStatus.WAITING.name();
+        ResultActions result = mvc.perform(get("/post/petition")
+                .param("status", waitingName));
 
         // then
+        String expiresAt = petition.getCreatedAt().plus(expiresTime).toLocalDate().toString();
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("content.size()", is(1)))
+                .andExpect(jsonPath("content[0].id", is(target.getId().intValue())))
+                .andExpect(jsonPath("content[0].title", is("title" + waitingName)))
+                .andExpect(jsonPath("content[0].body", is("body" + waitingName)))
+                .andExpect(jsonPath("content[0].expiresAt", is(expiresAt)))
+                .andExpect(jsonPath("content[0].status", is(PetitionStatus.WAITING.name())));
+    }
+
+    @Test
+    @DisplayName("단건 조회")
+    void findOne() throws Exception {
+        // when
+        ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()));
+
+        // then
+        String expiresAt = petition.getCreatedAt().plus(expiresTime).toLocalDate().toString();
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("id", is(petition.getId().intValue())))
                 .andExpect(jsonPath("title", is("title")))
                 .andExpect(jsonPath("body", is("body")))
-                .andExpect(jsonPath("author", is(user.getName())))
+                .andExpect(jsonPath("author", is(petition.getDisplayingUsername())))
                 .andExpect(jsonPath("mine", is(true)))
+                .andExpect(jsonPath("expiresAt", is(expiresAt)))
                 .andExpect(jsonPath("status", is(PetitionStatus.ACTIVE.name())));
     }
 
@@ -99,14 +146,13 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/reply/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
         assertThat(petition.getAnswer()).isEqualTo("hello good");
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.ANSWERED);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.ANSWERED);
     }
 
     @Test
@@ -117,8 +163,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         commentRepository.save(comment);
 
         // when
-        ResultActions result = mvc.perform(get("/post/petition/comment/" + petition.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(get("/post/petition/comment/" + petition.getId()));
 
         // then
         result.andExpect(status().isOk())
@@ -134,9 +179,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
@@ -157,9 +201,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isBadRequest());
@@ -169,7 +212,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     @DisplayName("동의 댓글 임계치 초과시 답변대기로 변경")
     void createCommentAndStateChanges() throws Exception {
         // given
-        List<User> users = UserMock.createList(150);
+        List<User> users = UserMock.createList(major, 150);
         users = userRepository.saveAll(users);
 
         List<Comment> comments = CommentMock.createList(petition, users, 150);
@@ -179,13 +222,12 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/comment/" + petition.getId())
-                        .content(objectMapper.writeValueAsBytes(dto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andDo(print());
+                .content(objectMapper.writeValueAsBytes(dto))
+                .contentType(MediaType.APPLICATION_JSON));
 
         // then
         result.andExpect(status().isOk());
-        assertThat(petition.getPetitionStatus()).isEqualTo(PetitionStatus.WAITING);
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
     }
 
     @Test
@@ -197,8 +239,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         comment = commentRepository.save(comment);
 
         // when
-        ResultActions result = mvc.perform(delete("/post/petition/comment/" + comment.getId()))
-                .andDo(print());
+        ResultActions result = mvc.perform(delete("/post/petition/comment/" + comment.getId()));
 
         // then
         result.andExpect(status().isOk());

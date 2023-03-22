@@ -1,26 +1,19 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.MajorData;
-import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
-import com.dku.council.domain.user.model.dto.request.RequestRefreshTokenDto;
-import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
-import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
-import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
-import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
-import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.model.dto.request.*;
+import com.dku.council.domain.user.model.dto.response.*;
+import com.dku.council.domain.user.service.SignupService;
+import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "사용자", description = "사용자 인증 및 정보 관련 api")
 @RestController
@@ -28,8 +21,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final MessageSource messageSource;
-    private final UserService service;
+    private final UserService userService;
+    private final UserFindService userFindService;
+    private final SignupService signupService;
 
 
     /**
@@ -40,12 +34,79 @@ public class UserController {
     @GetMapping
     @UserOnly
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
-        return service.getUserInfo(auth.getUserId());
+        return userService.getUserInfo(auth.getUserId());
     }
 
     /**
+     * 아이디(학번) 찾기.
+     * 휴대폰 번호를 보내면 SMS로 학번 전송
+     *
+     * @param dto 요청 body
+     */
+    @PostMapping("/find/id")
+    public void sendIdBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
+        userFindService.sendIdBySMS(dto.getPhoneNumber());
+    }
+
+    /**
+     * 비밀번호 재설정 인증 코드 전송 (1)
+     * <p>재설정 코드(6자리) SMS로 전송 -> 재설정 토큰(UUID) 응답.</p> 비밀번호 재설정 플로우는 SMS인증 코드 전송 ->
+     * 인증 코드 확인 -> 비밀번호 변경 순으로 흘러갑니다.
+     *
+     * @param dto 요청 body
+     * @return 비밀번호 재설정 토큰
+     */
+    @PostMapping("/find/pwd")
+    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestSendPasswordFindCodeDto dto) {
+        return userFindService.sendPwdCodeBySMS(dto.getStudentId(), dto.getPhoneNumber());
+    }
+
+    /**
+     * 비밀번호 재설정 인증 코드 확인 (2)
+     * <p>재설정 토큰과 재설정 코드로 본인 인증을 합니다.</p>
+     *
+     * @param dto 요청 body
+     */
+    @PostMapping("/find/pwd/verify")
+    public void verifyPwdCodeBySMS(@Valid @RequestBody RequestVerifyPwdSMSCodeDto dto) {
+        userFindService.verifyPwdCode(dto.getToken(), dto.getCode());
+    }
+
+    /**
+     * 비밀번호 변경 (3)
+     * <p>재설정 토큰과 새로운 비밀번호 -> 비밀번호 변경 완료.</p>
+     * 변경 전에 반드시 '재설정 인증 코드 확인'을 해야 합니다.
+     *
+     * @param dto 요청 body
+     */
+    @PatchMapping("/find/pwd/reset")
+    public void changePassword(@Valid @RequestBody RequestPasswordChangeDto dto) {
+        userFindService.changePassword(dto.getToken(), dto.getPassword());
+    }
+
+    /**
+     * 닉네임 변경.
+     *
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/nickname")
+    @UserOnly
+    public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto){
+        userService.changeNickName(auth.getUserId(), dto);
+    }
+
+    /**
+     * 비밀번호 변경 - 기존 비밀번호를 알고 있는 경우
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/password")
+    public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto){
+        userService.changePassword(auth.getUserId(), dto);
+    }
+
+
+    /**
      * 회원가입
-     * todo 이메일 인증으로 전환 + 회원가입 토큰 만료시간 정하기
      *
      * @param dto         요청 Body
      * @param signupToken 회원가입 토큰
@@ -53,7 +114,19 @@ public class UserController {
     @PostMapping("/{signup-token}")
     public void signup(@Valid @RequestBody RequestSignupDto dto,
                        @PathVariable("signup-token") String signupToken) {
-        service.signup(dto, signupToken);
+        signupService.signup(dto, signupToken);
+    }
+
+    /**
+     * 닉네임이 이미 존재하는지 검증.
+     * 닉네임이 이미 존재하는지 검증합니다. 만약 존재하지 않으면 OK를 반환하고,
+     * 이미 사용중인 경우에는 BAD_REQUEST 오류가 발생합니다.
+     *
+     * @param nickname 닉네임
+     */
+    @GetMapping("/valid")
+    public void validNickname(@RequestParam String nickname) {
+        signupService.checkAlreadyNickname(nickname);
     }
 
     /**
@@ -64,16 +137,7 @@ public class UserController {
      */
     @PostMapping("/login")
     public ResponseLoginDto login(@Valid @RequestBody RequestLoginDto dto) {
-        return service.login(dto);
-    }
-
-    /**
-     * 로그아웃 (현재 동작 안함)
-     * 서버에 같은 토큰으로 로그인 할 수 없게 로그아웃합니다.
-     */
-    @DeleteMapping
-    public void logout() {
-        // TODO Implementation
+        return userService.login(dto);
     }
 
     /**
@@ -86,7 +150,7 @@ public class UserController {
     @UserOnly
     public ResponseRefreshTokenDto refreshToken(HttpServletRequest request,
                                                 @Valid @RequestBody RequestRefreshTokenDto dto) {
-        return service.refreshToken(request, dto.getRefreshToken());
+        return userService.refreshToken(request, dto.getRefreshToken());
     }
 
     /**
@@ -94,18 +158,6 @@ public class UserController {
      */
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
-        // TODO Test it
-        return Arrays.stream(MajorData.values())
-                .filter(m -> !m.isSpecial())
-                .map(m -> new ResponseMajorDto(m.name(), m.getName(messageSource)))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * 비밀번호 변경 (현재 동작 안함)
-     */
-    @PatchMapping("/password")
-    public void changePassword() {
-        // TODO Implementation
+        return userService.getAllMajors();
     }
 }

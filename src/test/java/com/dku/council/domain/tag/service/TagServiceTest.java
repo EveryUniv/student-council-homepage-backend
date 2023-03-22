@@ -127,7 +127,7 @@ class TagServiceTest {
     @DisplayName("Post에 태그 추가하기")
     void addTagsToPost() {
         // given
-        Post post = NewsMock.create();
+        Post post = NewsMock.createDummy();
         List<Long> tagIds = List.of(10L, 11L, 12L, 13L);
         List<Tag> tags = List.of(TagMock.create(10L), TagMock.create(11L), TagMock.create(12L), TagMock.create(13L));
         when(repository.findAllById(tagIds)).thenReturn(tags);

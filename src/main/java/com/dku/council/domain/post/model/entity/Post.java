@@ -2,7 +2,7 @@ package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
-import com.dku.council.domain.like.PostLike;
+import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.user.model.entity.User;
@@ -32,7 +32,9 @@ import static lombok.AccessLevel.PROTECTED;
 @Inheritance(strategy = SINGLE_TABLE)
 @DiscriminatorColumn(name = "type")
 @NoArgsConstructor(access = PROTECTED)
-public class Post extends BaseEntity {
+public abstract class Post extends BaseEntity {
+
+    public static String ANONYMITY = "익명";
 
     @Id
     @GeneratedValue
@@ -44,7 +46,7 @@ public class Post extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true)
-    private List<PostTag> postTags = new ArrayList<>();
+    private final List<PostTag> postTags = new ArrayList<>();
 
     private String title;
 
@@ -55,14 +57,14 @@ public class Post extends BaseEntity {
     private PostStatus status;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostFile> files = new ArrayList<>();
+    private final List<PostFile> files = new ArrayList<>();
 
     @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostLike> likes = new ArrayList<>();
+    private final List<PostLike> likes = new ArrayList<>();
 
     private int views;
 
@@ -86,4 +88,7 @@ public class Post extends BaseEntity {
     public void blind() {
         this.status = PostStatus.BLINDED;
     }
+
+
+    public abstract String getDisplayingUsername();
 }

@@ -1,6 +1,5 @@
 package com.dku.council.domain.comment.service;
 
-import com.dku.council.domain.comment.CommentLogRepository;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
@@ -14,6 +13,7 @@ import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -34,15 +34,34 @@ public class CommentService {
 
 
     /**
-     * 댓글 목록을 가져옵니다.
+     * 댓글 목록을 가져옵니다. 작성자는 기본적으로 익명으로 채워집니다.
      *
-     * @param postId 게시글 ID
+     * @param postId   게시글 ID
+     * @param userId   사용자 ID
+     * @param pageable 페이징 정보
      * @return 페이징된 댓글 목록
      */
-    public Page<CommentDto> list(Long postId, Pageable pageable) {
-        postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
+    public Page<CommentDto> list(Long postId, Long userId, Pageable pageable) {
+        return list(postId, userId, pageable, null);
+    }
+
+    /**
+     * 댓글 목록을 가져옵니다. 작성자 매핑 함수를 통해 댓글 작성자를 매핑합니다.
+     * 매핑 함수에 null을 전달하면 익명으로 채워집니다.
+     *
+     * @param postId       게시글 ID
+     * @param userId       사용자 ID
+     * @param pageable     페이징 정보
+     * @param authorMapper 작성자 매핑 함수
+     * @return 페이징된 댓글 목록
+     */
+    public Page<CommentDto> list(Long postId, Long userId, Pageable pageable, AuthorMapper authorMapper) {
+        postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         return commentRepository.findAllByPostId(postId, pageable)
-                .map(ent -> new CommentDto(messageSource, ent));
+                .map(e -> {
+                    String author = authorMapper == null ? Post.ANONYMITY : authorMapper.mapAuthor(e);
+                    return new CommentDto(e, author, e.getUser().getId().equals(userId));
+                });
     }
 
     /**
@@ -53,7 +72,7 @@ public class CommentService {
      * @param content 댓글 내용
      */
     public Long create(Long postId, Long userId, String content) {
-        Post post = postRepository.findByIdAndActived(postId).orElseThrow(PostNotFoundException::new);
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         Comment comment = Comment.builder()
@@ -116,5 +135,10 @@ public class CommentService {
 
     public boolean isCommentedAlready(Long postId, Long userId) {
         return !commentRepository.findAllByPostIdAndUserId(postId, userId).isEmpty();
+    }
+
+    @FunctionalInterface
+    public interface AuthorMapper {
+        String mapAuthor(Comment comment);
     }
 }
