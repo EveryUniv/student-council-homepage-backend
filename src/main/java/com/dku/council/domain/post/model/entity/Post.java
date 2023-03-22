@@ -46,7 +46,7 @@ public abstract class Post extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true)
-    private List<PostTag> postTags = new ArrayList<>();
+    private final List<PostTag> postTags = new ArrayList<>();
 
     private String title;
 
@@ -57,14 +57,14 @@ public abstract class Post extends BaseEntity {
     private PostStatus status;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostFile> files = new ArrayList<>();
+    private final List<PostFile> files = new ArrayList<>();
 
     @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostLike> likes = new ArrayList<>();
+    private final List<PostLike> likes = new ArrayList<>();
 
     private int views;
 
