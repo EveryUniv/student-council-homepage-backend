@@ -50,9 +50,9 @@ public class GeneralForumController {
      */
     @GetMapping
     public ResponsePage<SummarizedGenericPostDto> list(@RequestParam(required = false) String keyword,
-                                                        @RequestParam(required = false) List<Long> tagIds,
-                                                        @RequestParam(defaultValue = "50") int bodySize,
-                                                        @ParameterObject Pageable pageable) {
+                                                       @RequestParam(required = false) List<Long> tagIds,
+                                                       @RequestParam(defaultValue = "50") int bodySize,
+                                                       @ParameterObject Pageable pageable) {
         Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
         spec = spec.and(PostSpec.withTitleOrBody(keyword));
         Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize);
@@ -116,8 +116,10 @@ public class GeneralForumController {
      */
     @GetMapping("/comment/{postId}")
     @UserOnly
-    public ResponsePage<CommentDto> listComment(@PathVariable Long postId, @ParameterObject Pageable pageable) {
-        Page<CommentDto> comments = commentService.list(postId, pageable);
+    public ResponsePage<CommentDto> listComment(AppAuthentication auth,
+                                                @PathVariable Long postId,
+                                                @ParameterObject Pageable pageable) {
+        Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable);
         return new ResponsePage<>(comments);
     }
 
