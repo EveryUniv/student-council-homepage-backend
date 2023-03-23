@@ -14,12 +14,11 @@ import java.util.List;
 @Getter
 public class RequestCreateConferenceDto extends RequestCreateGenericPostDto<Conference> {
 
-    @NotNull(message = "회차를 등록해주세요")
+    @NotNull
     @Schema(description = "회차", example = "4")
     private final Integer round;
 
-    @Pattern(regexp = "^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$",
-            message = "개최일자는 YYYY-MM-dd(YYYY-M-d) 형식만 가능합니다.")
+    @Pattern(regexp = "^\\d{4}-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$")
     @Schema(description = "회의 날짜. (YYYY-MM-dd / YYYY-M-d)", example = "2023-03-01",
             requiredMode = Schema.RequiredMode.REQUIRED)
     private final String date;
