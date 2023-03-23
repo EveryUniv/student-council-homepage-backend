@@ -1,4 +1,4 @@
-package com.dku.council.domain.timetable.model.dto;
+package com.dku.council.domain.timetable.model.dto.response;
 
 import com.dku.council.domain.timetable.model.entity.LectureTime;
 import io.swagger.v3.oas.annotations.media.Schema;

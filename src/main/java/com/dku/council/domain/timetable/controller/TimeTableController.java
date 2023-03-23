@@ -1,7 +1,9 @@
 package com.dku.council.domain.timetable.controller;
 
-import com.dku.council.domain.timetable.model.dto.LectureDto;
-import com.dku.council.domain.timetable.model.dto.TimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -22,16 +24,28 @@ public class TimeTableController {
     private final TimeTableService timeTableService;
 
     /**
-     * 내 시간표 조회
-     * <p>시간표 이름을 입력받아 해당 시간표를 가져옵니다.</p>
+     * 내 시간표 목록 조회
+     * <p>시간표 이름 목록을 가져옵니다.</p>
      *
-     * @param name 시간표 이름
-     * @return 시간표 수업 목록
+     * @return 시간표 목록
      */
     @GetMapping
     @UserOnly
-    public List<LectureDto> list(AppAuthentication auth, @RequestParam String name) {
-        return timeTableService.list(auth.getUserId(), name);
+    public List<TimeTableDto> list(AppAuthentication auth) {
+        return timeTableService.list(auth.getUserId());
+    }
+
+    /**
+     * 내 시간표 단건 조회
+     * <p>시간표에 어떤 수업이 있는지 구체적으로 조회합니다.</p>
+     *
+     * @param tableId 시간표 ID
+     * @return 시간표 수업 목록
+     */
+    @GetMapping("/{tableId}")
+    @UserOnly
+    public List<LectureDto> findOne(AppAuthentication auth, @PathVariable Long tableId) {
+        return timeTableService.findOne(auth.getUserId(), tableId);
     }
 
     /**
@@ -40,10 +54,11 @@ public class TimeTableController {
      * 오류가 발생합니다.</p>
      *
      * @param dto 요청 body
+     * @return 생성된 시간표 ID
      */
     @PostMapping
     @UserOnly
-    public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
+    public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody CreateTimeTableRequestDto dto) {
         Long id = timeTableService.create(auth.getUserId(), dto);
         return new ResponseIdDto(id);
     }
@@ -54,11 +69,14 @@ public class TimeTableController {
      * 발생합니다.</p>
      *
      * @param dto 요청 body
+     * @return 변경된 시간표 ID
      */
-    @PatchMapping
+    @PatchMapping("/{tableId}")
     @UserOnly
-    public ResponseIdDto update(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
-        Long id = timeTableService.update(auth.getUserId(), dto);
+    public ResponseIdDto update(AppAuthentication auth,
+                                @PathVariable Long tableId,
+                                @Valid @RequestBody UpdateTimeTableRequestDto dto) {
+        Long id = timeTableService.update(auth.getUserId(), tableId, dto.getLectures());
         return new ResponseIdDto(id);
     }
 
@@ -66,12 +84,13 @@ public class TimeTableController {
      * 시간표 삭제
      * <p>해당 이름의 시간표를 삭제합니다.</p>
      *
-     * @param name 시간표 이름
+     * @param tableId 시간표 ID
+     * @return 삭제된 시간표 ID
      */
-    @DeleteMapping
+    @DeleteMapping("/{tableId}")
     @UserOnly
-    public ResponseIdDto delete(AppAuthentication auth, @RequestParam String name) {
-        Long id = timeTableService.delete(auth.getUserId(), name);
+    public ResponseIdDto delete(AppAuthentication auth, @PathVariable Long tableId) {
+        Long id = timeTableService.delete(auth.getUserId(), tableId);
         return new ResponseIdDto(id);
     }
 }

@@ -1,8 +1,9 @@
 package com.dku.council.domain.timetable.controller;
 
-import com.dku.council.domain.timetable.model.dto.LectureDto;
-import com.dku.council.domain.timetable.model.dto.LectureTimeDto;
-import com.dku.council.domain.timetable.model.dto.TimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureTimeDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.util.base.AbstractAuthControllerTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,14 +54,32 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     }
 
     @Test
-    @DisplayName("내 시간표 조회")
+    @DisplayName("시간표 목록")
     void list() throws Exception {
         // given
-        given(timeTableService.list(1L, "test")).willReturn(testLectures);
+        List<TimeTableDto> tables = List.of(
+                new TimeTableDto(1L, "name"),
+                new TimeTableDto(2L, "name2")
+        );
+        given(timeTableService.list(USER_ID)).willReturn(tables);
+
+        // when
+        mvc.perform(get("/timetable"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("name"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].name").value("name2"));
+    }
+
+    @Test
+    @DisplayName("내 시간표 단건 조회")
+    void findOne() throws Exception {
+        // given
+        given(timeTableService.findOne(USER_ID, 3L)).willReturn(testLectures);
 
         // when & then
-        mvc.perform(get("/timetable")
-                        .param("name", "test"))
+        mvc.perform(get("/timetable/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("name"))
                 .andExpect(jsonPath("$[0].professor").value("professor"))
@@ -84,8 +102,8 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 생성")
     void create() throws Exception {
         // given
-        TimeTableRequestDto dto = new TimeTableRequestDto("test", testLectures);
-        given(timeTableService.create(any(), any())).willReturn(3L);
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", testLectures);
+        given(timeTableService.create(eq(USER_ID), any())).willReturn(3L);
 
         // when
         mvc.perform(post("/timetable")
@@ -100,11 +118,11 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 수정")
     void update() throws Exception {
         // given
-        TimeTableRequestDto dto = new TimeTableRequestDto("test", testLectures);
-        given(timeTableService.update(any(), any())).willReturn(3L);
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", testLectures);
+        given(timeTableService.update(eq(USER_ID), eq(3L), any())).willReturn(3L);
 
         // when
-        mvc.perform(patch("/timetable")
+        mvc.perform(patch("/timetable/3")
                         .with(csrf())
                         .content(objectMapper.writeValueAsBytes(dto))
                         .contentType(MediaType.APPLICATION_JSON))
@@ -116,13 +134,10 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 삭제")
     void del() throws Exception {
         // given
-        given(timeTableService.delete(any(), eq("test"))).willReturn(3L);
+        given(timeTableService.delete(USER_ID, 3L)).willReturn(3L);
 
         // when
-        mvc.perform(delete("/timetable")
-                        .with(csrf())
-                        .param("name", "test"))
-                .andDo(print())
+        mvc.perform(delete("/timetable/3").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(3L));
     }

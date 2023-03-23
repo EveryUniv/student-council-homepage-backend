@@ -9,6 +9,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 public abstract class AbstractAuthControllerTest {
 
+    protected static final Long USER_ID = 1L;
+
     @Autowired
     protected MockMvc mvc;
 
@@ -17,6 +19,6 @@ public abstract class AbstractAuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        UserAuth.withUser(1L);
+        UserAuth.withUser(USER_ID);
     }
 }
