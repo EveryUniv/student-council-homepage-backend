@@ -2,7 +2,10 @@ package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.timetable.model.dto.LectureDto;
 import com.dku.council.domain.timetable.model.dto.TimeTableRequestDto;
+import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,8 @@ import java.util.List;
 @RequestMapping("/timetable")
 public class TimeTableController {
 
+    private final TimeTableService timeTableService;
+
     /**
      * 내 시간표 조회
      * <p>시간표 이름을 입력받아 해당 시간표를 가져옵니다.</p>
@@ -24,8 +29,9 @@ public class TimeTableController {
      * @return 시간표 수업 목록
      */
     @GetMapping
+    @UserOnly
     public List<LectureDto> list(AppAuthentication auth, @RequestParam String name) {
-        return null;
+        return timeTableService.list(auth.getUserId(), name);
     }
 
     /**
@@ -36,7 +42,10 @@ public class TimeTableController {
      * @param dto 요청 body
      */
     @PostMapping
-    public void create(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
+    @UserOnly
+    public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
+        Long id = timeTableService.create(auth.getUserId(), dto);
+        return new ResponseIdDto(id);
     }
 
     /**
@@ -47,7 +56,10 @@ public class TimeTableController {
      * @param dto 요청 body
      */
     @PatchMapping
-    public void update(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
+    @UserOnly
+    public ResponseIdDto update(AppAuthentication auth, @Valid @RequestBody TimeTableRequestDto dto) {
+        Long id = timeTableService.update(auth.getUserId(), dto);
+        return new ResponseIdDto(id);
     }
 
     /**
@@ -57,6 +69,9 @@ public class TimeTableController {
      * @param name 시간표 이름
      */
     @DeleteMapping
-    public void delete(AppAuthentication auth, @RequestParam String name) {
+    @UserOnly
+    public ResponseIdDto delete(AppAuthentication auth, @RequestParam String name) {
+        Long id = timeTableService.delete(auth.getUserId(), name);
+        return new ResponseIdDto(id);
     }
 }

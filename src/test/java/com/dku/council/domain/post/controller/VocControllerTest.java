@@ -14,6 +14,7 @@ import com.dku.council.mock.VocMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -51,8 +51,9 @@ class VocControllerTest extends AbstractContainerRedisTest {
     @Autowired
     private GenericPostRepository<Voc> postRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private Voc voc;
     private User user;
 

@@ -2,11 +2,13 @@ package com.dku.council.domain.timetable.model.dto;
 
 import com.dku.council.domain.timetable.model.entity.Lecture;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@RequiredArgsConstructor
 public class LectureDto {
 
     private final String name;
