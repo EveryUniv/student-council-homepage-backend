@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class CreateTimeTableRequestDto {
+public class TimeTableRequestDto {
 
     @NotBlank
     private final String name;
