@@ -1,9 +1,12 @@
 package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureTimeDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.util.base.AbstractAuthControllerTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -57,9 +60,9 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 목록")
     void list() throws Exception {
         // given
-        List<TimeTableDto> tables = List.of(
-                new TimeTableDto(1L, "name"),
-                new TimeTableDto(2L, "name2")
+        List<TimeTableInfoDto> tables = List.of(
+                new TimeTableInfoDto(1L, "name"),
+                new TimeTableInfoDto(2L, "name2")
         );
         given(timeTableService.list(USER_ID)).willReturn(tables);
 
@@ -76,26 +79,29 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("내 시간표 단건 조회")
     void findOne() throws Exception {
         // given
-        given(timeTableService.findOne(USER_ID, 3L)).willReturn(testLectures);
+        TimeTableDto dto = new TimeTableDto(3L, "name", testLectures);
+        given(timeTableService.findOne(USER_ID, 3L)).willReturn(dto);
 
         // when & then
         mvc.perform(get("/timetable/3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("name"))
-                .andExpect(jsonPath("$[0].professor").value("professor"))
-                .andExpect(jsonPath("$[0].place").value("place"))
-                .andExpect(jsonPath("$[0].times[0].start").value("10:00:00"))
-                .andExpect(jsonPath("$[0].times[0].end").value("13:00:00"))
-                .andExpect(jsonPath("$[0].times[0].week").value(DayOfWeek.MONDAY.name()))
-                .andExpect(jsonPath("$[0].times[1].start").value("10:00:00"))
-                .andExpect(jsonPath("$[0].times[1].end").value("13:00:00"))
-                .andExpect(jsonPath("$[0].times[1].week").value(DayOfWeek.THURSDAY.name()))
-                .andExpect(jsonPath("$[1].name").value("name2"))
-                .andExpect(jsonPath("$[1].professor").value("professor2"))
-                .andExpect(jsonPath("$[1].place").value("place2"))
-                .andExpect(jsonPath("$[1].times[0].start").value("10:00:00"))
-                .andExpect(jsonPath("$[1].times[0].end").value("13:00:00"))
-                .andExpect(jsonPath("$[1].times[0].week").value(DayOfWeek.MONDAY.name()));
+                .andExpect(jsonPath("$.id").value(3L))
+                .andExpect(jsonPath("$.name").value("name"))
+                .andExpect(jsonPath("$.lectures[0].name").value("name"))
+                .andExpect(jsonPath("$.lectures[0].professor").value("professor"))
+                .andExpect(jsonPath("$.lectures[0].place").value("place"))
+                .andExpect(jsonPath("$.lectures[0].times[0].start").value("10:00:00"))
+                .andExpect(jsonPath("$.lectures[0].times[0].end").value("13:00:00"))
+                .andExpect(jsonPath("$.lectures[0].times[0].week").value(DayOfWeek.MONDAY.name()))
+                .andExpect(jsonPath("$.lectures[0].times[1].start").value("10:00:00"))
+                .andExpect(jsonPath("$.lectures[0].times[1].end").value("13:00:00"))
+                .andExpect(jsonPath("$.lectures[0].times[1].week").value(DayOfWeek.THURSDAY.name()))
+                .andExpect(jsonPath("$.lectures[1].name").value("name2"))
+                .andExpect(jsonPath("$.lectures[1].professor").value("professor2"))
+                .andExpect(jsonPath("$.lectures[1].place").value("place2"))
+                .andExpect(jsonPath("$.lectures[1].times[0].start").value("10:00:00"))
+                .andExpect(jsonPath("$.lectures[1].times[0].end").value("13:00:00"))
+                .andExpect(jsonPath("$.lectures[1].times[0].week").value(DayOfWeek.MONDAY.name()));
     }
 
     @Test
@@ -118,11 +124,27 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 수정")
     void update() throws Exception {
         // given
-        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", testLectures);
+        UpdateTimeTableRequestDto dto = new UpdateTimeTableRequestDto(testLectures);
         given(timeTableService.update(eq(USER_ID), eq(3L), any())).willReturn(3L);
 
         // when
         mvc.perform(patch("/timetable/3")
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsBytes(dto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3L));
+    }
+
+    @Test
+    @DisplayName("시간표 이름 수정")
+    void updateName() throws Exception {
+        // given
+        UpdateTimeTableNameRequestDto dto = new UpdateTimeTableNameRequestDto("newName");
+        given(timeTableService.updateName(USER_ID, 3L, "newName")).willReturn(3L);
+
+        // when
+        mvc.perform(patch("/timetable/name/3")
                         .with(csrf())
                         .content(objectMapper.writeValueAsBytes(dto))
                         .contentType(MediaType.APPLICATION_JSON))

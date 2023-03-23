@@ -5,6 +5,7 @@ import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequest
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureTimeDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.model.entity.Lecture;
 import com.dku.council.domain.timetable.model.entity.LectureTime;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
@@ -14,43 +15,45 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class TimeTableService {
 
     private final UserRepository userRepository;
     private final TimeTableRepository timeTableRepository;
 
-
-    public List<TimeTableDto> list(Long userId) {
+    @Transactional(readOnly = true)
+    public List<TimeTableInfoDto> list(Long userId) {
         List<TimeTable> timeTables = timeTableRepository.findAllByUserId(userId);
 
         return timeTables.stream()
-                .map(TimeTableDto::new)
+                .map(TimeTableInfoDto::new)
                 .collect(Collectors.toList());
     }
 
-    public List<LectureDto> findOne(Long userId, Long tableId) {
+    @Transactional(readOnly = true)
+    public TimeTableDto findOne(Long userId, Long tableId) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
 
         if (!table.getUser().getId().equals(userId))
             throw new TimeTableNotFoundException();
 
-        return table.getLectures().stream()
-                .map(LectureDto::new)
-                .collect(Collectors.toList());
+        return new TimeTableDto(table);
     }
 
     public Long create(Long userId, CreateTimeTableRequestDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
 
-        TimeTable timeTable = createTimeTableEntity(user, dto.getName(), dto.getLectures());
+        TimeTable timeTable = new TimeTable(user, dto.getName());
+        appendLecturesEntity(timeTable, dto.getLectures());
         timeTable = timeTableRepository.save(timeTable);
 
         return timeTable.getId();
@@ -63,18 +66,25 @@ public class TimeTableService {
         if (!table.getUser().getId().equals(userId))
             throw new TimeTableNotFoundException();
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(UserNotFoundException::new);
-
-        timeTableRepository.delete(table);
-        table = timeTableRepository.save(createTimeTableEntity(user, table.getName(), lectures));
+        table.getLectures().clear();
+        appendLecturesEntity(table, lectures);
 
         return table.getId();
     }
 
-    private TimeTable createTimeTableEntity(User user, String name, List<LectureDto> lectures) {
-        TimeTable timeTable = new TimeTable(user, name);
+    public Long updateName(Long userId, Long tableId, String name) {
+        TimeTable table = timeTableRepository.findById(tableId)
+                .orElseThrow(TimeTableNotFoundException::new);
 
+        if (!table.getUser().getId().equals(userId))
+            throw new TimeTableNotFoundException();
+
+        table.changeName(name);
+        System.out.println(table.getName());
+        return table.getId();
+    }
+
+    private void appendLecturesEntity(TimeTable table, List<LectureDto> lectures) {
         for (LectureDto lecDto : lectures) {
             Lecture lecture = Lecture.builder()
                     .name(lecDto.getName())
@@ -91,10 +101,8 @@ public class TimeTableService {
                 lectureTime.changeLecture(lecture);
             }
 
-            lecture.changeTimeTable(timeTable);
+            lecture.changeTimeTable(table);
         }
-
-        return timeTable;
     }
 
     public Long delete(Long userId, Long tableId) {

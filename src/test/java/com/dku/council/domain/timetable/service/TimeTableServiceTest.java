@@ -4,6 +4,7 @@ import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
 import com.dku.council.domain.timetable.repository.TimeTableRepository;
 import com.dku.council.domain.user.model.entity.User;
@@ -61,10 +62,10 @@ class TimeTableServiceTest {
         given(timeTableRepository.findAllByUserId(user.getId())).willReturn(tables);
 
         // when
-        List<TimeTableDto> actual = service.list(user.getId());
+        List<TimeTableInfoDto> actual = service.list(user.getId());
 
         // then
-        List<String> actualNames = actual.stream().map(TimeTableDto::getName)
+        List<String> actualNames = actual.stream().map(TimeTableInfoDto::getName)
                 .collect(Collectors.toList());
         assertThat(actualNames).containsAnyElementsOf(tableNames);
     }
@@ -76,11 +77,13 @@ class TimeTableServiceTest {
         given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
 
         // when
-        List<LectureDto> actual = service.findOne(table.getUser().getId(), table.getId());
+        TimeTableDto actual = service.findOne(table.getUser().getId(), table.getId());
 
         // then
         List<LectureDto> expected = getLectureDtos(table);
-        assertThat(actual).containsAnyElementsOf(expected);
+        assertThat(actual.getId()).isEqualTo(table.getId());
+        assertThat(actual.getName()).isEqualTo(table.getName());
+        assertThat(actual.getLectures()).containsAnyElementsOf(expected);
     }
 
     @Test
@@ -122,15 +125,13 @@ class TimeTableServiceTest {
         // given
         List<LectureDto> expectedLectures = getLectureDtos(table);
         given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
-        given(timeTableRepository.save(tableCheckArgThat())).willReturn(table);
-        given(userRepository.findById(table.getUser().getId())).willReturn(Optional.of(table.getUser()));
 
         // when
         Long id = service.update(table.getUser().getId(), table.getId(), expectedLectures);
 
         // then
         assertThat(id).isEqualTo(table.getId());
-        verify(timeTableRepository).delete(tableCheckArgThat());
+        assertThat(getLectureDtos(table)).containsAnyElementsOf(expectedLectures);
     }
 
     @Test
@@ -142,6 +143,31 @@ class TimeTableServiceTest {
         // when & then
         Assertions.assertThrows(TimeTableNotFoundException.class, () ->
                 service.update(-1L, table.getId(), List.of()));
+    }
+
+    @Test
+    @DisplayName("시간표 이름 수정")
+    void updateName() {
+        // given
+        given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
+
+        // when
+        Long id = service.updateName(table.getUser().getId(), table.getId(), "NewName");
+
+        // then
+        assertThat(id).isEqualTo(table.getId());
+        assertThat(table.getName()).isEqualTo("NewName");
+    }
+
+    @Test
+    @DisplayName("시간표 이름 수정 - 내 시간표가 아닌 경우")
+    void failedUpdateNameByNotMine() {
+        // given
+        given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
+
+        // when & then
+        Assertions.assertThrows(TimeTableNotFoundException.class, () ->
+                service.updateName(-1L, table.getId(), "New Name"));
     }
 
     @Test

@@ -1,9 +1,10 @@
 package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -31,7 +32,7 @@ public class TimeTableController {
      */
     @GetMapping
     @UserOnly
-    public List<TimeTableDto> list(AppAuthentication auth) {
+    public List<TimeTableInfoDto> list(AppAuthentication auth) {
         return timeTableService.list(auth.getUserId());
     }
 
@@ -44,7 +45,7 @@ public class TimeTableController {
      */
     @GetMapping("/{tableId}")
     @UserOnly
-    public List<LectureDto> findOne(AppAuthentication auth, @PathVariable Long tableId) {
+    public TimeTableDto findOne(AppAuthentication auth, @PathVariable Long tableId) {
         return timeTableService.findOne(auth.getUserId(), tableId);
     }
 
@@ -77,6 +78,22 @@ public class TimeTableController {
                                 @PathVariable Long tableId,
                                 @Valid @RequestBody UpdateTimeTableRequestDto dto) {
         Long id = timeTableService.update(auth.getUserId(), tableId, dto.getLectures());
+        return new ResponseIdDto(id);
+    }
+
+    /**
+     * 시간표 이름 변경
+     * <p>시간표 이름을 변경합니다.</p>
+     *
+     * @param dto 요청 body
+     * @return 변경된 시간표 ID
+     */
+    @PatchMapping("/name/{tableId}")
+    @UserOnly
+    public ResponseIdDto updateName(AppAuthentication auth,
+                                    @PathVariable Long tableId,
+                                    @Valid @RequestBody UpdateTimeTableNameRequestDto dto) {
+        Long id = timeTableService.updateName(auth.getUserId(), tableId, dto.getName());
         return new ResponseIdDto(id);
     }
 
