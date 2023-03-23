@@ -2,6 +2,7 @@ package com.dku.council.domain.timetable.model.dto.response;
 
 import com.dku.council.domain.timetable.model.entity.LectureTime;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 
 @Getter
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class LectureTimeDto {
 
     @Schema(description = "시작 시각", example = "09:00:00")

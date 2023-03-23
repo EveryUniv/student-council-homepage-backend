@@ -1,6 +1,7 @@
 package com.dku.council.domain.timetable.model.dto.response;
 
 import com.dku.council.domain.timetable.model.entity.Lecture;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class LectureDto {
 
     private final String name;
