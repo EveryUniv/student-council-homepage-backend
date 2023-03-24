@@ -1,14 +1,12 @@
 package com.dku.council.domain.user.controller;
 
+import com.dku.council.domain.comment.model.dto.CommentedPostResponseDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
-import com.dku.council.domain.user.service.MyPostService;
-import com.dku.council.domain.user.service.SignupService;
-import com.dku.council.domain.user.service.UserFindService;
-import com.dku.council.domain.user.service.UserService;
+import com.dku.council.domain.user.service.*;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +31,7 @@ public class UserController {
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
+    private final MyCommentService myCommentService;
 
     /**
      * 내 정보 조회
@@ -169,6 +168,9 @@ public class UserController {
         return userService.getAllMajors();
     }
 
+    /**
+     * 내가 쓴 글 모두 조회하기
+     */
     @GetMapping("/post")
     @UserOnly
     public ResponsePage<SummarizedPostDto> listMyPosts(AppAuthentication auth,
@@ -176,5 +178,16 @@ public class UserController {
                                                        @RequestParam(defaultValue = "50") int bodySize) {
         Page<SummarizedPostDto> posts = myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(posts);
+    }
+
+    /**
+     * 내가 댓글 단 글들 모두 조회하기
+     */
+    @GetMapping("/commentedPost")
+    @UserOnly
+    public ResponsePage<CommentedPostResponseDto> listMyCommentedPosts(AppAuthentication auth,
+                                                                       @ParameterObject Pageable pageable) {
+        Page<CommentedPostResponseDto> commentedPosts = myCommentService.listMyCommentedPosts(auth.getUserId(), pageable);
+        return new ResponsePage<>(commentedPosts);
     }
 }
