@@ -12,6 +12,7 @@ import com.dku.council.mock.GeneralForumMock;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -72,6 +73,7 @@ class CommentRepositoryTest {
     }
 
     @Test
+    @DisplayName("포스트 아이디로 댓글 조회 테스트")
     void findAllByPostId() {
         // when
         Page<Comment> actual1 = repository.findAllByPostId(post1.getId(), Pageable.unpaged());
@@ -91,6 +93,7 @@ class CommentRepositoryTest {
     }
 
     @Test
+    @DisplayName("포스트 아이디와 유저 아이디로 댓글 조회 테스트")
     void findAllByPostIdAndUserId() {
         // when
         List<Comment> actual1 = repository.findAllByPostIdAndUserId(post1.getId(), user1.getId());
