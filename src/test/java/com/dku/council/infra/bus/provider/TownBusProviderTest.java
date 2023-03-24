@@ -37,7 +37,7 @@ class TownBusProviderTest extends AbstractMockServerTest {
         List<BusArrival> arrivals = service.retrieveBusArrival(BusStation.DKU_GATE);
 
         // then
-        assertThat(arrivals.size()).isEqualTo(2);
+        assertThat(arrivals.size()).isEqualTo(3);
         BusArrival arrival = arrivals.stream()
                 .filter(ent -> ent.getBusNo().equals("24"))
                 .findFirst()
