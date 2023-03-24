@@ -12,8 +12,9 @@ public class CommentMock {
 
     public static List<Comment> createList(Post post, List<User> user, int size) {
         List<Comment> comments = new ArrayList<>();
+        final int userSize = user.size();
         for (int i = 0; i < size; i++) {
-            comments.add(create(null, post, user.get(i)));
+            comments.add(create(null, post, user.get(i % userSize)));
         }
         return comments;
     }
