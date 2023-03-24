@@ -1,7 +1,11 @@
 package com.dku.council.domain.user.controller;
 
+import com.dku.council.domain.post.model.dto.list.SummarizedPostDto;
+import com.dku.council.domain.post.model.dto.response.ResponsePage;
+import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
+import com.dku.council.domain.user.service.MyPostService;
 import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
@@ -9,6 +13,10 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +32,7 @@ public class UserController {
     private final UserService userService;
     private final UserFindService userFindService;
     private final SignupService signupService;
-
+    private final MyPostService myPostService;
 
     /**
      * 내 정보 조회
@@ -159,5 +167,14 @@ public class UserController {
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
         return userService.getAllMajors();
+    }
+
+    @GetMapping("/post")
+    @UserOnly
+    public ResponsePage<SummarizedPostDto> listMyPosts(AppAuthentication auth,
+                                                       @ParameterObject Pageable pageable,
+                                                       @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedPostDto> posts = myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
+        return new ResponsePage<>(posts);
     }
 }
