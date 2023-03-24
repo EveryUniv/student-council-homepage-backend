@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +24,13 @@ import java.time.format.DateTimeFormatter;
 public class JacksonDateTimeFormatter implements JacksonFormatConfigurer {
 
     public static final String DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+    public static final String TIME_FORMAT_PATTERN = "HH:mm:ss";
     public static final String DATE_TIME_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
     private static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN);
+    private static final DateTimeFormatter TIME_FORMAT =
+            DateTimeFormatter.ofPattern(TIME_FORMAT_PATTERN);
     private static final DateTimeFormatter DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern(DATE_TIME_FORMAT_PATTERN);
 
@@ -33,6 +38,7 @@ public class JacksonDateTimeFormatter implements JacksonFormatConfigurer {
     public void configure(Jackson2ObjectMapperBuilder builder) {
         builder.simpleDateFormat(DATE_TIME_FORMAT_PATTERN);
         builder.serializers(new LocalDateSerializer(DATE_FORMAT));
+        builder.serializers(new LocalTimeSerializer(TIME_FORMAT));
         builder.serializers(new LocalDateTimeSerializer(DATE_TIME_FORMAT));
         builder.serializerByType(ZonedDateTime.class, new JsonSerializer<ZonedDateTime>() {
             @Override
@@ -41,6 +47,7 @@ public class JacksonDateTimeFormatter implements JacksonFormatConfigurer {
             }
         });
         builder.deserializers(new LocalDateDeserializer(DATE_FORMAT));
+        builder.deserializers(new LocalTimeDeserializer(TIME_FORMAT));
         builder.deserializers(new LocalDateTimeDeserializer(DATE_TIME_FORMAT));
         builder.deserializerByType(ZonedDateTime.class, new JsonDeserializer<ZonedDateTime>() {
             @Override

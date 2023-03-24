@@ -15,6 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -55,6 +56,7 @@ public class GGBusProvider implements BusArrivalProvider {
 
             return response.getMsgBody().getBusArrivalList().stream()
                     .map(BusResponseMapper::to)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         } catch (Throwable e) {
             throw new CannotGetBusArrivalException(e);

@@ -6,13 +6,12 @@ import com.dku.council.infra.bus.model.BusStatus;
 import com.dku.council.infra.bus.model.ResponseGGBusArrival;
 import com.dku.council.infra.bus.model.ResponseKakaoBusApi;
 
-// todo Mapper Library를 사용해보는건 어떨까?
 public class BusResponseMapper {
     public static BusArrival to(ResponseGGBusArrival.Body.BusArrival model) {
         String routeId = model.getRouteId();
         Bus bus = Bus.of(routeId);
         if (bus == null) {
-            throw new IllegalArgumentException("Can't not find bus: " + routeId);
+            return null;
         }
 
         BusStatus state = getGGBusStateLabel(model.getFlag());

@@ -1,13 +1,13 @@
-package com.dku.council.domain.comment.model.entity;
+package com.dku.council.domain.timetable.model.entity;
 
-import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
@@ -15,29 +15,29 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class CommentLog extends BaseEntity {
+public class TimeTable extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "comment_log_id")
+    @Column(name = "timetable_id")
     private Long id;
-
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = Comment.COMMENT_MAX_LENGTH)
-    private String text;
+    private String name;
+
+    @OneToMany(mappedBy = "timetable", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Lecture> lectures = new ArrayList<>();
 
 
-    @Builder
-    private CommentLog(Post post, User user, String text) {
-        this.post = post;
+    public TimeTable(User user, String name) {
         this.user = user;
-        this.text = text;
+        this.name = name;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
     }
 }
