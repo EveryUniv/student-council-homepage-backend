@@ -119,6 +119,39 @@
         "collectStatus2": "NORMAL"
       },
       "running": false
+    },
+    {
+      "id": "B54367",
+      "name": "26-3",
+      "hcode": "31190",
+      "hname": "경기 용인시",
+      "type": "0109",
+      "busLineType": "MAUL",
+      "realTime": true,
+      "realtimeState": "NOVEHICLE",
+      "idx": "1/1",
+      "arrival": {
+        "direction": "대지고등학교.전내교차로 방향",
+        "busStopId": "BS264224",
+        "masterBusStopId": "BS83664",
+        "nextBusStopName": "대지고등학교.전내교차로",
+        "nextBusStopId": "BS264225",
+        "order": 18,
+        "vehicleType": "0",
+        "vehicleState": "1001",
+        "lastVehicle": false,
+        "arrivalTime": 0,
+        "busStopCount": 0,
+        "vehicleType2": "0",
+        "vehicleState2": "1001",
+        "lastVehicle2": false,
+        "arrivalTime2": 0,
+        "busStopCount2": 0,
+        "direction2": "",
+        "collectStatus": "NORMAL",
+        "collectStatus2": "NORMAL"
+      },
+      "running": true
     }
   ],
   "readableItsIdList": [

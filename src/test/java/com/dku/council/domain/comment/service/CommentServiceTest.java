@@ -24,6 +24,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,11 +75,18 @@ class CommentServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
+        String prevComment = comment.getText();
         Long edited = service.edit(10L, 10L, "new text");
 
         // then
         assertThat(edited).isEqualTo(10L);
         assertThat(comment.getText()).isEqualTo("new text");
+        verify(commentLogRepository).save(argThat(log -> {
+            assertThat(log.getText()).isEqualTo(prevComment);
+            assertThat(log.getUser().getId()).isEqualTo(user.getId());
+            assertThat(log.getPost().getId()).isEqualTo(comment.getPost().getId());
+            return true;
+        }));
     }
 
     @Test

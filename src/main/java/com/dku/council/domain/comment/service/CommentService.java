@@ -98,6 +98,7 @@ public class CommentService {
         if (!comment.getUser().getId().equals(userId)) {
             throw new NotGrantedException();
         }
+
         CommentLog commentLog = CommentLog.builder()
                 .post(post)
                 .user(user)
