@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -59,6 +60,11 @@ public class ControllerAdvisor {
     @ExceptionHandler
     protected ResponseEntity<ErrorResponseDto> accessDenied(AccessDeniedException e, Locale locale) {
         return localizedException(new NotGrantedException(e), locale);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponseDto> dataDuplicateException(DataIntegrityViolationException e, Locale locale) {
+        return localizedException(new DuplicateDataException(e), locale);
     }
 
     @ExceptionHandler

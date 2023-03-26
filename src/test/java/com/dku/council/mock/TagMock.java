@@ -18,6 +18,12 @@ public class TagMock {
         return tag;
     }
 
+    public static Tag create(Long id, String name){
+        Tag tag = new Tag(name);
+        EntityUtil.injectId(Tag.class, tag, id);
+        return tag;
+    }
+
     public static List<Tag> createList(int size) {
         List<Tag> categories = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
