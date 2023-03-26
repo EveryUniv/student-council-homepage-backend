@@ -71,6 +71,7 @@ class TagServiceTest {
         assertThat(created).isEqualTo(10L);
     }
 
+
     @Test
     @DisplayName("태그 이름 변경")
     void rename() {
