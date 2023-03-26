@@ -83,13 +83,4 @@ public class TestController {
 
         userRepository.save(user);
     }
-
-    @PostMapping("/users")
-    public void addUsers() {
-        int stdId = 32170000;
-        int phoneLast = 1000;
-        for (int i = 0; i < 4000; i++, stdId++, phoneLast++) {
-            addUser(String.valueOf(stdId), "121212", "홍길동" + i, "v홍길동v" + i, 2L, 2017, "0101111" + phoneLast);
-        }
-    }
 }
