@@ -1,6 +1,6 @@
 package com.dku.council.domain.like.scheduler;
 
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PostLikeDumpScheduler {
 
-    private final PostLikeService service;
+    private final RedisPostLikeServiceImpl service;
 
     @Scheduled(fixedDelayString = "${app.post.like-dump-delay}")
     public void dumpToDB() {
