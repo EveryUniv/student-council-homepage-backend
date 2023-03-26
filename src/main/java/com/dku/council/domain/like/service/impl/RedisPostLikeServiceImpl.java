@@ -72,7 +72,7 @@ public class RedisPostLikeServiceImpl implements PostLikeService {
      */
     @Transactional
     public long dumpToDB() {
-        List<LikeEntry> allLikes = memoryRepository.getAllPostLikes();
+        List<LikeEntry> allLikes = memoryRepository.getAllPostLikesAndClear();
         for (LikeEntry ent : allLikes) {
             if (ent.getState() == LikeState.LIKED) {
                 User user = userRepository.getReferenceById(ent.getUserId());
