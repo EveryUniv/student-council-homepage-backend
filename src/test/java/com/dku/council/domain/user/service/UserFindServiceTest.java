@@ -111,13 +111,13 @@ class UserFindServiceTest {
         User user = UserMock.createDummyMajor();
         SMSAuth auth = new SMSAuth(user.getPhone(), "CODE");
         String token = "token";
-        when(userFindRepository.getPwdAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
 
         // when
         service.verifyPwdCode(token, auth.getCode());
 
         // then
-        verify(userFindRepository).setPwdAuthCode(
+        verify(userFindRepository).setAuthCode(
                 eq(token),
                 eq(CODE_AUTH_COMPLETED),
                 eq(auth.getPhone()),
@@ -131,7 +131,7 @@ class UserFindServiceTest {
         User user = UserMock.createDummyMajor();
         SMSAuth auth = new SMSAuth(user.getPhone(), "CODE");
         String token = "token";
-        when(userFindRepository.getPwdAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
 
         // when & then
         assertThrows(WrongSMSCodeException.class, () ->
@@ -147,7 +147,7 @@ class UserFindServiceTest {
         SMSAuth auth = new SMSAuth("phone", CODE_AUTH_COMPLETED);
         User user = UserMock.createDummyMajor();
 
-        when(userFindRepository.getPwdAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
         when(userRepository.findByPhone(auth.getPhone())).thenReturn(Optional.of(user));
         when(passwordEncoder.encode(password)).thenReturn("encodedPassword");
 
@@ -156,7 +156,7 @@ class UserFindServiceTest {
 
         // then
         assertThat(user.getPassword()).isEqualTo("encodedPassword");
-        verify(userFindRepository).deletePwdAuthCode(token);
+        verify(userFindRepository).deleteAuthCode(token);
     }
 
     @Test
@@ -167,7 +167,7 @@ class UserFindServiceTest {
         String password = "password";
         SMSAuth auth = new SMSAuth("phone", "123456");
 
-        when(userFindRepository.getPwdAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
 
         // when & then
         assertThrows(NotSMSAuthorizedException.class, () ->

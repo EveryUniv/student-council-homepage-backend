@@ -63,7 +63,7 @@ class UserFindRedisRepositoryTest {
         }))).thenReturn("json");
 
         // when
-        repository.setPwdAuthCode("token", "code", "phone", now);
+        repository.setAuthCode("token", "code", "phone", now);
 
         // then
         verify(ops).put(
@@ -89,7 +89,7 @@ class UserFindRedisRepositoryTest {
         when(objectMapper.readValue(eq(json), (JavaType) isNull())).thenReturn(obj);
 
         // when
-        Optional<SMSAuth> auth = repository.getPwdAuthCode(token, now);
+        Optional<SMSAuth> auth = repository.getAuthCode(token, now);
 
         // then
         assertThat(auth.orElseThrow()).isEqualTo(expected);

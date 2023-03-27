@@ -2,7 +2,6 @@ package com.dku.council.domain.user.controller;
 
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
-import com.dku.council.domain.user.service.SMSVerificationService;
 import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Tag(name = "사용자", description = "사용자 인증 및 정보 관련 api")
@@ -26,7 +24,6 @@ public class UserController {
     private final UserService userService;
     private final UserFindService userFindService;
     private final SignupService signupService;
-    private final SMSVerificationService smsVerificationService;
 
 
     /**
@@ -60,7 +57,7 @@ public class UserController {
      * @return 비밀번호 재설정 토큰
      */
     @PostMapping("/find/pwd")
-    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
+    public ResponseChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
         return userFindService.sendPwdCodeBySMS(dto.getPhoneNumber());
     }
 
@@ -71,7 +68,7 @@ public class UserController {
      * @param dto 요청 body
      */
     @PostMapping("/find/pwd/verify")
-    public void verifyPwdCodeBySMS(@Valid @RequestBody RequestVerifyPwdSMSCodeDto dto) {
+    public void verifyPwdCodeBySMS(@Valid @RequestBody RequestVerifyTokenCodeDto dto) {
         userFindService.verifyPwdCode(dto.getToken(), dto.getCode());
     }
 
@@ -86,6 +83,32 @@ public class UserController {
     public void changePassword(@Valid @RequestBody RequestPasswordChangeDto dto) {
         userFindService.changePassword(dto.getToken(), dto.getPassword());
     }
+
+    /**
+     * 휴대폰 재설정 인증 코드 전송 (1)
+     * <p>재설정 코드(6자리) SMS로 전송 -> 재설정 토큰(UUID) 응답.</p> 핸드폰 번호 재설정 플로우는 SMS인증 코드 전송 ->
+     * 인증 코드 확인 & 핸드폰 번호 변경 순으로 흘러갑니다.
+     *
+     * @param dto 요청 body
+     * @return 핸드폰 번호 재설정 토큰
+     */
+    @PostMapping("/verify/phone")
+    @UserOnly
+    public ResponseChangeTokenDto sendChangePhoneCodeBySMS(AppAuthentication auth, @Valid @RequestBody RequestWithPhoneNumberDto dto){
+        return userFindService.sendChangePhoneCodeBySMS(auth.getUserId(), dto.getPhoneNumber());
+    }
+
+    /**
+     * 휴대폰 재설정 인증 코드 확인 (2)
+     * <p>재설정 토큰과 재설정 코드로 요청받은 번호로 핸드폰 번호 변경 합니다.</p>
+     * @param dto 요청 body
+     */
+    @PatchMapping("/change/phone")
+    @UserOnly
+    public void changePhoneNumber(AppAuthentication auth, @Valid @RequestBody RequestVerifyTokenCodeDto dto){
+        userFindService.changePhoneNumber(auth.getUserId(), dto.getToken(), dto.getCode());
+    }
+
 
     /**
      * 닉네임 변경.
