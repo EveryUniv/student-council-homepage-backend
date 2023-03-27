@@ -42,3 +42,4 @@ application.properties
 application.yml
 api.pdf
 
+/pinpoint-agent/

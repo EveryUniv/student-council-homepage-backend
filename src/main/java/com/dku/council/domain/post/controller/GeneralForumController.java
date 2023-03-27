@@ -4,6 +4,7 @@ import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.service.impl.DBPostLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -38,6 +39,7 @@ public class GeneralForumController {
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
     private final PostLikeService postLikeService;
+    private final DBPostLikeServiceImpl dbPostLikeServiceImpl;
 
     /**
      * 게시글 목록 및 태그 조회
@@ -190,5 +192,29 @@ public class GeneralForumController {
     @UserOnly
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         postLikeService.cancelLike(id, auth.getUserId());
+    }
+
+    /**
+     * 게시글에 좋아요 표시. (No cache)
+     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @PostMapping("/like/db/{id}")
+    @UserOnly
+    public void likeDB(AppAuthentication auth, @PathVariable Long id) {
+        dbPostLikeServiceImpl.like(id, auth.getUserId());
+    }
+
+    /**
+     * 좋아요 취소 (No cache)
+     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     *
+     * @param id 게시글 id
+     */
+    @DeleteMapping("/like/db/{id}")
+    @UserOnly
+    public void cancelLikeDB(AppAuthentication auth, @PathVariable Long id) {
+        dbPostLikeServiceImpl.cancelLike(id, auth.getUserId());
     }
 }
