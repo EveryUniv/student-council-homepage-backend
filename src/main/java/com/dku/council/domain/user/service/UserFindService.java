@@ -4,7 +4,8 @@ import com.dku.council.domain.user.exception.NotSMSAuthorizedException;
 import com.dku.council.domain.user.exception.NotSMSSentException;
 import com.dku.council.domain.user.exception.WrongSMSCodeException;
 import com.dku.council.domain.user.model.SMSAuth;
-import com.dku.council.domain.user.model.dto.response.ResponsePasswordChangeTokenDto;
+import com.dku.council.domain.user.model.dto.request.RequestWithPhoneNumberDto;
+import com.dku.council.domain.user.model.dto.response.ResponseChangeTokenDto;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserFindRepository;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -39,7 +40,6 @@ public class UserFindService {
     @Value("${app.auth.sms.digit-count}")
     private final int digitCount;
 
-
     @Transactional(readOnly = true)
     public void sendIdBySMS(String phone) {
         phone = eliminateDash(phone);
@@ -49,40 +49,68 @@ public class UserFindService {
     }
 
     @Transactional(readOnly = true)
-    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(String studentId, String phone) {
+    public ResponseChangeTokenDto sendPwdCodeBySMS(String phone) {
         Instant now = Instant.now(clock);
         String code = CodeGenerator.generateDigitCode(digitCount);
-        User user = userRepository.findByStudentId(studentId).orElseThrow(UserNotFoundException::new);
+        userRepository.findByPhone(phone).orElseThrow(UserNotFoundException::new);
 
         phone = eliminateDash(phone);
-        if (!user.getPhone().equals(phone)) {
-            throw new UserNotFoundException();
-        }
 
         String token = CodeGenerator.generateUUIDCode();
-        userFindRepository.setPwdAuthCode(token, code, phone, now);
+        userFindRepository.setAuthCode(token, code, phone, now);
         sendSMS(phone, "sms.find.pwd-auth-message", code);
 
-        return new ResponsePasswordChangeTokenDto(token);
+        return new ResponseChangeTokenDto(token);
     }
+
+    @Transactional(readOnly = true)
+    public ResponseChangeTokenDto sendChangePhoneCodeBySMS(Long userId, String phone) {
+        Instant now = Instant.now(clock);
+        String code = CodeGenerator.generateDigitCode(digitCount);
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        phone = eliminateDash(phone);
+
+        String token = CodeGenerator.generateUUIDCode();
+        userFindRepository.setAuthCode(token, code, phone, now);
+        sendSMS(phone, "sms.change.phone-auth-message", code);
+
+        return new ResponseChangeTokenDto(token);
+    }
+
+    @Transactional
+    public void changePhoneNumber(Long userId, String token, String code) {
+        Instant now = Instant.now(clock);
+        SMSAuth auth = userFindRepository.getAuthCode(token, now)
+                .orElseThrow(NotSMSSentException::new);
+
+        if(!auth.getCode().equals(code)) {
+            throw new WrongSMSCodeException();
+        }
+        String phone = eliminateDash(auth.getPhone());
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new).changePhone(phone);
+        userFindRepository.deleteAuthCode(token);
+    }
+
 
     public void verifyPwdCode(String token, String code) {
         Instant now = Instant.now(clock);
 
-        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now)
+        SMSAuth auth = userFindRepository.getAuthCode(token, now)
                 .orElseThrow(NotSMSSentException::new);
 
         if (!auth.getCode().equals(code)) {
             throw new WrongSMSCodeException();
         }
 
-        userFindRepository.setPwdAuthCode(token, CODE_AUTH_COMPLETED, auth.getPhone(), now);
+        userFindRepository.setAuthCode(token, CODE_AUTH_COMPLETED, auth.getPhone(), now);
     }
+
 
     @Transactional
     public void changePassword(String token, String password) {
         Instant now = Instant.now(clock);
-        SMSAuth auth = userFindRepository.getPwdAuthCode(token, now)
+        SMSAuth auth = userFindRepository.getAuthCode(token, now)
                 .orElseThrow(NotSMSSentException::new);
 
         if (!auth.getCode().equals(CODE_AUTH_COMPLETED)) {
@@ -93,7 +121,7 @@ public class UserFindService {
         password = passwordEncoder.encode(password);
         user.changePassword(password);
 
-        userFindRepository.deletePwdAuthCode(token);
+        userFindRepository.deleteAuthCode(token);
     }
 
     private void sendSMS(String phone, String messageCode, String argument) {
@@ -104,4 +132,5 @@ public class UserFindService {
     private static String eliminateDash(String phone) {
         return phone.replaceAll("-", "");
     }
+
 }

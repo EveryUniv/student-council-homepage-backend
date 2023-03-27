@@ -84,4 +84,8 @@ public class User extends BaseEntity {
     }
 
     public void changeNickName(String nickname){ this.nickname = nickname; }
+
+    public void changePhone(String phone) {
+        this.phone = phone;
+    }
 }
