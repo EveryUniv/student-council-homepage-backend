@@ -82,11 +82,11 @@ class UserFindServiceTest {
     void sendPwdCodeBySMS() {
         // given
         User user = UserMock.createDummyMajor();
-        when(userRepository.findByStudentId(user.getStudentId())).thenReturn(Optional.of(user));
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.of(user));
         when(messageSource.getMessage(eq("sms.find.pwd-auth-message"), any(), any())).thenReturn("Message");
 
         // when
-        service.sendPwdCodeBySMS(user.getStudentId(), user.getPhone());
+        service.sendPwdCodeBySMS(user.getPhone());
 
         // then
         verify(smsService).sendSMS(user.getPhone(), "Message");
@@ -97,11 +97,11 @@ class UserFindServiceTest {
     void failedSendPwdCodeBySMSByNotFoundUser() {
         // given
         User user = UserMock.createDummyMajor();
-        when(userRepository.findByStudentId(user.getStudentId())).thenReturn(Optional.empty());
+        when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.empty());
 
         // when & then
         Assertions.assertThrows(UserNotFoundException.class, () ->
-                service.sendPwdCodeBySMS(user.getStudentId(), user.getPhone()));
+                service.sendPwdCodeBySMS(user.getPhone()));
     }
 
     @Test

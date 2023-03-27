@@ -2,6 +2,7 @@ package com.dku.council.domain.user.controller;
 
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
+import com.dku.council.domain.user.service.SMSVerificationService;
 import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Tag(name = "사용자", description = "사용자 인증 및 정보 관련 api")
@@ -24,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final UserFindService userFindService;
     private final SignupService signupService;
+    private final SMSVerificationService smsVerificationService;
 
 
     /**
@@ -57,8 +60,8 @@ public class UserController {
      * @return 비밀번호 재설정 토큰
      */
     @PostMapping("/find/pwd")
-    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestSendPasswordFindCodeDto dto) {
-        return userFindService.sendPwdCodeBySMS(dto.getStudentId(), dto.getPhoneNumber());
+    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(@Valid @RequestBody RequestWithPhoneNumberDto dto) {
+        return userFindService.sendPwdCodeBySMS(dto.getPhoneNumber());
     }
 
     /**
@@ -100,10 +103,10 @@ public class UserController {
      * @param dto 요청 body
      */
     @PatchMapping("/change/password")
+    @UserOnly
     public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto){
         userService.changePassword(auth.getUserId(), dto);
     }
-
 
     /**
      * 회원가입

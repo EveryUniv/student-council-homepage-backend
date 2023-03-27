@@ -49,15 +49,12 @@ public class UserFindService {
     }
 
     @Transactional(readOnly = true)
-    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(String studentId, String phone) {
+    public ResponsePasswordChangeTokenDto sendPwdCodeBySMS(String phone) {
         Instant now = Instant.now(clock);
         String code = CodeGenerator.generateDigitCode(digitCount);
-        User user = userRepository.findByStudentId(studentId).orElseThrow(UserNotFoundException::new);
+        userRepository.findByPhone(phone).orElseThrow(UserNotFoundException::new);
 
         phone = eliminateDash(phone);
-        if (!user.getPhone().equals(phone)) {
-            throw new UserNotFoundException();
-        }
 
         String token = CodeGenerator.generateUUIDCode();
         userFindRepository.setPwdAuthCode(token, code, phone, now);
