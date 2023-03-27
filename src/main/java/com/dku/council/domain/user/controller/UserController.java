@@ -3,7 +3,6 @@ package com.dku.council.domain.user.controller;
 import com.dku.council.domain.comment.model.dto.CommentedPostResponseDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
 import com.dku.council.domain.user.service.*;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +29,8 @@ public class UserController {
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
-    private final MyCommentService myCommentService;
+    private final MyCommentedPostService myCommentedPostService;
+    private final MyLikedPostService myLikedPostService;
 
     /**
      * 내 정보 조회
@@ -183,11 +182,23 @@ public class UserController {
     /**
      * 내가 댓글 단 글들 모두 조회하기
      */
-    @GetMapping("/commentedPost")
+    @GetMapping("/post/commented")
     @UserOnly
     public ResponsePage<CommentedPostResponseDto> listMyCommentedPosts(AppAuthentication auth,
                                                                        @ParameterObject Pageable pageable) {
-        Page<CommentedPostResponseDto> commentedPosts = myCommentService.listMyCommentedPosts(auth.getUserId(), pageable);
+        Page<CommentedPostResponseDto> commentedPosts = myCommentedPostService.listMyCommentedPosts(auth.getUserId(), pageable);
         return new ResponsePage<>(commentedPosts);
+    }
+
+    /**
+     * 내가 좋아요 한 글들 모두 조회하기
+     */
+    @GetMapping("/post/liked")
+    @UserOnly
+    public ResponsePage<SummarizedPostDto> listMyLikedPosts(AppAuthentication auth,
+                                                                   @ParameterObject Pageable pageable,
+                                                                   @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedPostDto> likedPosts = myLikedPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
+        return new ResponsePage<>(likedPosts);
     }
 }
