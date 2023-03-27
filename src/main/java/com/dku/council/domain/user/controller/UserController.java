@@ -92,7 +92,7 @@ public class UserController {
      * @param dto 요청 body
      * @return 핸드폰 번호 재설정 토큰
      */
-    @PostMapping("/verify/phone")
+    @PostMapping("/change/phone/verify")
     @UserOnly
     public ResponseChangeTokenDto sendChangePhoneCodeBySMS(AppAuthentication auth, @Valid @RequestBody RequestWithPhoneNumberDto dto){
         return userFindService.sendChangePhoneCodeBySMS(auth.getUserId(), dto.getPhoneNumber());
