@@ -4,7 +4,6 @@ import com.dku.council.domain.user.exception.NotSMSAuthorizedException;
 import com.dku.council.domain.user.exception.NotSMSSentException;
 import com.dku.council.domain.user.exception.WrongSMSCodeException;
 import com.dku.council.domain.user.model.SMSAuth;
-import com.dku.council.domain.user.model.dto.request.RequestWithPhoneNumberDto;
 import com.dku.council.domain.user.model.dto.response.ResponseChangeTokenDto;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserFindRepository;

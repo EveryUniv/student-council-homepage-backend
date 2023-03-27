@@ -11,11 +11,13 @@ import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Primary
 @Service
 @RequiredArgsConstructor
 public class RedisPostLikeServiceImpl implements PostLikeService {
