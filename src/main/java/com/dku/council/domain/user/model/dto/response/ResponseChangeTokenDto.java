@@ -5,6 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class ResponsePasswordChangeTokenDto {
+public class ResponseChangeTokenDto {
     private final String token;
 }
