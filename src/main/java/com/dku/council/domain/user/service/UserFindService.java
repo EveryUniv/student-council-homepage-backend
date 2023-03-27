@@ -87,7 +87,8 @@ public class UserFindService {
         if(!auth.getCode().equals(code)) {
             throw new WrongSMSCodeException();
         }
-        userRepository.findById(userId).orElseThrow(UserNotFoundException::new).changePhone(auth.getPhone());
+        String phone = eliminateDash(auth.getPhone());
+        userRepository.findById(userId).orElseThrow(UserNotFoundException::new).changePhone(phone);
         userFindRepository.deleteAuthCode(token);
     }
 

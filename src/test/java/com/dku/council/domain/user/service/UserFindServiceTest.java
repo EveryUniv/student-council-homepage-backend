@@ -1,6 +1,7 @@
 package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.NotSMSAuthorizedException;
+import com.dku.council.domain.user.exception.NotSMSSentException;
 import com.dku.council.domain.user.exception.WrongSMSCodeException;
 import com.dku.council.domain.user.model.SMSAuth;
 import com.dku.council.domain.user.model.entity.User;
@@ -173,4 +174,80 @@ class UserFindServiceTest {
         assertThrows(NotSMSAuthorizedException.class, () ->
                 service.changePassword(token, password));
     }
+
+    @Test
+    @DisplayName("핸드폰변경 - 휴대폰 번호로 정확한 코드를 보내는가?")
+    void sendPhoneCodeBySMS() {
+        String phone = "01012341234";
+        // given
+        User user = UserMock.createDummyMajor();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(messageSource.getMessage(eq("sms.change.phone-auth-message"), any(), any())).thenReturn("Message");
+
+        // when
+        service.sendChangePhoneCodeBySMS(user.getId(), phone);
+        // then
+        verify(smsService).sendSMS(phone, "Message");
+    }
+
+    @Test
+    @DisplayName("핸드폰 변경 - 유저 없는 오류")
+    void checkPhoneCodeUser(){
+        String phone = "010-1234-1234";
+        //given
+        User user = UserMock.createDummyMajor();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+        //when & then
+        assertThrows(UserNotFoundException.class, () ->
+                service.sendChangePhoneCodeBySMS(user.getId(), phone));
+    }
+
+    @Test
+    @DisplayName("핸드폰 변경 - 성공 테스트")
+    void checkCode(){
+        String phone = "010-1234-1234";
+        String newPhone = "01012341234";
+        String token = "asdfasdf";
+        String code = "123456";
+        //given
+        User user = UserMock.createDummyMajor();
+        SMSAuth auth = new SMSAuth(phone, code);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+
+        service.changePhoneNumber(user.getId(), token, code);
+
+        assertThat(user.getPhone()).isEqualTo(newPhone);
+    }
+
+    @Test
+    @DisplayName("핸드폰 변경 - 실패 테스트(코드오류)")
+    void failedChangePhoneNumber_Code(){
+        String phone = "010-1234-1234";
+        String token = "asdfasdf";
+        String code = "code";
+        //given
+        User user = UserMock.createDummyMajor();
+        SMSAuth auth = new SMSAuth(phone, code);
+
+        when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
+
+        assertThrows(WrongSMSCodeException.class, () ->
+                service.changePhoneNumber(user.getId(), token, "wrong_code"));
+    }
+
+    @Test
+    @DisplayName("핸드폰 변경 - 실패 테스트(토큰오류)")
+    void failedChangePhoneNumber_token(){
+        //given
+        User user = UserMock.createDummyMajor();
+
+        when(userFindRepository.getAuthCode(any(), any())).thenReturn(Optional.empty());
+
+        assertThrows(NotSMSSentException.class, () ->
+                service.changePhoneNumber(user.getId(), "wrong_token", "12345"));
+    }
+
 }
