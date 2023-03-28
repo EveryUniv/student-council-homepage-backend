@@ -35,7 +35,7 @@ public interface LikeService {
     boolean isLiked(Long elementId, Long userId, LikeTarget target);
 
     /**
-     * '좋아요'누른 글 목록 가져오기
+     * '좋아요'누른 요소들 목록 가져오기
      *
      * @param userId   사용자 ID
      * @param pageable 페이징 정보
@@ -45,11 +45,11 @@ public interface LikeService {
     Page<Long> getLikedElementIds(Long userId, Pageable pageable, LikeTarget target);
 
     /**
-     * 게시글의 '좋아요' 개수 가져오기.
+     * '좋아요' 개수 가져오기.
      * 메모리에 '좋아요' 개수가 없다면 캐싱한다.
      *
-     * @param postId 게시글 ID
+     * @param elementId 요소 ID
      * @return 좋아요 개수
      */
-    int getCountOfLikes(Long postId, LikeTarget target);
+    int getCountOfLikes(Long elementId, LikeTarget target);
 }
