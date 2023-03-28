@@ -132,7 +132,8 @@ public class PetitionController {
      *
      * @param postId 댓글 생성할 게시글 id
      */
-    @GetMapping("/comment/{postId}")
+//    @GetMapping("/comment/{postId}")
+    //해당 API 는 deprecated 되었습니다. : 동의 댓글 UI 제외.
     @UserOnly
     public ResponsePage<CommentDto> listComment(AppAuthentication auth,
                                                 @PathVariable Long postId,
@@ -147,7 +148,8 @@ public class PetitionController {
      * @param postId     댓글 생성할 게시글 id
      * @param commentDto 댓글 내용(text)
      */
-    @PostMapping("/comment/{postId}")
+    //해당 API 는 deprecated 되었습니다. 대신 아래 API 를 사용해주세요.
+//    @PostMapping("/comment/{postId}")
     @UserOnly
     public ResponseIdDto createComment(AppAuthentication auth,
                                        @PathVariable Long postId,
@@ -157,11 +159,25 @@ public class PetitionController {
     }
 
     /**
+     * 동의 하기 : 해당 게시글에 동의합니다. (default : 동의합니다)
+     *
+     * @param postId    동의할 게시글 id
+     * @return          동의한 댓글 id
+     */
+    @PostMapping("/agree/{postId}")
+    @UserOnly
+    public void agreePetition(AppAuthentication auth,
+                                       @PathVariable Long postId) {
+        petitionService.agreePetition(postId, auth.getUserId());
+    }
+
+    /**
      * 동의 댓글 삭제 (Admin)
      *
      * @param id 댓글 id
      */
-    @DeleteMapping("/comment/{id}")
+    //deprecated : Petition 은 한번 동의하면 삭제할 수 없습니다.
+//    @DeleteMapping("/comment/{id}")
     @AdminOnly
     public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
         Long deleteId = petitionService.deleteComment(id, auth.getUserId());

@@ -2,6 +2,7 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.service.CommentService;
+import com.dku.council.domain.post.exception.DuplicateAgreementException;
 import com.dku.council.domain.post.exception.DuplicateCommentException;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -71,5 +72,19 @@ public class PetitionService {
 
     public Long deleteComment(Long id, Long userId) {
         return commentService.delete(id, userId, true);
+    }
+
+    public void agreePetition(Long postId, Long userId) {
+        Petition post = postService.findPost(postId);
+        if(commentService.isCommentedAlready(postId, userId)) {
+            throw new DuplicateAgreementException();
+        }
+
+        if(post.getExtraStatus() == PetitionStatus.ACTIVE && post.getComments().size() +1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
+            post.updatePetitionStatus(PetitionStatus.WAITING);
+        }
+
+        commentService.create(postId, userId, "동의합니다.");
+
     }
 }

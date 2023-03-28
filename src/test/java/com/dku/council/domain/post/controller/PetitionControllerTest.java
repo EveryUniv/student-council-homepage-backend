@@ -12,6 +12,7 @@ import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.dto.ResponseSuccessDto;
 import com.dku.council.mock.CommentMock;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.PetitionMock;
@@ -21,6 +22,7 @@ import com.dku.council.util.FieldReflector;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -154,7 +156,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         assertThat(petition.getAnswer()).isEqualTo("hello good");
         assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.ANSWERED);
     }
-
+    @Ignore
     @Test
     @DisplayName("동의 댓글 목록")
     void listComment() throws Exception {
@@ -170,7 +172,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("content.size()", is(1)))
                 .andExpect(jsonPath("content[0].text", is(comment.getText())));
     }
-
+    @Ignore
     @Test
     @DisplayName("동의 댓글 생성")
     void createComment() throws Exception {
@@ -191,6 +193,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         assertThat(comments.get(0).getPost().getId()).isEqualTo(petition.getId());
     }
 
+    @Ignore
     @Test
     @DisplayName("동의 댓글 생성 실패 - 같은글에 2회이상 불가")
     void createCommentTwice() throws Exception {
@@ -208,6 +211,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         result.andExpect(status().isBadRequest());
     }
 
+    @Ignore
     @Test
     @DisplayName("동의 댓글 임계치 초과시 답변대기로 변경")
     void createCommentAndStateChanges() throws Exception {
@@ -230,6 +234,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
     }
 
+    @Ignore
     @Test
     @DisplayName("동의 댓글 삭제")
     void deleteComment() throws Exception {
@@ -247,4 +252,59 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         List<Comment> comments = commentRepository.findAll();
         assertThat(comments.get(0).getStatus()).isEqualTo(CommentStatus.DELETED_BY_ADMIN);
     }
+
+    @Test
+    @DisplayName("동의 버튼 클릭")
+    void agreeComment() throws Exception {
+        // when
+        ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
+                .content(objectMapper.writeValueAsBytes(new ResponseSuccessDto()))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        result.andExpect(status().isOk());
+
+        List<Comment> comments = commentRepository.findAll();
+        assertThat(comments.size()).isEqualTo(1);
+        assertThat(comments.get(0).getText()).isEqualTo("동의합니다.");
+        assertThat(comments.get(0).getPost().getId()).isEqualTo(petition.getId());
+    }
+
+    @Test
+    @DisplayName("동의 버튼 클릭 실패 - 이미 동의한 경우")
+    void agreeCommentTwice() throws Exception {
+        // given
+        Comment comment = CommentMock.create(petition, user);
+        commentRepository.save(comment);
+
+        // when
+        ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
+                .content(objectMapper.writeValueAsBytes(new ResponseSuccessDto()))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        result.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("답변대기 상태 변화 - 동의 댓글이 150개 이상인 경우")
+    void agreeCommentOver150() throws Exception {
+        // given
+        List<User> users = UserMock.createList(major, 150);
+        users = userRepository.saveAll(users);
+
+        List<Comment> comments = CommentMock.createList(petition, users, 150);
+        commentRepository.saveAll(comments);
+
+        // when
+        ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
+                .content(objectMapper.writeValueAsBytes(new ResponseSuccessDto()))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        // then
+        result.andExpect(status().isOk());
+        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
+    }
+
+
 }
