@@ -5,7 +5,7 @@ import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.like.repository.PostLikeMemoryRepository;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
-import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
+import com.dku.council.domain.like.service.impl.CachedPostLikeServiceImpl;
 import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.NewsMock;
@@ -29,7 +29,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RedisPostLikeServiceImplTest {
+class CachedPostLikeServiceImplTest {
 
     @Mock
     private PostLikeMemoryRepository memoryRepository;
@@ -44,7 +44,7 @@ class RedisPostLikeServiceImplTest {
     private PostRepository postRepository;
 
     @InjectMocks
-    private RedisPostLikeServiceImpl service;
+    private CachedPostLikeServiceImpl service;
 
     @Test
     @DisplayName("좋아요 - 캐시에 count가 없는 경우")

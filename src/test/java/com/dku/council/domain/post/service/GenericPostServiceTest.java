@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
+import com.dku.council.domain.like.service.impl.CachedPostLikeServiceImpl;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -63,7 +63,7 @@ class GenericPostServiceTest {
     private FileUploadService fileUploadService;
 
     @Mock
-    private RedisPostLikeServiceImpl postLikeService;
+    private CachedPostLikeServiceImpl postLikeService;
 
     private GenericPostService<News> newsService;
     private GenericPostService<Petition> petitionService;
