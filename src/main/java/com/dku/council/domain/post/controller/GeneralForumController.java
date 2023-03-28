@@ -3,7 +3,8 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -37,7 +38,7 @@ public class GeneralForumController {
 
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
-    private final PostLikeService postLikeService;
+    private final LikeService likeService;
 
     /**
      * 게시글 목록 및 태그 조회
@@ -176,7 +177,7 @@ public class GeneralForumController {
     @PostMapping("/like/{id}")
     @UserOnly
     public void like(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.like(id, auth.getUserId());
+        likeService.like(id, auth.getUserId(), LikeTarget.POST);
     }
 
     /**
@@ -188,6 +189,6 @@ public class GeneralForumController {
     @DeleteMapping("/like/{id}")
     @UserOnly
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.cancelLike(id, auth.getUserId());
+        likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }
 }

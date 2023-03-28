@@ -2,7 +2,7 @@ package com.dku.council.domain.post.controller;
 
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
+
 @Tag(name = "청원 게시판", description = "청원 게시판 관련 api")
 @RestController
 @RequestMapping("/post/petition")
@@ -39,7 +41,7 @@ public class PetitionController {
 
     private final PetitionService petitionService;
     private final GenericPostService<Petition> petitionPostService;
-    private final PostLikeService postLikeService;
+    private final LikeService likeService;
 
     /**
      * 게시글 목록으로 조회
@@ -177,7 +179,7 @@ public class PetitionController {
     @PostMapping("/like/{id}")
     @UserOnly
     public void like(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.like(id, auth.getUserId());
+        likeService.like(id, auth.getUserId(), POST);
     }
 
     /**
@@ -189,6 +191,6 @@ public class PetitionController {
     @DeleteMapping("/like/{id}")
     @UserOnly
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.cancelLike(id, auth.getUserId());
+        likeService.cancelLike(id, auth.getUserId(), POST);
     }
 }

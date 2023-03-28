@@ -1,6 +1,6 @@
 package com.dku.council.domain.like.model.entity;
 
-import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -8,29 +8,35 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-public class PostLike extends BaseEntity {
+@Table(indexes = {
+        @Index(name = "idx_like_element_id", columnList = "elementId")
+})
+public class LikeElement extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "post_like_id")
+    @Column(name = "like_id")
     private Long id;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private Long elementId;
 
-    public PostLike(User user, Post post) {
+    @Enumerated(STRING)
+    private LikeTarget target;
+
+    public LikeElement(User user, Long elementId, LikeTarget target) {
         this.user = user;
-        this.post = post;
+        this.elementId = elementId;
+        this.target = target;
     }
 }
