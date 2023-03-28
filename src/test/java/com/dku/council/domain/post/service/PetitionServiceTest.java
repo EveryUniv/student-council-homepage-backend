@@ -5,13 +5,10 @@ import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
-import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.repository.UserRepository;
-import com.dku.council.global.dto.ResponseSuccessDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.PetitionStatisticMock;
@@ -23,8 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PetitionPostServiceTest {
+public class PetitionServiceTest {
     @Mock
     private GenericPostRepository<Petition> petitionRepository;
 
@@ -70,7 +65,7 @@ public class PetitionPostServiceTest {
 
     @Test
     @DisplayName("Petition mapper 와 함께 단건 조회가 잘 동작하는지?")
-    public void findOneWithMapper() {
+    public void findOnePetitionWithMapper() {
         // given
         Petition petition = PetitionMock.createWithDummy();
         PetitionStatisticDto petitionStatisticDto = PetitionStatisticMock.createDto();
@@ -90,6 +85,8 @@ public class PetitionPostServiceTest {
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
         assertThat(dto.getStatistic()).isEqualTo(petitionStatisticDto);
     }
+
+
 
 
 }

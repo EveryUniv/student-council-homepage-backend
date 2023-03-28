@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PetitionStatisticRepository extends JpaRepository<PetitionStatistic, Long> {
-    List<PetitionStatistic> findAllByPostId(Long petitionId);
+    List<PetitionStatistic> findAllByPetition(Long petitionId);
 }

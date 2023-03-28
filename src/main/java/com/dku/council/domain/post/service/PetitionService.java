@@ -89,6 +89,6 @@ public class PetitionService {
         }
 
         commentService.create(postId, userId, "동의합니다.");
-
+        statisticService.save(postId, userId);
     }
 }

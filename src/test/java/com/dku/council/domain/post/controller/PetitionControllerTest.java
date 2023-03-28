@@ -8,6 +8,8 @@ import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.statistic.PetitionStatistic;
+import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
@@ -64,6 +66,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
     private GenericPostRepository<Petition> postRepository;
+
+    @Autowired
+    private PetitionStatisticRepository petitionStatisticRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -188,6 +193,7 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         result.andExpect(status().isOk());
 
         List<Comment> comments = commentRepository.findAll();
+
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getText()).isEqualTo("this is comment");
         assertThat(comments.get(0).getPost().getId()).isEqualTo(petition.getId());
@@ -265,6 +271,13 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         result.andExpect(status().isOk());
 
         List<Comment> comments = commentRepository.findAll();
+        List<PetitionStatistic> statistics = petitionStatisticRepository.findAll();
+
+
+
+        assertThat(statistics.size()).isEqualTo(1);
+        assertThat(statistics.get(0).getDepartment()).isEqualTo("MyDepartment");
+
         assertThat(comments.size()).isEqualTo(1);
         assertThat(comments.get(0).getText()).isEqualTo("동의합니다.");
         assertThat(comments.get(0).getPost().getId()).isEqualTo(petition.getId());

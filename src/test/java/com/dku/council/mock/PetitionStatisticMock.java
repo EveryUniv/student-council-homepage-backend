@@ -51,8 +51,21 @@ public class PetitionStatisticMock {
     public static List<PetitionStatistic> list(Petition petition){
         List<PetitionStatistic> ret = new ArrayList<>();
         for(int i=0; i<10; i++){
-//            ret.add(create(petition));
-            ret.add(create(petition, "department" + i));
+            ret.add(create(petition, "department10"));
+        }
+
+        for(int i=0; i<100; i++){
+            ret.add(create(petition, "department100"));
+        }
+
+        for(int i=0; i<40; i++){
+            ret.add(create(petition, "department40"));
+        }
+        for(int i=0; i<39; i++){
+            ret.add(create(petition, "department39"));
+        }
+        for(int i=0; i<41; i++){
+            ret.add(create(petition, "department41"));
         }
         return ret;
 

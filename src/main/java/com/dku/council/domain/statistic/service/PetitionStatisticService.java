@@ -1,11 +1,14 @@
 package com.dku.council.domain.statistic.service;
 
+import com.dku.council.domain.post.exception.PostNotFoundException;
+import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.PetitionRepository;
-import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class PetitionStatisticService {
 
     private final PetitionStatisticRepository repository;
     private final UserRepository userRepository;
+    private final PetitionRepository petitionRepository;
 
     /**
      * petitionId 로 저장되어 있는 Department 를 조회하여 가장 많은 Department 4개를 조회한다.
@@ -34,7 +38,7 @@ public class PetitionStatisticService {
      * @return
      */
     public PetitionStatisticDto findTop4Department(Long petitionId){
-        List<PetitionStatistic> petitionStatisticList = repository.findAllByPostId(petitionId);
+        List<PetitionStatistic> petitionStatisticList = repository.findAllByPetition(petitionId);
 
         Stream<String> departmentList = petitionStatisticList.stream().map(PetitionStatistic::getDepartment);
 
@@ -48,5 +52,21 @@ public class PetitionStatisticService {
                 .collect(Collectors.toList());
 
         return new PetitionStatisticDto(top4Department);
+    }
+
+    /**
+     * 동의 통계 테이블에 저장합니다.
+     * @param postId
+     * @param userId
+     */
+    public void save(Long postId, Long userId){
+        Petition petition = petitionRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+
+        PetitionStatistic statistic = PetitionStatistic.builder()
+                .petition(petition)
+                .user(user)
+                .build();
+        repository.save(statistic);
     }
 }
