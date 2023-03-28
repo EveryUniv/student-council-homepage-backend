@@ -6,6 +6,7 @@ import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.MajorSubject;
 import com.dku.council.infra.dku.model.Subject;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class DkuLectureService extends DkuScrapper {
 
     private static final String DAY_OF_WEEK = "월화수목금토일";
@@ -30,7 +32,10 @@ public class DkuLectureService extends DkuScrapper {
 
     public DkuLectureService(@ChromeAgentWebClient WebClient webClient,
                              @Value("${dku.lecture.api-path}") String lectureApiPath) {
-        super(webClient);
+        super(webClient.mutate()
+                .codecs(configurer -> configurer.defaultCodecs()
+                        .maxInMemorySize(16 * 1024 * 1024))
+                .build());
         this.lectureApiPath = lectureApiPath;
     }
 
@@ -94,7 +99,10 @@ public class DkuLectureService extends DkuScrapper {
                     );
                 }
 
-                result.add(parser.parse(cols));
+                Subject subject = parser.parse(cols);
+                if (subject != null) {
+                    result.add(subject);
+                }
             }
 
             return result;
@@ -108,6 +116,18 @@ public class DkuLectureService extends DkuScrapper {
     }
 
     private static Subject parseSubject(Elements cols, int offset) {
+        String timeText = cols.get(7 + offset).text();
+
+        if (timeText.isBlank()) return null;
+
+        List<Subject.TimeAndPlace> times;
+        try {
+            times = parseTime(timeText);
+        } catch (NumberFormatException e) {
+            log.warn("Failed to parse time: {}", timeText);
+            throw new DkuFailedCrawlingException(e);
+        }
+
         return Subject.builder()
                 .category(cols.get(1 + offset).text())
                 .id(cols.get(2 + offset).text())
@@ -115,12 +135,14 @@ public class DkuLectureService extends DkuScrapper {
                 .name(cols.get(4 + offset).select("a").text())
                 .credit(Integer.parseInt(cols.get(5 + offset).text()))
                 .professor(cols.get(6 + offset).text())
-                .times(parseTime(cols.get(7 + offset).text()))
+                .times(times)
                 .build();
     }
 
     private static Subject parseMajorSubject(Elements cols) {
         Subject subject = parseSubject(cols, 2);
+        if(subject == null) return null;
+
         return new MajorSubject(cols.get(1).text(),
                 Integer.parseInt(cols.get(2).text()),
                 subject);
@@ -132,12 +154,12 @@ public class DkuLectureService extends DkuScrapper {
         String commonPlace = null;
         String[] tokens = time.split("/");
 
-        int placeCount = countOfBracketOpen(time);
+        int placeCount = countOfPlace(tokens);
 
         if (placeCount == 0) { // 장소가 지정되지 않은 경우엔 공통 장소를 null로 설정
             commonPlace = "";
         } else if (placeCount == 1) { // 장소 지정이 끝에 하나만 있으면 공통으로 강의실을 설정
-            int bracketOpenIndex = time.lastIndexOf("(");
+            int bracketOpenIndex = time.indexOf("(");
             commonPlace = time.substring(bracketOpenIndex + 1, time.length() - 1);
             tokens = time.substring(0, bracketOpenIndex).split("/");
         }
@@ -145,7 +167,7 @@ public class DkuLectureService extends DkuScrapper {
         for (String token : tokens) {
             String place;
             if (commonPlace == null) {
-                int bracketOpenIndex = token.lastIndexOf("(");
+                int bracketOpenIndex = token.indexOf("(");
                 place = token.substring(bracketOpenIndex + 1, token.length() - 1);
                 token = token.substring(0, bracketOpenIndex);
             } else {
@@ -171,10 +193,10 @@ public class DkuLectureService extends DkuScrapper {
         return result;
     }
 
-    private static int countOfBracketOpen(String str) {
+    private static int countOfPlace(String[] tokens) {
         int count = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (str.charAt(i) == '(') {
+        for (String token : tokens) {
+            if (token.indexOf('(') > 0) {
                 count++;
             }
         }

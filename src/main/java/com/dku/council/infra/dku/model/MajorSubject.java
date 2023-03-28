@@ -2,11 +2,9 @@ package com.dku.council.infra.dku.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
 public class MajorSubject extends Subject {
 
     /**

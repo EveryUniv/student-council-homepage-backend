@@ -229,26 +229,6 @@ class DkuLectureServiceTest extends AbstractMockServerTest {
                 2,
                 Subject.builder()
                         .category("전공필수")
-                        .id("338720")
-                        .classNumber(2)
-                        .name("매스컴기초통계")
-                        .credit(3)
-                        .professor("신동진")
-                        .times(List.of(
-                                new Subject.TimeAndPlace(
-                                        DayOfWeek.THURSDAY,
-                                        LocalTime.of(12, 0),
-                                        LocalTime.of(15, 0),
-                                        "미디어105"
-                                )
-                        ))
-                        .build()));
-
-        result.add(new MajorSubject(
-                "사회 커뮤니케이션학부 영상콘텐츠",
-                2,
-                Subject.builder()
-                        .category("전공필수")
                         .id("338800")
                         .classNumber(1)
                         .name("매스컴이론")
@@ -265,7 +245,7 @@ class DkuLectureServiceTest extends AbstractMockServerTest {
                                         DayOfWeek.WEDNESDAY,
                                         LocalTime.of(11, 0),
                                         LocalTime.of(12, 30),
-                                        "미디어507"
+                                        "체육125(주경기장)"
                                 )
                         ))
                         .build()));

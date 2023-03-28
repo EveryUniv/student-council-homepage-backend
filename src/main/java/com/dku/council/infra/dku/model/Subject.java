@@ -10,7 +10,6 @@ import java.util.List;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode
 @Builder
-@ToString
 public class Subject {
     /**
      * 이수구분
@@ -60,7 +59,6 @@ public class Subject {
     @Getter
     @RequiredArgsConstructor
     @EqualsAndHashCode
-    @ToString
     public static class TimeAndPlace {
         private final DayOfWeek dayOfWeek;
         private final LocalTime from;
