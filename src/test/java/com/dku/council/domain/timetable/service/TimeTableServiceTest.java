@@ -1,16 +1,19 @@
 package com.dku.council.domain.timetable.service;
 
+import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableLectureDto;
 import com.dku.council.domain.timetable.model.entity.Lecture;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
 import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
 import com.dku.council.domain.timetable.repository.LectureRepository;
 import com.dku.council.domain.timetable.repository.TimeTableRepository;
+import com.dku.council.domain.timetable.repository.spec.LectureSpec;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.LectureMock;
@@ -24,6 +27,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,7 +59,7 @@ class TimeTableServiceTest {
     private TimeTable table;
     private List<Lecture> lectures;
     private List<TimeTableLecture> lectureMappings;
-    private List<LectureDto> lectureDtos;
+    private List<TimeTableLectureDto> timeTableLectureDtos;
 
     @BeforeEach
     void setup() {
@@ -64,11 +70,30 @@ class TimeTableServiceTest {
                 .map(lecture -> new TimeTableLecture(lecture, "color" + lecture.getName()))
                 .collect(Collectors.toList());
         lectureMappings.forEach(lecture -> lecture.changeTimeTable(table));
-        lectureDtos = lectureMappings.stream()
-                .map(LectureDto::new)
+        timeTableLectureDtos = lectureMappings.stream()
+                .map(TimeTableLectureDto::new)
                 .collect(Collectors.toList());
     }
 
+
+    @Test
+    @DisplayName("수업 목록 조회")
+    void listLectures() {
+        // given
+        Specification<Lecture> spec = LectureSpec.withTitle("");
+        Pageable pageable = Pageable.unpaged();
+        Page<Lecture> pages = new DummyPage<>(lectures);
+        given(lectureRepository.findAll(spec, pageable)).willReturn(pages);
+
+        // when
+        Page<LectureDto> actual = service.listLectures(spec, pageable);
+
+        // then
+        List<LectureDto> lectureDtos = lectures.stream()
+                .map(LectureDto::new)
+                .collect(Collectors.toList());
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(lectureDtos);
+    }
 
     @Test
     @DisplayName("시간표 목록 조회")
@@ -103,7 +128,7 @@ class TimeTableServiceTest {
         // then
         assertThat(actual.getId()).isEqualTo(table.getId());
         assertThat(actual.getName()).isEqualTo(table.getName());
-        assertThat(actual.getLectures()).containsExactlyInAnyOrderElementsOf(lectureDtos);
+        assertThat(actual.getLectures()).containsExactlyInAnyOrderElementsOf(timeTableLectureDtos);
     }
 
     @Test

@@ -1,16 +1,23 @@
 package com.dku.council.domain.timetable.controller;
 
+import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
+import com.dku.council.domain.timetable.model.entity.Lecture;
+import com.dku.council.domain.timetable.repository.spec.LectureSpec;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +30,17 @@ import java.util.List;
 public class TimeTableController {
 
     private final TimeTableService timeTableService;
+
+    /**
+     * 수업 목록 조회
+     * <p>수업 목록을 조회합니다. 검색 키워드를 지정할 수 있으며, 지정하지 않으면 모든 수업 목록을 조회합니다.</p>
+     */
+    @GetMapping("/lecture")
+    public ResponsePage<LectureDto> listLectures(@RequestParam(required = false) String keyword,
+                                                 @ParameterObject Pageable pageable) {
+        Specification<Lecture> spec = LectureSpec.withTitle(keyword);
+        return new ResponsePage<>(timeTableService.listLectures(spec, pageable));
+    }
 
     /**
      * 내 시간표 목록 조회
@@ -69,7 +87,7 @@ public class TimeTableController {
      * 발생합니다.</p>
      *
      * @param tableId 시간표 ID
-     * @param dto 요청 body
+     * @param dto     요청 body
      * @return 변경된 시간표 ID
      */
     @PatchMapping("/{tableId}")
@@ -86,7 +104,7 @@ public class TimeTableController {
      * <p>시간표 이름을 변경합니다.</p>
      *
      * @param tableId 시간표 ID
-     * @param dto 요청 body
+     * @param dto     요청 body
      * @return 변경된 시간표 ID
      */
     @PatchMapping("/name/{tableId}")

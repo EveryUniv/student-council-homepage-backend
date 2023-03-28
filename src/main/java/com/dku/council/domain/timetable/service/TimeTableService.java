@@ -4,6 +4,7 @@ import com.dku.council.domain.timetable.exception.LectureNotFoundException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.model.entity.Lecture;
@@ -15,6 +16,9 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +33,13 @@ public class TimeTableService {
     private final UserRepository userRepository;
     private final LectureRepository lectureRepository;
     private final TimeTableRepository timeTableRepository;
+
+
+    @Transactional(readOnly = true)
+    public Page<LectureDto> listLectures(Specification<Lecture> spec, Pageable pageable) {
+        Page<Lecture> lectures = lectureRepository.findAll(spec, pageable);
+        return lectures.map(LectureDto::new);
+    }
 
     @Transactional(readOnly = true)
     public List<TimeTableInfoDto> list(Long userId) {
