@@ -1,11 +1,11 @@
 package com.dku.council.domain.user.controller;
 
+import com.dku.council.domain.user.model.UserSignupInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.service.DkuEmailService;
-import com.dku.council.infra.dku.model.StudentInfo;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -51,8 +51,8 @@ public class EmailController {
      */
     @GetMapping("/{signup-token}")
     public ResponseScrappedStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
-        StudentInfo studentInfo = service.getStudentInfo(signupToken);
-        return new ResponseScrappedStudentInfoDto(studentInfo);
+        UserSignupInfo info = service.getStudentInfo(signupToken);
+        return new ResponseScrappedStudentInfoDto(info);
     }
 
 

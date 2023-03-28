@@ -2,6 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
+import com.dku.council.domain.user.model.UserSignupInfo;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
@@ -9,7 +10,9 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.util.CodeGenerator;
+import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
+import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.service.DkuAuthenticationService;
 import com.dku.council.infra.dku.service.DkuCrawlerService;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.YearMonth;
 import java.util.Optional;
 
 @Service
@@ -40,9 +44,9 @@ public class DKUAuthService {
      * @param signupToken 회원가입 토큰
      * @throws NotDKUAuthorizedException 학생 인증을 하지 않았을 경우
      */
-    public StudentInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
+    public UserSignupInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
         Instant now = Instant.now(clock);
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class, now)
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, UserSignupInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 
@@ -69,11 +73,22 @@ public class DKUAuthService {
 
         DkuAuth auth = authenticationService.loginWebInfo(dto.getDkuStudentId(), dto.getDkuPassword());
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
+        StudentDuesStatus duesStatus;
 
-        Instant now = Instant.now(clock);
-        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo, now);
+        if (studentInfo.getStudentState().equals("졸업")) {
+            duesStatus = StudentDuesStatus.NOT_PAID;
+        } else {
+            try {
+                duesStatus = crawlerService.crawlStudentDues(auth, YearMonth.now(clock));
+            } catch (DkuFailedCrawlingException e) {
+                duesStatus = StudentDuesStatus.NOT_PAID;
+            }
+        }
 
-        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
+        UserSignupInfo info = new UserSignupInfo(studentInfo, duesStatus);
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, Instant.now(clock));
+
+        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(info);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
     }
 
