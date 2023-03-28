@@ -1,4 +1,4 @@
-package com.dku.council.global.dto;
+package com.dku.council.global.model.dto;
 
 import lombok.Getter;
 

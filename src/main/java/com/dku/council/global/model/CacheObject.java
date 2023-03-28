@@ -1,4 +1,4 @@
-package com.dku.council.global.component.model;
+package com.dku.council.global.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

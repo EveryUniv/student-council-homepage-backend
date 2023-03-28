@@ -14,7 +14,7 @@ import com.dku.council.domain.rental.service.RentalService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
-import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;

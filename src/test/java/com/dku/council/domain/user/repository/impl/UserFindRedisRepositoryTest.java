@@ -1,8 +1,8 @@
 package com.dku.council.domain.user.repository.impl;
 
 import com.dku.council.domain.user.model.SMSAuth;
-import com.dku.council.global.component.model.CacheObject;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.global.model.CacheObject;
 import com.dku.council.util.ClockUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
