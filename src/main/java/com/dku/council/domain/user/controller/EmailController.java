@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @Tag(name = "단국대학교 학생 인증-email", description = "단국대학교 학생 인증 관련 api")
-// TODO 향후 이메일 인증이 필요하면 활성화 합니다.
 //@RestController
 @RequestMapping("/user/email")
 @RequiredArgsConstructor

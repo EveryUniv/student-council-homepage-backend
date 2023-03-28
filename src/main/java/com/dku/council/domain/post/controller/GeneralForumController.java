@@ -141,7 +141,6 @@ public class GeneralForumController {
     /**
      * 게시글 댓글 수정
      * 댓글을 수정할 수 있는 사람은 본인뿐입니다. Admin도 다른 사람의 댓글은 수정할 수 없습니다. (조작 의혹 방지)
-     * todo 수정시 로그 남도록 하자
      *
      * @param id         댓글 id
      * @param commentDto 수정할 댓글 내용(text)

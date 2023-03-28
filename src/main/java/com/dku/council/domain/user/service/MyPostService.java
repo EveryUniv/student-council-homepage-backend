@@ -50,6 +50,7 @@ public class MyPostService {
         );
     }
 
+    // TODO Comment별 post가 중복되지 않게 가져와야 함.
     @Transactional(readOnly = true)
     public Page<CommentedPostResponseDto> listMyCommentedPosts(Long userId, Pageable pageable){
         Page<Comment> comments = commentRepository.findAllByUserId(userId, pageable);
