@@ -2,6 +2,7 @@ package com.dku.council.domain.post.model.dto.response;
 
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
+import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -21,18 +22,20 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
     @Schema(description = "청원 마감일")
     private final LocalDate expiresAt;
 
-    @Schema(description = "댓글 개수 (동의 인원)", example = "48")
-    private final int commentCount;
+    @Schema(description = "동의 인원", example = "48")
+    private final int agreeCount;
 
     @Schema(hidden = true)
     @JsonIgnore
     private final int likes = 0;
+    private final PetitionStatisticDto statistic;
 
-    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime) {
+    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime, PetitionStatisticDto statisticDto) {
         super(dto);
         this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
         this.expiresAt = post.getCreatedAt().plus(expiresTime).toLocalDate();
-        this.commentCount = post.getComments().size();
+        this.agreeCount = post.getComments().size();
+        this.statistic = statisticDto;
     }
 }

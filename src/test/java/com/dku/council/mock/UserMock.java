@@ -29,6 +29,11 @@ public class UserMock {
         return createDummyMajor(RandomGen.nextLong());
     }
 
+    public static User createMajor(String major, String department){
+        return create(RandomGen.nextLong(), NAME, UserRole.USER, MajorMock.create(major, department), null);
+    }
+
+
     public static User createDummyMajor(Long userId) {
         return create(userId, NAME, UserRole.USER, MAJOR, null);
     }
