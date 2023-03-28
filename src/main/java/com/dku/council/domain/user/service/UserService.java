@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;

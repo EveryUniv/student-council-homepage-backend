@@ -20,4 +20,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "and c.user.id=:userId " +
             "and (c.status='ACTIVE' or c.status='EDITED')")
     List<Comment> findAllByPostIdAndUserId(Long postId, Long userId);
+
+    Page<Comment> findAllByUserId(Long userId, Pageable pageable);
 }

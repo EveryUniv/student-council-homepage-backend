@@ -152,6 +152,7 @@ public class GenericPostService<E extends Post> {
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 
+
     /**
      * 게시글 삭제. 실제 DB에서 삭제처리되지 않고 표시만 해둔다.
      *
