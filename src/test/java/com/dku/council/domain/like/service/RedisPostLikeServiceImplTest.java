@@ -215,7 +215,7 @@ class RedisPostLikeServiceImplTest {
         List<LikeEntry> likes = Stream.concat(likeStream, cancelledStream)
                 .collect(Collectors.toList());
 
-        when(memoryRepository.getAllPostLikes()).thenReturn(likes);
+        when(memoryRepository.getAllPostLikesAndClear()).thenReturn(likes);
         when(userRepository.getReferenceById(any()))
                 .thenAnswer(inv -> UserMock.createDummyMajor(inv.getArgument(0)));
         when(postRepository.getReferenceById(any()))

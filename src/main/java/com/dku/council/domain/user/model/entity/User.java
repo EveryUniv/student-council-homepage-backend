@@ -3,6 +3,7 @@ package com.dku.council.domain.user.model.entity;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
+import com.dku.council.infra.dku.model.StudentDuesStatus;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -43,6 +44,11 @@ public class User extends BaseEntity {
 
     private Integer yearOfAdmission;
 
+    private String academicStatus;
+
+    @Enumerated(STRING)
+    private StudentDuesStatus duesStatus;
+
     @NotNull
     private String phone;
 
@@ -60,6 +66,8 @@ public class User extends BaseEntity {
                  @NonNull Major major,
                  @NonNull String phone,
                  @NonNull String nickname,
+                 @NonNull String academicStatus,
+                 @NonNull StudentDuesStatus duesStatus,
                  Integer yearOfAdmission,
                  UserStatus status,
                  UserRole role) {
@@ -69,7 +77,9 @@ public class User extends BaseEntity {
         this.major = major;
         this.phone = phone;
         this.nickname = nickname;
+        this.academicStatus = academicStatus;
         this.yearOfAdmission = yearOfAdmission;
+        this.duesStatus = duesStatus;
         this.status = status;
         this.userRole = role;
     }
@@ -83,7 +93,9 @@ public class User extends BaseEntity {
         this.password = encodedPassword;
     }
 
-    public void changeNickName(String nickname){ this.nickname = nickname; }
+    public void changeNickName(String nickname) {
+        this.nickname = nickname;
+    }
 
     public void changePhone(String phone) {
         this.phone = phone;

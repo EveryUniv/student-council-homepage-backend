@@ -15,10 +15,17 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@SequenceGenerator(
+        name = "lecture_seq_generator",
+        allocationSize = 300
+)
 public class Lecture extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "lecture_seq_generator"
+    )
     @Column(name = "lecture_id")
     private Long id;
 
@@ -30,25 +37,13 @@ public class Lecture extends BaseEntity {
 
     private String professor;
 
-    private String place;
-
     @OneToMany(mappedBy = "lecture", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<LectureTime> lectureTimes = new ArrayList<>();
 
 
     @Builder
-    private Lecture(String name, String professor, String place) {
+    private Lecture(String name, String professor) {
         this.name = name;
         this.professor = professor;
-        this.place = place;
-    }
-
-    public void changeTimeTable(TimeTable timetable) {
-        if (this.timetable != null) {
-            this.timetable.getLectures().remove(this);
-        }
-
-        this.timetable = timetable;
-        this.timetable.getLectures().add(this);
     }
 }

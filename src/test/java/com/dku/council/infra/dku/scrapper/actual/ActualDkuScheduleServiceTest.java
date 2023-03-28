@@ -1,9 +1,9 @@
-package com.dku.council.infra.dku.service.actual;
+package com.dku.council.infra.dku.scrapper.actual;
 
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.ScheduleInfo;
-import com.dku.council.infra.dku.service.DkuAuthenticationService;
-import com.dku.council.infra.dku.service.DkuScheduleService;
+import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
+import com.dku.council.infra.dku.scrapper.DkuScheduleService;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;

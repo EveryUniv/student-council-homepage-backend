@@ -19,7 +19,10 @@ import static lombok.AccessLevel.PROTECTED;
 public class LectureTime extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "lecture_seq_generator"
+    )
     @Column(name = "lectime_id")
     private Long id;
 
@@ -31,15 +34,18 @@ public class LectureTime extends BaseEntity {
 
     private LocalTime endTime;
 
+    private String place;
+
     @Enumerated(STRING)
     private DayOfWeek week;
 
 
     @Builder
-    private LectureTime(LocalTime startTime, LocalTime endTime, DayOfWeek week) {
+    private LectureTime(LocalTime startTime, LocalTime endTime, DayOfWeek week, String place) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.week = week;
+        this.place = place;
     }
 
     public void changeLecture(Lecture lecture) {

@@ -19,14 +19,14 @@ public class TimeTableDto {
     private final String name;
 
     @Schema(description = "수업 목록")
-    private final List<LectureDto> lectures;
+    private final List<TimeTableLectureDto> lectures;
 
 
     public TimeTableDto(TimeTable timeTable) {
         this.id = timeTable.getId();
         this.name = timeTable.getName();
         this.lectures = timeTable.getLectures().stream()
-                .map(LectureDto::new)
+                .map(TimeTableLectureDto::new)
                 .collect(Collectors.toList());
     }
 }

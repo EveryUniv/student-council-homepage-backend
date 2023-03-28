@@ -23,9 +23,13 @@ public class LectureTimeDto {
     @Schema(description = "요일")
     private final DayOfWeek week;
 
+    @Schema(description = "수업 장소")
+    private final String place;
+
     public LectureTimeDto(LectureTime lectureTime) {
         this.start = lectureTime.getStartTime();
         this.end = lectureTime.getEndTime();
         this.week = lectureTime.getWeek();
+        this.place = lectureTime.getPlace();
     }
 }

@@ -1,4 +1,4 @@
-package com.dku.council.infra.dku.service;
+package com.dku.council.infra.dku.scrapper;
 
 import com.dku.council.global.config.webclient.ChromeAgentWebClient;
 import com.dku.council.global.util.WebUtil;
