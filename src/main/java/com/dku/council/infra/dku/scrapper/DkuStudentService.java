@@ -104,10 +104,7 @@ public class DkuStudentService extends DkuScrapper {
             return false;
         }
 
-        int monthValue = yearMonth.getMonthValue();
-        if (monthValue >= 2 && monthValue < 9) {
-            return semester.equals("1");
-        } else return semester.equals("2");
+        return semester.equals(getSemester(yearMonth));
     }
 
     private StudentInfo parseStudentInfoHtml(String html) {

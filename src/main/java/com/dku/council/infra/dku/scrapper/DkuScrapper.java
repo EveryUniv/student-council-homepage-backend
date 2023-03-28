@@ -5,6 +5,8 @@ import com.dku.council.infra.dku.model.DkuAuth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.YearMonth;
+
 @RequiredArgsConstructor
 class DkuScrapper {
 
@@ -13,10 +15,7 @@ class DkuScrapper {
     protected String requestWebInfo(DkuAuth auth, String uri) {
         String result;
         try {
-            result = webClient.post()
-                    .uri(uri)
-                    .cookies(auth.authCookies())
-                    .header("Referer", "https://webinfo.dankook.ac.kr/")
+            result = makeRequestWebInfo(auth, uri)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -34,10 +33,7 @@ class DkuScrapper {
     protected <T> T requestPortal(DkuAuth auth, String uri, Class<T> clazz) {
         T result;
         try {
-            result = webClient.post()
-                    .uri(uri)
-                    .cookies(auth.authCookies())
-                    .header("Referer", "https://portal.dankook.ac.kr/p/S01/")
+            result = makeRequest(auth, uri, "https://portal.dankook.ac.kr/p/S01/")
                     .retrieve()
                     .bodyToMono(clazz)
                     .block();
@@ -50,5 +46,25 @@ class DkuScrapper {
         }
 
         return result;
+    }
+
+    protected WebClient.RequestBodySpec makeRequestWebInfo(DkuAuth auth, String uri) {
+        return makeRequest(auth, uri, "https://webinfo.dankook.ac.kr/");
+    }
+
+    private WebClient.RequestBodySpec makeRequest(DkuAuth auth, String uri, String referer) {
+        return webClient.post()
+                .uri(uri)
+                .cookies(auth.authCookies())
+                .header("Referer", referer);
+    }
+
+    public static String getSemester(YearMonth yearMonth) {
+        int month = yearMonth.getMonthValue();
+        if (month >= 2 && month <= 8) {
+            return "1";
+        } else {
+            return "2";
+        }
     }
 }
