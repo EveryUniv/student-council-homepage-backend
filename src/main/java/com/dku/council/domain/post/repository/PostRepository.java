@@ -1,5 +1,6 @@
 package com.dku.council.domain.post.repository;
 
+import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;

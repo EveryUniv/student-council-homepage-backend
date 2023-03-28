@@ -18,7 +18,7 @@ public class CommentedPostResponseDto {
     @Schema(description = "본문", example = "내용")
     private final String body;
 
-    @Schema(description = "", example = "익명")
+    @Schema(description = "댓글 아이디", example = "익명")
     private final Long commentId;
 
     @Schema(description = "댓글 내용", example = "댓글")

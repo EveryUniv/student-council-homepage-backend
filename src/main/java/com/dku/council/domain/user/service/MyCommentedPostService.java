@@ -4,6 +4,7 @@ import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.model.dto.CommentedPostResponseDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

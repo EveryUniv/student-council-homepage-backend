@@ -3,7 +3,7 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.like.repository.PostLikePersistenceRepository;
 import com.dku.council.domain.like.service.PostLikeService;
-import com.dku.council.domain.post.model.dto.list.SummarizedPostDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,11 +20,11 @@ public class MyLikedPostService {
     private final PostLikeService postLikeService;
 
     @Transactional(readOnly = true)
-    public Page<SummarizedPostDto> listMyLikedPosts(Long userId, Pageable pageable, int bodySize){
+    public Page<SummarizedGenericPostDto> listMyLikedPosts(Long userId, Pageable pageable, int bodySize){
         Page<PostLike> list = postLikeRepository.findAllByUserId(userId, pageable);
 
         return list.map(
-                e -> new SummarizedPostDto(fileUploadService.getBaseURL(),
+                e -> new SummarizedGenericPostDto(fileUploadService.getBaseURL(),
                         bodySize,
                         postLikeService.getCountOfLikes(e.getPost().getId()), e.getPost())
         );

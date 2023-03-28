@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.controller;
 
 import com.dku.council.domain.comment.model.dto.CommentedPostResponseDto;
-import com.dku.council.domain.post.model.dto.list.SummarizedPostDto;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
@@ -172,10 +172,10 @@ public class UserController {
      */
     @GetMapping("/post")
     @UserOnly
-    public ResponsePage<SummarizedPostDto> listMyPosts(AppAuthentication auth,
-                                                       @ParameterObject Pageable pageable,
-                                                       @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedPostDto> posts = myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
+    public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
+                                                              @ParameterObject Pageable pageable,
+                                                              @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedGenericPostDto> posts = myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(posts);
     }
 
@@ -195,10 +195,10 @@ public class UserController {
      */
     @GetMapping("/post/liked")
     @UserOnly
-    public ResponsePage<SummarizedPostDto> listMyLikedPosts(AppAuthentication auth,
+    public ResponsePage<SummarizedGenericPostDto> listMyLikedPosts(AppAuthentication auth,
                                                                    @ParameterObject Pageable pageable,
                                                                    @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedPostDto> likedPosts = myLikedPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
+        Page<SummarizedGenericPostDto> likedPosts = myLikedPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(likedPosts);
     }
 }
