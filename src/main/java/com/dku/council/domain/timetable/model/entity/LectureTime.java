@@ -31,15 +31,18 @@ public class LectureTime extends BaseEntity {
 
     private LocalTime endTime;
 
+    private String place;
+
     @Enumerated(STRING)
     private DayOfWeek week;
 
 
     @Builder
-    private LectureTime(LocalTime startTime, LocalTime endTime, DayOfWeek week) {
+    private LectureTime(LocalTime startTime, LocalTime endTime, DayOfWeek week, String place) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.week = week;
+        this.place = place;
     }
 
     public void changeLecture(Lecture lecture) {

@@ -1,14 +1,15 @@
 package com.dku.council.domain.timetable.service;
 
+import com.dku.council.domain.timetable.exception.LectureNotFoundException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.response.LectureDto;
-import com.dku.council.domain.timetable.model.dto.response.LectureTimeDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
 import com.dku.council.domain.timetable.model.entity.Lecture;
-import com.dku.council.domain.timetable.model.entity.LectureTime;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
+import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
+import com.dku.council.domain.timetable.repository.LectureRepository;
 import com.dku.council.domain.timetable.repository.TimeTableRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class TimeTableService {
 
     private final UserRepository userRepository;
+    private final LectureRepository lectureRepository;
     private final TimeTableRepository timeTableRepository;
 
     @Transactional(readOnly = true)
@@ -59,7 +61,7 @@ public class TimeTableService {
         return timeTable.getId();
     }
 
-    public Long update(Long userId, Long tableId, List<LectureDto> lectures) {
+    public Long update(Long userId, Long tableId, List<RequestLectureDto> lectureDtos) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
 
@@ -67,7 +69,7 @@ public class TimeTableService {
             throw new TimeTableNotFoundException();
 
         table.getLectures().clear();
-        appendLecturesEntity(table, lectures);
+        appendLecturesEntity(table, lectureDtos);
 
         return table.getId();
     }
@@ -80,28 +82,22 @@ public class TimeTableService {
             throw new TimeTableNotFoundException();
 
         table.changeName(name);
-        System.out.println(table.getName());
         return table.getId();
     }
 
-    private void appendLecturesEntity(TimeTable table, List<LectureDto> lectures) {
-        for (LectureDto lecDto : lectures) {
-            Lecture lecture = Lecture.builder()
-                    .name(lecDto.getName())
-                    .professor(lecDto.getProfessor())
-                    .place(lecDto.getPlace())
-                    .build();
+    private void appendLecturesEntity(TimeTable table, List<RequestLectureDto> lectureDtos) {
+        List<Long> idList = lectureDtos.stream()
+                .map(RequestLectureDto::getId)
+                .collect(Collectors.toList());
+        List<Lecture> lectures = lectureRepository.findAllById(idList);
 
-            for (LectureTimeDto timeDto : lecDto.getTimes()) {
-                LectureTime lectureTime = LectureTime.builder()
-                        .week(timeDto.getWeek())
-                        .startTime(timeDto.getStart())
-                        .endTime(timeDto.getEnd())
-                        .build();
-                lectureTime.changeLecture(lecture);
-            }
+        if (lectures.size() != lectureDtos.size()) {
+            throw new LectureNotFoundException();
+        }
 
-            lecture.changeTimeTable(table);
+        for (int i = 0; i < lectureDtos.size(); i++) {
+            TimeTableLecture mapping = new TimeTableLecture(lectures.get(i), lectureDtos.get(i).getColor());
+            mapping.changeTimeTable(table);
         }
     }
 

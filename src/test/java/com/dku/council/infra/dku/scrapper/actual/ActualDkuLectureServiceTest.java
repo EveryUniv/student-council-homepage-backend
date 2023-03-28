@@ -5,10 +5,7 @@ import com.dku.council.infra.dku.model.Subject;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuLectureService;
 import com.dku.council.util.YamlProperties;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -52,6 +49,7 @@ class ActualDkuLectureServiceTest {
 
     @Test
     @DisplayName("강의 정보 스크래핑 테스트")
+    @Disabled
     public void actualRetrieveLecture() {
         DkuAuth auth = authService.loginWebInfo(id, password);
 

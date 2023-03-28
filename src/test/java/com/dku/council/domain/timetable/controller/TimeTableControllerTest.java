@@ -1,6 +1,7 @@
 package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
@@ -42,17 +43,26 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     private final LocalTime start = LocalTime.of(10, 0);
     private final LocalTime end = LocalTime.of(13, 0);
     private List<LectureDto> testLectures;
+    private List<RequestLectureDto> requestLectureDto;
 
     @BeforeEach
     void setup() {
         testLectures = List.of(
-                new LectureDto("name", "professor", "place", List.of(
-                        new LectureTimeDto(start, end, DayOfWeek.MONDAY),
-                        new LectureTimeDto(start, end, DayOfWeek.THURSDAY)
-                )),
-                new LectureDto("name2", "professor2", "place2", List.of(
-                        new LectureTimeDto(start, end, DayOfWeek.MONDAY)
-                ))
+                new LectureDto("name", "professor", "ffffff",
+                        List.of(
+                                new LectureTimeDto(start, end, DayOfWeek.MONDAY, "place1"),
+                                new LectureTimeDto(start, end, DayOfWeek.THURSDAY, "place2")
+                        )),
+                new LectureDto("name2", "professor2", "aaaaaa",
+                        List.of(
+                                new LectureTimeDto(start, end, DayOfWeek.MONDAY, "place")
+                        ))
+        );
+
+        requestLectureDto = List.of(
+                new RequestLectureDto(1L, "color1"),
+                new RequestLectureDto(2L, "color2"),
+                new RequestLectureDto(3L, "color3")
         );
     }
 
@@ -89,26 +99,29 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.name").value("name"))
                 .andExpect(jsonPath("$.lectures[0].name").value("name"))
                 .andExpect(jsonPath("$.lectures[0].professor").value("professor"))
-                .andExpect(jsonPath("$.lectures[0].place").value("place"))
+                .andExpect(jsonPath("$.lectures[0].color").value("ffffff"))
                 .andExpect(jsonPath("$.lectures[0].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[0].end").value("13:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[0].week").value(DayOfWeek.MONDAY.name()))
+                .andExpect(jsonPath("$.lectures[0].times[0].place").value("place1"))
                 .andExpect(jsonPath("$.lectures[0].times[1].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[1].end").value("13:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[1].week").value(DayOfWeek.THURSDAY.name()))
+                .andExpect(jsonPath("$.lectures[0].times[1].place").value("place2"))
                 .andExpect(jsonPath("$.lectures[1].name").value("name2"))
                 .andExpect(jsonPath("$.lectures[1].professor").value("professor2"))
-                .andExpect(jsonPath("$.lectures[1].place").value("place2"))
+                .andExpect(jsonPath("$.lectures[1].color").value("aaaaaa"))
                 .andExpect(jsonPath("$.lectures[1].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[1].times[0].end").value("13:00:00"))
-                .andExpect(jsonPath("$.lectures[1].times[0].week").value(DayOfWeek.MONDAY.name()));
+                .andExpect(jsonPath("$.lectures[1].times[0].week").value(DayOfWeek.MONDAY.name()))
+                .andExpect(jsonPath("$.lectures[1].times[0].place").value("place"));
     }
 
     @Test
     @DisplayName("시간표 생성")
     void create() throws Exception {
         // given
-        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", testLectures);
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", requestLectureDto);
         given(timeTableService.create(eq(USER_ID), any())).willReturn(3L);
 
         // when
@@ -124,7 +137,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 수정")
     void update() throws Exception {
         // given
-        UpdateTimeTableRequestDto dto = new UpdateTimeTableRequestDto(testLectures);
+        UpdateTimeTableRequestDto dto = new UpdateTimeTableRequestDto(requestLectureDto);
         given(timeTableService.update(eq(USER_ID), eq(3L), any())).willReturn(3L);
 
         // when
