@@ -1,11 +1,11 @@
-package com.dku.council.infra.dku.service.actual;
+package com.dku.council.infra.dku.scrapper.actual;
 
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
-import com.dku.council.infra.dku.service.DkuAuthenticationService;
-import com.dku.council.infra.dku.service.DkuCrawlerService;
+import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
+import com.dku.council.infra.dku.scrapper.DkuStudentService;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
@@ -15,11 +15,11 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.YearMonth;
 
-class ActualDkuCrawlerServiceTest {
+class ActualDkuStudentServiceTest {
 
     private static YamlProperties properties;
     private DkuAuthenticationService authService;
-    private DkuCrawlerService service;
+    private DkuStudentService service;
 
     private String id;
     private String password;
@@ -45,7 +45,7 @@ class ActualDkuCrawlerServiceTest {
         String feePath = properties.get("dku.student-info.fee-api-path");
 
         this.authService = new DkuAuthenticationService(webClient, webinfoLoginPath, infoPath);
-        this.service = new DkuCrawlerService(webClient, infoPath, feePath);
+        this.service = new DkuStudentService(webClient, infoPath, feePath);
     }
 
     @Test

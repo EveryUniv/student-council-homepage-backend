@@ -1,4 +1,4 @@
-package com.dku.council.infra.dku.service;
+package com.dku.council.infra.dku.scrapper;
 
 import com.dku.council.global.config.webclient.ChromeAgentWebClient;
 import com.dku.council.global.error.exception.UnexpectedResponseException;
@@ -6,7 +6,6 @@ import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,17 +20,18 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
-public class DkuCrawlerService {
+public class DkuStudentService extends DkuScrapper {
 
-    @ChromeAgentWebClient
-    private final WebClient webClient;
-
-    @Value("${dku.student-info.info-api-path}")
     private final String studentInfoApiPath;
-
-    @Value("${dku.student-info.fee-api-path}")
     private final String feeInfoApiPath;
+
+    public DkuStudentService(@ChromeAgentWebClient WebClient webClient,
+                             @Value("${dku.student-info.info-api-path}") String studentInfoApiPath,
+                             @Value("${dku.student-info.fee-api-path}") String feeInfoApiPath) {
+        super(webClient);
+        this.studentInfoApiPath = studentInfoApiPath;
+        this.feeInfoApiPath = feeInfoApiPath;
+    }
 
 
     /**
@@ -41,7 +41,7 @@ public class DkuCrawlerService {
      * @return 학생 정보
      */
     public StudentInfo crawlStudentInfo(DkuAuth auth) {
-        String html = request(auth, studentInfoApiPath);
+        String html = requestWebInfo(auth, studentInfoApiPath);
         return parseStudentInfoHtml(html);
     }
 
@@ -52,24 +52,8 @@ public class DkuCrawlerService {
      * @return 학생 정보
      */
     public StudentDuesStatus crawlStudentDues(DkuAuth auth, YearMonth yearMonth) {
-        String html = request(auth, feeInfoApiPath);
+        String html = requestWebInfo(auth, feeInfoApiPath);
         return parseDuesStatusHtml(html, yearMonth);
-    }
-
-    private String request(DkuAuth auth, String uri) {
-        String result;
-        try {
-            result = webClient.post()
-                    .uri(uri)
-                    .cookies(auth.authCookies())
-                    .header("Referer", "https://webinfo.dankook.ac.kr/")
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        } catch (Throwable t) {
-            throw new DkuFailedCrawlingException(t);
-        }
-        return result;
     }
 
     private StudentDuesStatus parseDuesStatusHtml(String html, YearMonth yearMonth) {

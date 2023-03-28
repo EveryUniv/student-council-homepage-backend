@@ -1,4 +1,4 @@
-package com.dku.council.infra.dku.service;
+package com.dku.council.infra.dku.scrapper;
 
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -17,15 +17,15 @@ import java.time.YearMonth;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DkuCrawlerServiceTest extends AbstractMockServerTest {
+class DkuStudentServiceTest extends AbstractMockServerTest {
 
-    private DkuCrawlerService service;
+    private DkuStudentService service;
 
     @BeforeEach
     void beforeEach() {
         WebClient webClient = WebClient.create();
         String path = "http://localhost:" + mockServer.getPort();
-        this.service = new DkuCrawlerService(webClient, path, path);
+        this.service = new DkuStudentService(webClient, path, path);
     }
 
     @Test

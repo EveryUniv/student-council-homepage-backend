@@ -11,8 +11,8 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
-import com.dku.council.infra.dku.service.DkuAuthenticationService;
-import com.dku.council.infra.dku.service.DkuCrawlerService;
+import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
+import com.dku.council.infra.dku.scrapper.DkuStudentService;
 import com.dku.council.mock.UserMock;
 import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ class DKUAuthServiceTest {
     private final Clock clock = ClockUtil.create();
 
     @Mock
-    private DkuCrawlerService crawlerService;
+    private DkuStudentService crawlerService;
 
     @Mock
     private DkuAuthenticationService authenticationService;

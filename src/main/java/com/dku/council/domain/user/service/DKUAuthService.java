@@ -14,8 +14,8 @@ import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
-import com.dku.council.infra.dku.service.DkuAuthenticationService;
-import com.dku.council.infra.dku.service.DkuCrawlerService;
+import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
+import com.dku.council.infra.dku.scrapper.DkuStudentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +32,7 @@ public class DKUAuthService {
     public static final String DKU_AUTH_NAME = "dku";
 
     private final Clock clock;
-    private final DkuCrawlerService crawlerService;
+    private final DkuStudentService crawlerService;
     private final DkuAuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final SignupAuthRepository dkuAuthRepository;
