@@ -19,7 +19,10 @@ import static lombok.AccessLevel.PROTECTED;
 public class LectureTime extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "lecture_seq_generator"
+    )
     @Column(name = "lectime_id")
     private Long id;
 

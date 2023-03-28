@@ -15,7 +15,8 @@ public class LectureDumpScheduler {
     private final Clock clock;
     private final LectureRetrieveService service;
 
-    @Scheduled(cron = "${dku.lecture.cron}")
+    //@Scheduled(cron = "${dku.lecture.cron}")
+    @Scheduled(fixedDelayString = "PT30M")
     public void loadToDB() {
         YearMonth now = YearMonth.now(clock);
         service.reloadLectures(now);

@@ -38,7 +38,7 @@ public class TimeTableController {
 
     /**
      * 내 시간표 단건 조회
-     * <p>시간표에 어떤 수업이 있는지 구체적으로 조회합니다.</p>
+     * <p>시간표에 어떤 수업이 있는지 구체적으로 조회합니다. 장소는 지정되지 않은경우 null이 반환됩니다.</p>
      *
      * @param tableId 시간표 ID
      * @return 시간표 수업 목록
@@ -51,8 +51,7 @@ public class TimeTableController {
 
     /**
      * 시간표 추가
-     * <p>시간표 이름을 입력받아 시간표를 추가합니다. 같은 이름의 시간표가 이미 있는 경우에는
-     * 오류가 발생합니다.</p>
+     * <p>시간표 이름을 입력받아 시간표를 추가합니다.</p>
      *
      * @param dto 요청 body
      * @return 생성된 시간표 ID
@@ -66,9 +65,10 @@ public class TimeTableController {
 
     /**
      * 시간표 변경
-     * <p>시간표 이름을 입력받아 시간표를 변경합니다. 시간표를 찾을 수 없는 경우 오류가
+     * <p>시간표 아이디를 입력받아 시간표를 변경합니다. 시간표를 찾을 수 없는 경우 오류가
      * 발생합니다.</p>
      *
+     * @param tableId 시간표 ID
      * @param dto 요청 body
      * @return 변경된 시간표 ID
      */
@@ -85,6 +85,7 @@ public class TimeTableController {
      * 시간표 이름 변경
      * <p>시간표 이름을 변경합니다.</p>
      *
+     * @param tableId 시간표 ID
      * @param dto 요청 body
      * @return 변경된 시간표 ID
      */

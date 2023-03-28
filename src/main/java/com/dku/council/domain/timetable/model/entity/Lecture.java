@@ -15,10 +15,17 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
+@SequenceGenerator(
+        name = "lecture_seq_generator",
+        allocationSize = 300
+)
 public class Lecture extends BaseEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "lecture_seq_generator"
+    )
     @Column(name = "lecture_id")
     private Long id;
 
