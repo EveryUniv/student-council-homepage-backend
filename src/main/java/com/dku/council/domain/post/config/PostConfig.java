@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.config;
 
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.entity.posttype.*;
 import com.dku.council.domain.post.repository.*;
 import com.dku.council.domain.post.service.GenericPostService;
@@ -20,36 +20,36 @@ public class PostConfig {
     private final TagService tagService;
     private final ViewCountService viewCountService;
     private final FileUploadService fileUploadService;
-    private final PostLikeService postLikeService;
+    private final LikeService likeService;
 
     // TODO 이거 좀 더 깔끔하게 하고싶다 (자동화)
     @Bean
     public GenericPostService<Conference> conferencePostService(ConferenceRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 
     @Bean
     public GenericPostService<GeneralForum> generalForumPostService(GeneralForumRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 
     @Bean
     public GenericPostService<News> newsPostService(NewsRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 
     @Bean
     public GenericPostService<Rule> rulePostService(RuleRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 
     @Bean
     public GenericPostService<Petition> petitionPostService(PetitionRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 
     @Bean
     public GenericPostService<Voc> vocPostService(VocRepository repository) {
-        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
 }

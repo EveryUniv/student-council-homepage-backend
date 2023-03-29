@@ -1,6 +1,6 @@
 package com.dku.council.domain.bus.model;
 
-import com.dku.council.global.component.model.CacheObject;
+import com.dku.council.global.model.CacheObject;
 import com.dku.council.infra.bus.model.BusArrival;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

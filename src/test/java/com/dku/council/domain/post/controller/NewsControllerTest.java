@@ -9,7 +9,7 @@ import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
-import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.TagMock;

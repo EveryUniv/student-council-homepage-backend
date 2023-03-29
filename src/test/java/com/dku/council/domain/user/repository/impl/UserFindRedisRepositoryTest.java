@@ -1,8 +1,8 @@
 package com.dku.council.domain.user.repository.impl;
 
 import com.dku.council.domain.user.model.SMSAuth;
-import com.dku.council.global.component.model.CacheObject;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.global.model.CacheObject;
 import com.dku.council.util.ClockUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
@@ -63,7 +63,7 @@ class UserFindRedisRepositoryTest {
         }))).thenReturn("json");
 
         // when
-        repository.setPwdAuthCode("token", "code", "phone", now);
+        repository.setAuthCode("token", "code", "phone", now);
 
         // then
         verify(ops).put(
@@ -89,7 +89,7 @@ class UserFindRedisRepositoryTest {
         when(objectMapper.readValue(eq(json), (JavaType) isNull())).thenReturn(obj);
 
         // when
-        Optional<SMSAuth> auth = repository.getPwdAuthCode(token, now);
+        Optional<SMSAuth> auth = repository.getAuthCode(token, now);
 
         // then
         assertThat(auth.orElseThrow()).isEqualTo(expected);

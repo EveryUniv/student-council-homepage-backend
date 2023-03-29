@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,4 +87,5 @@ public class UserService {
             throw new WrongPasswordException();
         }
     }
+
 }

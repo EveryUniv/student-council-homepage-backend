@@ -5,7 +5,7 @@ import com.dku.council.domain.tag.model.dto.RequestRenameTagDto;
 import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.global.auth.role.AdminOnly;
-import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

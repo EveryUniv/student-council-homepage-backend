@@ -7,6 +7,8 @@ import com.dku.council.domain.comment.exception.CommentNotFoundException;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.comment.model.entity.CommentLog;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.PostRepository;
@@ -27,6 +29,7 @@ public class CommentService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final LikeService likeService;
     private final CommentRepository commentRepository;
     private final CommentLogRepository commentLogRepository;
 
@@ -58,7 +61,10 @@ public class CommentService {
         return commentRepository.findAllByPostId(postId, pageable)
                 .map(e -> {
                     String author = authorMapper == null ? Post.ANONYMITY : authorMapper.mapAuthor(e);
-                    return new CommentDto(e, author, e.getUser().getId().equals(userId));
+                    return new CommentDto(e, author,
+                            likeService.getCountOfLikes(e.getId(), LikeTarget.COMMENT),
+                            e.getUser().getId().equals(userId),
+                            likeService.isLiked(e.getId(), userId, LikeTarget.COMMENT));
                 });
     }
 

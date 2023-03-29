@@ -1,6 +1,6 @@
 package com.dku.council.global.base;
 
-import com.dku.council.global.component.model.CacheObject;
+import com.dku.council.global.model.CacheObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
