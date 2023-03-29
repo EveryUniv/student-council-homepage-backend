@@ -4,6 +4,7 @@ import com.dku.council.domain.like.model.LikeTarget;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+// TODO POST, Comment로 분리
 public interface LikeService {
 
     /**
