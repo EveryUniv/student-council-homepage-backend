@@ -11,5 +11,5 @@ import java.util.List;
 public class UpdateTimeTableRequestDto {
 
     @NotNull
-    private final List<RequestLectureDto> lectures;
+    private final List<RequestScheduleDto> lectures;
 }

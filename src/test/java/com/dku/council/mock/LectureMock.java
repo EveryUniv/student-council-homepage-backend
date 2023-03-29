@@ -1,6 +1,7 @@
 package com.dku.council.mock;
 
 import com.dku.council.domain.timetable.model.entity.TimeSchedule;
+import com.dku.council.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ public class LectureMock {
                     .memo("professor" + i)
                     .color("color" + i)
                     .build();
+            EntityUtil.injectId(TimeSchedule.class, lecture, (long) i);
             lectures.add(lecture);
         }
         return lectures;

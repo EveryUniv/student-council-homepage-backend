@@ -1,6 +1,6 @@
 package com.dku.council.domain.timetable.service;
 
-import com.dku.council.domain.timetable.model.dto.response.TimePromise;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.dku.council.domain.timetable.repository.LectureTemplateRepository;
 import com.dku.council.infra.dku.model.DkuAuth;

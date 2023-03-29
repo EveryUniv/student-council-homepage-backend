@@ -1,4 +1,4 @@
-package com.dku.council.domain.timetable.model.dto.response;
+package com.dku.council.domain.timetable.model.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;

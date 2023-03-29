@@ -1,6 +1,6 @@
 package com.dku.council.domain.timetable.repository;
 
-import com.dku.council.domain.timetable.model.dto.response.TimePromise;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.TimeSchedule;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
 import com.dku.council.domain.user.model.entity.Major;

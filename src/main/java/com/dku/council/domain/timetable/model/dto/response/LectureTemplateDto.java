@@ -1,5 +1,6 @@
 package com.dku.council.domain.timetable.model.dto.response;
 
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,5 +1,6 @@
 package com.dku.council.domain.timetable.model.dto.response;
 
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.TimeSchedule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.EqualsAndHashCode;

@@ -1,16 +1,19 @@
 package com.dku.council.mock;
 
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
+import com.dku.council.util.EntityUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class LectureTemplateMock {
 
-    public static List<LectureTemplate> createList(int size){
+    public static List<LectureTemplate> createList(int size) {
         List<LectureTemplate> result = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            result.add(create(i));
+            LectureTemplate e = create(i);
+            EntityUtil.injectId(LectureTemplate.class, e, (long) i);
+            result.add(e);
         }
         return result;
     }

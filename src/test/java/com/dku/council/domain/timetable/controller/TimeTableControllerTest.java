@@ -1,11 +1,15 @@
 package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.post.service.DummyPage;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.response.*;
+import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
+import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeScheduleDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.mock.LectureTemplateMock;
 import com.dku.council.util.base.AbstractAuthControllerTest;
@@ -46,7 +50,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     private final LocalTime end = LocalTime.of(13, 0);
     private List<LectureTemplateDto> testLectures;
     private List<TimeScheduleDto> testLectureMappings;
-    private List<RequestLectureDto> requestLectureDto;
+    private List<RequestScheduleDto> requestScheduleDto;
 
     @BeforeEach
     void setup() {
@@ -66,10 +70,10 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                         ))
         );
 
-        requestLectureDto = List.of(
-                new RequestLectureDto(1L, "color1"),
-                new RequestLectureDto(2L, "color2"),
-                new RequestLectureDto(3L, "color3")
+        requestScheduleDto = List.of(
+                new RequestScheduleDto(1L, "", "", List.of(), "color1"),
+                new RequestScheduleDto(null, "name", "memo", List.of(), "color2"),
+                new RequestScheduleDto(3L, "", "", List.of(), "color3")
         );
     }
 
@@ -161,7 +165,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 생성")
     void create() throws Exception {
         // given
-        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", requestLectureDto);
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto("test", requestScheduleDto);
         given(timeTableService.create(eq(USER_ID), any())).willReturn(3L);
 
         // when
@@ -177,7 +181,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
     @DisplayName("시간표 수정")
     void update() throws Exception {
         // given
-        UpdateTimeTableRequestDto dto = new UpdateTimeTableRequestDto(requestLectureDto);
+        UpdateTimeTableRequestDto dto = new UpdateTimeTableRequestDto(requestScheduleDto);
         given(timeTableService.update(eq(USER_ID), eq(3L), any())).willReturn(3L);
 
         // when

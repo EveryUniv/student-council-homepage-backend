@@ -15,5 +15,5 @@ public class CreateTimeTableRequestDto {
     private final String name;
 
     @NotNull
-    private final List<RequestLectureDto> lectures;
+    private final List<RequestScheduleDto> lectures;
 }

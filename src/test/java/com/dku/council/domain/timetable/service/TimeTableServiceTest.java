@@ -2,8 +2,9 @@ package com.dku.council.domain.timetable.service;
 
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
 import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeScheduleDto;
@@ -34,9 +35,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +78,7 @@ class TimeTableServiceTest {
         table = TimeTableMock.createDummy();
 
         schedules = LectureMock.createLectureList(10);
-        for(TimeSchedule schedule : schedules) {
+        for (TimeSchedule schedule : schedules) {
             schedule.changeTimeTable(table);
         }
 
@@ -155,8 +160,8 @@ class TimeTableServiceTest {
     @DisplayName("시간표 생성")
     void create() {
         // given
-        List<RequestLectureDto> reqDtos = schedules.stream()
-                .map(e -> new RequestLectureDto(e.getId(), e.getColor()))
+        List<RequestScheduleDto> reqDtos = schedules.stream()
+                .map(e -> new RequestScheduleDto(e.getId(), null, null, List.of(), e.getColor()))
                 .collect(Collectors.toList());
         CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), reqDtos);
 
@@ -174,11 +179,51 @@ class TimeTableServiceTest {
     }
 
     @Test
+    @DisplayName("시간표 생성 - 일정 추가")
+    void createWithSchedule() {
+        // given
+        List<RequestScheduleDto> reqDtos = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            RequestScheduleDto dto = new RequestScheduleDto(null, "name-" + i, "memo-" + i,
+                    List.of(
+                            new TimePromise(LocalTime.of(9, 0), LocalTime.of(10, 0),
+                                    DayOfWeek.MONDAY, "place")
+                    ),
+                    "color-" + i);
+            reqDtos.add(dto);
+        }
+
+        table.getSchedules().clear();
+        table.getSchedules().addAll(reqDtos.stream()
+                .map(e -> TimeSchedule.builder()
+                        .name(e.getName())
+                        .memo(e.getMemo())
+                        .color(e.getColor())
+                        .timesJson(TimePromise.serialize(mapper, e.getTimes()))
+                        .build())
+                .collect(Collectors.toList()));
+
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), reqDtos);
+
+        given(userRepository.findById(table.getUser().getId())).willReturn(Optional.of(table.getUser()));
+        given(lectureTemplateRepository.findAllById(any())).willReturn(List.of());
+        given(timeTableRepository.save(tableCheckArgThat())).willReturn(table);
+        given(timeScheduleRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+
+        // when
+        Long id = service.create(table.getUser().getId(), dto);
+
+        // then
+        verify(lectureTemplateRepository).findAllById(any());
+        assertThat(id).isEqualTo(table.getId());
+    }
+
+    @Test
     @DisplayName("시간표 수정")
     void update() {
         // given
-        List<RequestLectureDto> reqDtos = schedules.stream()
-                .map(e -> new RequestLectureDto(e.getId(), e.getColor()))
+        List<RequestScheduleDto> reqDtos = schedules.stream()
+                .map(e -> new RequestScheduleDto(e.getId(), null, null, List.of(), e.getColor()))
                 .collect(Collectors.toList());
         given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
         given(lectureTemplateRepository.findAllById(any())).willReturn(lectures);
@@ -188,8 +233,11 @@ class TimeTableServiceTest {
         Long id = service.update(table.getUser().getId(), table.getId(), reqDtos);
 
         // then
-        List<RequestLectureDto> tableLectures = table.getSchedules().stream()
-                .map(schedule -> new RequestLectureDto(schedule.getId(), schedule.getColor()))
+        List<RequestScheduleDto> tableLectures = IntStream.range(0, table.getSchedules().size())
+                .mapToObj(i -> {
+                    TimeSchedule schedule = table.getSchedules().get(i);
+                    return new RequestScheduleDto((long) i, null, null, List.of(), schedule.getColor());
+                })
                 .collect(Collectors.toList());
         verify(lectureTemplateRepository).findAllById(any());
         assertThat(id).isEqualTo(table.getId());
@@ -260,7 +308,7 @@ class TimeTableServiceTest {
     private TimeTable tableCheckArgThat() {
         return argThat(t -> {
             assertThat(t.getName()).isEqualTo(table.getName());
-            for(int i = 0; i < t.getSchedules().size(); i++) {
+            for (int i = 0; i < t.getSchedules().size(); i++) {
                 TimeSchedule actual = t.getSchedules().get(i);
                 TimeSchedule expect = table.getSchedules().get(i);
                 assertThat(actual.getName()).isEqualTo(expect.getName());

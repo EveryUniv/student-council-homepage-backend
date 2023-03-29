@@ -2,8 +2,9 @@ package com.dku.council.domain.timetable.service;
 
 import com.dku.council.domain.timetable.exception.LectureNotFoundException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
 import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
@@ -24,7 +25,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.dku.council.domain.timetable.model.mapper.TimeScheduleMapper.createScheduleFromLecture;
@@ -72,13 +76,13 @@ public class TimeTableService {
                 .orElseThrow(UserNotFoundException::new);
 
         TimeTable timeTable = new TimeTable(user, dto.getName());
-        appendLecturesEntity(timeTable, dto.getLectures());
+        appendScheduleEntity(timeTable, dto.getLectures());
         timeTable = timeTableRepository.save(timeTable);
 
         return timeTable.getId();
     }
 
-    public Long update(Long userId, Long tableId, List<RequestLectureDto> lectureDtos) {
+    public Long update(Long userId, Long tableId, List<RequestScheduleDto> lectureDtos) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
 
@@ -86,7 +90,7 @@ public class TimeTableService {
             throw new TimeTableNotFoundException();
 
         table.getSchedules().clear();
-        appendLecturesEntity(table, lectureDtos);
+        appendScheduleEntity(table, lectureDtos);
 
         return table.getId();
     }
@@ -102,18 +106,36 @@ public class TimeTableService {
         return table.getId();
     }
 
-    private void appendLecturesEntity(TimeTable table, List<RequestLectureDto> lectureDtos) {
+    private void appendScheduleEntity(TimeTable table, List<RequestScheduleDto> lectureDtos) {
         List<Long> idList = lectureDtos.stream()
-                .map(RequestLectureDto::getId)
+                .map(RequestScheduleDto::getLectureId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         List<LectureTemplate> lectures = lectureTemplateRepository.findAllById(idList);
 
-        if (lectures.size() != lectureDtos.size()) {
+        if (lectures.size() != idList.size()) {
             throw new LectureNotFoundException();
         }
 
-        for (int i = 0; i < lectureDtos.size(); i++) {
-            TimeSchedule schedule = createScheduleFromLecture(lectures.get(i), lectureDtos.get(i).getColor());
+        Map<Long, LectureTemplate> lectureMaps = new HashMap<>();
+        for (LectureTemplate lecture : lectures) {
+            lectureMaps.put(lecture.getId(), lecture);
+        }
+
+        for (RequestScheduleDto dto : lectureDtos) {
+            Long lectureId = dto.getLectureId();
+            TimeSchedule schedule;
+            if (lectureId != null) {
+                LectureTemplate lecture = lectureMaps.get(lectureId);
+                schedule = createScheduleFromLecture(lecture, dto.getColor());
+            } else {
+                schedule = TimeSchedule.builder()
+                        .name(dto.getName())
+                        .memo(dto.getMemo())
+                        .color(dto.getColor())
+                        .timesJson(TimePromise.serialize(objectMapper, dto.getTimes()))
+                        .build();
+            }
             schedule = timeScheduleRepository.save(schedule);
             schedule.changeTimeTable(table);
         }
