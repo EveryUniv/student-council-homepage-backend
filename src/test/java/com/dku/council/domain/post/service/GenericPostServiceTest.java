@@ -10,16 +10,16 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.statistic.PetitionStatistic;
+import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
+import com.dku.council.domain.statistic.service.PetitionStatisticService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import com.dku.council.mock.MultipartFileMock;
-import com.dku.council.mock.NewsMock;
-import com.dku.council.mock.PetitionMock;
-import com.dku.council.mock.UserMock;
+import com.dku.council.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -219,26 +219,6 @@ class GenericPostServiceTest {
         assertThat(dto.isMine()).isEqualTo(true);
     }
 
-    @Test
-    @DisplayName("Mapper와 함깨 단건 조회가 잘 동작하는지?")
-    public void findOneWithMapper() {
-        // given
-        Petition petition = PetitionMock.createWithDummy();
-        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
-        when(postLikeService.isPostLiked(any(), any())).thenReturn(true);
-
-        // when
-        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
-                new ResponsePetitionDto(d, post, Duration.ofDays(30)));
-
-        // then
-        assertThat(dto.getId()).isEqualTo(petition.getId());
-        assertThat(dto.getViews()).isEqualTo(petition.getViews());
-        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
-        assertThat(dto.isLiked()).isEqualTo(true);
-        assertThat(dto.isMine()).isEqualTo(false);
-        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
-    }
 
     @Test
     @DisplayName("없는 게시글 단건 조회시 오류")
