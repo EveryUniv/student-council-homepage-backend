@@ -11,6 +11,6 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, Long> {
     List<TimeTable> findAllByUserId(Long userId);
 
     @Override
-    @EntityGraph(attributePaths = {"lectures", "lectures.lecture", "lectures.lecture.lectureTimes"})
+    @EntityGraph(attributePaths = {"schedules"})
     Optional<TimeTable> findById(Long id);
 }

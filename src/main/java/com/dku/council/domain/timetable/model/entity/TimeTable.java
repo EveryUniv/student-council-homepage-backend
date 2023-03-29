@@ -28,8 +28,8 @@ public class TimeTable extends BaseEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "timetable", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<TimeTableLecture> lectures = new ArrayList<>();
+    @OneToMany(mappedBy = "timetable", orphanRemoval = true)
+    private List<TimeSchedule> schedules = new ArrayList<>();
 
 
     public TimeTable(User user, String name) {

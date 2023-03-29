@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static lombok.AccessLevel.PROTECTED;
@@ -15,16 +13,12 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
-@SequenceGenerator(
-        name = "lecture_seq_generator",
-        allocationSize = 300
-)
-public class Lecture extends BaseEntity {
+public class TimeSchedule extends BaseEntity {
 
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "lecture_seq_generator"
+            generator = "time_schedule_seq_generator"
     )
     @Column(name = "lecture_id")
     private Long id;
@@ -35,15 +29,28 @@ public class Lecture extends BaseEntity {
 
     private String name;
 
-    private String professor;
+    private String memo;
 
-    @OneToMany(mappedBy = "lecture", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private List<LectureTime> lectureTimes = new ArrayList<>();
+    private String color;
+
+    private String timesJson;
 
 
     @Builder
-    private Lecture(String name, String professor) {
+    private TimeSchedule(String name, String memo, String color, String timesJson) {
         this.name = name;
-        this.professor = professor;
+        this.memo = memo;
+        this.color = color;
+        this.timesJson = timesJson;
+    }
+
+
+    public void changeTimeTable(TimeTable timetable) {
+        if (this.timetable != null) {
+            this.timetable.getSchedules().remove(this);
+        }
+
+        this.timetable = timetable;
+        timetable.getSchedules().add(this);
     }
 }
