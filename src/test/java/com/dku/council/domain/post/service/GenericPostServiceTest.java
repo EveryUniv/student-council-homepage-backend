@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
+import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -10,16 +10,16 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.statistic.PetitionStatistic;
-import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
-import com.dku.council.domain.statistic.service.PetitionStatisticService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import com.dku.council.mock.*;
+import com.dku.council.mock.MultipartFileMock;
+import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.PetitionMock;
+import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -63,7 +64,7 @@ class GenericPostServiceTest {
     private FileUploadService fileUploadService;
 
     @Mock
-    private RedisPostLikeServiceImpl postLikeService;
+    private CachedLikeServiceImpl postLikeService;
 
     private GenericPostService<News> newsService;
     private GenericPostService<Petition> petitionService;
@@ -83,7 +84,7 @@ class GenericPostServiceTest {
         Page<News> allNews = new DummyPage<>(allNewsList, 20);
 
         when(newsRepository.findAll((Specification<News>) any(), (Pageable) any())).thenReturn(allNews);
-        when(postLikeService.getCountOfLikes(any())).thenReturn(15);
+        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
         Page<SummarizedGenericPostDto> allPage = newsService.list(null, Pageable.unpaged(), 500);
@@ -110,7 +111,7 @@ class GenericPostServiceTest {
         Duration expiresTime = Duration.ofDays(5);
 
         when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
-        when(postLikeService.getCountOfLikes(any())).thenReturn(15);
+        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
         Page<SummarizedPetitionDto> allPage = petitionService.list(null, Pageable.unpaged(), 500,
@@ -203,7 +204,7 @@ class GenericPostServiceTest {
         // given
         News news = NewsMock.createDummy(4L);
         when(newsRepository.findById(any())).thenReturn(Optional.of(news));
-        when(postLikeService.isPostLiked(any(), any())).thenReturn(false);
+        when(postLikeService.isLiked(any(), any(), eq(POST))).thenReturn(false);
 
         // when
         ResponseSingleGenericPostDto dto = newsService.findOne(4L, news.getUser().getId(), "Addr");
@@ -219,6 +220,26 @@ class GenericPostServiceTest {
         assertThat(dto.isMine()).isEqualTo(true);
     }
 
+    @Test
+    @DisplayName("Mapper와 함깨 단건 조회가 잘 동작하는지?")
+    public void findOneWithMapper() {
+        // given
+        Petition petition = PetitionMock.createWithDummy();
+        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
+        when(postLikeService.isLiked(any(), any(), eq(POST))).thenReturn(true);
+
+        // when
+        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
+                new ResponsePetitionDto(d, post, Duration.ofDays(30), List.of()));
+
+        // then
+        assertThat(dto.getId()).isEqualTo(petition.getId());
+        assertThat(dto.getViews()).isEqualTo(petition.getViews());
+        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
+        assertThat(dto.isLiked()).isEqualTo(true);
+        assertThat(dto.isMine()).isEqualTo(false);
+        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
+    }
 
     @Test
     @DisplayName("없는 게시글 단건 조회시 오류")

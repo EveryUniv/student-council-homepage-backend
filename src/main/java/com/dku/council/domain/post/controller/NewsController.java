@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -10,7 +11,7 @@ import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
-import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
+
 @Tag(name = "총학소식", description = "총학소식 게시판 관련 api")
 @RestController
 @RequestMapping("/post/news")
@@ -32,7 +35,7 @@ import java.util.List;
 public class NewsController {
 
     private final GenericPostService<News> postService;
-    private final PostLikeService postLikeService;
+    private final LikeService likeService;
 
     /**
      * 게시글 목록으로 조회
@@ -97,7 +100,7 @@ public class NewsController {
     @PostMapping("/like/{id}")
     @UserOnly
     public void like(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.like(id, auth.getUserId());
+        likeService.like(id, auth.getUserId(), POST);
     }
 
     /**
@@ -109,6 +112,6 @@ public class NewsController {
     @DeleteMapping("/like/{id}")
     @UserOnly
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.cancelLike(id, auth.getUserId());
+        likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }
 }

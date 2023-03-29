@@ -8,7 +8,6 @@ import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.PetitionStatisticMock;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

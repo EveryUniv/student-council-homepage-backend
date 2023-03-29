@@ -1,7 +1,8 @@
 package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.like.service.impl.RedisPostLikeServiceImpl;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,23 +47,21 @@ public class PetitionServiceTest {
     private FileUploadService fileUploadService;
 
     @Mock
-    private RedisPostLikeServiceImpl postLikeService;
+    private CachedLikeServiceImpl postLikeService;
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
     @Mock
     private CommentService commentService;
 
-    private GenericPostService<Petition> postService;
-
     private PetitionService petitionService;
 
 
     @BeforeEach
     public void setup() {
-        postService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        GenericPostService<Petition> postService = new GenericPostService<>(petitionRepository, userRepository, tagService,
+                viewCountService, fileUploadService, postLikeService);
         petitionService = new PetitionService(postService, commentService, petitionStatisticService, 150, Duration.ofDays(30));
-
     }
 
     @Test
@@ -72,7 +72,7 @@ public class PetitionServiceTest {
         List<PetitionStatisticDto> list = PetitionStatisticMock.createList();
 
         when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
-        when(postLikeService.isPostLiked(any(), any())).thenReturn(true);
+        when(postLikeService.isLiked(any(), any(), eq(LikeTarget.POST))).thenReturn(true);
         when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
         //when
         ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");

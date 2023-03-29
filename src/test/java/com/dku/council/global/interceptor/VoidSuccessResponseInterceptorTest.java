@@ -1,6 +1,6 @@
 package com.dku.council.global.interceptor;
 
-import com.dku.council.global.dto.ResponseSuccessDto;
+import com.dku.council.global.model.dto.ResponseSuccessDto;
 import com.dku.council.util.ObjectMapperGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.repository.impl;
 
-import com.dku.council.global.component.model.CacheObject;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.global.model.CacheObject;
 import com.dku.council.util.ClockUtil;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;

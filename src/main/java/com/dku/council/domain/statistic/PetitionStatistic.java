@@ -1,8 +1,6 @@
 package com.dku.council.domain.statistic;
 
-import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Builder;

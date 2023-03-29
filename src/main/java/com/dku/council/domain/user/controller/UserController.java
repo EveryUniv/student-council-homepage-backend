@@ -5,7 +5,10 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
-import com.dku.council.domain.user.service.*;
+import com.dku.council.domain.user.service.MyPostService;
+import com.dku.council.domain.user.service.SignupService;
+import com.dku.council.domain.user.service.UserFindService;
+import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,8 +32,6 @@ public class UserController {
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
-    private final MyCommentedPostService myCommentedPostService;
-    private final MyLikedPostService myLikedPostService;
 
     /**
      * 내 정보 조회
@@ -212,7 +213,7 @@ public class UserController {
     @UserOnly
     public ResponsePage<CommentedPostResponseDto> listMyCommentedPosts(AppAuthentication auth,
                                                                        @ParameterObject Pageable pageable) {
-        Page<CommentedPostResponseDto> commentedPosts = myCommentedPostService.listMyCommentedPosts(auth.getUserId(), pageable);
+        Page<CommentedPostResponseDto> commentedPosts = myPostService.listMyCommentedPosts(auth.getUserId(), pageable);
         return new ResponsePage<>(commentedPosts);
     }
 
@@ -224,7 +225,7 @@ public class UserController {
     public ResponsePage<SummarizedGenericPostDto> listMyLikedPosts(AppAuthentication auth,
                                                                    @ParameterObject Pageable pageable,
                                                                    @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedGenericPostDto> likedPosts = myLikedPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
+        Page<SummarizedGenericPostDto> likedPosts = myPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(likedPosts);
     }
 }

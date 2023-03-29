@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.like.service.PostLikeService;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
@@ -38,7 +39,7 @@ public class GenericPostService<E extends Post> {
     protected final TagService tagService;
     protected final ViewCountService viewCountService;
     protected final FileUploadService fileUploadService;
-    protected final PostLikeService postLikeService;
+    protected final LikeService likeService;
 
     /**
      * 게시글 목록으로 조회
@@ -74,7 +75,7 @@ public class GenericPostService<E extends Post> {
     }
 
     private SummarizedGenericPostDto makeListDto(int bodySize, E post) {
-        int likes = postLikeService.getCountOfLikes(post.getId());
+        int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
         return new SummarizedGenericPostDto(fileUploadService.getBaseURL(), bodySize, likes, post);
     }
 
@@ -121,9 +122,9 @@ public class GenericPostService<E extends Post> {
     }
 
     private ResponseSingleGenericPostDto makePostDto(Long userId, E post) {
-        int likes = postLikeService.getCountOfLikes(post.getId());
+        int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
         boolean isMine = post.getUser().getId().equals(userId);
-        boolean isLiked = postLikeService.isPostLiked(post.getId(), userId);
+        boolean isLiked = likeService.isLiked(post.getId(), userId, LikeTarget.POST);
         return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), likes, isMine, isLiked, post);
     }
 

@@ -3,8 +3,8 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.comment.service.CommentService;
-import com.dku.council.domain.like.service.PostLikeService;
-import com.dku.council.domain.like.service.impl.DBPostLikeServiceImpl;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
@@ -15,7 +15,7 @@ import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
-import com.dku.council.global.dto.ResponseIdDto;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +38,7 @@ public class GeneralForumController {
 
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
-    private final PostLikeService postLikeService;
-    private final DBPostLikeServiceImpl dbPostLikeServiceImpl;
+    private final LikeService likeService;
 
     /**
      * 게시글 목록 및 태그 조회
@@ -143,7 +142,6 @@ public class GeneralForumController {
     /**
      * 게시글 댓글 수정
      * 댓글을 수정할 수 있는 사람은 본인뿐입니다. Admin도 다른 사람의 댓글은 수정할 수 없습니다. (조작 의혹 방지)
-     * todo 수정시 로그 남도록 하자
      *
      * @param id         댓글 id
      * @param commentDto 수정할 댓글 내용(text)
@@ -179,7 +177,7 @@ public class GeneralForumController {
     @PostMapping("/like/{id}")
     @UserOnly
     public void like(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.like(id, auth.getUserId());
+        likeService.like(id, auth.getUserId(), LikeTarget.POST);
     }
 
     /**
@@ -191,30 +189,6 @@ public class GeneralForumController {
     @DeleteMapping("/like/{id}")
     @UserOnly
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
-        postLikeService.cancelLike(id, auth.getUserId());
-    }
-
-    /**
-     * 게시글에 좋아요 표시. (No cache)
-     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
-     *
-     * @param id 게시글 id
-     */
-    @PostMapping("/like/db/{id}")
-    @UserOnly
-    public void likeDB(AppAuthentication auth, @PathVariable Long id) {
-        dbPostLikeServiceImpl.like(id, auth.getUserId());
-    }
-
-    /**
-     * 좋아요 취소 (No cache)
-     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
-     *
-     * @param id 게시글 id
-     */
-    @DeleteMapping("/like/db/{id}")
-    @UserOnly
-    public void cancelLikeDB(AppAuthentication auth, @PathVariable Long id) {
-        dbPostLikeServiceImpl.cancelLike(id, auth.getUserId());
+        likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }
 }
