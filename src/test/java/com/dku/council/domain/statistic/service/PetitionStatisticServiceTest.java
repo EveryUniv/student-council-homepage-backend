@@ -44,17 +44,16 @@ class PetitionStatisticServiceTest {
         //given
         Petition petition = PetitionMock.createWithDummy();
         List<PetitionStatistic> list = PetitionStatisticMock.list(petition);
-        when(petitionStatisticRepository.findAllByPetition(petition.getId())).thenReturn(list);
+        when(petitionStatisticRepository.findAllByPetitionId(petition.getId())).thenReturn(list);
 
         //when
-        PetitionStatisticDto top4Department = service.findTop4Department(petition.getId());
+        List<PetitionStatisticDto> top4Department = service.findTop4Department(petition.getId());
         //then
-
-        assertThat(top4Department.getTop4Department().size()).isEqualTo(4);
-        assertThat(top4Department.getTop4Department().get(0).getValue()).isEqualTo(100);
-        assertThat(top4Department.getTop4Department().get(1).getValue()).isEqualTo(41);
-        assertThat(top4Department.getTop4Department().get(2).getValue()).isEqualTo(40);
-        assertThat(top4Department.getTop4Department().get(3).getValue()).isEqualTo(39);
+        assertThat(top4Department.size()).isEqualTo(4);
+        assertThat(top4Department.get(0).getAgreeCount()).isEqualTo(100);
+        assertThat(top4Department.get(1).getAgreeCount()).isEqualTo(41);
+        assertThat(top4Department.get(2).getAgreeCount()).isEqualTo(40);
+        assertThat(top4Department.get(3).getAgreeCount()).isEqualTo(39);
 
     }
 }

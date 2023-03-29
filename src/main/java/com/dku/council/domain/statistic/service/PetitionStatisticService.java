@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +38,8 @@ public class PetitionStatisticService {
      * @param petitionId
      * @return
      */
-    public PetitionStatisticDto findTop4Department(Long petitionId){
-        List<PetitionStatistic> petitionStatisticList = repository.findAllByPetition(petitionId);
+    public List<PetitionStatisticDto> findTop4Department(Long petitionId){
+        List<PetitionStatistic> petitionStatisticList = repository.findAllByPetitionId(petitionId);
 
         Stream<String> departmentList = petitionStatisticList.stream().map(PetitionStatistic::getDepartment);
 
@@ -50,8 +51,7 @@ public class PetitionStatisticService {
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .limit(4)
                 .collect(Collectors.toList());
-
-        return new PetitionStatisticDto(top4Department);
+        return top4Department.stream().map(data -> new PetitionStatisticDto(data.getKey(), data.getValue())).collect(Collectors.toList());
     }
 
     /**

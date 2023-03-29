@@ -40,12 +40,14 @@ public class PetitionStatisticMock {
     public static PetitionStatistic create(String department){
         return create(UserMock.createMajor("major", department));
     }
-    public static PetitionStatisticDto createDto(){
+    public static List<PetitionStatisticDto> createList(){
         List<Map.Entry<String, Integer>> dto = new ArrayList<>();
-        for(int i=0; i<10; i++){
+        List<PetitionStatisticDto> dtoList = new ArrayList<>();
+        for(int i=0; i<4; i++){
             dto.add(Map.entry("major"+i, i));
+            dtoList.add(new PetitionStatisticDto("major"+i, i));
         }
-        return new PetitionStatisticDto(dto);
+        return dtoList;
     }
 
     public static List<PetitionStatistic> list(Petition petition){

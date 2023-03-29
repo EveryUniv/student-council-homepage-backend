@@ -6,9 +6,12 @@ import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import org.springframework.lang.Nullable;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
@@ -28,14 +31,14 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
     @Schema(hidden = true)
     @JsonIgnore
     private final int likes = 0;
-    private final PetitionStatisticDto statistic;
+    private final List<PetitionStatisticDto> statisticList;
 
-    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime, PetitionStatisticDto statisticDto) {
+    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime, List<PetitionStatisticDto> statisticList) {
         super(dto);
         this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
         this.expiresAt = post.getCreatedAt().plus(expiresTime).toLocalDate();
         this.agreeCount = post.getComments().size();
-        this.statistic = statisticDto;
+        this.statisticList = statisticList;
     }
 }

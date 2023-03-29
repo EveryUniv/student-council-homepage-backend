@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,7 +58,7 @@ public class PetitionServiceTest {
 
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         postService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
         petitionService = new PetitionService(postService, commentService, petitionStatisticService, 150, Duration.ofDays(30));
 
@@ -68,11 +69,11 @@ public class PetitionServiceTest {
     public void findOnePetitionWithMapper() {
         // given
         Petition petition = PetitionMock.createWithDummy();
-        PetitionStatisticDto petitionStatisticDto = PetitionStatisticMock.createDto();
+        List<PetitionStatisticDto> list = PetitionStatisticMock.createList();
 
         when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
         when(postLikeService.isPostLiked(any(), any())).thenReturn(true);
-        when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(petitionStatisticDto);
+        when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
         //when
         ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
 
@@ -83,10 +84,7 @@ public class PetitionServiceTest {
         assertThat(dto.isLiked()).isEqualTo(true);
         assertThat(dto.isMine()).isEqualTo(false);
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
-        assertThat(dto.getStatistic()).isEqualTo(petitionStatisticDto);
+        assertThat(dto.getStatisticList()).isEqualTo(list);
     }
-
-
-
 
 }

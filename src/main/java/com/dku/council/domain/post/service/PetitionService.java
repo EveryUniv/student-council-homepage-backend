@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +45,9 @@ public class PetitionService {
 
     @Transactional
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
-        PetitionStatisticDto statisticDto = statisticService.findTop4Department(postId);
+        List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         return postService.findOne(postId, userId, remoteAddress, (dto, post) ->
-                new ResponsePetitionDto(dto, post, expiresTime, statisticDto));
+                new ResponsePetitionDto(dto, post, expiresTime, top4Department));
     }
 
     public void reply(Long postId, String answer) {
