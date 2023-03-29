@@ -12,18 +12,18 @@ import java.util.List;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
-public class LectureDto {
+public class TimeScheduleDto {
 
-    private final Long id;
     private final String name;
-    private final String professor;
+    private final String memo;
+    private final String color;
     private final List<TimePromise> times;
 
 
-    public LectureDto(ObjectMapper mapper, TimeSchedule lecture) {
-        this.id = lecture.getId();
-        this.name = lecture.getName();
-        this.professor = lecture.getMemo();
-        this.times = TimePromise.parse(mapper, lecture.getTimesJson());
+    public TimeScheduleDto(ObjectMapper mapper, TimeSchedule schedule) {
+        this.name = schedule.getName();
+        this.memo = schedule.getMemo();
+        this.color = schedule.getColor();
+        this.times = TimePromise.parse(mapper, schedule.getTimesJson());
     }
 }

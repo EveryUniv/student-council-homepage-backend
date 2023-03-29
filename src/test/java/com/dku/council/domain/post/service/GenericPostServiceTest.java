@@ -230,7 +230,7 @@ class GenericPostServiceTest {
 
         // when
         ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
-                new ResponsePetitionDto(d, post, Duration.ofDays(30)));
+                new ResponsePetitionDto(d, post, Duration.ofDays(30), List.of()));
 
         // then
         assertThat(dto.getId()).isEqualTo(petition.getId());

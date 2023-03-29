@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class TimeTableInfoDto {
+public class ListTimeTableDto {
 
     @Schema(description = "아이디", example = "2")
     private final Long id;
@@ -15,7 +15,7 @@ public class TimeTableInfoDto {
     @Schema(description = "시간표 이름", example = "1학기 시간표")
     private final String name;
 
-    public TimeTableInfoDto(TimeTable timeTable) {
+    public ListTimeTableDto(TimeTable timeTable) {
         this.id = timeTable.getId();
         this.name = timeTable.getName();
     }

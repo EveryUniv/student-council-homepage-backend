@@ -20,7 +20,7 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final ObjectMapper objectMapper;
     private final MessageSource messageSource;
 
 
@@ -47,12 +47,12 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         writeResponse(response, dto, 500);
     }
 
-    private static void writeResponse(HttpServletResponse response, Object dto, int statusCode) throws IOException {
+    private void writeResponse(HttpServletResponse response, Object dto, int statusCode) throws IOException {
         response.setStatus(statusCode);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        String exceptionMessage = OBJECT_MAPPER.writeValueAsString(dto);
+        String exceptionMessage = objectMapper.writeValueAsString(dto);
         response.getWriter().write(exceptionMessage);
     }
 }

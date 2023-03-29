@@ -1,12 +1,14 @@
 package com.dku.council.domain.timetable.service;
 
-import com.dku.council.domain.timetable.model.entity.Lecture;
-import com.dku.council.domain.timetable.model.entity.LectureTime;
-import com.dku.council.domain.timetable.repository.LectureRepository;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
+import com.dku.council.domain.timetable.model.entity.LectureTemplate;
+import com.dku.council.domain.timetable.repository.LectureTemplateRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.Subject;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuLectureService;
+import com.dku.council.util.ObjectMapperGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,14 +37,15 @@ class LectureRetrieveServiceTest {
     private DkuLectureService dkuLectureService;
 
     @Mock
-    private LectureRepository lectureRepository;
+    private LectureTemplateRepository lectureTemplateRepository;
 
+    private final ObjectMapper objectMapper = ObjectMapperGenerator.create();
     private LectureRetrieveService service;
 
     @BeforeEach
     void setUp() {
-        service = new LectureRetrieveService(dkuAuthenticationService, dkuLectureService, lectureRepository,
-                "id", "password");
+        service = new LectureRetrieveService(objectMapper, dkuAuthenticationService, dkuLectureService,
+                lectureTemplateRepository, "id", "password");
     }
 
     @Test
@@ -60,23 +63,25 @@ class LectureRetrieveServiceTest {
         service.reloadLectures(yearMonth);
 
         // then
-        verify(lectureRepository).deleteAll();
-        verify(lectureRepository).saveAll(checkSubjects(subjects));
+        verify(lectureTemplateRepository).deleteAll();
+        verify(lectureTemplateRepository).saveAll(checkSubjects(subjects));
     }
 
-    private static Iterable<Lecture> checkSubjects(List<Subject> subjects) {
+    private Iterable<LectureTemplate> checkSubjects(List<Subject> subjects) {
         return argThat(lectures -> {
             for (int i = 0; i < subjects.size(); i++) {
-                Lecture lecture = ((List<Lecture>) lectures).get(i);
+                LectureTemplate lecture = ((List<LectureTemplate>) lectures).get(i);
                 Subject subject = subjects.get(i);
+                List<TimePromise> promises = TimePromise.parse(objectMapper, lecture.getTimesJson());
+
                 assertThat(lecture.getName()).isEqualTo(subject.getName());
                 assertThat(lecture.getProfessor()).isEqualTo(subject.getProfessor());
-                assertThat(lecture.getLectureTimes().size()).isEqualTo(subject.getTimes().size());
+                assertThat(promises.size()).isEqualTo(subject.getTimes().size());
 
-                LectureTime lectureTime = lecture.getLectureTimes().get(0);
+                TimePromise lectureTime = promises.get(0);
                 Subject.TimeAndPlace time = subject.getTimes().get(0);
-                assertThat(lectureTime.getStartTime()).isEqualTo(time.getFrom());
-                assertThat(lectureTime.getEndTime()).isEqualTo(time.getTo());
+                assertThat(lectureTime.getStart()).isEqualTo(time.getFrom());
+                assertThat(lectureTime.getEnd()).isEqualTo(time.getTo());
                 assertThat(lectureTime.getPlace()).isEqualTo(time.getPlace());
                 assertThat(lectureTime.getWeek()).isEqualTo(time.getDayOfWeek());
 

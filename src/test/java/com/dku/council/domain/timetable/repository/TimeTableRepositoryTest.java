@@ -1,15 +1,16 @@
 package com.dku.council.domain.timetable.repository;
 
-import com.dku.council.domain.timetable.model.entity.Lecture;
-import com.dku.council.domain.timetable.model.entity.LectureTime;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
+import com.dku.council.domain.timetable.model.entity.TimeSchedule;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
-import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.ObjectMapperGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import javax.persistence.EntityManager;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,11 +37,12 @@ class TimeTableRepositoryTest {
     private TimeTableRepository repository;
 
     @Autowired
-    private LectureRepository lectureRepository;
+    private TimeScheduleRepository timeScheduleRepository;
 
     @Autowired
     private EntityManager em;
 
+    private final ObjectMapper mapper = ObjectMapperGenerator.create();
     private TimeTable timeTable;
 
 
@@ -53,58 +56,28 @@ class TimeTableRepositoryTest {
 
         timeTable = new TimeTable(user, "test");
 
-        Lecture lecture = Lecture.builder()
+        List<TimePromise> lectureTime = List.of(
+                new TimePromise(LocalTime.of(10, 0), LocalTime.of(13, 0),
+                        DayOfWeek.FRIDAY, "place")
+        );
+
+        TimeSchedule lecture = TimeSchedule.builder()
                 .name("name")
-                .professor("professor")
+                .memo("professor")
+                .color("color")
+                .timesJson(TimePromise.serialize(mapper, lectureTime))
                 .build();
-        lecture = lectureRepository.save(lecture);
-
-        TimeTableLecture mapping = new TimeTableLecture(lecture, "color");
-        mapping.changeTimeTable(timeTable);
-
-        LectureTime lectureTime = LectureTime.builder()
-                .startTime(LocalTime.of(10, 0))
-                .endTime(LocalTime.of(13, 0))
-                .place("place")
-                .week(DayOfWeek.FRIDAY)
-                .build();
-        lectureTime.changeLecture(lecture);
+        lecture = timeScheduleRepository.save(lecture);
+        lecture.changeTimeTable(timeTable);
 
         timeTable = repository.save(timeTable);
     }
 
     @Test
-    @DisplayName("Timetable을 persist시 모두 잘 저장되는지 확인")
-    public void persistCascade() {
-        // when
-        em.flush();
-        em.clear();
-
-        // then
-        TimeTable actualTable = repository.findById(timeTable.getId()).orElseThrow();
-        assertThat(actualTable.getName()).isEqualTo("test");
-        assertThat(actualTable.getLectures().size()).isEqualTo(1);
-
-        TimeTableLecture mapping = actualTable.getLectures().get(0);
-        assertThat(mapping.getColor()).isEqualTo("color");
-
-        Lecture actualLecture = actualTable.getLectures().get(0).getLecture();
-        assertThat(actualLecture.getName()).isEqualTo("name");
-        assertThat(actualLecture.getProfessor()).isEqualTo("professor");
-        assertThat(actualLecture.getLectureTimes().size()).isEqualTo(1);
-
-        LectureTime actualLectureTime = actualLecture.getLectureTimes().get(0);
-        assertThat(actualLectureTime.getStartTime()).isEqualTo(LocalTime.of(10, 0));
-        assertThat(actualLectureTime.getEndTime()).isEqualTo(LocalTime.of(13, 0));
-        assertThat(actualLectureTime.getWeek()).isEqualTo(DayOfWeek.FRIDAY);
-        assertThat(actualLectureTime.getPlace()).isEqualTo("place");
-    }
-
-    @Test
-    @DisplayName("Timetable 삭제시 mapping 잘 삭제되는지 확인")
+    @DisplayName("Timetable 삭제시 schedule 잘 삭제되는지 확인")
     public void deleteCascade() {
         // given
-        TimeTableLecture actualLecture = timeTable.getLectures().get(0);
+        TimeSchedule actualLecture = timeTable.getSchedules().get(0);
 
         // when
         repository.delete(timeTable);
@@ -114,6 +87,22 @@ class TimeTableRepositoryTest {
 
         // then
         assertThat(repository.findById(timeTable.getId())).isEmpty();
-        assertThat(em.find(TimeTableLecture.class, actualLecture.getId())).isNull();
+        assertThat(em.find(TimeSchedule.class, actualLecture.getId())).isNull();
+    }
+
+    @Test
+    @DisplayName("Timetable schedules 리스트에서 삭제시 schedule 잘 삭제되는지 확인")
+    public void deleteInList() {
+        // given
+        TimeSchedule actualLecture = timeTable.getSchedules().get(0);
+
+        // when
+        timeTable.getSchedules().clear();
+
+        em.flush();
+        em.clear();
+
+        // then
+        assertThat(em.find(TimeSchedule.class, actualLecture.getId())).isNull();
     }
 }
