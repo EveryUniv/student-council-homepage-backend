@@ -67,7 +67,9 @@ class TimeTableRepositoryTest {
                 .color("color")
                 .timesJson(TimePromise.serialize(mapper, lectureTime))
                 .build();
-        timeScheduleRepository.save(lecture);
+        lecture = timeScheduleRepository.save(lecture);
+        lecture.changeTimeTable(timeTable);
+
         timeTable = repository.save(timeTable);
     }
 

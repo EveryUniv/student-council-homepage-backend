@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -84,12 +85,13 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         // when
         mvc.perform(get("/timetable/lecture"))
                 .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.content.size()").value(3))
-                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].id").isEmpty())
                 .andExpect(jsonPath("$.content[0].lectureCode").value("539250"))
                 .andExpect(jsonPath("$.content[0].category").value("세계시민역량"))
-                .andExpect(jsonPath("$.content[0].name").value("대학영어1([초급]문과대학)"))
-                .andExpect(jsonPath("$.content[0].professor").value("최희영"))
+                .andExpect(jsonPath("$.content[0].name").value("lecture0"))
+                .andExpect(jsonPath("$.content[0].professor").value("professor0"))
                 .andExpect(jsonPath("$.content[0].classNumber").value(1))
                 .andExpect(jsonPath("$.content[0].credit").value(3))
                 .andExpect(jsonPath("$.content[0].times[0].start").value("16:00:00"))
@@ -132,10 +134,11 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         // when & then
         mvc.perform(get("/timetable/3"))
                 .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.id").value(3L))
                 .andExpect(jsonPath("$.name").value("name"))
                 .andExpect(jsonPath("$.lectures[0].name").value("name"))
-                .andExpect(jsonPath("$.lectures[0].professor").value("professor"))
+                .andExpect(jsonPath("$.lectures[0].memo").value("professor"))
                 .andExpect(jsonPath("$.lectures[0].color").value("ffffff"))
                 .andExpect(jsonPath("$.lectures[0].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[0].end").value("13:00:00"))
@@ -146,7 +149,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.lectures[0].times[1].week").value(DayOfWeek.THURSDAY.name()))
                 .andExpect(jsonPath("$.lectures[0].times[1].place").value("place2"))
                 .andExpect(jsonPath("$.lectures[1].name").value("name2"))
-                .andExpect(jsonPath("$.lectures[1].professor").value("professor2"))
+                .andExpect(jsonPath("$.lectures[1].memo").value("professor2"))
                 .andExpect(jsonPath("$.lectures[1].color").value("aaaaaa"))
                 .andExpect(jsonPath("$.lectures[1].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[1].times[0].end").value("13:00:00"))

@@ -28,7 +28,7 @@ public class TimeTable extends BaseEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "timetable", orphanRemoval = true)
+    @OneToMany(mappedBy = "timetable", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<TimeSchedule> schedules = new ArrayList<>();
 
 
