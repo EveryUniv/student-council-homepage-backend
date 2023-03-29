@@ -1,11 +1,10 @@
-package com.dku.council.infra.dku.service;
+package com.dku.council.infra.dku.scrapper;
 
 import com.dku.council.global.config.webclient.ChromeAgentWebClient;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.ScheduleInfo;
 import com.dku.council.infra.dku.model.ScheduleResponse;
-import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,16 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
-public class DkuScheduleService {
+public class DkuScheduleService extends DkuScrapper {
 
     private static final DateTimeFormatter SCHEDULE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    @ChromeAgentWebClient
-    private final WebClient webClient;
-
-    @Value("${dku.schedule.api-path}")
     private final String scheduleApiPath;
+
+    public DkuScheduleService(@ChromeAgentWebClient WebClient webClient,
+                              @Value("${dku.schedule.api-path}") String scheduleApiPath) {
+        super(webClient);
+        this.scheduleApiPath = scheduleApiPath;
+    }
 
 
     /**
@@ -48,24 +48,12 @@ public class DkuScheduleService {
     }
 
     private ScheduleResponse request(DkuAuth auth, LocalDate from, LocalDate to) {
-        ScheduleResponse result;
-        try {
-            result = webClient.post()
-                    .uri(String.format(scheduleApiPath,
-                            SCHEDULE_DATE_FORMAT.format(from),
-                            SCHEDULE_DATE_FORMAT.format(to)))
-                    .cookies(auth.authCookies())
-                    .header("Referer", "https://portal.dankook.ac.kr/p/S01/")
-                    .retrieve()
-                    .bodyToMono(ScheduleResponse.class)
-                    .block();
-        } catch (Throwable t) {
-            throw new DkuFailedCrawlingException(t);
-        }
-
-        if (result == null) {
-            throw new DkuFailedCrawlingException("Failed to crawl schedule");
-        }
+        ScheduleResponse result = requestPortal(auth,
+                String.format(scheduleApiPath,
+                        SCHEDULE_DATE_FORMAT.format(from),
+                        SCHEDULE_DATE_FORMAT.format(to)),
+                ScheduleResponse.class
+        );
 
         if (!result.isSuccess()) {
             throw new DkuFailedCrawlingException(result.getMsg());

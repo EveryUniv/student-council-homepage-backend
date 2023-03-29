@@ -1,4 +1,4 @@
-package com.dku.council.infra.dku.service;
+package com.dku.council.infra.dku.scrapper;
 
 import com.dku.council.infra.dku.exception.DkuFailedLoginException;
 import com.dku.council.infra.dku.model.DkuAuth;

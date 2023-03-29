@@ -9,6 +9,7 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
+import com.dku.council.infra.dku.model.StudentDuesStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +79,8 @@ public class TestController {
                 .nickname(nickname)
                 .major(major)
                 .yearOfAdmission(yearOfAdmission)
+                .academicStatus("재학")
+                .duesStatus(StudentDuesStatus.PAID)
                 .phone(phone)
                 .build();
 

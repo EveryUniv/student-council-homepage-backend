@@ -1,14 +1,22 @@
 package com.dku.council.domain.timetable.service;
 
+import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
+import com.dku.council.domain.timetable.model.dto.response.TimeTableLectureDto;
+import com.dku.council.domain.timetable.model.entity.Lecture;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
+import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
+import com.dku.council.domain.timetable.repository.LectureRepository;
 import com.dku.council.domain.timetable.repository.TimeTableRepository;
+import com.dku.council.domain.timetable.repository.spec.LectureSpec;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.mock.LectureMock;
 import com.dku.council.mock.TimeTableMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.Assertions;
@@ -19,12 +27,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -38,16 +50,50 @@ class TimeTableServiceTest {
     @Mock
     private TimeTableRepository timeTableRepository;
 
+    @Mock
+    private LectureRepository lectureRepository;
+
     @InjectMocks
     private TimeTableService service;
 
     private TimeTable table;
+    private List<Lecture> lectures;
+    private List<TimeTableLecture> lectureMappings;
+    private List<TimeTableLectureDto> timeTableLectureDtos;
 
     @BeforeEach
     void setup() {
         table = TimeTableMock.createDummy();
+        lectures = LectureMock.createLectureList(10);
+
+        lectureMappings = lectures.stream()
+                .map(lecture -> new TimeTableLecture(lecture, "color" + lecture.getName()))
+                .collect(Collectors.toList());
+        lectureMappings.forEach(lecture -> lecture.changeTimeTable(table));
+        timeTableLectureDtos = lectureMappings.stream()
+                .map(TimeTableLectureDto::new)
+                .collect(Collectors.toList());
     }
 
+
+    @Test
+    @DisplayName("수업 목록 조회")
+    void listLectures() {
+        // given
+        Specification<Lecture> spec = LectureSpec.withTitle("");
+        Pageable pageable = Pageable.unpaged();
+        Page<Lecture> pages = new DummyPage<>(lectures);
+        given(lectureRepository.findAll(spec, pageable)).willReturn(pages);
+
+        // when
+        Page<LectureDto> actual = service.listLectures(spec, pageable);
+
+        // then
+        List<LectureDto> lectureDtos = lectures.stream()
+                .map(LectureDto::new)
+                .collect(Collectors.toList());
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(lectureDtos);
+    }
 
     @Test
     @DisplayName("시간표 목록 조회")
@@ -67,7 +113,7 @@ class TimeTableServiceTest {
         // then
         List<String> actualNames = actual.stream().map(TimeTableInfoDto::getName)
                 .collect(Collectors.toList());
-        assertThat(actualNames).containsAnyElementsOf(tableNames);
+        assertThat(actualNames).containsExactlyInAnyOrderElementsOf(tableNames);
     }
 
     @Test
@@ -80,10 +126,9 @@ class TimeTableServiceTest {
         TimeTableDto actual = service.findOne(table.getUser().getId(), table.getId());
 
         // then
-        List<LectureDto> expected = getLectureDtos(table);
         assertThat(actual.getId()).isEqualTo(table.getId());
         assertThat(actual.getName()).isEqualTo(table.getName());
-        assertThat(actual.getLectures()).containsAnyElementsOf(expected);
+        assertThat(actual.getLectures()).containsExactlyInAnyOrderElementsOf(timeTableLectureDtos);
     }
 
     @Test
@@ -101,9 +146,13 @@ class TimeTableServiceTest {
     @DisplayName("시간표 생성")
     void create() {
         // given
-        List<LectureDto> expectedLectures = getLectureDtos(table);
-        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), expectedLectures);
+        List<RequestLectureDto> reqDtos = lectureMappings.stream()
+                .map(mapping -> new RequestLectureDto(mapping.getLecture().getId(), mapping.getColor()))
+                .collect(Collectors.toList());
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), reqDtos);
+
         given(userRepository.findById(table.getUser().getId())).willReturn(Optional.of(table.getUser()));
+        given(lectureRepository.findAllById(any())).willReturn(lectures);
         given(timeTableRepository.save(tableCheckArgThat())).willReturn(table);
 
         // when
@@ -113,25 +162,25 @@ class TimeTableServiceTest {
         assertThat(id).isEqualTo(table.getId());
     }
 
-    private static List<LectureDto> getLectureDtos(TimeTable table) {
-        return table.getLectures().stream()
-                .map(LectureDto::new)
-                .collect(Collectors.toList());
-    }
-
     @Test
     @DisplayName("시간표 수정")
     void update() {
         // given
-        List<LectureDto> expectedLectures = getLectureDtos(table);
+        List<RequestLectureDto> reqDtos = lectureMappings.stream()
+                .map(mapping -> new RequestLectureDto(mapping.getLecture().getId(), mapping.getColor()))
+                .collect(Collectors.toList());
         given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
+        given(lectureRepository.findAllById(any())).willReturn(lectures);
 
         // when
-        Long id = service.update(table.getUser().getId(), table.getId(), expectedLectures);
+        Long id = service.update(table.getUser().getId(), table.getId(), reqDtos);
 
         // then
+        List<RequestLectureDto> tableLectures = table.getLectures().stream()
+                .map(lecture -> new RequestLectureDto(lecture.getLecture().getId(), lecture.getColor()))
+                .collect(Collectors.toList());
         assertThat(id).isEqualTo(table.getId());
-        assertThat(getLectureDtos(table)).containsAnyElementsOf(expectedLectures);
+        assertThat(tableLectures).containsExactlyInAnyOrderElementsOf(reqDtos);
     }
 
     @Test
@@ -198,7 +247,7 @@ class TimeTableServiceTest {
     private TimeTable tableCheckArgThat() {
         return argThat(t -> {
             assertThat(t.getName()).isEqualTo(table.getName());
-            assertThat(getLectureDtos(t)).containsAnyElementsOf(getLectureDtos(table));
+            assertThat(table.getLectures()).containsExactlyInAnyOrderElementsOf(lectureMappings);
             return true;
         });
     }

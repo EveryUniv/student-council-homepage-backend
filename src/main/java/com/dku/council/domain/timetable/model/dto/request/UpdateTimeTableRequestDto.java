@@ -1,6 +1,5 @@
 package com.dku.council.domain.timetable.model.dto.request;
 
-import com.dku.council.domain.timetable.model.dto.response.LectureDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,5 +11,5 @@ import java.util.List;
 public class UpdateTimeTableRequestDto {
 
     @NotNull
-    private final List<LectureDto> lectures;
+    private final List<RequestLectureDto> lectures;
 }

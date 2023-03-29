@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<!-- saved from url=(0088)https://webinfo.dankook.ac.kr/tiac/univ/enrl/rcmg/views/findTfeePymtgDscList.do?_view=ok -->
+<html><script async="" src="./등록금납부내역조회-웹정보_files/analytics.js.다운로드"></script><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!--<base href="https://webinfo.dankook.ac.kr:443/tiac/">--><base href=".">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- crosseditor를 사용하기 위해서는 아래 meta 태크 삽입 -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>등록금납부내역조회-웹정보</title>
+  <link rel="shortcut icon" type="image/x-icon" href="https://webinfo.dankook.ac.kr/tiac/images/layout/favicon.ICO">
+  <link href="./등록금납부내역조회-웹정보_files/jquery-ui.min.css" rel="stylesheet">
+
+  <link href="./등록금납부내역조회-웹정보_files/chosen.css" rel="stylesheet">
+  <link href="./등록금납부내역조회-웹정보_files/style.css" rel="stylesheet">
+  <link href="./등록금납부내역조회-웹정보_files/tablesorter.css" rel="stylesheet">
+
+  <!-- 구글 Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-68894441-2', 'auto');
+    ga('send', 'pageview');
+  </script>
+
+  <!-- jquery-->
+  <script src="./등록금납부내역조회-웹정보_files/jquery-1.11.1.min.js.다운로드"></script>
+
+  <script src="./등록금납부내역조회-웹정보_files/jquery.browser.min.js.다운로드"></script>
+
+  <!-- placeholder-->
+  <script src="./등록금납부내역조회-웹정보_files/jquery.placeholder.min.js.다운로드"></script>
+
+  <!-- jquery-ui script & datepicker i18n -->
+  <script src="./등록금납부내역조회-웹정보_files/jquery-ui.min.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/jquery.ui.datepicker-ko.js.다운로드"></script>
+
+  <!-- jquery-validation script & i18n -->
+  <script src="./등록금납부내역조회-웹정보_files/jquery.validate.min.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/messages_ko.js.다운로드"></script>
+
+  <!-- mask -->
+  <script src="./등록금납부내역조회-웹정보_files/jquery.inputmask.bundle.min.js.다운로드"></script>
+
+  <!-- chosen -->
+  <script src="./등록금납부내역조회-웹정보_files/chosen.jquery.js.다운로드"></script>
+
+  <!-- tablesorter -->
+  <script src="./등록금납부내역조회-웹정보_files/jquery.tablesorter.js.다운로드"></script>
+
+  <!-- rexpert -->
+  <script src="./등록금납부내역조회-웹정보_files/rexpert.min.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/rexpert.properties.js.다운로드"></script>
+
+  <script src="./등록금납부내역조회-웹정보_files/jquery.storageapi.min.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/jquery.cookie.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/jquery.highlight.min.js.다운로드"></script>
+
+  <!-- commons -->
+  <script src="./등록금납부내역조회-웹정보_files/hashmap.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/common.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/common-popup.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/validation.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/mask.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/layout.js.다운로드"></script>
+  <script src="./등록금납부내역조회-웹정보_files/menu.js.다운로드"></script>
+
+  <script type="text/javascript">
+  
+
+  setLocal("", "/tiac");
+
+  
+    setPermission(true, true, true, false, false);
+  
+  
+    setPageAttribute("WUNIV", "WENRL", "3965", "10", false);
+  
+
+  var backgroundClasses = ["ico_engin", "ico_pofol"];
+  $(document).ready(function() {
+      setRptServiceUrl("production");
+      renderContextMenu("","");
+
+      // 사용자 목록
+      var changeUsers = $.sessionStorage.get( "changeUsers" );
+      if ( changeUsers ) {
+          renderChangeUsers( changeUsers );
+      } else {
+          $.getJSON( "findWebMultiIndentList.do" ,function ( data ) {
+              $.sessionStorage.set( "changeUsers" ,data );
+              renderChangeUsers( data );
+          } );
+      }
+
+      $( "#lang" ).val( "ko" ).attr( "selected" ,"selected" );
+      $( "#lang" ).change( function () {
+          if ( this.value != "" ) {
+              $.sessionStorage.removeAll();
+              $( "#localeChange" ).submit();
+          }
+      } );
+  });
+
+  function renderChangeUsers ( data ) {
+        var $changeUsers = $( "#changeUsers" );
+        if ( data.multiIndentList.length > 0 ) {
+            $.each( data.multiIndentList ,function ( index ,user ) {
+                if ( user.authTy == "M" ) {
+                    $changeUsers.append( $( "<option>" ,{
+                        value : user.intgUid ,
+                        text : user.userTyNm + "-" + user.intgUid
+                    } ) );
+                } else {
+                    // 이양받은 권한
+                    $changeUsers.append( $( "<option value='" + user.intgUid + "' data-orgid='" + user.orgid + "'>" + user.userTyNm + "</option>" ) );
+                }
+            } );
+            $changeUsers.change( function ( event ) {
+                // 이양받은 권한에서 이양받은 권한으로 변환 방지.
+                var orgid = $( this ).find( ':selected' ).data( 'orgid' );
+                if ( "false" == "true" && orgid ) {
+                    alert( "이양받은 권한에서 이양받은 권한으로 변경할수 없습니다." );
+                    $changeUsers.selected( "32111111" );
+                    return false;
+                }
+                if ( confirm( "[" + this.value + "] 아이디로 로그인 하시겠습니까?" ) ) {
+                    $( "#orgid" ).val( $( this ).find( ':selected' ).data( 'orgid' ) );
+                    $( this ).parents( "form" ).submit();
+                }
+            } );
+        } else {
+            // 홍길동(부서-교직원번호/학번)
+            // 신분-학번
+            $changeUsers.append( $( "<option>" ,{
+                value : "32111111" ,
+                text : "학부-재학생" + "-" + "32111111"
+            } ) );
+        }
+        $changeUsers.selected( "32111111" );
+    }
+  </script>
+</head>
+<!-- 마우스 우클릭 방지 oncontextmenu="return false" -->
+<body id="body">
+  <!-- wrap -->
+  <div id="wrap">
+    <!-- header -->
+    <div id="header">
+      <div class="top_sec">
+        <h1 class="">
+          <a href="https://webinfo.dankook.ac.kr/tiac/main.do" data-context="ticm"><img src="./등록금납부내역조회-웹정보_files/top_logo.png" alt="DKU Web Information System"></a>
+        </h1>
+        <a href="https://portal.dankook.ac.kr/" class="btn_portal">portal 바로가기</a>
+        <div class="util_box">
+          <form method="post" action="https://webinfo.dankook.ac.kr/tiac/comm/syst/accm/changeUser.do">
+            <!-- my_name -->
+            <div class="my_name">
+              <p>홍길동(공과대학 응용컴퓨터공학과-32111111)</p>
+              <span class="my_count" style="display:none"></span>
+            </div>
+            <!-- //my_name -->
+            <!-- 학과 -->
+            <div class="study_select">
+              <select id="changeUsers" name="changeId" title="조직" class="chosen-select-no-single" style="display: none;">
+              <option value="32111111">[재학]학부-재학생-32111111</option></select><div class="chosen-container chosen-container-single chosen-container-single-nosearch" style="width: 100%;" title="조직" id="changeUsers_chosen"><a class="chosen-single" tabindex="-1"><span>[재학]학부-재학생-32111111</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off" readonly=""></div><ul class="chosen-results"></ul></div></div>
+              <input type="hidden" id="orgid" name="orgid">
+            </div>
+            <!-- //학과 -->
+            <a href="https://webinfo.dankook.ac.kr/j_security_logout" class="btn_logout"><span class="blind">로그아웃</span></a>
+          </form>
+        </div>
+      </div>
+
+      <div class="nav_wrap">
+        <h2 class="nav_tit"><img src="./등록금납부내역조회-웹정보_files/nav_tit.png" alt="단국대학교 웹정보시스템"></h2>
+        <!-- 메인메뉴 -->
+        <ul class="nav"><li id="WCOMM"><a href="https://webinfo.dankook.ac.kr/tiac/#" class="ico_nav ico_common">공통</a></li><li id="WUNIV" class="on"><a href="https://webinfo.dankook.ac.kr/tiac/#" class="ico_nav ico_school">학사정보</a><div class="nav_bookmark"></div></li><li id="WADMI"><a href="https://webinfo.dankook.ac.kr/tiac/#" class="ico_nav ico_admin">행정정보</a></li><li id="WADJT"><a href="https://webinfo.dankook.ac.kr/tiac/#" class="ico_nav ico_research">부속행정</a></li><li id="WPOTF"><a href="https://webinfo.dankook.ac.kr/ptfo/pofm/views/findMainList.do" class="ico_nav ico_pofol" data-context="/ptfo">포트폴리오</a></li></ul>
+        <!-- //메인메뉴 -->
+        <!-- 다국어 선택 -->
+        <form id="localeChange" method="post">
+          <div class="language_select">
+            <select id="lang" name="lang" title="다국어선택" selected="selected">
+              <option value="ko">한글</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </form>
+        <!-- //다국어 선택 -->
+      </div>
+    </div>
+    <!-- //header -->
+
+    <!-- contents -->
+    <div id="contents" style="min-height: 709px;">
+      <!-- 사이드메뉴 폴더 -->
+      <div class="btn_fold"><a href="https://webinfo.dankook.ac.kr/tiac/#"><span class="blind">사이드메뉴 보기</span></a></div>
+      <!-- //사이드메뉴 폴더 -->
+      <!-- aside -->
+      <div class="aside">
+        <div class="snb">
+          <h2 class="aside_tit">학사정보</h2>
+          <ul class="sub_nav"><li id="WSREC" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">학적관리</a><ul style="display: none;"><li id="3893" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/srlm/views/findScregBasWeb.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>기본학적(신상정보변경)</a></li><li id="3895" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/mamg/views/findSregMjDscMamgList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>전공신청</a></li><li id="3896" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/mamg/views/findSregExcMjAplDscMamgList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>교류전공신청</a></li><li id="3897" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/srlm/views/findWebScregModDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학적변동신청</a></li><li id="3898" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/chma/views/findChmjAplDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>전부(과)신청</a></li><li id="3899" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/chma/views/findChmjAplRateList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>전부(과)경쟁률조회</a></li><li id="3900" data-parent="WSREC"><a href="https://webinfo.dankook.ac.kr/tiac/univ/srec/srlm/views/findRwpsmDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>상벌정보조회</a></li></ul></li><li id="WPROQ" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">자격관리</a><ul style="display: none;"><li id="3903" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findTechgApp.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>교직이수신청</a></li><li id="3905" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findTechgSubApp.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>교직복수(연계)전공신청</a></li><li id="5730" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findFieldTrainingBssForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학교현장실습기초조사</a></li><li id="5660" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findFieldTrainingConForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학교현장실습동의서제출</a></li><li id="3909" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findFieldTraining.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학교현장실습신청</a></li><li id="5071" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findFieldPresence.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학교현장실습 출석인정서</a></li><li id="5657" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findTeacSvcDscBasListW.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>개인별교육봉사조회</a></li><li id="3911" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findPslTestApp.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>적성ㆍ인성검사 신청 및 결과</a></li><li id="3912" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findIndTrainingApp.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>공업계현장실습신청</a></li><li id="3913" data-parent="WPROQ"><a href="https://webinfo.dankook.ac.kr/tiac/univ/proq/teac/views/findTeacQualificationsApp.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>교원자격무시험검정신청</a></li></ul></li><li id="WGRAD" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">졸업관리</a><ul style="display: none;"><li id="3917" data-parent="WGRAD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/grad/egpm/views/findGrdFast.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>조기졸업신청</a></li><li id="3918" data-parent="WGRAD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/grad/egpm/views/findGrdDelay.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학사학위취득유예신청</a></li><li id="3919" data-parent="WGRAD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/grad/gasm/views/findGrdtObjrDscGeneration.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>자가진단시뮬레이션</a></li></ul></li><li id="WLSSN" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">수업관리</a><ul style="display: none;"><li id="WSSTM" data-parent="WLSSN"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">수강신청</a><ul style="display: none;"><li id="5465" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/tcam/views/findTkcrsBrc.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강안내문</a></li><li id="5160" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/tcam/views/findTkcrsAplMv.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강신청</a></li><li id="5726" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/tcam/views/findTkcrsAplCfm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강신청확인서</a></li><li id="5313" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/tcam/views/findTkcrsPlHlper.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강계획도우미</a></li><li id="5159" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/ttmg/views/findTkcrsTmtblList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강시간표</a></li><li id="5323" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/tcam/views/findTkcrsWd.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>수강철회 신청</a></li><li id="3954" data-parent="WSSTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/sstm/views/findSznSemTkcrsCfm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>계절학기 수강확인 및 고지서 출력</a></li></ul></li><li id="WLPCI" data-parent="WLSSN"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">강의시간표</a><ul style="display: none;"><li id="3955" data-parent="WLPCI"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/lpci/views/findLctTmtblDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>강의시간표(전체용)</a></li></ul></li><li id="WBZTM" data-parent="WLSSN"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">출강관리</a><ul style="display: none;"><li id="3927" data-parent="WBZTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/bztm/views/findLecrAttndCfmDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>출석확인 조회</a></li><li id="6026" data-parent="WBZTM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/bztm/views/findAbseWithLeavForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>유고결석신청</a></li></ul></li><li id="WLEQI" data-parent="WLSSN"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">강의평가</a><ul style="display: none;"><li id="3930" data-parent="WLEQI"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/leqi/views/findLecevSrvshDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>강의평가 입력</a></li><li id="5314" data-parent="WLEQI"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/lepc/views/findLecevCfm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>강의평가 확인조회</a></li></ul></li><li id="WETCM" data-parent="WLSSN"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">교양영어</a><ul style="display: none;"><li id="5120" data-parent="WETCM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/etcm/views/findVldComplForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>영어특별학습 신청</a></li><li id="5503" data-parent="WETCM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/etcm/views/findStuTkcrsEngLvlDsc.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>영어 레벨 조회</a></li></ul></li></ul></li><li id="WGDMG" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">성적관리</a><ul style="display: none;"><li id="4018" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/rgcm/views/findSvcAplForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>사회봉사 입력 및 조회</a></li><li id="5335" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/rgcm/views/findEngSbjtExmpAplForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>영어교과면제신청</a></li><li id="4019" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/auem/views/findOaengAplForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>공인외국어 입력 및 조회</a></li><li id="4020" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/auem/views/findOaengSprtAmtAplForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>공인영어 지원금 신청</a></li><li id="4021" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdmg/views/findLtrClTskStuList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>과제/기타성적 조회</a></li><li id="4022" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdmg/views/findMidExamStuList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>중간고사성적 조회</a></li><li id="4023" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdim/views/findTkcrsGrWList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>최종성적 조회</a></li><li id="4024" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdmg/views/findGrCrapyAplWForm.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>성적정정 신청</a></li><li id="4025" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdcm/views/findGrDscWList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>누적성적 조회</a></li><li id="4026" data-parent="WGDMG"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cret/gdmg/views/findSubjAbdntList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>교과목포기신청</a></li></ul></li><li id="WCLIN" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">클리닉</a><ul style="display: none;"><li id="5117" data-parent="WCLIN"><a href="https://webinfo.dankook.ac.kr/tiac/univ/lssn/etcm/views/findEclinicGuide.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>English Clinic 신청</a></li></ul></li><li id="WEFLN" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">장학관리</a><ul style="display: none;"><li id="3959" data-parent="WEFLN"><a href="https://webinfo.dankook.ac.kr/tiac/univ/efln/sssm/views/findGrSchlrApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>성적장학신청</a></li><li id="6071" data-parent="WEFLN"><a href="https://webinfo.dankook.ac.kr/tiac/univ/efln/sssm/views/findCntyLaborAbdntApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>국가근로포기신청</a></li><li id="3962" data-parent="WEFLN"><a href="https://webinfo.dankook.ac.kr/tiac/univ/efln/sssm/views/findSchspBnfDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>장학금수혜내역조회</a></li></ul></li><li id="WENRL" data-parent="WUNIV" class="on"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">등록관리</a><ul style="display: block;"><li id="3963" data-parent="WENRL"><a href="https://webinfo.dankook.ac.kr/tiac/univ/enrl/ismm/views/findInstmApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>분납신청</a></li><li id="3964" data-parent="WENRL"><a href="https://webinfo.dankook.ac.kr/tiac/univ/enrl/rgom/views/findTfeeNtshtDsc.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>등록금고지서출력</a></li><li id="3965" data-parent="WENRL" class="on"><a href="https://webinfo.dankook.ac.kr/tiac/univ/enrl/rcmg/views/findTfeePymtgDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>등록금납부내역조회</a></li></ul></li><li id="WSTUD" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">학생관리</a><ul style="display: none;"><li id="3966" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/cbmg/views/findClubJoinApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>동아리가입신청</a></li><li id="3973" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/cbmg/views/findClubActyCrtList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>동아리활동확인서발급</a></li><li id="3968" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/sppm/views/findStpcnPgmList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학생참여프로그램신청</a></li><li id="3971" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/sppm/views/findStpcnPgmRsl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학생참여프로그램보고서등록</a></li><li id="5297" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/sppm/views/findStpcnPgmCrtList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학생참여프로그램확인서발급</a></li><li id="3972" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/essm/views/findStutActyCrtList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>학생활동확인서발급</a></li><li id="5891" data-parent="WSTUD"><a href="https://webinfo.dankook.ac.kr/tiac/univ/stud/milg/views/findStudMilgAplDscList.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>창업마일리지신청</a></li></ul></li><li id="WCUSL" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">상담관리</a><ul style="display: none;"><li id="3974" data-parent="WCUSL"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cusl/cslm/views/findCuslApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>상담신청</a></li><li id="6579" data-parent="WCUSL"><a href="https://webinfo.dankook.ac.kr/tiac/univ/cusl/cslm/views/findCuslCareApl.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>STEP상담신청(학생)</a></li></ul></li><li id="WMILT" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">예비군민방위</a><ul style="display: none;"><li id="WRFMM" data-parent="WMILT"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">예비군전출입관리</a><ul style="display: none;"><li id="3982" data-parent="WRFMM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/milt/rfmm/views/findRsvfcFrmtRepor.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>예비군편성신고</a></li></ul></li></ul></li><li id="WMUDM" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">음악관리</a><ul style="display: none;"><li id="5534" data-parent="WMUDM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/mudm/mcss/views/findMusicDataInq.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>음악 자료 조회</a></li><li id="5535" data-parent="WMUDM"><a href="https://webinfo.dankook.ac.kr/tiac/univ/mudm/mcss/views/findMusicDataLnRtnInq.do" data-context="/tiac" data-leap="Y"><span class="lnb_lst_header">-</span>음악 자료 대출 반납 조회</a></li></ul></li><li id="WEXCH" data-parent="WUNIV"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">국제교류</a><ul style="display: none;"><li id="WISSM" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">ISS/IWS</a><ul style="display: none;"><li id="4031" data-parent="WISSM"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/issm/tcsr/views/findIssTkcrsAplForm.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>수강신청</a></li><li id="4032" data-parent="WISSM"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/issm/tcsr/views/findIssTkcrsAplList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>수강조회</a></li><li id="5672" data-parent="WISSM"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/issm/tcsr/views/findIssRfndAplForm.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>환불신청</a></li></ul></li><li id="WESOM" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">교환학생</a><ul style="display: none;"><li id="4034" data-parent="WESOM"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/esom/views/findExstdOutAplRslList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>교환학생신청</a></li><li id="4035" data-parent="WESOM"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/esom/views/findExstdOutRgcdtAplList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>학점인정신청</a></li></ul></li><li id="WESVT" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">복수학위</a><ul style="display: none;"><li id="5599" data-parent="WESVT"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/esvt/views/findExstdOutAplRslList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>복수학위신청</a></li><li id="5601" data-parent="WESVT"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/esvt/views/findExstdOutRgcdtAplList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>학점인정신청</a></li></ul></li><li id="WLGST" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">어학연수</a><ul style="display: none;"><li id="4036" data-parent="WLGST"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/lgst/views/findLangsTrngAplRslList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>어학연수신청</a></li><li id="4038" data-parent="WLGST"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/lgst/views/findLangsTrngSfBudenRgcdtAplList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>학점인정신청(자비)</a></li></ul></li><li id="WFCIS" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">해외인턴십</a><ul style="display: none;"><li id="4040" data-parent="WFCIS"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/fcis/views/findFcntyItspAplRslList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>해외인턴십신청</a></li><li id="5383" data-parent="WFCIS"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/fcis/views/findFcntyItspSfRgcdtAplList.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>학점인정신청(자비)</a></li></ul></li><li id="WFSAS" data-parent="WEXCH"><a href="https://webinfo.dankook.ac.kr/tiac/#" data-context="/ptfo" data-leap="N">외국인유학생</a><ul style="display: none;"><li id="6493" data-parent="WFSAS"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/fsas/views/findSablvStudPrsnInfoForm.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>학생정보</a></li><li id="4042" data-parent="WFSAS"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/fsas/views/findSablvStudOathSbmForm.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>서약서제출</a></li><li id="4043" data-parent="WFSAS"><a href="https://webinfo.dankook.ac.kr/tiaf/adjt/exch/fsas/views/findSablvStudDormAplForm.do" data-context="/tiaf" data-leap="Y"><span class="lnb_lst_header">-</span>생활관신청</a></li></ul></li></ul></li></ul>
+        </div>
+      </div>
+      <!-- //aside -->
+
+      <!-- cont -->
+      <div class="cont">
+        
+        
+        
+        
+        
+        <!-- 필드입력 미입력안내 -->
+        <div id="_error_" class="section_required " style="display: none">
+          <h3 class="blind">해당 항목을 입력해주세요.</h3>
+          <ul id="errorContainer" class="lst_square">
+            
+          </ul>
+        </div>
+        <!-- //필수입력 미기재 -->
+
+        <!-- 타이틀 -->
+        <div id="titleSection" class="section_top_tit" style="">
+          <!-- 현재위치 -->
+          <ul class="gps">
+            <li class="home">
+              <span class="blind">home</span>
+            </li>
+          <li>등록관리</li><li>등록금납부내역조회</li></ul>
+          <!-- //현재위치 -->
+          <h3 id="title" class="tit_now tit_school">등록금납부내역조회</h3>
+        </div>
+        
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $("#tbl_bntList").tablesorter();
+
+    $("#tbl_feeList tr").on("click",function(e) {
+        var url    = "univ/enrl/rcmg/findSemMiscfPaidList.do";
+        var params = {
+            yy   : $(this).find("td").eq(1).text()
+           ,semCd: $(this).find("td").eq(2).text()
+        };
+
+	    $.getJSON(url, params, function (data) {
+
+	        var $tblSemList = $("#tbl_semList");
+	        $tblSemList.find("tbody").empty();
+
+	        if (data.semMiscfPaidList.length) {
+	            $.each(data.semMiscfPaidList, function (index, entry) {
+	                $tblSemList.addRow("#txt_semList");
+	                var $row = $tblSemList.find("tbody tr:last");
+
+	                $.each(entry,function (name, value) {
+	                	var $element = $row.find("#" + name );
+	                    $element.text(value);
+	                });
+	            });
+
+	            $("#form_semList").find("em").text(data.semMiscfPaidList.length);
+	            $(".ta_r").mask("currency");
+	        } else {
+	            $empAcdmcrListTbl.addEmptyRow();
+	        }
+	    });
+	    // 선택 tr class 적용
+        $(this).addClass("tr_on");
+        $(this).siblings().removeClass();
+    });
+});
+</script>
+<form>
+<div class="section_tbl">
+  <div class="section_mid_tit">
+    <h4 class="tit_mid f_l">등록금납부내역</h4> <p class="f_l fc_blue" style="margin-top:5px;margin-left:10px;"> (※ 증명서 출력은 인터넷 증명을 이용하시기 바랍니다.)</p>
+    <p class="txt_number f_r">검색결과는 [ <em class="fc_orange"> 7 건</em> ] 입니다.</p>
+  </div>
+  <div class="tbl_column">
+    <table id="tbl_feeList" class="tbl_mixed tbl_click" role="grid" aria-labelledby="theCaption">
+      <caption>등록금납부내역</caption>
+      <colgroup>
+        <col style="width: 5%;">
+        <col style="width: 6%;">
+        <col style="width: 6%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: 10%;">
+        <col style="width: *%;">
+      </colgroup>
+      <thead>
+        <tr class="tablesorter-headerRow" role="row">
+            <th scope="col" data-sorter="false">#</th>
+            <th scope="col">년도</th>
+            <th scope="col">학기</th>
+            <th scope="col">입학금</th>
+            <th scope="col">수업료</th>
+            <th scope="col">연구등록금</th>
+            <th scope="col">등록금합계</th>
+            <th scope="col">장학금</th>
+            <th scope="col">실납입금액</th>
+            <th scope="col">수납금액</th>
+            <th scope="col">수납일자</th>
+        </tr>
+      </thead>
+        <tbody>
+            
+            <tr>
+                <td class="ta_c">1</td>
+                <td class="ta_c">2023</td>
+                <td class="ta_c">1</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2023-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">2</td>
+                <td class="ta_c">2022</td>
+                <td class="ta_c">2</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2022-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">3</td>
+                <td class="ta_c">2022</td>
+                <td class="ta_c">1</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2022-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">4</td>
+                <td class="ta_c">2020</td>
+                <td class="ta_c">2</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2020-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">5</td>
+                <td class="ta_c">2020</td>
+                <td class="ta_c">1</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2020-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">6</td>
+                <td class="ta_c">2019</td>
+                <td class="ta_c">2</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2019-01-01</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">7</td>
+                <td class="ta_c">2019</td>
+                <td class="ta_c">1</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_r">0</td>
+                <td class="ta_c">2019-01-01</td>
+            </tr>
+            
+            
+        </tbody>
+    </table>
+  </div>
+</div>
+</form>
+<form id="form_semList" name="form_semList">
+<div class="section_tbl">
+  <div class="section_mid_tit">
+    <h4 class="tit_mid f_l">학기별선택경비납부내역</h4>
+    <p class="txt_number f_r">검색결과는 [ <em class="fc_orange"> 7 건</em> ] 입니다.</p>
+  </div>
+  <div class="tbl_column">
+    <table id="tbl_semList" class="tbl_mixed tablesorter tablesorter-default" role="grid" aria-labelledby="theCaption">
+      <caption>학기별선택경비납부내역</caption>
+      <colgroup>
+        <col style="width: 5%;">
+        <col style="width: 8%;">
+        <col style="width: 8%;">
+        <col style="width: 20%;">
+        <col style="width: 20%;">
+        <col style="width: 20%;">
+      </colgroup>
+      <thead>
+        <tr class="tablesorter-headerRow" role="row">
+            <th scope="col" data-sorter="false">#</th>
+            <th scope="col">년도</th>
+            <th scope="col">학기</th>
+            <th scope="col">구분</th>
+            <th scope="col">선택경비납입금액</th>
+            <th scope="col">선택경비수납금액</th>
+        </tr>
+      </thead>
+      <tbody>
+            
+            <tr>
+                <td class="ta_c">2</td>
+                <td class="ta_c">2022</td>
+                <td class="ta_c">2</td>
+                <td class="ta_c">학생회비</td>
+                <td class="ta_r">7,000</td>
+                <td class="ta_r">7,000</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">3</td>
+                <td class="ta_c">2022</td>
+                <td class="ta_c">2</td>
+                <td class="ta_c">학생회비</td>
+                <td class="ta_r">7,000</td>
+                <td class="ta_r">7,000</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">4</td>
+                <td class="ta_c">2021</td>
+                <td class="ta_c">1</td>
+                <td class="ta_c">학생회비</td>
+                <td class="ta_r">7,000</td>
+                <td class="ta_r">7,000</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">5</td>
+                <td class="ta_c">2021</td>
+                <td class="ta_c">2</td>
+                <td class="ta_c">학생회비</td>
+                <td class="ta_r">7,000</td>
+                <td class="ta_r">7,000</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">6</td>
+                <td class="ta_c">2020</td>
+                <td class="ta_c">1</td>
+                <td class="ta_c">학생회비</td>
+                <td class="ta_r">7,000</td>
+                <td class="ta_r">7,000</td>
+            </tr>
+            
+            <tr>
+                <td class="ta_c">7</td>
+                <td class="ta_c">2020</td>
+                <td class="ta_c">1</td>
+                <td class="ta_c">교재대</td>
+                <td class="ta_r">100,000</td>
+                <td class="ta_r">100,000</td>
+            </tr>
+            
+            
+        </tbody>
+    </table>
+  </div>
+</div>
+</form>
+
+<textarea id="txt_semList" name="txt_semList" style="display: none">  &lt;tr&gt;
+    &lt;td class="left_line ta_c numbering"&gt;{0}&lt;/td&gt;
+    &lt;td class="ta_c" id="yy"&gt;&lt;/td&gt;
+    &lt;td class="ta_c" id="semCd"&gt;&lt;/td&gt;
+    &lt;td class="ta_l" id="tfeeItemNm"&gt;&lt;/td&gt;
+    &lt;td class="ta_r" id="pymAmt"&gt;&lt;/td&gt;
+    &lt;td class="ta_r" id="rcipAmt"&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+</textarea>
+
+      </div>
+      <!-- //cont -->
+    </div>
+    <!-- //contents -->
+
+    <!-- footer -->
+    <div id="footer">
+      <div class="addr_box">
+        <p class="addr">죽전캠퍼스 경기도 용인시 수지구 죽전로 152 (우)16890 / 천안캠퍼스 충남 천안시 동남구 단대로 119 (우)31116 </p>
+        <p class="copy">COPYRIGHT(C) 2015 BY DANKOOK UNIVERSITY. ALL RIGHTS RESERVED.</p>
+      </div>
+      <!--
+      <ul class="footer_btn">
+        <li><a href="#" id="help"><img src="images/layout/footer_help.gif" alt="문의하기" /></a></li>
+      </ul>
+       -->
+    </div>
+    <!-- //footer -->
+  </div>
+  <!-- //wrap -->
+
+  <iframe src="./등록금납부내역조회-웹정보_files/dummy.html" width="0" height="0" style="display: none"></iframe>
+
+
+</body></html>

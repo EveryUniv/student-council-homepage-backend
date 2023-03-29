@@ -3,6 +3,7 @@ package com.dku.council.domain.timetable.repository;
 import com.dku.council.domain.timetable.model.entity.Lecture;
 import com.dku.council.domain.timetable.model.entity.LectureTime;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
+import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
@@ -34,6 +35,9 @@ class TimeTableRepositoryTest {
     private TimeTableRepository repository;
 
     @Autowired
+    private LectureRepository lectureRepository;
+
+    @Autowired
     private EntityManager em;
 
     private TimeTable timeTable;
@@ -51,14 +55,17 @@ class TimeTableRepositoryTest {
 
         Lecture lecture = Lecture.builder()
                 .name("name")
-                .place("place")
                 .professor("professor")
                 .build();
-        lecture.changeTimeTable(timeTable);
+        lecture = lectureRepository.save(lecture);
+
+        TimeTableLecture mapping = new TimeTableLecture(lecture, "color");
+        mapping.changeTimeTable(timeTable);
 
         LectureTime lectureTime = LectureTime.builder()
                 .startTime(LocalTime.of(10, 0))
                 .endTime(LocalTime.of(13, 0))
+                .place("place")
                 .week(DayOfWeek.FRIDAY)
                 .build();
         lectureTime.changeLecture(lecture);
@@ -78,9 +85,11 @@ class TimeTableRepositoryTest {
         assertThat(actualTable.getName()).isEqualTo("test");
         assertThat(actualTable.getLectures().size()).isEqualTo(1);
 
-        Lecture actualLecture = actualTable.getLectures().get(0);
+        TimeTableLecture mapping = actualTable.getLectures().get(0);
+        assertThat(mapping.getColor()).isEqualTo("color");
+
+        Lecture actualLecture = actualTable.getLectures().get(0).getLecture();
         assertThat(actualLecture.getName()).isEqualTo("name");
-        assertThat(actualLecture.getPlace()).isEqualTo("place");
         assertThat(actualLecture.getProfessor()).isEqualTo("professor");
         assertThat(actualLecture.getLectureTimes().size()).isEqualTo(1);
 
@@ -88,14 +97,14 @@ class TimeTableRepositoryTest {
         assertThat(actualLectureTime.getStartTime()).isEqualTo(LocalTime.of(10, 0));
         assertThat(actualLectureTime.getEndTime()).isEqualTo(LocalTime.of(13, 0));
         assertThat(actualLectureTime.getWeek()).isEqualTo(DayOfWeek.FRIDAY);
+        assertThat(actualLectureTime.getPlace()).isEqualTo("place");
     }
 
     @Test
-    @DisplayName("Timetable 삭제시 모두 잘 삭제되는지 확인")
+    @DisplayName("Timetable 삭제시 mapping 잘 삭제되는지 확인")
     public void deleteCascade() {
         // given
-        Lecture actualLecture = timeTable.getLectures().get(0);
-        LectureTime actualLectureTime = actualLecture.getLectureTimes().get(0);
+        TimeTableLecture actualLecture = timeTable.getLectures().get(0);
 
         // when
         repository.delete(timeTable);
@@ -105,7 +114,6 @@ class TimeTableRepositoryTest {
 
         // then
         assertThat(repository.findById(timeTable.getId())).isEmpty();
-        assertThat(em.find(Lecture.class, actualLecture.getId())).isNull();
-        assertThat(em.find(LectureTime.class, actualLectureTime.getId())).isNull();
+        assertThat(em.find(TimeTableLecture.class, actualLecture.getId())).isNull();
     }
 }
