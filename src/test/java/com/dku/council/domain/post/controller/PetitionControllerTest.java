@@ -14,7 +14,7 @@ import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
-import com.dku.council.global.dto.ResponseSuccessDto;
+import com.dku.council.global.model.dto.ResponseSuccessDto;
 import com.dku.council.mock.CommentMock;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.PetitionMock;

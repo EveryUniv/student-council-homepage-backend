@@ -22,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -89,9 +88,8 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         // when
         mvc.perform(get("/timetable/lecture"))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.content.size()").value(3))
-                .andExpect(jsonPath("$.content[0].id").isEmpty())
+                .andExpect(jsonPath("$.content[0].id").value(0))
                 .andExpect(jsonPath("$.content[0].lectureCode").value("539250"))
                 .andExpect(jsonPath("$.content[0].category").value("세계시민역량"))
                 .andExpect(jsonPath("$.content[0].name").value("lecture0"))
@@ -138,7 +136,6 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         // when & then
         mvc.perform(get("/timetable/3"))
                 .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.id").value(3L))
                 .andExpect(jsonPath("$.name").value("name"))
                 .andExpect(jsonPath("$.lectures[0].name").value("name"))
