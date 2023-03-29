@@ -4,11 +4,11 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableNameRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.UpdateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.response.LectureDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
+import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
-import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
-import com.dku.council.domain.timetable.model.entity.Lecture;
-import com.dku.council.domain.timetable.repository.spec.LectureSpec;
+import com.dku.council.domain.timetable.model.entity.LectureTemplate;
+import com.dku.council.domain.timetable.repository.spec.LectureTemplateSpec;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
@@ -36,9 +36,9 @@ public class TimeTableController {
      * <p>수업 목록을 조회합니다. 검색 키워드를 지정할 수 있으며, 지정하지 않으면 모든 수업 목록을 조회합니다.</p>
      */
     @GetMapping("/lecture")
-    public ResponsePage<LectureDto> listLectures(@RequestParam(required = false) String keyword,
-                                                 @ParameterObject Pageable pageable) {
-        Specification<Lecture> spec = LectureSpec.withTitle(keyword);
+    public ResponsePage<LectureTemplateDto> listLectures(@RequestParam(required = false) String keyword,
+                                                         @ParameterObject Pageable pageable) {
+        Specification<LectureTemplate> spec = LectureTemplateSpec.withTitle(keyword);
         return new ResponsePage<>(timeTableService.listLectures(spec, pageable));
     }
 
@@ -50,7 +50,7 @@ public class TimeTableController {
      */
     @GetMapping
     @UserOnly
-    public List<TimeTableInfoDto> list(AppAuthentication auth) {
+    public List<ListTimeTableDto> list(AppAuthentication auth) {
         return timeTableService.list(auth.getUserId());
     }
 

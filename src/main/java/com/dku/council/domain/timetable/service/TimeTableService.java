@@ -2,19 +2,22 @@ package com.dku.council.domain.timetable.service;
 
 import com.dku.council.domain.timetable.exception.LectureNotFoundException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
+import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
-import com.dku.council.domain.timetable.model.dto.request.RequestLectureDto;
-import com.dku.council.domain.timetable.model.dto.response.LectureDto;
+import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
+import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
+import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
-import com.dku.council.domain.timetable.model.dto.response.TimeTableInfoDto;
-import com.dku.council.domain.timetable.model.entity.Lecture;
+import com.dku.council.domain.timetable.model.entity.LectureTemplate;
+import com.dku.council.domain.timetable.model.entity.TimeSchedule;
 import com.dku.council.domain.timetable.model.entity.TimeTable;
-import com.dku.council.domain.timetable.model.entity.TimeTableLecture;
-import com.dku.council.domain.timetable.repository.LectureRepository;
+import com.dku.council.domain.timetable.repository.LectureTemplateRepository;
+import com.dku.council.domain.timetable.repository.TimeScheduleRepository;
 import com.dku.council.domain.timetable.repository.TimeTableRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,31 +25,38 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.dku.council.domain.timetable.model.mapper.TimeScheduleMapper.createScheduleFromLecture;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class TimeTableService {
 
+    private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
-    private final LectureRepository lectureRepository;
+    private final LectureTemplateRepository lectureTemplateRepository;
     private final TimeTableRepository timeTableRepository;
+    private final TimeScheduleRepository timeScheduleRepository;
 
 
     @Transactional(readOnly = true)
-    public Page<LectureDto> listLectures(Specification<Lecture> spec, Pageable pageable) {
-        Page<Lecture> lectures = lectureRepository.findAll(spec, pageable);
-        return lectures.map(LectureDto::new);
+    public Page<LectureTemplateDto> listLectures(Specification<LectureTemplate> spec, Pageable pageable) {
+        Page<LectureTemplate> lectures = lectureTemplateRepository.findAll(spec, pageable);
+        return lectures.map(e -> new LectureTemplateDto(objectMapper, e));
     }
 
     @Transactional(readOnly = true)
-    public List<TimeTableInfoDto> list(Long userId) {
+    public List<ListTimeTableDto> list(Long userId) {
         List<TimeTable> timeTables = timeTableRepository.findAllByUserId(userId);
 
         return timeTables.stream()
-                .map(TimeTableInfoDto::new)
+                .map(ListTimeTableDto::new)
                 .collect(Collectors.toList());
     }
 
@@ -58,7 +68,7 @@ public class TimeTableService {
         if (!table.getUser().getId().equals(userId))
             throw new TimeTableNotFoundException();
 
-        return new TimeTableDto(table);
+        return new TimeTableDto(objectMapper, table);
     }
 
     public Long create(Long userId, CreateTimeTableRequestDto dto) {
@@ -66,21 +76,21 @@ public class TimeTableService {
                 .orElseThrow(UserNotFoundException::new);
 
         TimeTable timeTable = new TimeTable(user, dto.getName());
-        appendLecturesEntity(timeTable, dto.getLectures());
+        appendScheduleEntity(timeTable, dto.getLectures());
         timeTable = timeTableRepository.save(timeTable);
 
         return timeTable.getId();
     }
 
-    public Long update(Long userId, Long tableId, List<RequestLectureDto> lectureDtos) {
+    public Long update(Long userId, Long tableId, List<RequestScheduleDto> lectureDtos) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
 
         if (!table.getUser().getId().equals(userId))
             throw new TimeTableNotFoundException();
 
-        table.getLectures().clear();
-        appendLecturesEntity(table, lectureDtos);
+        table.getSchedules().clear();
+        appendScheduleEntity(table, lectureDtos);
 
         return table.getId();
     }
@@ -96,19 +106,38 @@ public class TimeTableService {
         return table.getId();
     }
 
-    private void appendLecturesEntity(TimeTable table, List<RequestLectureDto> lectureDtos) {
+    private void appendScheduleEntity(TimeTable table, List<RequestScheduleDto> lectureDtos) {
         List<Long> idList = lectureDtos.stream()
-                .map(RequestLectureDto::getId)
+                .map(RequestScheduleDto::getLectureId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        List<Lecture> lectures = lectureRepository.findAllById(idList);
+        List<LectureTemplate> lectures = lectureTemplateRepository.findAllById(idList);
 
-        if (lectures.size() != lectureDtos.size()) {
+        if (lectures.size() != idList.size()) {
             throw new LectureNotFoundException();
         }
 
-        for (int i = 0; i < lectureDtos.size(); i++) {
-            TimeTableLecture mapping = new TimeTableLecture(lectures.get(i), lectureDtos.get(i).getColor());
-            mapping.changeTimeTable(table);
+        Map<Long, LectureTemplate> lectureMaps = new HashMap<>();
+        for (LectureTemplate lecture : lectures) {
+            lectureMaps.put(lecture.getId(), lecture);
+        }
+
+        for (RequestScheduleDto dto : lectureDtos) {
+            Long lectureId = dto.getLectureId();
+            TimeSchedule schedule;
+            if (lectureId != null) {
+                LectureTemplate lecture = lectureMaps.get(lectureId);
+                schedule = createScheduleFromLecture(lecture, dto.getColor());
+            } else {
+                schedule = TimeSchedule.builder()
+                        .name(dto.getName())
+                        .memo(dto.getMemo())
+                        .color(dto.getColor())
+                        .timesJson(TimePromise.serialize(objectMapper, dto.getTimes()))
+                        .build();
+            }
+            schedule = timeScheduleRepository.save(schedule);
+            schedule.changeTimeTable(table);
         }
     }
 
