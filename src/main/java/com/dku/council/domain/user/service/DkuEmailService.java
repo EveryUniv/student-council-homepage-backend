@@ -4,6 +4,7 @@ import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.MajorNotFoundException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.exception.WrongEmailCodeException;
+import com.dku.council.domain.user.model.UserSignupInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
@@ -15,7 +16,7 @@ import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.global.util.TextTemplateEngine;
-import com.dku.council.infra.dku.model.StudentInfo;
+import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.nhn.service.NHNEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,12 +92,12 @@ public class DkuEmailService {
 
         Major major = majorRepository.findById(dto.getMajorId())
                 .orElseThrow(MajorNotFoundException::new);
-        StudentInfo studentInfo = new StudentInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
-                major.getName(), major.getDepartment());
+        UserSignupInfo info = new UserSignupInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
+                dto.getAcademicStatus(), StudentDuesStatus.NOT_PAID, major.getName(), major.getDepartment());
 
-        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, studentInfo, now);
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, now);
 
-        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(studentInfo);
+        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(info);
         return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
     }
 
@@ -106,9 +107,9 @@ public class DkuEmailService {
      * @param signupToken 학생인증 토큰
      * @return 학생정보
      */
-    public StudentInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
+    public UserSignupInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
         Instant now = Instant.now(clock);
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, StudentInfo.class, now)
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, UserSignupInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 

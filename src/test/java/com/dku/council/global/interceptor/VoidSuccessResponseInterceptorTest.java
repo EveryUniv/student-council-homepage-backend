@@ -1,6 +1,7 @@
 package com.dku.council.global.interceptor;
 
-import com.dku.council.global.dto.ResponseSuccessDto;
+import com.dku.council.global.model.dto.ResponseSuccessDto;
+import com.dku.council.util.ObjectMapperGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,13 +28,12 @@ class VoidSuccessResponseInterceptorTest {
     @Mock
     private ContentCachingResponseWrapper response;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = ObjectMapperGenerator.create();
     private VoidSuccessResponseInterceptor interceptor;
 
 
     @BeforeEach
     public void beforeEach() {
-        this.objectMapper = new ObjectMapper();
         this.interceptor = new VoidSuccessResponseInterceptor(objectMapper);
     }
 

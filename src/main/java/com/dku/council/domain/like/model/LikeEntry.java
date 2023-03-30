@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class LikeEntry {
-    private final Long postId;
-    private final Long userId;
+    private final Long elementId;
     private final LikeState state;
 }

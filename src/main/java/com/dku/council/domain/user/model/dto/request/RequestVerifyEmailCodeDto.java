@@ -15,13 +15,16 @@ public class RequestVerifyEmailCodeDto {
     @Pattern(regexp = "^\\d{8}$", message = "학번을 정확히 입력해주세요")
     private final String studentId;
 
-    @NotBlank(message = "이름을 입력해주세요")
+    @NotBlank
     private final String studentName;
 
-    @NotEmpty(message = "학과 ID를 입력해주세요")
+    @NotEmpty
     private final Long majorId;
 
     private final int yearOfAdmission = 23;
+
+    @NotBlank
+    private final String academicStatus;
 
     @NotBlank
     @Pattern(regexp = "^.{5}$", message = "이메일 코드는 5자리 입니다.")
