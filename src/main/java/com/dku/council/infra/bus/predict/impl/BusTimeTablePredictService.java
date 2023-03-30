@@ -67,7 +67,7 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
             case SATURDAY:
                 return "saturday";
             case SUNDAY:
-                return "holiday";
+                return "holiday"; // TODO 일요일 + 공휴일은 holiday로 지정
             default:
                 return "weekday";
         }
