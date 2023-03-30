@@ -51,7 +51,6 @@ public class ResponseSingleGenericPostDto {
         this.title = post.getTitle();
         this.body = post.getBody();
         this.author = post.getDisplayingUsername();
-        // TODO 쿼리 확인해보기. 일괄쿼리로 나가는지?
         this.tag = post.getPostTags().stream()
                 .map(e -> new TagDto(e.getTag()))
                 .collect(Collectors.toList());

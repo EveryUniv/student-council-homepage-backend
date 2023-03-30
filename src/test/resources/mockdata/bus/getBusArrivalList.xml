@@ -24,6 +24,22 @@
             <stationId>228001978</stationId>
         </busArrivalList>
         <busArrivalList>
+            <flag>PASS</flag>
+            <locationNo1>1</locationNo1>
+            <locationNo2/>
+            <lowPlate1>0</lowPlate1>
+            <lowPlate2>0</lowPlate2>
+            <plateNo1>경기70아1122</plateNo1>
+            <plateNo2/>
+            <predictTime1>1</predictTime1>
+            <predictTime2/>
+            <remainSeatCnt1>32</remainSeatCnt1>
+            <remainSeatCnt2>0</remainSeatCnt2>
+            <routeId>200000000</routeId>
+            <staOrder>2</staOrder>
+            <stationId>228001978</stationId>
+        </busArrivalList>
+        <busArrivalList>
             <flag>WAIT</flag>
             <locationNo1>2</locationNo1>
             <locationNo2>5</locationNo2>

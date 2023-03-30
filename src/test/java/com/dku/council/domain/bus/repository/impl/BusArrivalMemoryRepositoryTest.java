@@ -2,8 +2,8 @@ package com.dku.council.domain.bus.repository.impl;
 
 import com.dku.council.domain.bus.model.CachedBusArrivals;
 import com.dku.council.domain.bus.repository.BusArrivalRepository;
-import com.dku.council.global.component.model.CacheObject;
 import com.dku.council.global.config.redis.RedisKeys;
+import com.dku.council.global.model.CacheObject;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.mock.BusArrivalMock;
 import com.dku.council.util.FullIntegrationTest;

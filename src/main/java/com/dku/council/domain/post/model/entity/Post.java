@@ -2,7 +2,6 @@ package com.dku.council.domain.post.model.entity;
 
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
-import com.dku.council.domain.like.model.entity.PostLike;
 import com.dku.council.domain.post.model.PostStatus;
 import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.user.model.entity.User;
@@ -46,7 +45,7 @@ public abstract class Post extends BaseEntity {
     private User user;
 
     @OneToMany(mappedBy = "post", orphanRemoval = true)
-    private final List<PostTag> postTags = new ArrayList<>();
+    private List<PostTag> postTags = new ArrayList<>();
 
     private String title;
 
@@ -56,15 +55,12 @@ public abstract class Post extends BaseEntity {
     @Enumerated(STRING)
     private PostStatus status;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<PostFile> files = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<PostFile> files = new ArrayList<>();
 
     @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<PostLike> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     private int views;
 

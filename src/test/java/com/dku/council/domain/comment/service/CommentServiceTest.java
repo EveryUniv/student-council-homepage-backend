@@ -1,5 +1,6 @@
 package com.dku.council.domain.comment.service;
 
+import com.dku.council.domain.comment.CommentLogRepository;
 import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
@@ -23,6 +24,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +42,9 @@ class CommentServiceTest {
 
     @InjectMocks
     private CommentService service;
+
+    @Mock
+    private CommentLogRepository commentLogRepository;
 
 
     @Test
@@ -66,13 +72,21 @@ class CommentServiceTest {
         User user = UserMock.createDummyMajor(10L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
+        String prevComment = comment.getText();
         Long edited = service.edit(10L, 10L, "new text");
 
         // then
         assertThat(edited).isEqualTo(10L);
         assertThat(comment.getText()).isEqualTo("new text");
+        verify(commentLogRepository).save(argThat(log -> {
+            assertThat(log.getText()).isEqualTo(prevComment);
+            assertThat(log.getUser().getId()).isEqualTo(user.getId());
+            assertThat(log.getPost().getId()).isEqualTo(comment.getPost().getId());
+            return true;
+        }));
     }
 
     @Test
@@ -82,6 +96,7 @@ class CommentServiceTest {
         User user = UserMock.createDummyMajor(11L);
         Comment comment = CommentMock.createWithId(user);
         when(commentRepository.findById(10L)).thenReturn(Optional.of(comment));
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
 
         // when & then
         assertThrows(NotGrantedException.class,
