@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.comment.model.dto.CommentedPostResponseDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.user.model.dto.request.*;
@@ -101,18 +100,19 @@ public class UserController {
      */
     @PostMapping("/change/phone/verify")
     @UserOnly
-    public ResponseChangeTokenDto sendChangePhoneCodeBySMS(AppAuthentication auth, @Valid @RequestBody RequestWithPhoneNumberDto dto){
+    public ResponseChangeTokenDto sendChangePhoneCodeBySMS(AppAuthentication auth, @Valid @RequestBody RequestWithPhoneNumberDto dto) {
         return userFindService.sendChangePhoneCodeBySMS(auth.getUserId(), dto.getPhoneNumber());
     }
 
     /**
      * 휴대폰 재설정 인증 코드 확인 (2)
      * <p>재설정 토큰과 재설정 코드로 요청받은 번호로 핸드폰 번호 변경 합니다.</p>
+     *
      * @param dto 요청 body
      */
     @PatchMapping("/change/phone")
     @UserOnly
-    public void changePhoneNumber(AppAuthentication auth, @Valid @RequestBody RequestVerifyTokenCodeDto dto){
+    public void changePhoneNumber(AppAuthentication auth, @Valid @RequestBody RequestVerifyTokenCodeDto dto) {
         userFindService.changePhoneNumber(auth.getUserId(), dto.getToken(), dto.getCode());
     }
 
@@ -124,17 +124,18 @@ public class UserController {
      */
     @PatchMapping("/change/nickname")
     @UserOnly
-    public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto){
+    public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto) {
         userService.changeNickName(auth.getUserId(), dto);
     }
 
     /**
      * 비밀번호 변경 - 기존 비밀번호를 알고 있는 경우
+     *
      * @param dto 요청 body
      */
     @PatchMapping("/change/password")
     @UserOnly
-    public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto){
+    public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto) {
         userService.changePassword(auth.getUserId(), dto);
     }
 
@@ -202,7 +203,8 @@ public class UserController {
     public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
                                                               @ParameterObject Pageable pageable,
                                                               @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedGenericPostDto> posts = myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
+        Page<SummarizedGenericPostDto> posts =
+                myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(posts);
     }
 
@@ -211,9 +213,11 @@ public class UserController {
      */
     @GetMapping("/post/commented")
     @UserOnly
-    public ResponsePage<CommentedPostResponseDto> listMyCommentedPosts(AppAuthentication auth,
-                                                                       @ParameterObject Pageable pageable) {
-        Page<CommentedPostResponseDto> commentedPosts = myPostService.listMyCommentedPosts(auth.getUserId(), pageable);
+    public ResponsePage<SummarizedGenericPostDto> listMyCommentedPosts(AppAuthentication auth,
+                                                                       @ParameterObject Pageable pageable,
+                                                                       @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedGenericPostDto> commentedPosts =
+                myPostService.listMyCommentedPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(commentedPosts);
     }
 
@@ -225,7 +229,8 @@ public class UserController {
     public ResponsePage<SummarizedGenericPostDto> listMyLikedPosts(AppAuthentication auth,
                                                                    @ParameterObject Pageable pageable,
                                                                    @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedGenericPostDto> likedPosts = myPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
+        Page<SummarizedGenericPostDto> likedPosts =
+                myPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(likedPosts);
     }
 }

@@ -16,10 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 public class TimeSchedule extends BaseEntity {
 
     @Id
-    @GeneratedValue(
-            strategy = GenerationType.SEQUENCE,
-            generator = "time_schedule_seq_generator"
-    )
+    @GeneratedValue
     @Column(name = "lecture_id")
     private Long id;
 

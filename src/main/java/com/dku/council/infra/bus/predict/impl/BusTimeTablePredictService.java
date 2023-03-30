@@ -65,8 +65,9 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
         DayOfWeek week = dateTime.getDayOfWeek();
         switch (week) {
             case SATURDAY:
+                return "saturday";
             case SUNDAY:
-                return "weekend";
+                return "holiday"; // TODO 일요일 + 공휴일은 holiday로 지정
             default:
                 return "weekday";
         }

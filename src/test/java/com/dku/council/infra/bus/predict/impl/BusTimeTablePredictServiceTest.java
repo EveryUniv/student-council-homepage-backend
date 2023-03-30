@@ -54,7 +54,7 @@ class BusTimeTablePredictServiceTest {
         when(table.getFirstTime()).thenReturn(LocalTime.of(10, 0));
         when(table.getLastTime()).thenReturn(LocalTime.of(20, 0));
         when(table.remainingNextBusArrival(now.toLocalTime())).thenReturn(Duration.ZERO);
-        when(parser.parse("/bustable/weekend/dkugate/11.table")).thenReturn(table);
+        when(parser.parse("/bustable/saturday/dkugate/11.table")).thenReturn(table);
 
         // when
         Duration time = service.remainingNextBusArrival("11", BusStation.DKU_GATE, now);

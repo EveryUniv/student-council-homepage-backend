@@ -1,6 +1,7 @@
 package com.dku.council.domain.comment;
 
 import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.post.model.entity.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,5 +22,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "and (c.status='ACTIVE' or c.status='EDITED')")
     List<Comment> findAllByPostIdAndUserId(Long postId, Long userId);
 
-    Page<Comment> findAllByUserId(Long userId, Pageable pageable);
+    @Query("select p from Post p where p.id in " +
+            "(select p.id from Post p join Comment c " +
+            "on p.id = c.post.id and c.user.id=:userId and c.status='ACTIVE' " +
+            "group by p.id)")
+    Page<Post> findAllCommentedPostId(Long userId, Pageable pageable);
 }
