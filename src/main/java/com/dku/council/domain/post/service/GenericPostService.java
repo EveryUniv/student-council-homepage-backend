@@ -92,7 +92,7 @@ public class GenericPostService<E extends Post> {
         E post = dto.toEntity(user);
         tagService.addTagsToPost(post, dto.getTagIds());
 
-        fileUploadService.uploadFiles(dto.getFiles(), "news")
+        fileUploadService.uploadFiles(dto.getFiles(), post.getClass().getSimpleName())
                 .forEach((file) -> new PostFile(file).changePost(post));
 
         E savedPost = postRepository.save(post);
