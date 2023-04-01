@@ -20,24 +20,19 @@ import java.util.Optional;
 @Repository
 public class BusArrivalRedisRepository extends AbstractKeyValueCacheRepository implements BusArrivalRepository {
 
-    private final ObjectMapper objectMapper;
-    private final Duration busCacheTime;
-
     protected BusArrivalRedisRepository(StringRedisTemplate redisTemplate,
-                                        ObjectMapper objectMapper,
-                                        @Value("${bus.cache-time}") Duration busCacheTime) {
-        super(redisTemplate, objectMapper, busCacheTime, RedisKeys.BUS_ARRIVAL_KEY);
-        this.objectMapper = objectMapper;
-        this.busCacheTime = busCacheTime;
+                                        ObjectMapper objectMapper) {
+        super(redisTemplate, objectMapper, RedisKeys.BUS_ARRIVAL_KEY);
     }
 
     public Optional<CachedBusArrivals> getArrivals(String stationId, Instant now) {
-        JavaType type = objectMapper.getTypeFactory().constructCollectionType(List.class, BusArrival.class);
-        Optional<CacheObject<List<BusArrival>>> cacheObject = getCacheObject(stationId, type, now);
-        return cacheObject.map(e -> new CachedBusArrivals(e, busCacheTime));
+        Optional<CacheObject<CachedBusArrivals>> cacheObject = getCacheObject(stationId, CachedBusArrivals.class, now);
+        return cacheObject.map(CacheObject::getValue);
     }
 
     public CachedBusArrivals cacheArrivals(String stationId, List<BusArrival> arrivals, Instant now) {
-        return new CachedBusArrivals(set(stationId, arrivals, now), busCacheTime);
+        CachedBusArrivals cachePayload = new CachedBusArrivals(now, arrivals);
+        set(stationId, cachePayload, now);
+        return cachePayload;
     }
 }

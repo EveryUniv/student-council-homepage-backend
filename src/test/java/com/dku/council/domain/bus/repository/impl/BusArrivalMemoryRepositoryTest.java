@@ -15,11 +15,9 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -38,9 +36,6 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${bus.cache-time}")
-    private Duration busCacheTime;
 
 
     @Test
@@ -75,22 +70,6 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
     }
 
     @Test
-    @DisplayName("도착 정보가 만료되었으면 null반환")
-    void getArrivalsWithExpiredData() {
-        // given
-        String stationId = "stationId";
-        Instant now = Instant.now();
-        List<BusArrival> arrivals = BusArrivalMock.createList(5);
-        put(stationId, arrivals, now.minusSeconds(busCacheTime.getSeconds() + 1));
-
-        // when
-        Optional<CachedBusArrivals> cached = repository.getArrivals(stationId, now);
-
-        // then
-        assertThat(cached).isEmpty();
-    }
-
-    @Test
     @DisplayName("도착 정보가 잘 캐싱되는가")
     void cacheArrivals() {
         // given
@@ -107,16 +86,35 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
         assertThat(actualCached.getArrivals()).containsExactlyInAnyOrderElementsOf(arrivals);
     }
 
+    @Test
+    @DisplayName("도착 정보 중복 캐싱시 덮어쓰기")
+    void cacheArrivalsDuplicated() {
+        // given
+        String stationId = "stationId";
+        Instant now = Instant.now();
+        Instant now2 = Instant.now().plusSeconds(600);
+        List<BusArrival> arrivals = BusArrivalMock.createList(5);
+        List<BusArrival> arrivals2 = BusArrivalMock.createList(2);
+
+        // when
+        repository.cacheArrivals(stationId, arrivals, now);
+        repository.cacheArrivals(stationId, arrivals2, now2);
+
+        // then
+        CachedBusArrivals actualCached = get(stationId);
+        assertThat(actualCached.getCapturedAt().getEpochSecond()).isEqualTo(now2.getEpochSecond());
+        assertThat(actualCached.getArrivals()).containsExactlyInAnyOrderElementsOf(arrivals2);
+    }
+
     public CachedBusArrivals get(String stationId) {
         try {
             Object value = redisTemplate.opsForHash().get(RedisKeys.BUS_ARRIVAL_KEY, stationId);
+
             TypeFactory typeFactory = objectMapper.getTypeFactory();
+            JavaType type = typeFactory.constructParametricType(CacheObject.class, CachedBusArrivals.class);
 
-            JavaType collectionType = typeFactory.constructCollectionType(List.class, BusArrival.class);
-            JavaType type = typeFactory.constructParametricType(CacheObject.class, collectionType);
-
-            CacheObject<List<BusArrival>> cacheObject = objectMapper.readValue((String) value, type);
-            return new CachedBusArrivals(cacheObject, busCacheTime);
+            CacheObject<CachedBusArrivals> obj = objectMapper.readValue((String) value, type);
+            return obj.getValue();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -124,7 +122,8 @@ class BusArrivalMemoryRepositoryTest extends AbstractContainerRedisTest {
 
     public void put(String stationId, List<BusArrival> cache, Instant now) {
         try {
-            CacheObject<List<BusArrival>> obj = new CacheObject<>(now.plus(busCacheTime), cache);
+            CachedBusArrivals arrivals = new CachedBusArrivals(now, cache);
+            CacheObject<CachedBusArrivals> obj = new CacheObject<>(Instant.MAX, arrivals);
             String value = objectMapper.writeValueAsString(obj);
             redisTemplate.opsForHash().put(RedisKeys.BUS_ARRIVAL_KEY, stationId, value);
         } catch (JsonProcessingException e) {
