@@ -2,7 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
-import com.dku.council.domain.user.model.UserSignupInfo;
+import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -30,9 +31,9 @@ public class SignupService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void signup(RequestSignupDto dto, String signupToken) {
-        UserSignupInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
+        DkuUserInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
 
         checkAlreadyStudentId(studentInfo.getStudentId());
         checkAlreadyNickname(dto.getNickname());
