@@ -9,16 +9,14 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
+import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.model.dto.ResponseSuccessDto;
-import com.dku.council.mock.CommentMock;
-import com.dku.council.mock.MajorMock;
-import com.dku.council.mock.PetitionMock;
-import com.dku.council.mock.UserMock;
+import com.dku.council.mock.*;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.FieldReflector;
 import com.dku.council.util.FullIntegrationTest;
@@ -123,7 +121,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("content[0].title", is("title" + waitingName)))
                 .andExpect(jsonPath("content[0].body", is("body" + waitingName)))
                 .andExpect(jsonPath("content[0].expiresAt", is(expiresAt)))
-                .andExpect(jsonPath("content[0].status", is(PetitionStatus.WAITING.name())));
+                .andExpect(jsonPath("content[0].status", is(PetitionStatus.WAITING.name())))
+                .andExpect(jsonPath("content[0].agreeCount", is(0)));
+
     }
 
     @Test
@@ -143,7 +143,8 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("mine", is(true)))
                 .andExpect(jsonPath("expiresAt", is(expiresAt)))
                 .andExpect(jsonPath("status", is(PetitionStatus.ACTIVE.name())))
-                .andExpect(jsonPath("statisticList", is(new ArrayList<>())));
+                .andExpect(jsonPath("statisticList", is(new ArrayList<>())))
+                .andExpect(jsonPath("agreeCount", is(0)));
     }
 
     @Test
@@ -234,6 +235,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
         List<Comment> comments = CommentMock.createList(petition, users, 150);
         commentRepository.saveAll(comments);
+
+        List<PetitionStatistic> agreeComments = PetitionStatisticMock.createList(petition, users, 150);
+        petitionStatisticRepository.saveAll(agreeComments);
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())

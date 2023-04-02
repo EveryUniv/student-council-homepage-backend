@@ -103,36 +103,6 @@ class GenericPostServiceTest {
     }
 
     @Test
-    @DisplayName("list와 mapper가 잘 동작하는지?")
-    public void listWithMapper() {
-        // given
-        List<Petition> allPostList = PetitionMock.createListDummy("generic-", 20);
-        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
-        Duration expiresTime = Duration.ofDays(5);
-
-        when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
-        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
-
-        // when
-        Page<SummarizedPetitionDto> allPage = petitionService.list(null, Pageable.unpaged(), 500,
-                (dto, post) -> new SummarizedPetitionDto(dto, post, expiresTime, post.getComments().size()));
-
-        // then
-        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
-        for (int i = 0; i < allPage.getTotalElements(); i++) {
-            SummarizedPetitionDto dto = allPage.getContent().get(i);
-            Petition post = allPostList.get(i);
-            assertThat(dto.getId()).isEqualTo(post.getId());
-            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
-            assertThat(dto.getBody()).isEqualTo(post.getBody());
-            assertThat(dto.getAgreeCount()).isEqualTo(post.getComments().size());
-            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
-            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt().toLocalDate());
-            assertThat(dto.getViews()).isEqualTo(post.getViews());
-        }
-    }
-
-    @Test
     @DisplayName("새롭게 잘 생성되는지?")
     public void create() {
         // given
@@ -220,26 +190,6 @@ class GenericPostServiceTest {
         assertThat(dto.isMine()).isEqualTo(true);
     }
 
-    @Test
-    @DisplayName("Mapper와 함깨 단건 조회가 잘 동작하는지?")
-    public void findOneWithMapper() {
-        // given
-        Petition petition = PetitionMock.createWithDummy();
-        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
-        when(postLikeService.isLiked(any(), any(), eq(POST))).thenReturn(true);
-
-        // when
-        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
-                new ResponsePetitionDto(d, post, Duration.ofDays(30), List.of()));
-
-        // then
-        assertThat(dto.getId()).isEqualTo(petition.getId());
-        assertThat(dto.getViews()).isEqualTo(petition.getViews());
-        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
-        assertThat(dto.isLiked()).isEqualTo(true);
-        assertThat(dto.isMine()).isEqualTo(false);
-        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
-    }
 
     @Test
     @DisplayName("없는 게시글 단건 조회시 오류")

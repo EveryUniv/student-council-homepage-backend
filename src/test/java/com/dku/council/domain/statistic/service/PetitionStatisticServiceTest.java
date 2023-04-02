@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
@@ -53,6 +54,17 @@ class PetitionStatisticServiceTest {
         assertThat(top4Department.get(1).getAgreeCount()).isEqualTo(41);
         assertThat(top4Department.get(2).getAgreeCount()).isEqualTo(40);
         assertThat(top4Department.get(3).getAgreeCount()).isEqualTo(39);
+    }
 
+    @Test
+    @DisplayName("총 동의 수를 잘 가져오는지")
+    void getTotalAgreeCount() {
+        //given
+        Petition petition = PetitionMock.createWithDummy();
+        List<PetitionStatistic> list = PetitionStatisticMock.list(petition);
+        when(petitionStatisticRepository.findAllByPetitionId(petition.getId())).thenReturn(list);
+
+        //when  &  then
+        assertThat(service.count(petition.getId())).isEqualTo(list.size());
     }
 }
