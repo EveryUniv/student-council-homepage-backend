@@ -58,7 +58,7 @@ public class SignupService {
         deleteSignupAuths(signupToken);
     }
 
-    private void checkAlreadyNickname(String nickname) {
+    public void checkAlreadyNickname(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new AlreadyNicknameException();
         }
