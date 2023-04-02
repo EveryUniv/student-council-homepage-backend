@@ -225,14 +225,14 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
         public boolean isLiked(StringRedisTemplate redisTemplate) {
             String key = combine(RedisKeys.LIKE_POSTS_KEY, POST, userId);
             Object value = redisTemplate.opsForHash().get(key, elementId.toString());
-            return LikeState.LIKED.toString().equals(value);
+            return LikeState.LIKED.name().equals(value);
         }
 
         public void setLiked(StringRedisTemplate redisTemplate, boolean isLiked) {
-            String key = combine(RedisKeys.LIKE_USERS_KEY, POST, userId);
-            String value = LikeState.CANCELLED.toString();
+            String key = combine(RedisKeys.LIKE_POSTS_KEY, POST, userId);
+            String value = LikeState.CANCELLED.name();
             if (isLiked) {
-                value = LikeState.LIKED.toString();
+                value = LikeState.LIKED.name();
             }
             redisTemplate.opsForHash().put(key, elementId.toString(), value);
         }

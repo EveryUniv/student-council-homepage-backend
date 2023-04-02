@@ -176,7 +176,7 @@ class CachedLikeServiceImplTest {
 
         // then
         assertThat(liked).isEqualTo(true);
-        verify(memoryRepository).setIsLiked(10L, 10L, POST, true);
+        verify(memoryRepository).setIsLiked(5L, 10L, POST, true);
     }
 
     @Test
