@@ -56,29 +56,6 @@ public class PetitionService {
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
     }
 
-    @Transactional(readOnly = true)
-    public Page<CommentDto> listComment(Long postId, Long userId, Pageable pageable) {
-        return commentService.list(postId, userId, pageable, (e) -> e.getUser().getMajor().getDepartment());
-    }
-
-    public Long createComment(Long postId, Long userId, String text, boolean isAdmin) {
-        Petition post = postService.findPost(postId);
-
-        if (!isAdmin && commentService.isCommentedAlready(postId, userId)) {
-            throw new DuplicateCommentException();
-        }
-
-        if (post.getExtraStatus() == PetitionStatus.ACTIVE && post.getComments().size() + 1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
-            post.updatePetitionStatus(PetitionStatus.WAITING);
-        }
-
-        return commentService.create(postId, userId, text);
-    }
-
-    public Long deleteComment(Long id, Long userId) {
-        return commentService.delete(id, userId, true);
-    }
-
     public void agreePetition(Long postId, Long userId) {
         Petition post = postService.findPost(postId);
         if(commentService.isCommentedAlready(postId, userId)) {
