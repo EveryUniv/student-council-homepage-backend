@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @RequiredArgsConstructor
-public class RequestVerifyStudentDto {
+public class RequestDkuStudentDto {
 
     @NotBlank
     private final String dkuStudentId;

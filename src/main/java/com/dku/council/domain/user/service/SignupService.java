@@ -2,7 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
-import com.dku.council.domain.user.model.UserSignupInfo;
+import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class SignupService {
@@ -32,7 +31,7 @@ public class SignupService {
 
     @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
-        UserSignupInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
+        DkuUserInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
 
         checkAlreadyStudentId(studentInfo.getStudentId());
         checkAlreadyNickname(dto.getNickname());
@@ -59,7 +58,7 @@ public class SignupService {
         deleteSignupAuths(signupToken);
     }
 
-    public void checkAlreadyNickname(String nickname) {
+    private void checkAlreadyNickname(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new AlreadyNicknameException();
         }

@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class UserSignupInfo {
+public class DkuUserInfo {
     private final String studentName;
     private final String studentId;
     private final int yearOfAdmission;
@@ -17,7 +17,7 @@ public class UserSignupInfo {
     private final String majorName;
     private final String departmentName;
 
-    public UserSignupInfo(StudentInfo info, StudentDuesStatus duesStatus) {
+    public DkuUserInfo(StudentInfo info, StudentDuesStatus duesStatus) {
         this.studentName = info.getStudentName();
         this.studentId = info.getStudentId();
         this.yearOfAdmission = info.getYearOfAdmission();

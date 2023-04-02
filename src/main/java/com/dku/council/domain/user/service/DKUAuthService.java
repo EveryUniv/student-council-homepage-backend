@@ -2,14 +2,17 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
-import com.dku.council.domain.user.model.UserSignupInfo;
-import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
+import com.dku.council.domain.user.model.DkuUserInfo;
+import com.dku.council.domain.user.model.dto.request.RequestDkuStudentDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.util.CodeGenerator;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
 import com.dku.council.infra.dku.model.StudentDuesStatus;
@@ -36,6 +39,7 @@ public class DKUAuthService {
     private final DkuAuthenticationService authenticationService;
     private final UserRepository userRepository;
     private final SignupAuthRepository dkuAuthRepository;
+    private final MajorRepository majorRepository;
 
     /**
      * 회원가입 토큰을 기반으로 인증된 학생 정보를 가져옵니다. 학생인증이 되어있지 않으면 Exception이 발생합니다.
@@ -44,9 +48,9 @@ public class DKUAuthService {
      * @param signupToken 회원가입 토큰
      * @throws NotDKUAuthorizedException 학생 인증을 하지 않았을 경우
      */
-    public UserSignupInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
+    public DkuUserInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
         Instant now = Instant.now(clock);
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, UserSignupInfo.class, now)
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, DkuUserInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 
@@ -67,11 +71,50 @@ public class DKUAuthService {
      * @return 학생 인증 결과 dto
      */
     @Transactional(readOnly = true)
-    public ResponseVerifyStudentDto verifyStudent(RequestVerifyStudentDto dto) {
+    public ResponseVerifyStudentDto verifyStudent(RequestDkuStudentDto dto) {
         String signupToken = CodeGenerator.generateUUIDCode();
         checkAlreadyStudentId(dto);
 
-        DkuAuth auth = authenticationService.loginWebInfo(dto.getDkuStudentId(), dto.getDkuPassword());
+        DkuUserInfo info = retrieveDkuUserInfo(dto.getDkuStudentId(), dto.getDkuPassword());
+        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, Instant.now(clock));
+
+        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(info);
+        return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
+    }
+
+    private void checkAlreadyStudentId(RequestDkuStudentDto dto) {
+        Optional<User> alreadyUser = userRepository.findByStudentId(dto.getDkuStudentId());
+        if (alreadyUser.isPresent()) {
+            throw new AlreadyStudentIdException();
+        }
+    }
+
+    /**
+     * 단대 id, password로 학생 정보를 가져와 계정에 업데이트합니다.
+     *
+     * @param dto 요청 dto
+     * @return 학생 인증 결과 dto
+     */
+    @Transactional(readOnly = true)
+    public ResponseScrappedStudentInfoDto updateDKUStudent(Long userId, RequestDkuStudentDto dto) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        DkuUserInfo info = retrieveDkuUserInfo(dto.getDkuStudentId(), dto.getDkuPassword());
+
+        Major major = retrieveMajor(info.getMajorName(), info.getDepartmentName());
+
+        user.changeGenericInfo(
+                info.getStudentId(),
+                info.getStudentName(),
+                major,
+                info.getYearOfAdmission(),
+                info.getStudentState(),
+                info.getDuesStatus());
+
+        return new ResponseScrappedStudentInfoDto(info);
+    }
+
+    private DkuUserInfo retrieveDkuUserInfo(String id, String pwd) {
+        DkuAuth auth = authenticationService.loginWebInfo(id, pwd);
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
         StudentDuesStatus duesStatus;
 
@@ -85,17 +128,15 @@ public class DKUAuthService {
             }
         }
 
-        UserSignupInfo info = new UserSignupInfo(studentInfo, duesStatus);
-        dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, Instant.now(clock));
-
-        ResponseScrappedStudentInfoDto studentInfoDto = new ResponseScrappedStudentInfoDto(info);
-        return new ResponseVerifyStudentDto(signupToken, studentInfoDto);
+        return new DkuUserInfo(studentInfo, duesStatus);
     }
 
-    private void checkAlreadyStudentId(RequestVerifyStudentDto dto) {
-        Optional<User> alreadyUser = userRepository.findByStudentId(dto.getDkuStudentId());
-        if (alreadyUser.isPresent()) {
-            throw new AlreadyStudentIdException();
-        }
+    private Major retrieveMajor(String majorName, String departmentName) {
+        return majorRepository.findByName(majorName, departmentName)
+                .orElseGet(() -> {
+                    Major entity = new Major(majorName, departmentName);
+                    entity = majorRepository.save(entity);
+                    return entity;
+                });
     }
 }
