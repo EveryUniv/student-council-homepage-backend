@@ -14,13 +14,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 @Slf4j
 public class SignupService {
@@ -31,7 +29,7 @@ public class SignupService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
         DkuUserInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
 
@@ -60,7 +58,7 @@ public class SignupService {
         deleteSignupAuths(signupToken);
     }
 
-    public void checkAlreadyNickname(String nickname) {
+    private void checkAlreadyNickname(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new AlreadyNicknameException();
         }
