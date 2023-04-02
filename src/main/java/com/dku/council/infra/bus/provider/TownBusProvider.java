@@ -58,7 +58,7 @@ public class TownBusProvider implements BusArrivalProvider {
     // 곰상으로 가는 버스는 제외
     private static boolean filter24Bus(BusArrival busArrival) {
         if (busArrival.getBusNo().equals("24")) {
-            return busArrival.getStationOrder() != 11 && busArrival.getLocationNo1() <= 2;
+            return busArrival.getStationOrder() != 11 && busArrival.getLocationNo1() < 2;
         }
         return true;
     }
