@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PetitionStatisticRepository extends JpaRepository<PetitionStatistic, Long> {
     List<PetitionStatistic> findAllByPetitionId(Long petitionId);
+
+    Integer countByPetitionId(Long petitionId);
 }

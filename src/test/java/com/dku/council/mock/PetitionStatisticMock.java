@@ -1,6 +1,7 @@
 package com.dku.council.mock;
 
 
+import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
@@ -40,6 +41,7 @@ public class PetitionStatisticMock {
     public static PetitionStatistic create(String department){
         return create(UserMock.createMajor("major", department));
     }
+
     public static List<PetitionStatisticDto> createList(){
         List<Map.Entry<String, Integer>> dto = new ArrayList<>();
         List<PetitionStatisticDto> dtoList = new ArrayList<>();
@@ -73,4 +75,12 @@ public class PetitionStatisticMock {
 
     }
 
+    public static List<PetitionStatistic> createList(Petition petition, List<User> users, int size) {
+        List<PetitionStatistic> ret = new ArrayList<>();
+        final int userSize = users.size();
+        for (int i = 0; i < size; i++) {
+            ret.add(create(users.get(i % userSize), petition));
+        }
+        return ret;
+    }
 }
