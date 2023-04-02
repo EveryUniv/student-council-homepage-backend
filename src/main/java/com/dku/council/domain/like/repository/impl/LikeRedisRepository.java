@@ -30,6 +30,7 @@ public class LikeRedisRepository implements LikeMemoryRepository {
 
         key = combine(RedisKeys.LIKE_USERS_KEY, target);
         redisTemplate.opsForSet().add(key, userId.toString());
+        setIsLiked(elementId, userId, target, true);
     }
 
     @Override
@@ -39,11 +40,22 @@ public class LikeRedisRepository implements LikeMemoryRepository {
 
         key = combine(RedisKeys.LIKE_USERS_KEY, target);
         redisTemplate.opsForSet().add(key, userId.toString());
+        setIsLiked(elementId, userId, target, false);
+    }
+
+    @Override
+    public void setIsLiked(Long elementId, Long userId, LikeTarget target, boolean isLiked) {
+        String key = combine(RedisKeys.LIKE_POSTS_KEY, target, userId);
+        String value = LikeState.CANCELLED.toString();
+        if (isLiked) {
+            value = LikeState.LIKED.toString();
+        }
+        redisTemplate.opsForHash().put(key, elementId.toString(), value);
     }
 
     @Override
     public Boolean isLiked(Long elementId, Long userId, LikeTarget target) {
-        String key = combine(RedisKeys.LIKE_KEY, target, userId);
+        String key = combine(RedisKeys.LIKE_POSTS_KEY, target, userId);
         Object value = redisTemplate.opsForHash().get(key, elementId.toString());
         if (value == null) {
             return null;

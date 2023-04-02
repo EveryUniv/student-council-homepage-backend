@@ -55,10 +55,10 @@ public class TownBusProvider implements BusArrivalProvider {
         return "T_";
     }
 
-    // 곰상에 정차중인 24번 버스는 제외
+    // 곰상으로 가는 버스는 제외
     private static boolean filter24Bus(BusArrival busArrival) {
         if (busArrival.getBusNo().equals("24")) {
-            return busArrival.getLocationNo1() != 2;
+            return busArrival.getStationOrder() != 11 && busArrival.getLocationNo1() < 2;
         }
         return true;
     }

@@ -40,6 +40,16 @@ public interface LikeMemoryRepository {
     Boolean isLiked(Long elementId, Long userId, LikeTarget target);
 
     /**
+     * 좋아요 여부를 메모리에 캐싱한다.
+     *
+     * @param elementId 요소 ID
+     * @param userId    사용자 ID
+     * @param target    요소 타입
+     * @param isLiked   좋아요 여부
+     */
+    void setIsLiked(Long elementId, Long userId, LikeTarget target, boolean isLiked);
+
+    /**
      * 메모리에 캐싱된 좋아요 개수 확인.
      *
      * @param elementId 요소 ID

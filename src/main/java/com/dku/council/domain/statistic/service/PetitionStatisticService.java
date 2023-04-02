@@ -68,4 +68,9 @@ public class PetitionStatisticService {
                 .build();
         repository.save(statistic);
     }
+
+    public int count(Long postId){
+        return repository.countByPetitionId(postId);
+    }
+
 }
