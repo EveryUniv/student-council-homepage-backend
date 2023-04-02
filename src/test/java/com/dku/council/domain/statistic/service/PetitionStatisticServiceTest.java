@@ -62,7 +62,7 @@ class PetitionStatisticServiceTest {
         //given
         Petition petition = PetitionMock.createWithDummy();
         List<PetitionStatistic> list = PetitionStatisticMock.list(petition);
-        when(petitionStatisticRepository.findAllByPetitionId(petition.getId())).thenReturn(list);
+        when(petitionStatisticRepository.countByPetitionId(petition.getId())).thenReturn(list.size());
 
         //when  &  then
         assertThat(service.count(petition.getId())).isEqualTo(list.size());

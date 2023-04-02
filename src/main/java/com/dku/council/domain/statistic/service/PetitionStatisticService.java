@@ -70,7 +70,7 @@ public class PetitionStatisticService {
     }
 
     public int count(Long postId){
-        return repository.findAllByPetitionId(postId).size();
+        return repository.countByPetitionId(postId);
     }
 
 }
