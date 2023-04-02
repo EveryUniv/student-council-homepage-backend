@@ -1,7 +1,7 @@
 # 24 time table
 
 # 전체 Offset
-@offset -PT11M
+@offset -PT2M
 
 # 시간표
 # 문법: 시:분
