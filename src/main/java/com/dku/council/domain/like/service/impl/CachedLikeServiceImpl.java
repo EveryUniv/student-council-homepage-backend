@@ -49,11 +49,7 @@ public class CachedLikeServiceImpl implements LikeService {
         Boolean liked = memoryRepository.isLiked(elementId, userId, target);
         if (liked == null) {
             liked = persistenceRepository.findByElementIdAndUserId(elementId, userId, target).isPresent();
-            if (liked) {
-                memoryRepository.like(elementId, userId, target);
-            } else {
-                memoryRepository.cancelLike(elementId, userId, target);
-            }
+            memoryRepository.setIsLiked(elementId, userId, target, liked);
         }
         return liked;
     }

@@ -6,6 +6,7 @@ public class RedisKeys {
     public static final String POST_VIEW_COUNT_SET_KEY = "postViewSet";
 
     public static final String LIKE_KEY = "like";
+    public static final String LIKE_POSTS_KEY = "likePosts";
     public static final String LIKE_USERS_KEY = "likeUsers";
     public static final String LIKE_COUNT_KEY = "likeCount";
 
