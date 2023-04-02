@@ -6,12 +6,14 @@ import com.dku.council.infra.bus.exception.CannotGetBusArrivalException;
 import com.dku.council.infra.bus.model.BusArrival;
 import com.dku.council.infra.bus.model.ResponseGGBusArrival;
 import com.dku.council.infra.bus.model.mapper.BusResponseMapper;
+import io.netty.handler.ssl.SslHandshakeTimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -33,14 +35,16 @@ public class GGBusProvider implements BusArrivalProvider {
     private final String serviceKey;
 
 
-
     public List<BusArrival> retrieveBusArrival(BusStation station) {
         try {
             ResponseGGBusArrival response;
             try {
                 response = request(station.getGgNodeId());
-            } catch (RuntimeException e) {
-                log.warn("Failed retrieve data from GGBus", e);
+            } catch (WebClientRequestException e) {
+                if (!(e.getCause() instanceof SslHandshakeTimeoutException)) {
+                    log.warn("Failed retrieve data from GGBus");
+                    throw e;
+                }
                 return List.of();
             }
 
