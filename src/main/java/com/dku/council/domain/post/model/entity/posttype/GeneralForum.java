@@ -31,6 +31,6 @@ public class GeneralForum extends Post {
     @Override
     @Transient
     public String getDisplayingUsername() {
-        return getUser().getMajor().getName() + " " + getUser().getNickname();
+        return getUser().getNickname();
     }
 }

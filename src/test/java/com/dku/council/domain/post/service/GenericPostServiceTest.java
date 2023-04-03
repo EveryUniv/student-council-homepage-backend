@@ -127,7 +127,7 @@ class GenericPostServiceTest {
             assertThat(dto.getBody()).isEqualTo(generalForum.getBody());
             assertThat(dto.getLikes()).isEqualTo(15);
             assertThat(dto.getViews()).isEqualTo(generalForum.getViews());
-            assertThat(dto.getAuthor()).isEqualTo(generalForum.getUser().getMajor().getName() + " " + generalForum.getUser().getNickname());
+            assertThat(dto.getAuthor()).isEqualTo(generalForum.getUser().getNickname());
         }
     }
 
