@@ -7,14 +7,11 @@ import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
-import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
-import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.mock.CommentMock;
 import com.dku.council.mock.NewsMock;
@@ -25,15 +22,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -178,6 +171,8 @@ class CommentServiceTest {
         
         // when
         Page<CommentDto> list = service.list(11L, 1L, Pageable.unpaged(), data -> data.getUser().getMajor().getName() + " " + data.getUser().getNickname());
+        
+        // then
         assertThat(list.toList().get(0).getAuthor()).isEqualTo(comment.getUser().getMajor().getName() + " " + comment.getUser().getNickname());
     }
 
