@@ -7,6 +7,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
+import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
@@ -16,10 +17,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import com.dku.council.mock.MultipartFileMock;
-import com.dku.council.mock.NewsMock;
-import com.dku.council.mock.PetitionMock;
-import com.dku.council.mock.UserMock;
+import com.dku.council.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +45,8 @@ class GenericPostServiceTest {
 
     @Mock
     private GenericPostRepository<News> newsRepository;
+    @Mock
+    private GenericPostRepository<GeneralForum> generalForumRepository;
 
     @Mock
     private GenericPostRepository<Petition> petitionRepository;
@@ -67,12 +67,12 @@ class GenericPostServiceTest {
     private CachedLikeServiceImpl postLikeService;
 
     private GenericPostService<News> newsService;
-    private GenericPostService<Petition> petitionService;
+    private GenericPostService<GeneralForum> generalForumService;
 
     @BeforeEach
     public void setup() {
         newsService = new GenericPostService<>(newsRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
-        petitionService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        generalForumService = new GenericPostService<>(generalForumRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
     }
 
 
@@ -99,6 +99,35 @@ class GenericPostServiceTest {
             assertThat(dto.getBody()).isEqualTo(news.getBody());
             assertThat(dto.getLikes()).isEqualTo(15);
             assertThat(dto.getViews()).isEqualTo(news.getViews());
+        }
+    }
+
+
+    @Test
+    @DisplayName("list에 작성자가 잘 들어가는지?")
+    public void list_GeneralForum() {
+        // given
+        List<GeneralForum> allForumList = GeneralForumMock.createListDummy("generic-", 20);
+        Page<GeneralForum> allGeneralForum = new DummyPage<>(allForumList, 20);
+
+
+        when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(allGeneralForum);
+        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
+
+        // when
+        Page<SummarizedGenericPostDto> allPage = generalForumService.list(null, Pageable.unpaged(), 500);
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allForumList.size());
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedGenericPostDto dto = allPage.getContent().get(i);
+            GeneralForum generalForum = allForumList.get(i);
+            assertThat(dto.getId()).isEqualTo(generalForum.getId());
+            assertThat(dto.getTitle()).isEqualTo(generalForum.getTitle());
+            assertThat(dto.getBody()).isEqualTo(generalForum.getBody());
+            assertThat(dto.getLikes()).isEqualTo(15);
+            assertThat(dto.getViews()).isEqualTo(generalForum.getViews());
+            assertThat(dto.getAuthor()).isEqualTo(generalForum.getUser().getNickname());
         }
     }
 

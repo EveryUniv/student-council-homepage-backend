@@ -3,8 +3,11 @@ package com.dku.council.mock;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.global.base.BaseEntity;
 import com.dku.council.util.EntityUtil;
+import com.dku.council.util.FieldReflector;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +43,7 @@ public class CommentMock {
         if (id != null) {
             EntityUtil.injectId(Comment.class, comment, id);
         }
+        FieldReflector.inject(BaseEntity.class, comment, "createdAt", LocalDateTime.of(2022, 3, 3, 3, 3));
         return comment;
     }
 }

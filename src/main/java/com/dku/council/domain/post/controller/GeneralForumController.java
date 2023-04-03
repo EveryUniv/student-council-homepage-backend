@@ -122,7 +122,7 @@ public class GeneralForumController {
     public ResponsePage<CommentDto> listComment(AppAuthentication auth,
                                                 @PathVariable Long postId,
                                                 @ParameterObject Pageable pageable) {
-        Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable);
+        Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable, data -> data.getUser().getMajor().getName() + " " + data.getUser().getNickname());
         return new ResponsePage<>(comments);
     }
 
