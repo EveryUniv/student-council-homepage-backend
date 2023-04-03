@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dku.council.domain.like.model.LikeTarget.POST;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -95,7 +94,7 @@ public class PetitionServiceTest {
             assertThat(dto.getBody()).isEqualTo(post.getBody());
             assertThat(dto.getAgreeCount()).isEqualTo(10);
             assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
-            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt().toLocalDate());
+            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt());
             assertThat(dto.getViews()).isEqualTo(post.getViews());
         }
     }
