@@ -59,7 +59,7 @@ public class ConferenceController {
 
     /**
      * 게시글 삭제 (Admin)
-     *
+     *w
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
