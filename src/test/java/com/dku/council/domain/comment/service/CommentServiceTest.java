@@ -171,6 +171,8 @@ class CommentServiceTest {
         
         // when
         Page<CommentDto> list = service.list(11L, 1L, Pageable.unpaged(), data -> data.getUser().getMajor().getName() + " " + data.getUser().getNickname());
+        
+        // then
         assertThat(list.toList().get(0).getAuthor()).isEqualTo(comment.getUser().getMajor().getName() + " " + comment.getUser().getNickname());
     }
 
