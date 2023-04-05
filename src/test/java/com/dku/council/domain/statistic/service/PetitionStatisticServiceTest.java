@@ -14,9 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -26,17 +26,21 @@ class PetitionStatisticServiceTest {
 
     @Mock
     private PetitionStatisticRepository petitionStatisticRepository;
+
     @Mock
     private UserRepository userRepository;
+
     @Mock
     private PetitionRepository petitionRepository;
 
     private PetitionStatisticService service;
 
+
     @BeforeEach
-    public void setup(){
+    public void setup() {
         service = new PetitionStatisticService(petitionStatisticRepository, userRepository, petitionRepository);
     }
+
 
     @Test
     @DisplayName("상위 4개의 데이터를 잘 가져오는지")
@@ -66,5 +70,18 @@ class PetitionStatisticServiceTest {
 
         //when  &  then
         assertThat(service.count(petition.getId())).isEqualTo(list.size());
+    }
+
+    @Test
+    @DisplayName("이미 동의한 유저인지 확인")
+    void isAlreadyAgreed() {
+        // given
+        Petition petition = PetitionMock.createWithDummy();
+        PetitionStatistic stat = PetitionStatisticMock.create(petition);
+        when(petitionStatisticRepository.findByPetitionIdAndUserId(petition.getId(), stat.getUser().getId()))
+                .thenReturn(Optional.of(stat));
+
+        // when & then
+        assertThat(service.isAlreadyAgreed(petition.getId(), stat.getUser().getId())).isTrue();
     }
 }

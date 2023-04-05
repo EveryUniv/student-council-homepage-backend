@@ -1,7 +1,5 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.comment.model.dto.CommentDto;
-import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -133,7 +131,6 @@ public class PetitionController {
      * 동의 하기 : 해당 게시글에 동의합니다. (default : 동의합니다)
      *
      * @param postId    동의할 게시글 id
-     * @return          동의한 댓글 id
      */
     @PostMapping("/agree/{postId}")
     @UserOnly

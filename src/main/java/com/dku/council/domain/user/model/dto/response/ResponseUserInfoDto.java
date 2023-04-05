@@ -7,7 +7,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ResponseUserInfoDto {
 
-    private final String studentName;
+    private final String studentId;
+    private final String username;
+    private final String nickname;
     private final String yearOfAdmission;
     private final String major;
+    private final String department;
 }

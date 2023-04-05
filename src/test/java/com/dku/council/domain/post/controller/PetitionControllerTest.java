@@ -1,28 +1,24 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.comment.CommentRepository;
-import com.dku.council.domain.comment.CommentStatus;
-import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
-import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
-import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.model.dto.ResponseSuccessDto;
-import com.dku.council.mock.*;
+import com.dku.council.mock.MajorMock;
+import com.dku.council.mock.PetitionMock;
+import com.dku.council.mock.PetitionStatisticMock;
+import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.FieldReflector;
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,17 +34,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-@FullIntegrationTest
+//@FullIntegrationTest
 class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -58,9 +58,6 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     private UserRepository userRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
     private MajorRepository majorRepository;
 
     @Autowired
@@ -68,20 +65,26 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
     private PetitionStatisticRepository petitionStatisticRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Value("${app.post.petition.expires}")
     private Duration expiresTime;
 
+    @Value("${app.post.petition.threshold-comment-count}")
+    private int thresholdCommentCount;
+
     private Petition petition;
     private User user;
     private Major major;
+    private Major major2;
 
 
     @BeforeEach
     void setupUser() {
         major = majorRepository.save(MajorMock.create());
+        major2 = majorRepository.save(MajorMock.create("MAJOR", "DEP"));
 
         user = UserMock.create(11L, major);
         user = userRepository.save(user);
@@ -177,25 +180,17 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
         // then
         result.andExpect(status().isOk());
 
-        List<Comment> comments = commentRepository.findAll();
         List<PetitionStatistic> statistics = petitionStatisticRepository.findAll();
-
-
-
         assertThat(statistics.size()).isEqualTo(1);
         assertThat(statistics.get(0).getDepartment()).isEqualTo("MyDepartment");
-
-        assertThat(comments.size()).isEqualTo(1);
-        assertThat(comments.get(0).getText()).isEqualTo("동의합니다.");
-        assertThat(comments.get(0).getPost().getId()).isEqualTo(petition.getId());
     }
 
     @Test
     @DisplayName("동의 버튼 클릭 실패 - 이미 동의한 경우")
     void agreeCommentTwice() throws Exception {
         // given
-        Comment comment = CommentMock.create(petition, user);
-        commentRepository.save(comment);
+        PetitionStatistic statistic = PetitionStatisticMock.create(user, petition);
+        petitionStatisticRepository.save(statistic);
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
@@ -207,14 +202,14 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     }
 
     @Test
-    @DisplayName("답변대기 상태 변화 - 동의 댓글이 150개 이상인 경우")
+    @DisplayName("답변대기 상태 변화 - 동의 댓글이 k개 이상인 경우")
     void agreeCommentOver150() throws Exception {
         // given
-        List<User> users = UserMock.createList(major, 150);
+        List<User> users = UserMock.createList(major, thresholdCommentCount);
         users = userRepository.saveAll(users);
 
-        List<Comment> comments = CommentMock.createList(petition, users, 150);
-        commentRepository.saveAll(comments);
+        List<PetitionStatistic> comments = PetitionStatisticMock.createList(petition, users, thresholdCommentCount);
+        petitionStatisticRepository.saveAll(comments);
 
         // when
         ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
@@ -227,43 +222,39 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     }
 
     @Test
-    @DisplayName("답변대기 상태 변화 - 동의 댓글이 150개 이상인 경우 & 통계 응답 확인")
+    @DisplayName("통계 응답 확인")
     void agreeCommentOver150AndStatistic() throws Exception {
         // given
-        List<User> users = UserMock.createList(major, 150);
+        List<User> users1 = UserMock.createList(major, 50);
+        List<User> users2 = UserMock.createList(major2, 50);
+        List<User> users = Stream.concat(users1.stream(), users2.stream())
+                .collect(Collectors.toList());
         users = userRepository.saveAll(users);
 
-        List<Comment> comments = CommentMock.createList(petition, users, 150);
-        commentRepository.saveAll(comments);
-
-        List<PetitionStatistic> agreeComments = PetitionStatisticMock.createList(petition, users, 150);
+        List<PetitionStatistic> agreeComments = PetitionStatisticMock.createList(petition, users, 100);
         petitionStatisticRepository.saveAll(agreeComments);
 
         // when
-        ResultActions result = mvc.perform(post("/post/petition/agree/" + petition.getId())
-                .content(objectMapper.writeValueAsBytes(new ResponseSuccessDto()))
-                .contentType(MediaType.APPLICATION_JSON));
-
-        // then
-        result.andExpect(status().isOk());
-        assertThat(petition.getExtraStatus()).isEqualTo(PetitionStatus.WAITING);
-
-
-        // when
-        ResultActions result2 = mvc.perform(get("/post/petition/" + petition.getId()));
+        ResultActions result = mvc.perform(get("/post/petition/" + petition.getId()))
+                .andDo(print());
 
         // then
         String expiresAt = petition.getCreatedAt().plus(expiresTime).toLocalDate().toString();
 
-        result2.andExpect(status().isOk())
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("id", is(petition.getId().intValue())))
                 .andExpect(jsonPath("title", is("title")))
                 .andExpect(jsonPath("body", is("body")))
                 .andExpect(jsonPath("author", is(petition.getDisplayingUsername())))
                 .andExpect(jsonPath("mine", is(true)))
                 .andExpect(jsonPath("expiresAt", is(expiresAt)))
-                .andExpect(jsonPath("status", is(PetitionStatus.WAITING.name())))
-                .andExpect(jsonPath("agreeCount", is(151)));
+                .andExpect(jsonPath("status", is(PetitionStatus.ACTIVE.name())))
+                .andExpect(jsonPath("agreeCount", is(100)))
+                .andExpect(jsonPath("statisticList.size()", is(2)))
+                .andExpect(jsonPath("statisticList[0].agreeCount", is(50)))
+                .andExpect(jsonPath("statisticList[0].department", is(major.getDepartment())))
+                .andExpect(jsonPath("statisticList[1].agreeCount", is(50)))
+                .andExpect(jsonPath("statisticList[1].department", is(major2.getDepartment())));
 
     }
 
