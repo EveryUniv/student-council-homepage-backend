@@ -47,26 +47,25 @@ public class CommentService {
     }
 
 
-
     /**
      * 댓글 목록을 가져옵니다. 작성자 매핑 함수를 통해 댓글 작성자를 매핑합니다.
      * 매핑 함수에 null을 전달하면 익명으로 채워집니다.
      *
-     * @param postId       게시글 ID
-     * @param userId       사용자 ID
-     * @param pageable     페이징 정보
-     * @param authorMapper 작성자 매핑 함수
+     * @param postId   게시글 ID
+     * @param userId   사용자 ID
+     * @param pageable 페이징 정보
+     * @param mapper   dto 매핑 함수
      * @return 페이징된 댓글 목록
      */
-    public Page<CommentDto> list(Long postId, Long userId, Pageable pageable, AuthorMapper authorMapper) {
+    public Page<CommentDto> list(Long postId, Long userId, Pageable pageable, CommentMapper mapper) {
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         return commentRepository.findAllByPostId(postId, pageable)
                 .map(e -> {
-                    String author = authorMapper == null ? Post.ANONYMITY : authorMapper.mapAuthor(e);
-                    return new CommentDto(e, author,
+                    CommentDto dto = new CommentDto(e, Post.ANONYMITY,
                             likeService.getCountOfLikes(e.getId(), LikeTarget.COMMENT),
                             e.getUser().getId().equals(userId),
                             likeService.isLiked(e.getId(), userId, LikeTarget.COMMENT));
+                    return mapper == null ? dto : mapper.map(e, dto);
                 });
     }
 
@@ -140,12 +139,8 @@ public class CommentService {
         return commentId;
     }
 
-    public boolean isCommentedAlready(Long postId, Long userId) {
-        return !commentRepository.findAllByPostIdAndUserId(postId, userId).isEmpty();
-    }
-
     @FunctionalInterface
-    public interface AuthorMapper {
-        String mapAuthor(Comment comment);
+    public interface CommentMapper {
+        CommentDto map(Comment entity, CommentDto parent);
     }
 }

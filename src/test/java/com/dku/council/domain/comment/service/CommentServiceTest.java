@@ -155,25 +155,34 @@ class CommentServiceTest {
         assertThrows(NotGrantedException.class,
                 () -> service.delete(comment.getId(), 10L, false));
     }
-    
+
     @Test
     @DisplayName("댓글 목록 생성 - 매핑함수가 잘 적용되는가?")
-    void listWithMapper(){
+    void listWithMapper() {
         //given
         Post post = NewsMock.createDummy();
         User user = UserMock.createDummyMajor();
+        String author = user.getMajor().getName() + " " + user.getNickname();
+
         Comment comment = CommentMock.createWithId(post, user);
         DummyPage<Comment> comments = new DummyPage<>(List.of(comment));
+
         when(commentRepository.findAllByPostId(11L, Pageable.unpaged())).thenReturn(comments);
         when(postRepository.findById(11L)).thenReturn(Optional.ofNullable(post));
         when(likeService.getCountOfLikes(comment.getId(), LikeTarget.COMMENT)).thenReturn(10);
         when(likeService.isLiked(any(), any(), eq(LikeTarget.COMMENT))).thenReturn(eq(true));
-        
+
         // when
-        Page<CommentDto> list = service.list(11L, 1L, Pageable.unpaged(), data -> data.getUser().getMajor().getName() + " " + data.getUser().getNickname());
-        
+        Page<CommentDto> list = service.list(11L, 1L, Pageable.unpaged(),
+                (ent, dto) -> new CustomCommentDto(ent, dto, author));
+
         // then
-        assertThat(list.toList().get(0).getAuthor()).isEqualTo(comment.getUser().getMajor().getName() + " " + comment.getUser().getNickname());
+        assertThat(list.toList().get(0).getAuthor()).isEqualTo(author);
     }
 
+    private static class CustomCommentDto extends CommentDto {
+        public CustomCommentDto(Comment ent, CommentDto dto, String customAuthor) {
+            super(ent, customAuthor, dto.getLikes(), dto.isMine(), dto.isLiked());
+        }
+    }
 }

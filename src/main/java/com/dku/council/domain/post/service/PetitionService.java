@@ -1,9 +1,6 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.comment.model.dto.CommentDto;
-import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.domain.post.exception.DuplicateAgreementException;
-import com.dku.council.domain.post.exception.DuplicateCommentException;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
@@ -27,7 +24,6 @@ import java.util.List;
 public class PetitionService {
 
     private final GenericPostService<Petition> postService;
-    private final CommentService commentService;
     private final PetitionStatisticService statisticService;
 
     @Value("${app.post.petition.threshold-comment-count}")
@@ -43,7 +39,6 @@ public class PetitionService {
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
-    @Transactional
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
@@ -59,15 +54,15 @@ public class PetitionService {
 
     public void agreePetition(Long postId, Long userId) {
         Petition post = postService.findPost(postId);
-        if(commentService.isCommentedAlready(postId, userId)) {
+        if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
         }
 
-        if(post.getExtraStatus() == PetitionStatus.ACTIVE && post.getComments().size() +1 >= thresholdCommentCount) { // todo 댓글 수 캐싱
+        int countAgree = statisticService.count(postId); // TODO 캐싱
+        if (post.getExtraStatus() == PetitionStatus.ACTIVE && countAgree + 1 >= thresholdCommentCount) {
             post.updatePetitionStatus(PetitionStatus.WAITING);
         }
 
-        commentService.create(postId, userId, "동의합니다.");
         statisticService.save(postId, userId);
     }
 }

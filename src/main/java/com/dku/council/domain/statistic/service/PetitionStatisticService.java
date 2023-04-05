@@ -34,10 +34,10 @@ public class PetitionStatisticService {
     /**
      * petitionId 로 저장되어 있는 Department 를 조회하여 가장 많은 Department 4개를 조회한다.
      *
-     * @param petitionId
-     * @return
+     * @param petitionId 조회할 petitionId
+     * @return Department 4개
      */
-    public List<PetitionStatisticDto> findTop4Department(Long petitionId){
+    public List<PetitionStatisticDto> findTop4Department(Long petitionId) {
         List<PetitionStatistic> petitionStatisticList = repository.findAllByPetitionId(petitionId);
 
         Stream<String> departmentList = petitionStatisticList.stream().map(PetitionStatistic::getDepartment);
@@ -55,10 +55,11 @@ public class PetitionStatisticService {
 
     /**
      * 동의 통계 테이블에 저장합니다.
-     * @param postId
-     * @param userId
+     *
+     * @param postId 게시글 id
+     * @param userId 사용자 id
      */
-    public void save(Long postId, Long userId){
+    public void save(Long postId, Long userId) {
         Petition petition = petitionRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
@@ -69,8 +70,11 @@ public class PetitionStatisticService {
         repository.save(statistic);
     }
 
-    public int count(Long postId){
+    public int count(Long postId) {
         return repository.countByPetitionId(postId);
     }
 
+    public boolean isAlreadyAgreed(Long postId, Long userId) {
+        return repository.findByPetitionIdAndUserId(postId, userId).isPresent();
+    }
 }
