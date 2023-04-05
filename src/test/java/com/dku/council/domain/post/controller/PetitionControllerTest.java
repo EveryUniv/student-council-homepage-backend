@@ -17,6 +17,7 @@ import com.dku.council.mock.PetitionStatisticMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.FieldReflector;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @SpringBootTest
 @Transactional
-//@FullIntegrationTest
+@FullIntegrationTest
 class PetitionControllerTest extends AbstractContainerRedisTest {
 
     @Autowired
