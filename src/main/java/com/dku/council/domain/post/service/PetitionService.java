@@ -39,7 +39,6 @@ public class PetitionService {
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
-    @Transactional
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);

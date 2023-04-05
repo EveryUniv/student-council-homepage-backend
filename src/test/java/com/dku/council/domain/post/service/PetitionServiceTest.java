@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -56,8 +55,6 @@ public class PetitionServiceTest {
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
-    @Mock
-    private CommentService commentService;
 
     private PetitionService petitionService;
     private GenericPostService<Petition> postService;
@@ -67,8 +64,9 @@ public class PetitionServiceTest {
     public void setup() {
         postService = new GenericPostService<>(petitionRepository, userRepository, tagService,
                 viewCountService, fileUploadService, postLikeService);
-        petitionService = new PetitionService(postService, commentService, petitionStatisticService, 150, Duration.ofDays(30));
+        petitionService = new PetitionService(postService, petitionStatisticService, 150, Duration.ofDays(30));
     }
+
     @Test
     @DisplayName("list와 mapper가 잘 동작하는지?")
     public void listWithMapper() {
