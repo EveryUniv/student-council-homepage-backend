@@ -1,8 +1,8 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.comment.service.CommentService;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
+import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
@@ -19,11 +19,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,17 +55,46 @@ public class PetitionServiceTest {
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
-    @Mock
-    private CommentService commentService;
 
     private PetitionService petitionService;
+    private GenericPostService<Petition> postService;
 
 
     @BeforeEach
     public void setup() {
-        GenericPostService<Petition> postService = new GenericPostService<>(petitionRepository, userRepository, tagService,
+        postService = new GenericPostService<>(petitionRepository, userRepository, tagService,
                 viewCountService, fileUploadService, postLikeService);
-        petitionService = new PetitionService(postService, commentService, petitionStatisticService, 150, Duration.ofDays(30));
+        petitionService = new PetitionService(postService, petitionStatisticService, 150, Duration.ofDays(30));
+    }
+
+    @Test
+    @DisplayName("list와 mapper가 잘 동작하는지?")
+    public void listWithMapper() {
+        // given
+        List<Petition> allPostList = PetitionMock.createListDummy("generic-", 20);
+        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
+        Duration expiresTime = Duration.ofDays(5);
+
+        when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
+        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
+
+        // when
+        Page<SummarizedPetitionDto> allPage = postService.list(null, Pageable.unpaged(), 500,
+                (dto, post) -> new SummarizedPetitionDto(dto, post, expiresTime,10 ));
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedPetitionDto dto = allPage.getContent().get(i);
+            Petition post = allPostList.get(i);
+            assertThat(dto.getId()).isEqualTo(post.getId());
+            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
+            assertThat(dto.getBody()).isEqualTo(post.getBody());
+            assertThat(dto.getAgreeCount()).isEqualTo(10);
+            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
+            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt());
+            assertThat(dto.getViews()).isEqualTo(post.getViews());
+        }
     }
 
     @Test
@@ -74,6 +107,7 @@ public class PetitionServiceTest {
         when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
         when(postLikeService.isLiked(any(), any(), eq(LikeTarget.POST))).thenReturn(true);
         when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
+        when(petitionStatisticService.count(petition.getId())).thenReturn(list.size());
         //when
         ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
 
@@ -85,6 +119,7 @@ public class PetitionServiceTest {
         assertThat(dto.isMine()).isEqualTo(false);
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
         assertThat(dto.getStatisticList()).isEqualTo(list);
+        assertThat(dto.getAgreeCount()).isEqualTo(list.size());
     }
 
 }

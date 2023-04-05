@@ -26,17 +26,19 @@ public class ResponsePetitionDto extends ResponseSingleGenericPostDto {
     @Schema(description = "동의 인원", example = "48")
     private final int agreeCount;
 
+    @Schema(description = "동의 인원 분포")
+    private final List<PetitionStatisticDto> statisticList;
+
     @Schema(hidden = true)
     @JsonIgnore
     private final int likes = 0;
-    private final List<PetitionStatisticDto> statisticList;
 
-    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime, List<PetitionStatisticDto> statisticList) {
+    public ResponsePetitionDto(ResponseSingleGenericPostDto dto, Petition post, Duration expiresTime, int agreeCount, List<PetitionStatisticDto> statisticList) {
         super(dto);
         this.status = post.getExtraStatus();
         this.answer = post.getAnswer();
         this.expiresAt = post.getCreatedAt().plus(expiresTime).toLocalDate();
-        this.agreeCount = post.getComments().size();
+        this.agreeCount = agreeCount;
         this.statisticList = statisticList;
     }
 }

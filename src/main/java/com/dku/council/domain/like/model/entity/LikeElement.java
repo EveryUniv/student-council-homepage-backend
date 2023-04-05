@@ -17,7 +17,11 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 @Table(indexes = {
         @Index(name = "idx_like_element_id", columnList = "elementId")
-})
+},
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_like_element", columnNames = {"user_id", "elementId", "target"})
+        }
+)
 public class LikeElement extends BaseEntity {
 
     @Id

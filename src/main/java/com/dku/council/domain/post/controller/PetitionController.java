@@ -1,7 +1,5 @@
 package com.dku.council.domain.post.controller;
 
-import com.dku.council.domain.comment.model.dto.CommentDto;
-import com.dku.council.domain.comment.model.dto.RequestCreateCommentDto;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
@@ -130,41 +128,9 @@ public class PetitionController {
     }
 
     /**
-     * 동의 댓글 목록 가져오기
-     *
-     * @param postId 댓글 생성할 게시글 id
-     */
-//    @GetMapping("/comment/{postId}")
-    //해당 API 는 deprecated 되었습니다. : 동의 댓글 UI 제외.
-    @UserOnly
-    public ResponsePage<CommentDto> listComment(AppAuthentication auth,
-                                                @PathVariable Long postId,
-                                                @ParameterObject Pageable pageable) {
-        Page<CommentDto> comments = petitionService.listComment(postId, auth.getUserId(), pageable);
-        return new ResponsePage<>(comments);
-    }
-
-    /**
-     * 동의 댓글 생성
-     *
-     * @param postId     댓글 생성할 게시글 id
-     * @param commentDto 댓글 내용(text)
-     */
-    //해당 API 는 deprecated 되었습니다. 대신 아래 API 를 사용해주세요.
-//    @PostMapping("/comment/{postId}")
-    @UserOnly
-    public ResponseIdDto createComment(AppAuthentication auth,
-                                       @PathVariable Long postId,
-                                       @Valid @RequestBody RequestCreateCommentDto commentDto) {
-        Long id = petitionService.createComment(postId, auth.getUserId(), commentDto.getText(), auth.isAdmin());
-        return new ResponseIdDto(id);
-    }
-
-    /**
      * 동의 하기 : 해당 게시글에 동의합니다. (default : 동의합니다)
      *
      * @param postId    동의할 게시글 id
-     * @return          동의한 댓글 id
      */
     @PostMapping("/agree/{postId}")
     @UserOnly
@@ -173,18 +139,6 @@ public class PetitionController {
         petitionService.agreePetition(postId, auth.getUserId());
     }
 
-    /**
-     * 동의 댓글 삭제 (Admin)
-     *
-     * @param id 댓글 id
-     */
-    //deprecated : Petition 은 한번 동의하면 삭제할 수 없습니다.
-//    @DeleteMapping("/comment/{id}")
-    @AdminOnly
-    public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
-        Long deleteId = petitionService.deleteComment(id, auth.getUserId());
-        return new ResponseIdDto(deleteId);
-    }
 
     /**
      * 게시글에 좋아요 표시

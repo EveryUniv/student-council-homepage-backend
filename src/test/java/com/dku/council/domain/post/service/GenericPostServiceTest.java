@@ -7,6 +7,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
+import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
@@ -16,10 +17,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import com.dku.council.mock.MultipartFileMock;
-import com.dku.council.mock.NewsMock;
-import com.dku.council.mock.PetitionMock;
-import com.dku.council.mock.UserMock;
+import com.dku.council.mock.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +45,8 @@ class GenericPostServiceTest {
 
     @Mock
     private GenericPostRepository<News> newsRepository;
+    @Mock
+    private GenericPostRepository<GeneralForum> generalForumRepository;
 
     @Mock
     private GenericPostRepository<Petition> petitionRepository;
@@ -67,12 +67,12 @@ class GenericPostServiceTest {
     private CachedLikeServiceImpl postLikeService;
 
     private GenericPostService<News> newsService;
-    private GenericPostService<Petition> petitionService;
+    private GenericPostService<GeneralForum> generalForumService;
 
     @BeforeEach
     public void setup() {
         newsService = new GenericPostService<>(newsRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
-        petitionService = new GenericPostService<>(petitionRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
+        generalForumService = new GenericPostService<>(generalForumRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
     }
 
 
@@ -102,33 +102,32 @@ class GenericPostServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("list와 mapper가 잘 동작하는지?")
-    public void listWithMapper() {
-        // given
-        List<Petition> allPostList = PetitionMock.createListDummy("generic-", 20);
-        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
-        Duration expiresTime = Duration.ofDays(5);
 
-        when(petitionRepository.findAll((Specification<Petition>) any(), (Pageable) any())).thenReturn(allPost);
+    @Test
+    @DisplayName("list에 작성자가 잘 들어가는지?")
+    public void list_GeneralForum() {
+        // given
+        List<GeneralForum> allForumList = GeneralForumMock.createListDummy("generic-", 20);
+        Page<GeneralForum> allGeneralForum = new DummyPage<>(allForumList, 20);
+
+
+        when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(allGeneralForum);
         when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
-        Page<SummarizedPetitionDto> allPage = petitionService.list(null, Pageable.unpaged(), 500,
-                (dto, post) -> new SummarizedPetitionDto(dto, post, expiresTime, post.getComments().size()));
+        Page<SummarizedGenericPostDto> allPage = generalForumService.list(null, Pageable.unpaged(), 500);
 
         // then
-        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
+        assertThat(allPage.getTotalElements()).isEqualTo(allForumList.size());
         for (int i = 0; i < allPage.getTotalElements(); i++) {
-            SummarizedPetitionDto dto = allPage.getContent().get(i);
-            Petition post = allPostList.get(i);
-            assertThat(dto.getId()).isEqualTo(post.getId());
-            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
-            assertThat(dto.getBody()).isEqualTo(post.getBody());
-            assertThat(dto.getAgreeCount()).isEqualTo(post.getComments().size());
-            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
-            assertThat(dto.getCreatedAt()).isEqualTo(post.getCreatedAt().toLocalDate());
-            assertThat(dto.getViews()).isEqualTo(post.getViews());
+            SummarizedGenericPostDto dto = allPage.getContent().get(i);
+            GeneralForum generalForum = allForumList.get(i);
+            assertThat(dto.getId()).isEqualTo(generalForum.getId());
+            assertThat(dto.getTitle()).isEqualTo(generalForum.getTitle());
+            assertThat(dto.getBody()).isEqualTo(generalForum.getBody());
+            assertThat(dto.getLikes()).isEqualTo(15);
+            assertThat(dto.getViews()).isEqualTo(generalForum.getViews());
+            assertThat(dto.getAuthor()).isEqualTo(generalForum.getUser().getNickname());
         }
     }
 
@@ -220,26 +219,6 @@ class GenericPostServiceTest {
         assertThat(dto.isMine()).isEqualTo(true);
     }
 
-    @Test
-    @DisplayName("Mapper와 함깨 단건 조회가 잘 동작하는지?")
-    public void findOneWithMapper() {
-        // given
-        Petition petition = PetitionMock.createWithDummy();
-        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
-        when(postLikeService.isLiked(any(), any(), eq(POST))).thenReturn(true);
-
-        // when
-        ResponsePetitionDto dto = petitionService.findOne(petition.getId(), 0L, "Addr", (d, post) ->
-                new ResponsePetitionDto(d, post, Duration.ofDays(30), List.of()));
-
-        // then
-        assertThat(dto.getId()).isEqualTo(petition.getId());
-        assertThat(dto.getViews()).isEqualTo(petition.getViews());
-        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
-        assertThat(dto.isLiked()).isEqualTo(true);
-        assertThat(dto.isMine()).isEqualTo(false);
-        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
-    }
 
     @Test
     @DisplayName("없는 게시글 단건 조회시 오류")

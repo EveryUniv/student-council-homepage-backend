@@ -7,11 +7,13 @@ import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
+import com.dku.council.domain.post.model.dto.response.GeneralForumCommentDto;
+import com.dku.council.domain.post.model.dto.response.ResponseGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
@@ -79,10 +81,12 @@ public class GeneralForumController {
      */
     @GetMapping("/{id}")
     @UserOnly
-    public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
-                                                @PathVariable Long id,
-                                                HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+    public ResponseGeneralForumDto findOne(AppAuthentication auth,
+                                           @PathVariable Long id,
+                                           HttpServletRequest request) {
+        return postService.findOne(id, auth.getUserId(),
+                RemoteAddressUtil.getProxyableAddr(request),
+                ResponseGeneralForumDto::new);
     }
 
     /**
@@ -120,7 +124,11 @@ public class GeneralForumController {
     public ResponsePage<CommentDto> listComment(AppAuthentication auth,
                                                 @PathVariable Long postId,
                                                 @ParameterObject Pageable pageable) {
-        Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable);
+        Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable,
+                (ent, dto) -> {
+                    User user = ent.getUser();
+                    return new GeneralForumCommentDto(ent, dto, user.getName(), user.getMajor().getName());
+                });
         return new ResponsePage<>(comments);
     }
 

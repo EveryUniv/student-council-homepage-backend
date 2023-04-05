@@ -19,8 +19,22 @@ public abstract class AbstractKeyValueCacheRepository {
     private final String cacheRootKey;
 
 
+    protected AbstractKeyValueCacheRepository(StringRedisTemplate redisTemplate,
+                                              ObjectMapper objectMapper,
+                                              String cacheRootKey) {
+        this(redisTemplate, objectMapper, null, cacheRootKey);
+    }
+
+
     public <T> CacheObject<T> set(String key, T data, Instant now) {
-        CacheObject<T> obj = new CacheObject<>(now.plus(cacheDuration), data);
+        Instant expiredAt;
+        if (cacheDuration != null) {
+            expiredAt = now.plus(cacheDuration);
+        } else {
+            expiredAt = Instant.MAX;
+        }
+
+        CacheObject<T> obj = new CacheObject<>(expiredAt, data);
         String value;
         try {
             value = objectMapper.writeValueAsString(obj);
@@ -63,7 +77,6 @@ public abstract class AbstractKeyValueCacheRepository {
         Optional<CacheObject<T>> cacheObject = getCacheObject(key, type, now);
         return cacheObject.map(CacheObject::getValue);
     }
-
 
     public boolean remove(String key) {
         return redisTemplate.opsForHash().delete(cacheRootKey, key) > 0;

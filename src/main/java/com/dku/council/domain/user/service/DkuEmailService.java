@@ -4,7 +4,7 @@ import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.MajorNotFoundException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
 import com.dku.council.domain.user.exception.WrongEmailCodeException;
-import com.dku.council.domain.user.model.UserSignupInfo;
+import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
@@ -92,7 +92,7 @@ public class DkuEmailService {
 
         Major major = majorRepository.findById(dto.getMajorId())
                 .orElseThrow(MajorNotFoundException::new);
-        UserSignupInfo info = new UserSignupInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
+        DkuUserInfo info = new DkuUserInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
                 dto.getAcademicStatus(), StudentDuesStatus.NOT_PAID, major.getName(), major.getDepartment());
 
         dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, now);
@@ -107,9 +107,9 @@ public class DkuEmailService {
      * @param signupToken 학생인증 토큰
      * @return 학생정보
      */
-    public UserSignupInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
+    public DkuUserInfo getStudentInfo(String signupToken) throws NotDKUAuthorizedException {
         Instant now = Instant.now(clock);
-        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, UserSignupInfo.class, now)
+        return dkuAuthRepository.getAuthPayload(signupToken, DKU_AUTH_NAME, DkuUserInfo.class, now)
                 .orElseThrow(NotDKUAuthorizedException::new);
     }
 

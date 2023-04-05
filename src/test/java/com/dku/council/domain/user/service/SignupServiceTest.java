@@ -2,7 +2,7 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
-import com.dku.council.domain.user.model.UserSignupInfo;
+import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
@@ -54,7 +54,7 @@ class SignupServiceTest {
     private final String encodedPwd = "Encoded";
     private final String phone = "01011112222";
     private final String studentId = "id";
-    private final UserSignupInfo info = new UserSignupInfo("name", studentId, 0, "재학",
+    private final DkuUserInfo info = new DkuUserInfo("name", studentId, 0, "재학",
             StudentDuesStatus.PAID, "Major", "Department");
     private final RequestSignupDto dto = new RequestSignupDto("nickname", "pwd");
 
