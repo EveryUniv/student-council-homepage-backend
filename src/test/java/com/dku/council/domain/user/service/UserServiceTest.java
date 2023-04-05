@@ -64,7 +64,7 @@ class UserServiceTest {
 
         // then
         assertThat(response.getStudentId()).isEqualTo(user.getStudentId());
-        assertThat(response.getUserName()).isEqualTo(user.getName());
+        assertThat(response.getUsername()).isEqualTo(user.getName());
         assertThat(response.getAccessToken()).isEqualTo("access");
         assertThat(response.getRefreshToken()).isEqualTo("refresh");
         assertThat(response.isAdmin()).isEqualTo(false);
@@ -129,9 +129,12 @@ class UserServiceTest {
         ResponseUserInfoDto info = service.getUserInfo(user.getId());
 
         // then
-        assertThat(info.getMajor()).isEqualTo(major.getName());
-        assertThat(info.getStudentName()).isEqualTo(user.getName());
+        assertThat(info.getStudentId()).isEqualTo(user.getStudentId());
+        assertThat(info.getUsername()).isEqualTo(user.getName());
+        assertThat(info.getNickname()).isEqualTo(user.getNickname());
         assertThat(info.getYearOfAdmission()).isEqualTo(user.getYearOfAdmission().toString());
+        assertThat(info.getMajor()).isEqualTo(user.getMajor().getName());
+        assertThat(info.getDepartment()).isEqualTo(user.getMajor().getDepartment());
     }
 
     @Test
