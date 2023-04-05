@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.post.repository.PostRepository;
 import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
@@ -10,6 +9,7 @@ import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
 import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
+import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -61,8 +61,9 @@ public class UserService {
                 .orElseThrow(LoginUserNotFoundException::new);
 
         String year = user.getYearOfAdmission().toString();
-        String major = user.getMajor().getName();
-        return new ResponseUserInfoDto(user.getName(), year, major);
+        Major major = user.getMajor();
+        return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
+                user.getNickname(), year, major.getName(), major.getDepartment());
     }
 
     public List<ResponseMajorDto> getAllMajors() {

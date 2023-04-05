@@ -10,7 +10,8 @@ public class ResponseLoginDto {
     private final String accessToken;
     private final String refreshToken;
     private final boolean isAdmin;
-    private final String userName;
+    private final String username;
+    private final String nickname;
     private final String studentId;
     private final String major;
     private final String department;
@@ -19,7 +20,8 @@ public class ResponseLoginDto {
         this.accessToken = token.getAccessToken();
         this.refreshToken = token.getRefreshToken();
         this.isAdmin = role.isAdmin();
-        this.userName = user.getName();
+        this.username = user.getName();
+        this.nickname = user.getNickname();
         this.studentId = user.getStudentId();
         this.major = user.getMajor().getName();
         this.department = user.getMajor().getDepartment();
