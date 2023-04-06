@@ -135,6 +135,7 @@ class UserServiceTest {
         assertThat(info.getYearOfAdmission()).isEqualTo(user.getYearOfAdmission().toString());
         assertThat(info.getMajor()).isEqualTo(user.getMajor().getName());
         assertThat(info.getDepartment()).isEqualTo(user.getMajor().getDepartment());
+        assertThat(info.isAdmin()).isEqualTo(user.getUserRole().isAdmin());
     }
 
     @Test
