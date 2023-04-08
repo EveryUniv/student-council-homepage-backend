@@ -1,6 +1,6 @@
 package com.dku.council.domain.user.controller;
 
-import com.dku.council.domain.user.model.UserSignupInfo;
+import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSendEmailCode;
 import com.dku.council.domain.user.model.dto.request.RequestVerifyEmailCodeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
@@ -50,7 +50,7 @@ public class EmailController {
      */
     @GetMapping("/{signup-token}")
     public ResponseScrappedStudentInfoDto getStudentInfo(@PathVariable("signup-token") String signupToken) {
-        UserSignupInfo info = service.getStudentInfo(signupToken);
+        DkuUserInfo info = service.getStudentInfo(signupToken);
         return new ResponseScrappedStudentInfoDto(info);
     }
 

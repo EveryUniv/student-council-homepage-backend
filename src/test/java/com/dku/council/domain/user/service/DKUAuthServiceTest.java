@@ -2,10 +2,12 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
 import com.dku.council.domain.user.exception.NotDKUAuthorizedException;
-import com.dku.council.domain.user.model.UserSignupInfo;
-import com.dku.council.domain.user.model.dto.request.RequestVerifyStudentDto;
+import com.dku.council.domain.user.model.DkuUserInfo;
+import com.dku.council.domain.user.model.dto.request.RequestDkuStudentDto;
+import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInfoDto;
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
@@ -13,6 +15,7 @@ import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuStudentService;
+import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,12 +53,15 @@ class DKUAuthServiceTest {
     @Mock
     private SignupAuthRepository dkuAuthRepository;
 
+    @Mock
+    private MajorRepository majorRepository;
+
     private DKUAuthService service;
 
     @BeforeEach
     public void setup() {
         this.service = new DKUAuthService(clock, crawlerService,
-                authenticationService, userRepository, dkuAuthRepository);
+                authenticationService, userRepository, dkuAuthRepository, majorRepository);
     }
 
 
@@ -63,14 +69,14 @@ class DKUAuthServiceTest {
     @DisplayName("studentInfo를 잘 가져오는지")
     void getStudentInfo() {
         // given
-        UserSignupInfo info = new UserSignupInfo("name", "1212", 0, "state",
+        DkuUserInfo info = new DkuUserInfo("name", "1212", 0, "state",
                 StudentDuesStatus.PAID, "", "");
         when(dkuAuthRepository.getAuthPayload(any(),
-                eq(DKU_AUTH_NAME), eq(UserSignupInfo.class), any()))
+                eq(DKU_AUTH_NAME), eq(DkuUserInfo.class), any()))
                 .thenReturn(Optional.of(info));
 
         // when
-        UserSignupInfo result = service.getStudentInfo("token");
+        DkuUserInfo result = service.getStudentInfo("token");
 
         // then
         assertThat(result).isEqualTo(info);
@@ -81,7 +87,7 @@ class DKUAuthServiceTest {
     void getStudentInfoWhenNotFound() {
         // given
         when(dkuAuthRepository.getAuthPayload(eq("token"),
-                eq(DKU_AUTH_NAME), eq(UserSignupInfo.class), any()))
+                eq(DKU_AUTH_NAME), eq(DkuUserInfo.class), any()))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -113,7 +119,7 @@ class DKUAuthServiceTest {
         DkuAuth auth = new DkuAuth(new LinkedMultiValueMap<>());
         StudentInfo info = new StudentInfo("name", "1212", 0, "state",
                 "", "");
-        RequestVerifyStudentDto dto = new RequestVerifyStudentDto(id, pwd);
+        RequestDkuStudentDto dto = new RequestDkuStudentDto(id, pwd);
 
         when(authenticationService.loginWebInfo(id, pwd)).thenReturn(auth);
         when(crawlerService.crawlStudentInfo(auth)).thenReturn(info);
@@ -126,7 +132,7 @@ class DKUAuthServiceTest {
         // then
         assertThat(response.getStudent().getStudentId()).isEqualTo("1212");
         assertThat(response.getStudent().getStudentName()).isEqualTo("name");
-        verify(dkuAuthRepository).setAuthPayload(any(), eq(DKU_AUTH_NAME), isA(UserSignupInfo.class), any());
+        verify(dkuAuthRepository).setAuthPayload(any(), eq(DKU_AUTH_NAME), isA(DkuUserInfo.class), any());
     }
 
     @Test
@@ -135,7 +141,7 @@ class DKUAuthServiceTest {
         // given
         String id = "id";
         String pwd = "pwd";
-        RequestVerifyStudentDto dto = new RequestVerifyStudentDto(id, pwd);
+        RequestDkuStudentDto dto = new RequestDkuStudentDto(id, pwd);
         User user = UserMock.createDummyMajor();
 
         when(userRepository.findByStudentId(id)).thenReturn(Optional.of(user));
@@ -143,5 +149,41 @@ class DKUAuthServiceTest {
         // when & then
         assertThrows(AlreadyStudentIdException.class, () ->
                 service.verifyStudent(dto));
+    }
+
+    @Test
+    @DisplayName("학생 정보 업데이트")
+    void updateDKUStudent() {
+        // given
+        String id = "id";
+        String pwd = "pwd";
+        DkuAuth auth = new DkuAuth(new LinkedMultiValueMap<>());
+        User user = UserMock.createDummyMajor();
+        StudentInfo info = new StudentInfo("name", "1212", 0, "state",
+                "major", "department");
+        RequestDkuStudentDto dto = new RequestDkuStudentDto(id, pwd);
+
+        when(authenticationService.loginWebInfo(id, pwd)).thenReturn(auth);
+        when(crawlerService.crawlStudentInfo(auth)).thenReturn(info);
+        when(majorRepository.findByName(info.getMajorName(), info.getDepartmentName()))
+                .thenReturn(Optional.of(MajorMock.create(info.getMajorName(), info.getDepartmentName())));
+        when(crawlerService.crawlStudentDues(eq(auth), any())).thenReturn(StudentDuesStatus.PAID);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // when
+        ResponseScrappedStudentInfoDto result = service.updateDKUStudent(user.getId(), dto);
+
+        // then
+        assertThat(result.getStudentId()).isEqualTo("1212");
+        assertThat(result.getMajor()).isEqualTo("major");
+        assertThat(result.getStudentName()).isEqualTo("name");
+
+        assertThat(user.getStudentId()).isEqualTo(result.getStudentId());
+        assertThat(user.getName()).isEqualTo(result.getStudentName());
+        assertThat(user.getMajor().getName()).isEqualTo(info.getMajorName());
+        assertThat(user.getMajor().getDepartment()).isEqualTo(info.getDepartmentName());
+        assertThat(user.getYearOfAdmission()).isEqualTo(info.getYearOfAdmission());
+        assertThat(user.getAcademicStatus()).isEqualTo(info.getStudentState());
+        assertThat(user.getDuesStatus()).isEqualTo(StudentDuesStatus.PAID);
     }
 }

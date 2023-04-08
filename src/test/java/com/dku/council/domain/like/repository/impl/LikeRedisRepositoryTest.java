@@ -41,6 +41,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(key.getLike(redisTemplate)).isEqualTo(LikeState.LIKED.name());
+        assertThat(key.isLiked(redisTemplate)).isEqualTo(true);
     }
 
     @Test
@@ -55,6 +56,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(key.getLike(redisTemplate)).isEqualTo(LikeState.LIKED.name());
+        assertThat(key.isLiked(redisTemplate)).isEqualTo(true);
     }
 
     @Test
@@ -69,6 +71,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(key.getLike(redisTemplate)).isEqualTo(LikeState.CANCELLED.name());
+        assertThat(key.isLiked(redisTemplate)).isEqualTo(false);
     }
 
     @Test
@@ -82,6 +85,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(key.getLike(redisTemplate)).isEqualTo(LikeState.CANCELLED.name());
+        assertThat(key.isLiked(redisTemplate)).isEqualTo(false);
     }
 
     @Test
@@ -89,7 +93,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
     void isPostLiked() {
         // given
         PostLikeKey key = new PostLikeKey();
-        repository.like(key.elementId, key.userId, POST);
+        key.setLiked(redisTemplate, true);
 
         // when
         Boolean value = repository.isLiked(key.elementId, key.userId, POST);
@@ -103,7 +107,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
     void isPostLikedCancelled() {
         // given
         PostLikeKey key = new PostLikeKey();
-        repository.cancelLike(key.elementId, key.userId, POST);
+        key.setLiked(redisTemplate, false);
 
         // when
         Boolean value = repository.isLiked(key.elementId, key.userId, POST);
@@ -218,9 +222,19 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
             redisTemplate.opsForValue().set(key, data);
         }
 
-        public boolean isMember(StringRedisTemplate redisTemplate) {
-            String key = combine(RedisKeys.LIKE_USERS_KEY, POST);
-            return Boolean.TRUE.equals(redisTemplate.opsForSet().isMember(key, elementId.toString()));
+        public boolean isLiked(StringRedisTemplate redisTemplate) {
+            String key = combine(RedisKeys.LIKE_POSTS_KEY, POST, userId);
+            Object value = redisTemplate.opsForHash().get(key, elementId.toString());
+            return LikeState.LIKED.name().equals(value);
+        }
+
+        public void setLiked(StringRedisTemplate redisTemplate, boolean isLiked) {
+            String key = combine(RedisKeys.LIKE_POSTS_KEY, POST, userId);
+            String value = LikeState.CANCELLED.name();
+            if (isLiked) {
+                value = LikeState.LIKED.name();
+            }
+            redisTemplate.opsForHash().put(key, elementId.toString(), value);
         }
     }
 }

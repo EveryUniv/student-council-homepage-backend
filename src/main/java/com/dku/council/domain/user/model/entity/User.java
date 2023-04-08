@@ -107,4 +107,13 @@ public class User extends BaseEntity {
     public void changePhone(String phone) {
         this.phone = phone;
     }
+
+    public void changeGenericInfo(String studentId, String studentName, Major major, int yearOfAdmission, String studentState, StudentDuesStatus duesStatus) {
+        this.studentId = studentId;
+        this.name = studentName;
+        this.major = major;
+        this.yearOfAdmission = yearOfAdmission;
+        this.academicStatus = studentState;
+        this.duesStatus = duesStatus;
+    }
 }
