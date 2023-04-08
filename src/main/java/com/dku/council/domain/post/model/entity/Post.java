@@ -3,6 +3,7 @@ package com.dku.council.domain.post.model.entity;
 import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.PostStatus;
+import com.dku.council.domain.report.model.entity.Report;
 import com.dku.council.domain.tag.model.entity.PostTag;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
@@ -61,6 +62,9 @@ public abstract class Post extends BaseEntity {
     @Where(clause = "status = '" + CommentStatus.ACTIVE_NAME + "'")
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
 
     private int views;
 

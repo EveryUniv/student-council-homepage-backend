@@ -5,11 +5,16 @@ import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
+import com.dku.council.domain.post.model.dto.request.RequestCreateReportDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.domain.report.exception.AlreadyReportedException;
+import com.dku.council.domain.report.model.entity.Report;
+import com.dku.council.domain.report.model.entity.ReportCategory;
+import com.dku.council.domain.report.repository.ReportRepository;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -184,7 +189,8 @@ public class GenericPostService<E extends Post> {
         post.blind();
     }
 
-    @FunctionalInterface
+
+        @FunctionalInterface
     public interface PostResultMapper<T, D, E extends Post> {
         T map(D dto, E post);
     }

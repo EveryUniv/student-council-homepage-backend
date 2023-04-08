@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.model.entity;
 
+import com.dku.council.domain.report.model.entity.Report;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
@@ -9,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
@@ -57,6 +61,9 @@ public class User extends BaseEntity {
 
     @Enumerated(STRING)
     private UserRole userRole;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
 
 
     @Builder
