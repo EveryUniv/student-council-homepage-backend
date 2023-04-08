@@ -63,7 +63,8 @@ public class UserService {
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
-                user.getNickname(), year, major.getName(), major.getDepartment());
+                user.getNickname(), year, major.getName(), major.getDepartment(),
+                user.getUserRole().isAdmin());
     }
 
     public List<ResponseMajorDto> getAllMajors() {
