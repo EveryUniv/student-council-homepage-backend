@@ -4,6 +4,7 @@ import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.dku.council.domain.timetable.repository.LectureTemplateRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
+import com.dku.council.infra.dku.model.MajorSubject;
 import com.dku.council.infra.dku.model.Subject;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuLectureService;
@@ -54,6 +55,7 @@ class LectureRetrieveServiceTest {
         // given
         YearMonth yearMonth = YearMonth.of(2022, 9);
         DkuAuth auth = new DkuAuth(new LinkedMultiValueMap<>());
+
         List<Subject> subjects = createSubjects();
 
         when(dkuAuthenticationService.loginWebInfo("id", "password")).thenReturn(auth);
@@ -84,6 +86,12 @@ class LectureRetrieveServiceTest {
                 assertThat(lectureTime.getEnd()).isEqualTo(time.getTo());
                 assertThat(lectureTime.getPlace()).isEqualTo(time.getPlace());
                 assertThat(lectureTime.getWeek()).isEqualTo(time.getDayOfWeek());
+
+                if (subject instanceof MajorSubject) {
+                    MajorSubject majorSubject = (MajorSubject) subject;
+                    assertThat(lecture.getMajor()).isEqualTo(majorSubject.getMajor());
+                    assertThat(lecture.getGrade()).isEqualTo(majorSubject.getGrade());
+                }
 
             }
             return true;
@@ -129,7 +137,26 @@ class LectureRetrieveServiceTest {
                                         "상경507"
                                 )
                         ))
-                        .build()
+                        .build(),
+                new MajorSubject(
+                        "문과 국어국문학과",
+                        1,
+                        Subject.builder()
+                                .category("학과기초")
+                                .id("471580")
+                                .classNumber(1)
+                                .name("고전문학강독")
+                                .credit(3)
+                                .professor("권진옥")
+                                .times(List.of(
+                                        new Subject.TimeAndPlace(
+                                                DayOfWeek.TUESDAY,
+                                                LocalTime.of(10, 30),
+                                                LocalTime.of(12, 0),
+                                                null
+                                        )
+                                ))
+                                .build())
         );
     }
 }
