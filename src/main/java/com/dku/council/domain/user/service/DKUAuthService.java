@@ -13,9 +13,7 @@ import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.global.error.exception.UserNotFoundException;
-import com.dku.council.infra.dku.exception.DkuFailedCrawlingException;
 import com.dku.council.infra.dku.model.DkuAuth;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuStudentService;
@@ -25,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.YearMonth;
 import java.util.Optional;
 
 @Service
@@ -107,8 +104,7 @@ public class DKUAuthService {
                 info.getStudentName(),
                 major,
                 info.getYearOfAdmission(),
-                info.getStudentState(),
-                info.getDuesStatus());
+                info.getStudentState());
 
         return new ResponseScrappedStudentInfoDto(info);
     }
@@ -116,19 +112,7 @@ public class DKUAuthService {
     private DkuUserInfo retrieveDkuUserInfo(String id, String pwd) {
         DkuAuth auth = authenticationService.loginWebInfo(id, pwd);
         StudentInfo studentInfo = crawlerService.crawlStudentInfo(auth);
-        StudentDuesStatus duesStatus;
-
-        if (studentInfo.getStudentState().equals("졸업")) {
-            duesStatus = StudentDuesStatus.NOT_PAID;
-        } else {
-            try {
-                duesStatus = crawlerService.crawlStudentDues(auth, YearMonth.now(clock));
-            } catch (DkuFailedCrawlingException e) {
-                duesStatus = StudentDuesStatus.NOT_PAID;
-            }
-        }
-
-        return new DkuUserInfo(studentInfo, duesStatus);
+        return new DkuUserInfo(studentInfo);
     }
 
     private Major retrieveMajor(String majorName, String departmentName) {
