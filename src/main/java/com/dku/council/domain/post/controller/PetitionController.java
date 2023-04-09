@@ -96,7 +96,7 @@ public class PetitionController {
      *
      * @param id 삭제할 게시글 id
      */
-    @DeleteMapping("/{id}")
+//    @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         petitionPostService.delete(id, auth.getUserId(), auth.isAdmin());
