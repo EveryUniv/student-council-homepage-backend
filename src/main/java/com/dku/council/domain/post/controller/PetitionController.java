@@ -72,7 +72,7 @@ public class PetitionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreatePetitionDto request) {
-        Long postId = petitionPostService.create(auth.getUserId(), request);
+        Long postId = petitionService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 

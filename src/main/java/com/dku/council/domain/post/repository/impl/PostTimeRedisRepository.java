@@ -19,14 +19,14 @@ public class PostTimeRedisRepository extends AbstractKeyValueCacheRepository imp
     }
 
     @Override
-    public boolean isAlreadyContains(Long postId, String userIdentifier, Instant now) {
-        String key = RedisKeys.combine(RedisKeys.POST_WRITE_KEY, postId, userIdentifier);
+    public boolean isAlreadyContains(String postType, Long userId, Instant now) {
+        String key = RedisKeys.combine(RedisKeys.POST_WRITE_KEY, postType, userId);
         return get(key, String.class, now).isPresent();
     }
 
     @Override
-    public void put(Long postId, String userIdentifier, Duration expiresAfter, Instant now) {
-        String key = RedisKeys.combine(RedisKeys.POST_WRITE_KEY, postId, userIdentifier);
+    public void put(String postType, Long userId, Duration expiresAfter, Instant now) {
+        String key = RedisKeys.combine(RedisKeys.POST_WRITE_KEY, postType, userId);
         set(key, "", now, expiresAfter);
     }
 }
