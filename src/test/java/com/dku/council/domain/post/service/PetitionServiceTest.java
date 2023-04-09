@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.service;
 
-import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.exception.PostCooltimeException;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
@@ -10,7 +9,6 @@ import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
-import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.post.service.GenericPostService.PostResultMapper;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
@@ -42,12 +40,6 @@ public class PetitionServiceTest {
 
     private final Clock clock = ClockUtil.create();
     private final Duration writeCooltime = Duration.ofDays(1);
-
-    @Mock
-    private GenericPostRepository<Petition> petitionRepository;
-
-    @Mock
-    private CachedLikeServiceImpl postLikeService;
 
     @Mock
     private PetitionStatisticService petitionStatisticService;

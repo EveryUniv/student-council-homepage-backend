@@ -12,6 +12,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.domain.post.service.GeneralForumService;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AppAuthentication;
@@ -40,6 +41,7 @@ public class GeneralForumController {
 
     private final CommentService commentService;
     private final GenericPostService<GeneralForum> postService;
+    private final GeneralForumService forumService;
     private final LikeService likeService;
 
     /**
@@ -69,7 +71,7 @@ public class GeneralForumController {
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth,
                                 @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
-        Long postId = postService.create(auth.getUserId(), request);
+        Long postId = forumService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
