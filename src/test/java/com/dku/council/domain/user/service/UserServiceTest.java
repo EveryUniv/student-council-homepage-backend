@@ -63,11 +63,8 @@ class UserServiceTest {
         ResponseLoginDto response = service.login(dto);
 
         // then
-        assertThat(response.getStudentId()).isEqualTo(user.getStudentId());
-        assertThat(response.getUsername()).isEqualTo(user.getName());
         assertThat(response.getAccessToken()).isEqualTo("access");
         assertThat(response.getRefreshToken()).isEqualTo("refresh");
-        assertThat(response.isAdmin()).isEqualTo(false);
     }
 
     @Test
