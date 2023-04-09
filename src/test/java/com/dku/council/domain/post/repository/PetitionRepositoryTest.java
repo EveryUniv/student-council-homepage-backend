@@ -2,6 +2,7 @@ package com.dku.council.domain.post.repository;
 
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;

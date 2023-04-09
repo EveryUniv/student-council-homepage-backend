@@ -3,7 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.VocStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Voc;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;

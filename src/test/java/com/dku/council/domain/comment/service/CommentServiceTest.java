@@ -8,7 +8,7 @@ import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.repository.PostRepository;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;

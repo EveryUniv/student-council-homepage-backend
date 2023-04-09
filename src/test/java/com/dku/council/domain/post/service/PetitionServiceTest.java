@@ -5,7 +5,7 @@ import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
 import com.dku.council.domain.tag.service.TagService;
