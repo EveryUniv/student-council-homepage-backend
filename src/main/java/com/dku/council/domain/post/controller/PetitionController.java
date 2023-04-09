@@ -91,18 +91,6 @@ public class PetitionController {
     }
 
     /**
-     * 게시글 삭제 (Admin)
-     * 운영진만 삭제할 수 있습니다. 청원 게시판에서는 본인이 작성한 게시글이어도 삭제할 수 없습니다.
-     *
-     * @param id 삭제할 게시글 id
-     */
-    @DeleteMapping("/{id}")
-    @AdminOnly
-    public void delete(AppAuthentication auth, @PathVariable Long id) {
-        petitionPostService.delete(id, auth.getUserId(), auth.isAdmin());
-    }
-
-    /**
      * 게시글을 블라인드 처리
      * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
      *
