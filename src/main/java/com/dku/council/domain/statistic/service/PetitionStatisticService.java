@@ -2,24 +2,20 @@ package com.dku.council.domain.statistic.service;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.PetitionRepository;
-import com.dku.council.domain.statistic.PetitionStatistic;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
+import com.dku.council.domain.statistic.model.entity.PetitionStatistic;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -38,19 +34,8 @@ public class PetitionStatisticService {
      * @return Department 4개
      */
     public List<PetitionStatisticDto> findTop4Department(Long petitionId) {
-        List<PetitionStatistic> petitionStatisticList = repository.findAllByPetitionId(petitionId);
-
-        Stream<String> departmentList = petitionStatisticList.stream().map(PetitionStatistic::getDepartment);
-
-        Map<String, Integer> collect = departmentList.collect(
-                Collectors.toMap(Function.identity(), value -> 1, Integer::sum)
-        );
-
-        List<Map.Entry<String, Integer>> top4Department = collect.entrySet().stream()
-                .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
-                .limit(4)
-                .collect(Collectors.toList());
-        return top4Department.stream().map(data -> new PetitionStatisticDto(data.getKey(), data.getValue())).collect(Collectors.toList());
+        PageRequest pageable = PageRequest.of(0, 4);
+        return repository.findCountGroupByDepartment(petitionId, pageable);
     }
 
     /**

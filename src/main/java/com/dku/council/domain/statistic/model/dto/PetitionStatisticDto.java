@@ -2,10 +2,8 @@ package com.dku.council.domain.statistic.model.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 
-@RequiredArgsConstructor
 @Getter
 public class PetitionStatisticDto {
 
@@ -13,5 +11,10 @@ public class PetitionStatisticDto {
     private final String department;
 
     @Schema(description = "동의 인원", example = "11")
-    private final Integer agreeCount;
+    private final Long agreeCount;
+
+    public PetitionStatisticDto(String department, Long agreeCount) {
+        this.department = department;
+        this.agreeCount = agreeCount;
+    }
 }

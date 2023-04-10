@@ -4,6 +4,7 @@ import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.dku.council.domain.timetable.repository.LectureTemplateRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
+import com.dku.council.infra.dku.model.MajorSubject;
 import com.dku.council.infra.dku.model.Subject;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuLectureService;
@@ -49,14 +50,21 @@ public class LectureRetrieveService {
                 .map(t -> new TimePromise(t.getFrom(), t.getTo(), t.getDayOfWeek(), t.getPlace()))
                 .collect(Collectors.toList());
 
-        return LectureTemplate.builder()
+        LectureTemplate.LectureTemplateBuilder builder = LectureTemplate.builder()
                 .lectureId(subject.getId())
                 .category(subject.getCategory())
                 .name(subject.getName())
                 .professor(subject.getProfessor())
                 .classNumber(subject.getClassNumber())
                 .credit(subject.getCredit())
-                .timesJson(TimePromise.serialize(mapper, times))
-                .build();
+                .timesJson(TimePromise.serialize(mapper, times));
+
+        if (subject instanceof MajorSubject) {
+            MajorSubject majorSubject = (MajorSubject) subject;
+            builder.major(majorSubject.getMajor())
+                    .grade(majorSubject.getGrade());
+        }
+
+        return builder.build();
     }
 }

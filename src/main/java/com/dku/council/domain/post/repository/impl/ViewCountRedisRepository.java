@@ -1,8 +1,9 @@
 package com.dku.council.domain.post.repository.impl;
 
 import com.dku.council.domain.post.repository.ViewCountMemoryRepository;
+import com.dku.council.global.base.AbstractKeyValueCacheRepository;
 import com.dku.council.global.config.redis.RedisKeys;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,36 +11,22 @@ import java.time.Duration;
 import java.time.Instant;
 
 @Repository
-@RequiredArgsConstructor
-public class ViewCountRedisRepository implements ViewCountMemoryRepository {
+public class ViewCountRedisRepository extends AbstractKeyValueCacheRepository implements ViewCountMemoryRepository {
 
-    private final StringRedisTemplate redisTemplate;
+    public ViewCountRedisRepository(StringRedisTemplate redisTemplate,
+                                    ObjectMapper objectMapper) {
+        super(redisTemplate, objectMapper, RedisKeys.POST_VIEW_COUNT_SET_KEY);
+    }
 
     @Override
     public boolean isAlreadyContains(Long postId, String userIdentifier, Instant now) {
-        String key = makeEntryKey(postId, userIdentifier);
-        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
-        if (value == null) {
-            return false;
-        }
-
-        long expiresAt = Long.parseLong((String) value);
-        if (now.isAfter(Instant.ofEpochSecond(expiresAt))) {
-            redisTemplate.opsForHash().delete(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
-            return false;
-        }
-
-        return true;
+        String key = RedisKeys.combine(postId, userIdentifier);
+        return get(key, String.class, now).isPresent();
     }
 
     @Override
     public void put(Long postId, String userIdentifier, Duration expiresAfter, Instant now) {
-        String key = makeEntryKey(postId, userIdentifier);
-        long expiresAt = now.plus(expiresAfter).getEpochSecond();
-        redisTemplate.opsForHash().put(RedisKeys.POST_VIEW_COUNT_SET_KEY, key, String.valueOf(expiresAt));
-    }
-
-    public String makeEntryKey(Long postId, String userIdentifier) {
-        return postId.toString() + RedisKeys.KEY_DELIMITER + userIdentifier;
+        String key = RedisKeys.combine(postId, userIdentifier);
+        set(key, "", now, expiresAfter);
     }
 }

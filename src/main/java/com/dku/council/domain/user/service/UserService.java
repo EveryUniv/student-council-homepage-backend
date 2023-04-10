@@ -15,7 +15,6 @@ import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
-import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,9 +41,8 @@ public class UserService {
                 .orElseThrow(LoginUserNotFoundException::new);
 
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            UserRole role = user.getUserRole();
             AuthenticationToken token = jwtProvider.issue(user);
-            return new ResponseLoginDto(token, role, user);
+            return new ResponseLoginDto(token);
         } else {
             throw new WrongPasswordException();
         }
@@ -63,7 +61,8 @@ public class UserService {
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
-                user.getNickname(), year, major.getName(), major.getDepartment());
+                user.getNickname(), year, major.getName(), major.getDepartment(),
+                user.getUserRole().isAdmin());
     }
 
     public List<ResponseMajorDto> getAllMajors() {

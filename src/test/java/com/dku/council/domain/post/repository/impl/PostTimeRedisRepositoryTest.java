@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -16,28 +15,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @FullIntegrationTest
-class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
+class PostTimeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
-    private ViewCountRedisRepository repository;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    private PostTimeRedisRepository repository;
 
 
     @Test
     @DisplayName("조회수 카운팅 캐시에 잘 입력되는가?")
-    void addPostLike() {
+    void put() {
         // given
-        String userIdentifier = "User";
         Instant now = Instant.now();
         Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 
         // when
-        repository.put(10L, userIdentifier, expiresAfter, now);
+        repository.put("Post", 10L, expiresAfter, now);
 
         // then
-        boolean result = repository.isAlreadyContains(10L, userIdentifier, now);
+        boolean result = repository.isAlreadyContains("Post", 10L, now);
         assertThat(result).isTrue();
     }
 
@@ -49,7 +44,7 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         Instant now = Instant.now();
 
         // when
-        boolean result = repository.isAlreadyContains(10L, userIdentifier, now);
+        boolean result = repository.isAlreadyContains("Post", 10L, now);
 
         // then
         assertThat(result).isEqualTo(false);
@@ -63,8 +58,8 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         Instant now = Instant.now();
 
         // when
-        repository.put(10L, userIdentifier, Duration.of(10, ChronoUnit.MINUTES), now);
-        boolean result = repository.isAlreadyContains(10L, userIdentifier, now);
+        repository.put("Post", 10L, Duration.of(10, ChronoUnit.MINUTES), now);
+        boolean result = repository.isAlreadyContains("Post", 10L, now);
 
         // then
         assertThat(result).isEqualTo(true);
@@ -79,8 +74,8 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 
         // when
-        repository.put(10L, userIdentifier, expiresAfter, now);
-        boolean result = repository.isAlreadyContains(10L, userIdentifier, now.plus(expiresAfter).plusSeconds(60));
+        repository.put("Post", 10L, expiresAfter, now);
+        boolean result = repository.isAlreadyContains("Post", 10L, now.plus(expiresAfter).plusSeconds(60));
 
         // then
         assertThat(result).isEqualTo(false);

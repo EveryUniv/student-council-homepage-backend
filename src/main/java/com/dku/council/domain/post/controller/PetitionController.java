@@ -72,7 +72,7 @@ public class PetitionController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreatePetitionDto request) {
-        Long postId = petitionPostService.create(auth.getUserId(), request);
+        Long postId = petitionService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -88,18 +88,6 @@ public class PetitionController {
                                        @PathVariable Long id,
                                        HttpServletRequest request) {
         return petitionService.findOnePetition(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
-    }
-
-    /**
-     * 게시글 삭제 (Admin)
-     * 운영진만 삭제할 수 있습니다. 청원 게시판에서는 본인이 작성한 게시글이어도 삭제할 수 없습니다.
-     *
-     * @param id 삭제할 게시글 id
-     */
-    @DeleteMapping("/{id}")
-    @AdminOnly
-    public void delete(AppAuthentication auth, @PathVariable Long id) {
-        petitionPostService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
     /**

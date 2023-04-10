@@ -2,7 +2,7 @@ package com.dku.council.domain.comment;
 
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
-import com.dku.council.domain.post.repository.GeneralForumRepository;
+import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;

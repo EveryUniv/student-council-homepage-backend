@@ -1,4 +1,4 @@
-package com.dku.council.domain.statistic;
+package com.dku.council.domain.statistic.model.entity;
 
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.user.model.entity.User;

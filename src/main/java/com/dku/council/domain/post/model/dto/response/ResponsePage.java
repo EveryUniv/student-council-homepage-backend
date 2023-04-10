@@ -41,7 +41,7 @@ public class ResponsePage<T> implements Serializable {
         this.hasNext = pageInfo.hasNext();
         this.totalPages = pageInfo.getTotalPages();
         this.totalElements = pageInfo.getTotalElements();
-        this.page = pageInfo.getNumber() + 1;
+        this.page = pageInfo.getNumber();
         this.size = pageInfo.getSize();
         this.first = pageInfo.isFirst();
         this.last = pageInfo.isLast();

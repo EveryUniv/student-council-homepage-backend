@@ -8,7 +8,7 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
