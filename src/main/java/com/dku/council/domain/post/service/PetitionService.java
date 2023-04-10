@@ -70,7 +70,7 @@ public class PetitionService {
         int totalCount = statisticService.count(postId);
 
         // 상위 4개 부서의 합이 전체 동의 수보다 작을 경우, 기타로 표시
-        Optional<Integer> reduce = top4Department.stream().map(PetitionStatisticDto::getAgreeCount).reduce(Integer::sum);
+        Optional<Long> reduce = top4Department.stream().map(PetitionStatisticDto::getAgreeCount).reduce(Long::sum);
         if (reduce.isPresent() && totalCount > reduce.get()) {
             top4Department.add(new PetitionStatisticDto("기타", totalCount - reduce.get()));
         }
