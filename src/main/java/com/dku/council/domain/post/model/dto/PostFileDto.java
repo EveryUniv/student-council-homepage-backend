@@ -20,10 +20,15 @@ public class PostFileDto {
     @Schema(description = "원본파일 이름", example = "my_image.png")
     private final String originalName;
 
+    @Schema(description = "파일 타입", example = "image/jpeg")
+    private final String mimeType;
+
+
     public PostFileDto(String baseUrl, PostFile file) {
         this.id = file.getId();
         this.url = URI.create(baseUrl + "/").resolve(file.getFileId()).toString();
         this.originalName = file.getFileName();
+        this.mimeType = file.getMimeType();
     }
 
     public static List<PostFileDto> listOf(String baseFileUrl, List<PostFile> entities) {
