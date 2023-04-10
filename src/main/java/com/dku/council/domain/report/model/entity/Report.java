@@ -38,4 +38,5 @@ public class Report extends BaseEntity {
         this.post = post;
         this.reportCategory = reportCategory;
     }
+
 }

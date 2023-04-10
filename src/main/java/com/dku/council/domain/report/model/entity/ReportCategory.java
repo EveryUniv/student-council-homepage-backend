@@ -7,21 +7,29 @@ import java.util.Locale;
 
 public enum ReportCategory {
 
-    PROFANITY,
+    PROFANITY(0),
 
-    FISHING,
+    FISHING(1),
 
-    ADVERTISEMENT("광고성 게시글"),
+    ADVERTISEMENT(2),
 
-    POLITICS("정당, 정치인 비하 및 선거운동"),
+    POLITICS(3),
 
-    PORNOGRAPHY("음란물/불건전한 만남 및 대화"),
+    PORNOGRAPHY(4),
 
-    INAPPROPRIATE_CONTENT("게시판 성격에 부적합"),
+    INAPPROPRIATE_CONTENT(5),
 
-    FRAUD("유출/사칭/사기");
+    FRAUD(6);
 
+    private final int id;
 
+    ReportCategory(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
 
     public String getName(MessageSource messageSource) {
         Locale locale = LocaleContextHolder.getLocale();

@@ -5,16 +5,11 @@ import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
-import com.dku.council.domain.post.model.dto.request.RequestCreateReportDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.report.exception.AlreadyReportedException;
-import com.dku.council.domain.report.model.entity.Report;
-import com.dku.council.domain.report.model.entity.ReportCategory;
-import com.dku.council.domain.report.repository.ReportRepository;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -53,16 +48,18 @@ public class GenericPostService<E extends Post> {
      * @param pageable 페이징 방법
      * @return 페이징된 목록
      */
+
+
     @Transactional(readOnly = true)
-    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize) {
-        Page<E> result = list(spec, pageable);
+    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId) {
+        Page<E> result = list(spec, pageable, userId);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
-    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize,
+    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId,
                             PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(spec, pageable);
+        Page<E> result = list(spec, pageable, userId);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -70,12 +67,17 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(Specification<E> spec, Pageable pageable) {
+    private Page<E> list(Specification<E> spec, Pageable pageable, Long userId) {
         if (spec == null) {
             spec = Specification.where(null);
         }
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        spec = spec.and(PostSpec.withActive());
+        if(user.isAdmin()) {
+            spec = spec.and(PostSpec.withActiveOrBlinded());
+        }else {
+            spec = spec.and(PostSpec.withActive());
+        }
         return postRepository.findAll(spec, pageable);
     }
 
@@ -114,14 +116,14 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
-        E post = viewPost(postId, remoteAddress);
+        E post = viewPost(postId, userId, remoteAddress);
         return makePostDto(userId, post);
     }
 
     @Transactional
     public <T> T findOne(Long postId, Long userId, String remoteAddress,
                          PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
-        E post = viewPost(postId, remoteAddress);
+        E post = viewPost(postId, userId, remoteAddress);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
         return mapper.map(dto, post);
     }
@@ -141,8 +143,8 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    public E viewPost(Long postId, String remoteAddress) {
-        E post = findPost(postId);
+    public E viewPost(Long postId, Long userId, String remoteAddress) {
+        E post = findPost(postId, userId);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
     }
@@ -154,7 +156,12 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    public E findPost(Long postId) {
+    public E findPost(Long postId, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if(user.isAdmin()){
+            return postRepository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        }
+        //TODO admin인 경우는 blind된 게시글도 보여줘야함(active 또는 blind만)
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 
@@ -189,8 +196,19 @@ public class GenericPostService<E extends Post> {
         post.blind();
     }
 
+    /**
+     * 게시글을 unblind처리 합니다.
+     *
+     * @param postId 게시글 id
+     */
+    @Transactional
+    public void unblind(Long postId) {
+        E post = postRepository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        post.unblind();
+    }
 
-        @FunctionalInterface
+
+    @FunctionalInterface
     public interface PostResultMapper<T, D, E extends Post> {
         T map(D dto, E post);
     }

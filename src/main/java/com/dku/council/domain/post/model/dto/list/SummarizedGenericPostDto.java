@@ -38,6 +38,9 @@ public class SummarizedGenericPostDto {
     @Schema(description = "댓글 개수", example = "2")
     private final int commentCount;
 
+    @Schema(description = "블라인드 여부", example = "false")
+    private final boolean isBlinded;
+
     public SummarizedGenericPostDto(String baseFileUrl, int bodySize, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
@@ -48,6 +51,8 @@ public class SummarizedGenericPostDto {
         this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
         this.views = post.getViews();
         this.commentCount = post.getComments().size(); // 댓글 개수 캐싱 필요
+        this.isBlinded = post.isBlinded();
+
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
@@ -60,6 +65,7 @@ public class SummarizedGenericPostDto {
         this.files = copy.getFiles();
         this.views = copy.getViews();
         this.commentCount = copy.getCommentCount();
+        this.isBlinded = copy.isBlinded();
     }
 
     private static String slice(String text, int maxLen) {

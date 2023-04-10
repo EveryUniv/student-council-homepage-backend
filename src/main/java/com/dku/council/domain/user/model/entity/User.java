@@ -116,4 +116,8 @@ public class User extends BaseEntity {
         this.academicStatus = studentState;
         this.duesStatus = duesStatus;
     }
+
+    public boolean isAdmin() {
+        return this.userRole == UserRole.ADMIN;
+    }
 }

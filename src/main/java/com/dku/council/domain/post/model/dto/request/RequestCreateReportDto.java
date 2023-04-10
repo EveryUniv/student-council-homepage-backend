@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RequestCreateReportDto {
 
-    @Schema(description = "신고 카테고리", example = "욕설/비하")
-    private final String categoryId;
+    @Schema(description = "신고 카테고리", example = "PROFANITY")
+    private final String categoryName;
 
     public Report toEntity(User user, Post post) {
         return Report.builder()
                 .user(user)
                 .post(post)
-                .reportCategory(ReportCategory.fromValue(categoryId))
+                .reportCategory(ReportCategory.fromValue(categoryName))
                 .build();
     }
 }

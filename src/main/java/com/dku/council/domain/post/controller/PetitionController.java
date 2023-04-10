@@ -12,10 +12,12 @@ import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.post.service.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -52,7 +54,9 @@ public class PetitionController {
      * @return 페이징 된 청원 목록
      */
     @GetMapping
-    public ResponsePage<SummarizedPetitionDto> list(@RequestParam(required = false) String keyword,
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public ResponsePage<SummarizedPetitionDto> list(AppAuthentication auth,
+                                                    @RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) List<Long> tagIds,
                                                     @RequestParam(required = false) PetitionStatus status,
                                                     @RequestParam(defaultValue = "50") int bodySize,
@@ -60,7 +64,7 @@ public class PetitionController {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionService.listPetition(spec, bodySize, pageable);
+        Page<SummarizedPetitionDto> list = petitionService.listPetition(spec, bodySize, pageable, auth.getUserId());
         return new ResponsePage<>(list);
     }
 
@@ -114,6 +118,18 @@ public class PetitionController {
         petitionPostService.blind(id);
     }
 
+/**
+     * 게시글을 블라인드 해제
+     * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
+     *
+     * @param id 블라인드 해제할 게시글 id
+     */
+    @PatchMapping("/unblind/{id}")
+    @AdminOnly
+    public void unblind(@PathVariable Long id) {
+        petitionPostService.unblind(id);
+    }
+
     /**
      * 운영진 답변 등록 (Admin)
      *
@@ -122,9 +138,10 @@ public class PetitionController {
      */
     @PostMapping("/reply/{postId}")
     @AdminOnly
-    public void reply(@PathVariable Long postId,
+    public void reply(AppAuthentication auth,
+                      @PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
-        petitionService.reply(postId, dto.getAnswer());
+        petitionService.reply(postId, dto.getAnswer(), auth.getUserId());
     }
 
     /**

@@ -89,6 +89,17 @@ public abstract class Post extends BaseEntity {
         this.status = PostStatus.BLINDED;
     }
 
+    public void unblind() {
+        this.status = PostStatus.ACTIVE;
+    }
 
     public abstract String getDisplayingUsername();
+
+    public int getReportedCount() {
+        return reports.size();
+    }
+
+    public boolean isBlinded() {
+        return status == PostStatus.BLINDED;
+    }
 }
