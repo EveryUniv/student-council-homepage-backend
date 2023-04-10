@@ -28,6 +28,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.dku.council.domain.post.service.PetitionService.PETITION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +119,12 @@ public class PetitionServiceTest {
         assertThat(dto.isMine()).isEqualTo(false);
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
         assertThat(dto.getStatisticList()).isEqualTo(list);
+        assertThat(dto.getStatisticList()).isEqualTo(list);
+        assertThat(dto.getStatisticList().size()).isEqualTo(5);
+        assertThat(dto.getStatisticList().stream()
+                .map(PetitionStatisticDto::getDepartment)
+                .collect(Collectors.toList()))
+                .contains("기타");
         assertThat(dto.getAgreeCount()).isEqualTo(list.size());
     }
 

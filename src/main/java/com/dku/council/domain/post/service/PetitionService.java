@@ -22,6 +22,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -67,8 +68,16 @@ public class PetitionService {
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
+        /**
+         * 상위 4개 부서의 합이 전체 동의 수보다 작을 경우, 기타로 표시
+         */
+        Optional<Integer> reduce = top4Department.stream().map(PetitionStatisticDto::getAgreeCount).reduce(Integer::sum);
+        if(reduce.isPresent() && totalCount > reduce.get()) {
+            top4Department.add(new PetitionStatisticDto("기타", totalCount - reduce.get()));
+        }
+        boolean agreed = statisticService.isAlreadyAgreed(postId, userId);
         return postService.findOne(postId, userId, remoteAddress, (dto, post) ->
-                new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department));
+                new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
     public void reply(Long postId, String answer) {

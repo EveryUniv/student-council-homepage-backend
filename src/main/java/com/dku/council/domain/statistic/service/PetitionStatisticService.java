@@ -50,6 +50,7 @@ public class PetitionStatisticService {
                 .sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
                 .limit(4)
                 .collect(Collectors.toList());
+
         return top4Department.stream().map(data -> new PetitionStatisticDto(data.getKey(), data.getValue())).collect(Collectors.toList());
     }
 

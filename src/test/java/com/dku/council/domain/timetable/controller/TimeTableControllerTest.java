@@ -96,6 +96,8 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.content[0].professor").value("professor0"))
                 .andExpect(jsonPath("$.content[0].classNumber").value(1))
                 .andExpect(jsonPath("$.content[0].credit").value(3))
+                .andExpect(jsonPath("$.content[0].major").isEmpty())
+                .andExpect(jsonPath("$.content[0].grade").isEmpty())
                 .andExpect(jsonPath("$.content[0].times[0].start").value("16:00:00"))
                 .andExpect(jsonPath("$.content[0].times[0].end").value("17:30:00"))
                 .andExpect(jsonPath("$.content[0].times[0].week").value(DayOfWeek.TUESDAY.name()))

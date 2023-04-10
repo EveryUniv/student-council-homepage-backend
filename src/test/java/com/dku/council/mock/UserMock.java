@@ -3,7 +3,6 @@ package com.dku.council.mock;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.util.EntityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -66,7 +65,6 @@ public class UserMock {
                 .nickname(NICKNAME)
                 .yearOfAdmission(2017)
                 .academicStatus("재학")
-                .duesStatus(StudentDuesStatus.PAID)
                 .major(major)
                 .phone("01011112222")
                 .build();

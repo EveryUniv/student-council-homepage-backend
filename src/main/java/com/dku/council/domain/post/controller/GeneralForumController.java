@@ -129,7 +129,7 @@ public class GeneralForumController {
         Page<CommentDto> comments = commentService.list(postId, auth.getUserId(), pageable,
                 (ent, dto) -> {
                     User user = ent.getUser();
-                    return new GeneralForumCommentDto(ent, dto, user.getName(), user.getMajor().getName());
+                    return new GeneralForumCommentDto(ent, dto, user.getNickname(), user.getMajor().getName());
                 });
         return new ResponsePage<>(comments);
     }
