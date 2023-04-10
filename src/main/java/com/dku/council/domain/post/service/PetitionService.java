@@ -42,8 +42,9 @@ public class PetitionService {
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
+        boolean agreed = statisticService.isAlreadyAgreed(postId, userId);
         return postService.findOne(postId, userId, remoteAddress, (dto, post) ->
-                new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department));
+                new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
     public void reply(Long postId, String answer) {
