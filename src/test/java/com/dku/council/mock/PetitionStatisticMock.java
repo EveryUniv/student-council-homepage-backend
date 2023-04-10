@@ -41,9 +41,9 @@ public class PetitionStatisticMock {
         return create(UserMock.createMajor("major", department));
     }
 
-    public static List<PetitionStatisticDto> createList() {
+    public static List<PetitionStatisticDto> createList(int size) {
         List<PetitionStatisticDto> dtoList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < size; i++) {
             dtoList.add(new PetitionStatisticDto("major" + i, i));
         }
         return dtoList;
