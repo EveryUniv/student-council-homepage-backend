@@ -11,7 +11,6 @@ import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.dku.model.DkuAuth;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.dku.model.StudentInfo;
 import com.dku.council.infra.dku.scrapper.DkuAuthenticationService;
 import com.dku.council.infra.dku.scrapper.DkuStudentService;
@@ -69,8 +68,7 @@ class DKUAuthServiceTest {
     @DisplayName("studentInfo를 잘 가져오는지")
     void getStudentInfo() {
         // given
-        DkuUserInfo info = new DkuUserInfo("name", "1212", 0, "state",
-                StudentDuesStatus.PAID, "", "");
+        DkuUserInfo info = new DkuUserInfo("name", "1212", 0, "state", "", "");
         when(dkuAuthRepository.getAuthPayload(any(),
                 eq(DKU_AUTH_NAME), eq(DkuUserInfo.class), any()))
                 .thenReturn(Optional.of(info));
@@ -123,7 +121,6 @@ class DKUAuthServiceTest {
 
         when(authenticationService.loginWebInfo(id, pwd)).thenReturn(auth);
         when(crawlerService.crawlStudentInfo(auth)).thenReturn(info);
-        when(crawlerService.crawlStudentDues(eq(auth), any())).thenReturn(StudentDuesStatus.PAID);
         when(userRepository.findByStudentId(id)).thenReturn(Optional.empty());
 
         // when
@@ -167,7 +164,6 @@ class DKUAuthServiceTest {
         when(crawlerService.crawlStudentInfo(auth)).thenReturn(info);
         when(majorRepository.findByName(info.getMajorName(), info.getDepartmentName()))
                 .thenReturn(Optional.of(MajorMock.create(info.getMajorName(), info.getDepartmentName())));
-        when(crawlerService.crawlStudentDues(eq(auth), any())).thenReturn(StudentDuesStatus.PAID);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         // when
@@ -184,6 +180,5 @@ class DKUAuthServiceTest {
         assertThat(user.getMajor().getDepartment()).isEqualTo(info.getDepartmentName());
         assertThat(user.getYearOfAdmission()).isEqualTo(info.getYearOfAdmission());
         assertThat(user.getAcademicStatus()).isEqualTo(info.getStudentState());
-        assertThat(user.getDuesStatus()).isEqualTo(StudentDuesStatus.PAID);
     }
 }

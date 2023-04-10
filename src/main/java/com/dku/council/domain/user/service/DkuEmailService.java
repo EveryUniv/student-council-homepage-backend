@@ -16,7 +16,6 @@ import com.dku.council.domain.user.repository.SignupAuthRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.global.util.TextTemplateEngine;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.infra.nhn.service.NHNEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,7 +92,7 @@ public class DkuEmailService {
         Major major = majorRepository.findById(dto.getMajorId())
                 .orElseThrow(MajorNotFoundException::new);
         DkuUserInfo info = new DkuUserInfo(dto.getStudentName(), dto.getStudentId(), dto.getYearOfAdmission(),
-                dto.getAcademicStatus(), StudentDuesStatus.NOT_PAID, major.getName(), major.getDepartment());
+                dto.getAcademicStatus(), major.getName(), major.getDepartment());
 
         dkuAuthRepository.setAuthPayload(signupToken, DKU_AUTH_NAME, info, now);
 

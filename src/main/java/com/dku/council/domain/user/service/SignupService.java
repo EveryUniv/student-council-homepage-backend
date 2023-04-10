@@ -49,7 +49,6 @@ public class SignupService {
                 .major(major)
                 .yearOfAdmission(studentInfo.getYearOfAdmission())
                 .academicStatus(studentInfo.getStudentState())
-                .duesStatus(studentInfo.getDuesStatus())
                 .status(UserStatus.ACTIVE)
                 .role(UserRole.USER)
                 .build();

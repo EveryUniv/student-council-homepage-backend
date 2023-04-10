@@ -9,7 +9,6 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
@@ -54,8 +53,7 @@ class SignupServiceTest {
     private final String encodedPwd = "Encoded";
     private final String phone = "01011112222";
     private final String studentId = "id";
-    private final DkuUserInfo info = new DkuUserInfo("name", studentId, 0, "재학",
-            StudentDuesStatus.PAID, "Major", "Department");
+    private final DkuUserInfo info = new DkuUserInfo("name", studentId, 0, "재학", "Major", "Department");
     private final RequestSignupDto dto = new RequestSignupDto("nickname", "pwd");
 
 
@@ -83,7 +81,6 @@ class SignupServiceTest {
             assertThat(user.getPhone()).isEqualTo(phone);
             assertThat(user.getYearOfAdmission()).isEqualTo(0);
             assertThat(user.getAcademicStatus()).isEqualTo(info.getStudentState());
-            assertThat(user.getDuesStatus()).isEqualTo(info.getDuesStatus());
             assertThat(user.getUserRole()).isEqualTo(UserRole.USER);
             assertThat(user.getMajor()).isEqualTo(major);
             return true;
