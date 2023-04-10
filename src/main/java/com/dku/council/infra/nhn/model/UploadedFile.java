@@ -9,12 +9,15 @@ public class UploadedFile {
 
     private final String originalName;
 
-    public UploadedFile(String fileId, String originalName) {
+    private final String mimeType;
+
+    public UploadedFile(String fileId, String originalName, String mimeType) {
         this.fileId = fileId;
         this.originalName = originalName;
+        this.mimeType = mimeType;
     }
 
-    public static UploadedFile of(PostFile entity) {
-        return new UploadedFile(entity.getFileId(), entity.getFileName());
+    public PostFile toEntity() {
+        return new PostFile(fileId, originalName, mimeType);
     }
 }

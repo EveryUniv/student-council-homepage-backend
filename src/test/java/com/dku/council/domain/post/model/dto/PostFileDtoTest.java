@@ -11,10 +11,10 @@ class PostFileDtoTest {
     @DisplayName("URL Path가 잘 합쳐지는가?")
     public void buildingPathProperly() {
         // given
-        PostFile postFile1 = new PostFile("fileId", "fileName");
-        PostFile postFile2 = new PostFile("/fileId", "fileName");
-        PostFile postFile3 = new PostFile("fileId/", "fileName");
-        PostFile postFile4 = new PostFile("/fileId/", "fileName");
+        PostFile postFile1 = new PostFile("fileId", "fileName", "text/plain");
+        PostFile postFile2 = new PostFile("/fileId", "fileName", "text/plain");
+        PostFile postFile3 = new PostFile("fileId/", "fileName", "text/plain");
+        PostFile postFile4 = new PostFile("/fileId/", "fileName", "text/plain");
 
         // when
         PostFileDto dtoCase1 = new PostFileDto("http://base.com", postFile1);

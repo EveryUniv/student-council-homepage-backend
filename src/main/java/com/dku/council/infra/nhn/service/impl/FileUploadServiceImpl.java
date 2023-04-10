@@ -35,8 +35,8 @@ public class FileUploadServiceImpl implements FileUploadService {
             } while (s3service.isInObject(fileId));
 
             try {
-                s3service.uploadObject(token, fileId, file.getInputStream());
-                postFiles.add(new UploadedFile(fileId, originName));
+                s3service.uploadObject(token, fileId, file.getInputStream(), file.getContentType());
+                postFiles.add(new UploadedFile(fileId, originName, file.getContentType()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -48,15 +48,15 @@ public class FileUploadServiceImpl implements FileUploadService {
     public String uploadFile(MultipartFile file, String prefix) {
         String token = nhnAuthService.requestToken();
         String originName = file.getOriginalFilename();
-        if(originName == null) originName = "";
+        if (originName == null) originName = "";
 
         String ext = originName.substring(originName.lastIndexOf(".") + 1);
         String fileId = prefix + "-" + UUID.randomUUID() + "." + ext;
 
-        try{
-            s3service.uploadObject(token, fileId, file.getInputStream());
+        try {
+            s3service.uploadObject(token, fileId, file.getInputStream(), file.getContentType());
             return fileId;
-        }catch (Throwable e){
+        } catch (Throwable e) {
             throw new InvalidAccessObjectStorageException(e);
         }
     }

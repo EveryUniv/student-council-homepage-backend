@@ -7,7 +7,6 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.tag.service.TagService;
@@ -93,7 +92,7 @@ public class GenericPostService<E extends Post> {
         tagService.addTagsToPost(post, dto.getTagIds());
 
         fileUploadService.uploadFiles(dto.getFiles(), post.getClass().getSimpleName())
-                .forEach((file) -> new PostFile(file).changePost(post));
+                .forEach((file) -> file.toEntity().changePost(post));
 
         E savedPost = postRepository.save(post);
         return savedPost.getId();

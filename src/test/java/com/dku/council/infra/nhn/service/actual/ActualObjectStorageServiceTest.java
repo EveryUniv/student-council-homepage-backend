@@ -53,7 +53,7 @@ class ActualObjectStorageServiceTest {
     public void actualUploadObject() {
         String token = authService.requestToken();
         InputStream inStream = ActualObjectStorageServiceTest.class.getResourceAsStream("/dummy/dummy_img1.jpg");
-        storageService.uploadObject(token, "TestObject", inStream);
+        storageService.uploadObject(token, "TestObject", inStream, "image/jpeg");
     }
 
     @Test

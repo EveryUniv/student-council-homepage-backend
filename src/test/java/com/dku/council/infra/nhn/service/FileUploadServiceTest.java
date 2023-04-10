@@ -63,7 +63,7 @@ class FileUploadServiceTest {
 
     @Test
     @DisplayName("upload 로직 검증 - 단일")
-    public void uploadFile(){
+    public void uploadFile() {
         //given
         String title = "test";
         String ext = "txt";
@@ -100,7 +100,7 @@ class FileUploadServiceTest {
         service.uploadFiles(files, "prefix");
 
         // then
-        verify(storageService, times(totalFiles)).uploadObject(eq("token"), any(), any());
+        verify(storageService, times(totalFiles)).uploadObject(eq("token"), any(), any(), eq("text/plain"));
     }
 
     @Test

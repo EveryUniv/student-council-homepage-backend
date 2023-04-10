@@ -71,7 +71,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
         mockWithStatus(HttpStatus.OK);
 
         // when & then(no error)
-        service.uploadObject("token", "object", InputStream.nullInputStream());
+        service.uploadObject("token", "object", InputStream.nullInputStream(), "image/png");
     }
 
     @Test
@@ -93,7 +93,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
 
         // when & then(no error)
         Assertions.assertThrows(InvalidAccessObjectStorageException.class, () ->
-                service.uploadObject("token", "object", InputStream.nullInputStream()));
+                service.uploadObject("token", "object", InputStream.nullInputStream(), "image/png"));
     }
 
     @Test

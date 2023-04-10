@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,15 +44,20 @@ public class ObjectStorageServiceImpl implements ObjectStorageService {
         return true;
     }
 
-    public void uploadObject(String tokenId, String objectName, final InputStream inputStream) {
+    public void uploadObject(String tokenId, String objectName, final InputStream inputStream, @Nullable String contentType) {
         if (isInObject(objectName)) {
             throw new AlreadyInStorageException();
         }
         try {
-            webClient.put()
+            WebClient.RequestBodySpec spec = webClient.put()
                     .uri(getObjectURL(objectName))
-                    .header("X-Auth-Token", tokenId)
-                    .body(BodyInserters.fromResource(new InputStreamResource(inputStream)))
+                    .header("X-Auth-Token", tokenId);
+
+            if (contentType != null) {
+                spec = spec.header("Content-Type", contentType);
+            }
+
+            spec.body(BodyInserters.fromResource(new InputStreamResource(inputStream)))
                     .retrieve()
                     .bodyToMono(Void.class)
                     .block();
