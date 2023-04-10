@@ -9,6 +9,7 @@ import com.dku.council.domain.post.repository.GenericPostRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -88,6 +89,8 @@ public class PetitionServiceTest {
         assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
         for (int i = 0; i < allPage.getTotalElements(); i++) {
             SummarizedPetitionDto dto = allPage.getContent().get(i);
+            List<TagDto> tag = dto.getTag();
+            tag.forEach(data -> System.out.println("data.getName() = " + data.getName()));
             Petition post = allPostList.get(i);
             assertThat(dto.getId()).isEqualTo(post.getId());
             assertThat(dto.getTitle()).isEqualTo(post.getTitle());
