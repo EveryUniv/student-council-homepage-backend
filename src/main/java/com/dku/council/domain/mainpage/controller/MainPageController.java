@@ -11,6 +11,7 @@ import com.dku.council.global.config.jackson.JacksonDateTimeFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -55,7 +56,7 @@ public class MainPageController {
      *
      * @param dto 이미지 파일 & 리다이렉트 URL
      */
-    @PostMapping("/carousel")
+    @PostMapping(value = "/carousel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
     public void uploadCarouselImage(@Valid @ModelAttribute RequestCarouselImageDto dto) {
         mainPageService.addCarouselImage(dto);

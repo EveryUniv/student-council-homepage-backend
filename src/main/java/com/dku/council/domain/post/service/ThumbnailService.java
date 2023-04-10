@@ -5,13 +5,14 @@ import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -30,16 +31,21 @@ public class ThumbnailService {
         for (UploadedFile file : files) {
             try {
                 if (file.getMimeType().getType().equalsIgnoreCase("image")) {
-                    PipedInputStream pis = new PipedInputStream();
-                    PipedOutputStream pos = new PipedOutputStream(pis);
+                    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                    InputStream fileInStream = file.getFile().getInputStream();
+                    Thumbnails.of(fileInStream)
+                            .size(size, size) // todo 비율 맞춰 줄이기
+                            .toOutputStream(outStream);
 
-                    Thumbnailator.createThumbnail(file.getFile().getInputStream(), pos, size, size); // todo 비율 맞춰 줄이기
-                    FileRequest req = new FileRequest(file.getOriginalName(), file.getMimeType(), () -> pis);
+                    InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+                    FileRequest req = new FileRequest(file.getOriginalName(), file.getMimeType(), () -> inStream);
 
                     String thumbnailId = uploadContext.makeThumbnailId(file.getFileId());
                     uploadCtx.uploadFileWithName(req, thumbnailId);
-                    pis.close();
-                    pos.close();
+
+                    fileInStream.close();
+                    inStream.close();
+                    outStream.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
