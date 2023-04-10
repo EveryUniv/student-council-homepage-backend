@@ -63,6 +63,9 @@ public class SummarizedGenericPostDto {
     }
 
     private static String slice(String text, int maxLen) {
+        if (text == null) {
+            return null;
+        }
         return text.substring(0, Math.min(text.length(), maxLen));
     }
 }
