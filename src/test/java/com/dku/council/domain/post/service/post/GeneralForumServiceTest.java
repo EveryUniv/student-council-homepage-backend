@@ -3,7 +3,7 @@ package com.dku.council.domain.post.service.post;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
-import com.dku.council.domain.post.repository.post.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.post.service.ThumbnailService;
 import com.dku.council.domain.post.service.ViewCountService;
@@ -14,8 +14,10 @@ import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.mock.GeneralForumMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -28,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class GeneralForumServiceTest {
 
     @Mock
@@ -52,7 +55,7 @@ class GeneralForumServiceTest {
     private CachedLikeServiceImpl postLikeService;
 
     @Mock
-    private GenericPostRepository<GeneralForum> generalForumRepository;
+    private GeneralForumRepository generalForumRepository;
 
     @InjectMocks
     private GenericPostService<GeneralForum> generalForumService;

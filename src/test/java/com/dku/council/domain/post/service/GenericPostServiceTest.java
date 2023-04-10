@@ -144,6 +144,7 @@ class GenericPostServiceTest {
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", tagIds, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
+        when(fileUploadService.newContext()).thenReturn(fileUploadContext);
 
         // when
         Long newsId = newsService.create(newsRepository, 2L, dto);

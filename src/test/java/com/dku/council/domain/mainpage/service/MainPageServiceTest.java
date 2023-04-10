@@ -9,6 +9,7 @@ import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.mock.MultipartFileMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,9 @@ public class MainPageServiceTest {
 
     @Mock
     private CarouselImageRepository carouselImageRepository;
+
+    @Mock
+    private ObjectUploadContext uploadContext;
 
     @Mock
     private FileUploadService fileUploadService;
@@ -112,6 +116,7 @@ public class MainPageServiceTest {
 
         when(carouselImageRepository.findById(carouselImage.getId())).thenReturn(Optional.of(carouselImage));
         when(carouselImageRepository.findById(100L)).thenThrow(CarouselNotFoundException.class);
+        when(fileUploadService.newContext()).thenReturn(context);
 
         // when & then
         assertThrows(CarouselNotFoundException.class, () -> service.deleteCarouselImage(100L));

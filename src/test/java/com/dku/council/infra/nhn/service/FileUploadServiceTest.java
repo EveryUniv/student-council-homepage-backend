@@ -33,6 +33,9 @@ class FileUploadServiceTest {
     @Mock
     private ObjectStorageService storageService;
 
+    @Mock
+    private ObjectUploadContext uploadContext;
+
     @InjectMocks
     private FileUploadService service;
 
@@ -48,6 +51,7 @@ class FileUploadServiceTest {
         List<MultipartFile> files = MultipartFileMock.createList(totalFiles, ext);
         when(authService.requestToken()).thenReturn("token");
         when(storageService.isInObject(any())).thenReturn(false);
+        when(uploadContext.makeObjectId(any(), any())).thenReturn("fileId");
 
         // when
         ArrayList<UploadedFile> uploadedFiles = service.newContext().uploadFiles(FileRequest.ofList(files), prefix);
@@ -55,7 +59,7 @@ class FileUploadServiceTest {
         // then
         for (int i = 1; i <= totalFiles; i++) {
             UploadedFile file = uploadedFiles.get(i - 1);
-            assertFileId(file.getFileId(), prefix, ext);
+            assertThat(file.getFileId()).isEqualTo("fileId");
             assertThat(file.getOriginalName()).isEqualTo("myFile" + i + ".txt");
             assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN);
         }
@@ -70,22 +74,14 @@ class FileUploadServiceTest {
         MultipartFile file = MultipartFileMock.create(title, ext);
 
         when(authService.requestToken()).thenReturn("token");
+        when(uploadContext.makeObjectId(any(), any())).thenReturn("fileId");
 
         //when
         UploadedFile uploadedFile = service.newContext().uploadFile(new FileRequest(file), "test");
 
         //then
         assertThat(uploadedFile.getOriginalName()).isEqualTo(file.getOriginalFilename());
-        assertFileId(uploadedFile.getFileId(), "test", ext);
-    }
-
-    private void assertFileId(String fileId, String prefix, String ext) {
-        int firstIndexDash = fileId.indexOf('-');
-        int lastIndexDot = fileId.lastIndexOf('.');
-
-        assertThat(fileId.substring(0, firstIndexDash)).isEqualTo(prefix);
-        assertThat(fileId.substring(firstIndexDash + 1, lastIndexDot)).matches(UUID_PATTERN);
-        assertThat(fileId.substring(lastIndexDot + 1)).isEqualTo(ext);
+        assertThat(uploadedFile.getFileId()).isEqualTo("fileId");
     }
 
     @Test
@@ -96,6 +92,7 @@ class FileUploadServiceTest {
         List<MultipartFile> files = MultipartFileMock.createList(totalFiles, "txt");
         when(authService.requestToken()).thenReturn("token");
         when(storageService.isInObject(any())).thenReturn(false);
+        when(uploadContext.makeObjectId(any(), any())).thenReturn("fileId");
 
         // when
         service.newContext().uploadFiles(FileRequest.ofList(files), "prefix");

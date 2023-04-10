@@ -113,7 +113,7 @@ public class PetitionServiceTest {
                     ResponseSingleGenericPostDto dto =
                             new ResponseSingleGenericPostDto(uploadContext, 0, false, true, petition);
                     PostResultMapper<ResponsePetitionDto, ResponseSingleGenericPostDto, Petition> mapper =
-                            ino.getArgument(3);
+                            ino.getArgument(4);
                     return mapper.map(dto, petition);
                 });
 

@@ -69,7 +69,6 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
     @DisplayName("성공 응답 - Upload")
     public void uploadingSuccessResponse() {
         // given
-        mockWithStatus(HttpStatus.NOT_FOUND); // storage에 없는 파일이어야 함
         mockWithStatus(HttpStatus.OK);
 
         // when & then(no error)
