@@ -1,7 +1,7 @@
 package com.dku.council.domain.statistic.service;
 
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.PetitionRepository;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;

@@ -3,7 +3,7 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.Major;

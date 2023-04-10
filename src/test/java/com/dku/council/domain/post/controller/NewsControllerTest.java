@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.controller;
 
 import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;
 import com.dku.council.domain.tag.service.TagService;
