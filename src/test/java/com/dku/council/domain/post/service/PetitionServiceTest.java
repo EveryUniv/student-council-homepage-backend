@@ -95,9 +95,10 @@ public class PetitionServiceTest {
     public void findOnePetitionWithMapper() {
         // given
         Petition petition = PetitionMock.createWithDummy();
-        List<PetitionStatisticDto> list = PetitionStatisticMock.createList();
+        List<PetitionStatisticDto> top4 = PetitionStatisticMock.createList(4);
+        List<PetitionStatisticDto> list = PetitionStatisticMock.createList(10);
 
-        when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
+        when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(top4);
         when(petitionStatisticService.count(petition.getId())).thenReturn(list.size());
         when(postService.findOne(eq(petition.getId()), eq(0L), eq("Addr"), any()))
                 .thenAnswer(ino -> {
@@ -108,7 +109,7 @@ public class PetitionServiceTest {
                     return mapper.map(dto, petition);
                 });
 
-        //when
+        // when
         ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
 
         // then
@@ -118,8 +119,6 @@ public class PetitionServiceTest {
         assertThat(dto.isLiked()).isEqualTo(true);
         assertThat(dto.isMine()).isEqualTo(false);
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
-        assertThat(dto.getStatisticList()).isEqualTo(list);
-        assertThat(dto.getStatisticList()).isEqualTo(list);
         assertThat(dto.getStatisticList().size()).isEqualTo(5);
         assertThat(dto.getStatisticList().stream()
                 .map(PetitionStatisticDto::getDepartment)
