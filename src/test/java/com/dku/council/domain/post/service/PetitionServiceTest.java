@@ -6,8 +6,10 @@ import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -26,6 +28,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,6 +111,7 @@ public class PetitionServiceTest {
         when(postLikeService.isLiked(any(), any(), eq(LikeTarget.POST))).thenReturn(true);
         when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
         when(petitionStatisticService.count(petition.getId())).thenReturn(list.size());
+
         //when
         ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
 
@@ -120,6 +124,35 @@ public class PetitionServiceTest {
         assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
         assertThat(dto.getStatisticList()).isEqualTo(list);
         assertThat(dto.getAgreeCount()).isEqualTo(list.size());
+    }
+
+
+    @Test
+    @DisplayName("Petition mapper 와 함께 단건 조회가 잘 동작하는지? - 기타 필드가 생성되는가?")
+    public void findOnePetitionWithMapperAndCreateField() {
+        // given
+        Petition petition = PetitionMock.createWithDummy();
+        List<PetitionStatisticDto> list = PetitionStatisticMock.createList();
+
+        when(petitionRepository.findById(petition.getId())).thenReturn(Optional.of(petition));
+        when(postLikeService.isLiked(any(), any(), eq(LikeTarget.POST))).thenReturn(true);
+        when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(list);
+        when(petitionStatisticService.count(petition.getId())).thenReturn(15);
+
+        //when
+        ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
+
+        // then
+        assertThat(dto.getId()).isEqualTo(petition.getId());
+        assertThat(dto.getViews()).isEqualTo(petition.getViews());
+        assertThat(dto.getAnswer()).isEqualTo(petition.getAnswer());
+        assertThat(dto.isLiked()).isEqualTo(true);
+        assertThat(dto.isMine()).isEqualTo(false);
+        assertThat(dto.getExpiresAt()).isEqualTo(petition.getCreatedAt().plusDays(30).toLocalDate());
+        assertThat(dto.getStatisticList()).isEqualTo(list);
+        assertThat(dto.getStatisticList().size()).isEqualTo(5);
+        assertThat(dto.getStatisticList().stream().map(PetitionStatisticDto::getDepartment).collect(Collectors.toList()).contains("기타"));
+        assertThat(dto.getAgreeCount()).isEqualTo(15);
     }
 
 }
