@@ -13,11 +13,11 @@ import javax.validation.constraints.Pattern;
 @RequiredArgsConstructor
 public class RequestCarouselImageDto {
 
-    @NotNull(message = "파일을 등록해주세요")
-    @Schema(description = "이미지 파일 등록", example = "myImage.png")
+    @NotNull
+    @Schema(description = "이미지 파일 등록")
     private final MultipartFile imageFile;
 
-    @NotEmpty(message = "리다이렉트 URL 이 필요합니다.")
+    @NotEmpty
     @Schema(description = "이미지 리다이렉트 경로", example = "redirect.com/redirectPath")
     @Pattern(regexp = "^[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b(?:[-a-zA-Z0-9()@:%_\\+.~#?&//=]*)$",
     message = "url 형식을 맞춰야 합니다.")

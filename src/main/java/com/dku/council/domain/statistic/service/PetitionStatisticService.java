@@ -60,6 +60,6 @@ public class PetitionStatisticService {
     }
 
     public boolean isAlreadyAgreed(Long postId, Long userId) {
-        return repository.findByPetitionIdAndUserId(postId, userId).isPresent();
+        return repository.countByPetitionIdAndUserId(postId, userId) > 0;
     }
 }

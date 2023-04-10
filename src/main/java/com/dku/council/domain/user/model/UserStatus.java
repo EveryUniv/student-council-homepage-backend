@@ -4,5 +4,10 @@ public enum UserStatus {
     /**
      * 정상 활성화된 계정
      */
-    ACTIVE
+    ACTIVE,
+
+    /**
+     * 비활성화된 계정
+     */
+    INACTIVE
 }

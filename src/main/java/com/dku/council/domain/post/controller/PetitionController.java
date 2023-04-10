@@ -108,7 +108,7 @@ public class PetitionController {
     }
 
     /**
-     * 동의 하기 : 해당 게시글에 동의합니다. (default : 동의합니다)
+     * 해당 게시글에 동의
      *
      * @param postId 동의할 게시글 id
      */
@@ -122,7 +122,7 @@ public class PetitionController {
 
     /**
      * 게시글에 좋아요 표시
-     * 중복으로 좋아요 표시해도 1개만 적용됩니다.
+     * <p>중복으로 좋아요 표시해도 1개만 적용됩니다.</p>
      *
      * @param id 게시글 id
      */
@@ -134,7 +134,7 @@ public class PetitionController {
 
     /**
      * 좋아요 취소
-     * 중복으로 좋아요 취소해도 최초 1건만 적용됩니다.
+     * <p>중복으로 좋아요 취소해도 최초 1건만 적용됩니다.</p>
      *
      * @param id 게시글 id
      */
