@@ -16,6 +16,11 @@ import static lombok.AccessLevel.PROTECTED;
         name = "lecture_template_seq_generator",
         allocationSize = 300
 )
+@Table(
+        indexes = {
+                @Index(name = "idx_lecture_template_name", columnList = "name")
+        }
+)
 public class LectureTemplate extends BaseEntity {
 
     @Id

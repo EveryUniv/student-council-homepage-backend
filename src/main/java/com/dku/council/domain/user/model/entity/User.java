@@ -13,7 +13,12 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-@Table(name = "dku_user")
+@Table(name = "dku_user",
+        indexes = {
+                @Index(name = "idx_user_student_id", columnList = "studentId"),
+                @Index(name = "idx_user_phone", columnList = "phone"),
+                @Index(name = "idx_user_nickname", columnList = "nickname")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
