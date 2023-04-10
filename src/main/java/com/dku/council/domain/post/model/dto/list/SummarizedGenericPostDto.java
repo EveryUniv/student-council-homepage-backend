@@ -39,6 +39,7 @@ public class SummarizedGenericPostDto {
 
     @Schema(description = "댓글 개수", example = "2")
     private final int commentCount;
+
     @Schema(description = "태그 목록")
     private final List<TagDto> tag;
 
