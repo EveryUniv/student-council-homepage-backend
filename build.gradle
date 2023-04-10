@@ -44,6 +44,9 @@ dependencies {
 	// jsoup (html parser)
 	implementation 'org.jsoup:jsoup:1.15.4'
 
+	// thumbnailator (image thumbnail generator)
+	implementation 'net.coobird:thumbnailator:[0.4, 0.5)'
+
 	// jwt
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 

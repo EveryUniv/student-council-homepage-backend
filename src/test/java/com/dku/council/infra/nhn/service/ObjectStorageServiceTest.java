@@ -1,13 +1,13 @@
 package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.InvalidAccessObjectStorageException;
-import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
 import com.dku.council.util.base.AbstractMockServerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.InputStream;
@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ObjectStorageServiceTest extends AbstractMockServerTest {
 
     private ObjectStorageService service;
+    private ObjectUploadContext uploadContext;
     private String apiPath;
 
 
@@ -24,7 +25,8 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
     public void beforeEach() {
         WebClient webClient = WebClient.create();
         this.apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new ObjectStorageServiceImpl(webClient, apiPath);
+        this.uploadContext = new ObjectUploadContext("prefix", apiPath);
+        this.service = new ObjectStorageService(webClient, uploadContext);
     }
 
     @Test
@@ -57,7 +59,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
     @DisplayName("object url을 잘 생성하는지?")
     public void getObjectUrl() {
         // when
-        String url = service.getObjectURL("object");
+        String url = uploadContext.getObjectUrl("object");
 
         // then
         assertThat(url).isEqualTo(String.format(apiPath, "object"));
@@ -71,7 +73,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
         mockWithStatus(HttpStatus.OK);
 
         // when & then(no error)
-        service.uploadObject("token", "object", InputStream.nullInputStream(), "image/png");
+        service.uploadObject("token", "object", InputStream.nullInputStream(), MediaType.IMAGE_JPEG);
     }
 
     @Test
@@ -93,7 +95,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
 
         // when & then(no error)
         Assertions.assertThrows(InvalidAccessObjectStorageException.class, () ->
-                service.uploadObject("token", "object", InputStream.nullInputStream(), "image/png"));
+                service.uploadObject("token", "object", InputStream.nullInputStream(), MediaType.IMAGE_JPEG));
     }
 
     @Test

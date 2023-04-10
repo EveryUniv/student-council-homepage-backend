@@ -1,17 +1,16 @@
 package com.dku.council.infra.nhn.service;
 
+import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.model.UploadedFile;
-import com.dku.council.infra.nhn.service.impl.FileUploadServiceImpl;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
-import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
 import com.dku.council.mock.MultipartFileMock;
-import com.dku.council.mock.UploadedFileMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -32,10 +31,10 @@ class FileUploadServiceTest {
     private NHNAuthServiceImpl authService;
 
     @Mock
-    private ObjectStorageServiceImpl storageService;
+    private ObjectStorageService storageService;
 
     @InjectMocks
-    private FileUploadServiceImpl service;
+    private FileUploadService service;
 
 
     @Test
@@ -51,13 +50,14 @@ class FileUploadServiceTest {
         when(storageService.isInObject(any())).thenReturn(false);
 
         // when
-        ArrayList<UploadedFile> uploadedFiles = service.uploadFiles(files, prefix);
+        ArrayList<UploadedFile> uploadedFiles = service.newContext().uploadFiles(FileRequest.ofList(files), prefix);
 
         // then
         for (int i = 1; i <= totalFiles; i++) {
             UploadedFile file = uploadedFiles.get(i - 1);
             assertFileId(file.getFileId(), prefix, ext);
             assertThat(file.getOriginalName()).isEqualTo("myFile" + i + ".txt");
+            assertThat(file.getMimeType()).isEqualTo(MediaType.TEXT_PLAIN);
         }
     }
 
@@ -72,10 +72,11 @@ class FileUploadServiceTest {
         when(authService.requestToken()).thenReturn("token");
 
         //when
-        String fileId = service.uploadFile(file, "test");
+        UploadedFile uploadedFile = service.newContext().uploadFile(new FileRequest(file), "test");
 
         //then
-        assertFileId(fileId, "test", ext);
+        assertThat(uploadedFile.getOriginalName()).isEqualTo(file.getOriginalFilename());
+        assertFileId(uploadedFile.getFileId(), "test", ext);
     }
 
     private void assertFileId(String fileId, String prefix, String ext) {
@@ -97,24 +98,22 @@ class FileUploadServiceTest {
         when(storageService.isInObject(any())).thenReturn(false);
 
         // when
-        service.uploadFiles(files, "prefix");
+        service.newContext().uploadFiles(FileRequest.ofList(files), "prefix");
 
         // then
-        verify(storageService, times(totalFiles)).uploadObject(eq("token"), any(), any(), eq("text/plain"));
+        verify(storageService, times(totalFiles)).uploadObject(eq("token"), any(), any(), eq(MediaType.TEXT_PLAIN));
     }
 
     @Test
     @DisplayName("delete시 object storage 호출이 정확한가?")
     public void deleteFilesCallProperly() {
         // given
-        final int totalFiles = 10;
-        List<UploadedFile> files = UploadedFileMock.createList(totalFiles);
         when(authService.requestToken()).thenReturn("token");
 
         // when
-        service.deletePostFiles(files);
+        service.newContext().deleteFile("fileId");
 
         // then
-        verify(storageService, times(totalFiles)).deleteObject(eq("token"), any());
+        verify(storageService).deleteObject("token", "fileId");
     }
 }

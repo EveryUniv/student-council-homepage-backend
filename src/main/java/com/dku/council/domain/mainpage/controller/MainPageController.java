@@ -32,7 +32,7 @@ public class MainPageController {
      */
     @GetMapping
     public MainPageResponseDto index() {
-        return mainPageService.getMainPage();
+        return mainPageService.mainPageInfo();
     }
 
     /**

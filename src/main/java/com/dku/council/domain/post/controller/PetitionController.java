@@ -7,10 +7,7 @@ import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
-import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
-import com.dku.council.domain.post.service.PetitionService;
+import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
@@ -21,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +34,6 @@ import static com.dku.council.domain.like.model.LikeTarget.POST;
 public class PetitionController {
 
     private final PetitionService petitionService;
-    private final GenericPostService<Petition> petitionPostService;
     private final LikeService likeService;
 
     /**
@@ -57,10 +52,7 @@ public class PetitionController {
                                                     @RequestParam(required = false) PetitionStatus status,
                                                     @RequestParam(defaultValue = "50") int bodySize,
                                                     @ParameterObject Pageable pageable) {
-        Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withPetitionStatus(status));
-        spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionService.listPetition(spec, bodySize, pageable);
+        Page<SummarizedPetitionDto> list = petitionService.listPetition(keyword, tagIds, status, bodySize, pageable);
         return new ResponsePage<>(list);
     }
 
@@ -99,7 +91,7 @@ public class PetitionController {
     @PatchMapping("/blind/{id}")
     @AdminOnly
     public void blind(@PathVariable Long id) {
-        petitionPostService.blind(id);
+        petitionService.blind(id);
     }
 
     /**
@@ -118,12 +110,12 @@ public class PetitionController {
     /**
      * 동의 하기 : 해당 게시글에 동의합니다. (default : 동의합니다)
      *
-     * @param postId    동의할 게시글 id
+     * @param postId 동의할 게시글 id
      */
     @PostMapping("/agree/{postId}")
     @UserOnly
     public void agreePetition(AppAuthentication auth,
-                                       @PathVariable Long postId) {
+                              @PathVariable Long postId) {
         petitionService.agreePetition(postId, auth.getUserId());
     }
 

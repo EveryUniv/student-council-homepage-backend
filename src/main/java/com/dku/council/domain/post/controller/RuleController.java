@@ -4,9 +4,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedRuleDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateRuleDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.posttype.Rule;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
@@ -17,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +27,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class RuleController {
 
-    private final GenericPostService<Rule> postService;
+    private final RuleService postService;
 
     /**
      * 게시글 목록으로 조회
@@ -43,8 +40,7 @@ public class RuleController {
     public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
-        Page<SummarizedRuleDto> list = postService.list(spec, pageable, bodySize, SummarizedRuleDto::new);
+        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

@@ -1,9 +1,8 @@
 package com.dku.council.domain.mainpage.model.dto.response;
 
 import com.dku.council.domain.mainpage.model.entity.CarouselImage;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.Getter;
-
-import java.net.URI;
 
 @Getter
 public class CarouselImageResponse {
@@ -11,9 +10,9 @@ public class CarouselImageResponse {
     private final String url;
     private final String redirectUrl;
 
-    public CarouselImageResponse(String baseUrl, CarouselImage image) {
+    public CarouselImageResponse(ObjectUploadContext context, CarouselImage image) {
         this.id = image.getId();
-        this.url = URI.create(baseUrl + "/").resolve(image.getFileId()).toString();
+        this.url = context.getObjectUrl(image.getFileId());
         this.redirectUrl = image.getRedirectUrl();
     }
 }

@@ -2,11 +2,12 @@ package com.dku.council.infra.nhn.service.actual;
 
 import com.dku.council.infra.nhn.service.NHNAuthService;
 import com.dku.council.infra.nhn.service.ObjectStorageService;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
-import com.dku.council.infra.nhn.service.impl.ObjectStorageServiceImpl;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
@@ -32,13 +33,16 @@ class ActualObjectStorageServiceTest {
                 .clientConnector(WebClientUtil.logger())
                 .build();
 
+        String thumbnailPrefix = properties.get("app.post.thumbnail.prefix");
         String osApiPath = properties.get("nhn.os.api-path");
         String authApiPath = properties.get("nhn.auth.api-path");
         String tenantId = properties.get("nhn.auth.tenant-id");
         String username = properties.get("nhn.auth.username");
         String password = properties.get("nhn.auth.password");
 
-        this.storageService = new ObjectStorageServiceImpl(webClient, osApiPath);
+        ObjectUploadContext uploadContext = new ObjectUploadContext(thumbnailPrefix, osApiPath);
+
+        this.storageService = new ObjectStorageService(webClient, uploadContext);
         this.authService = new NHNAuthServiceImpl(webClient, authApiPath, tenantId, username, password);
 
         // call @postconstruct manually
@@ -53,7 +57,7 @@ class ActualObjectStorageServiceTest {
     public void actualUploadObject() {
         String token = authService.requestToken();
         InputStream inStream = ActualObjectStorageServiceTest.class.getResourceAsStream("/dummy/dummy_img1.jpg");
-        storageService.uploadObject(token, "TestObject", inStream, "image/jpeg");
+        storageService.uploadObject(token, "TestObject", inStream, MediaType.IMAGE_JPEG);
     }
 
     @Test

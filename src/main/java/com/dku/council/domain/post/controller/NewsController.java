@@ -6,9 +6,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
@@ -18,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +31,7 @@ import static com.dku.council.domain.like.model.LikeTarget.POST;
 @RequiredArgsConstructor
 public class NewsController {
 
-    private final GenericPostService<News> postService;
+    private final NewsService postService;
     private final LikeService likeService;
 
     /**
@@ -50,9 +47,7 @@ public class NewsController {
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Specification<News> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize);
+        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

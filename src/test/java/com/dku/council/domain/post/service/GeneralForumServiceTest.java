@@ -5,6 +5,9 @@ import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
+import com.dku.council.domain.post.repository.post.GeneralForumRepository;
+import com.dku.council.domain.post.service.post.GeneralForumService;
+import com.dku.council.domain.post.service.post.GenericPostService;
 import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +22,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-import static com.dku.council.domain.post.service.GeneralForumService.GENERAL_FORUM_KEY;
+import static com.dku.council.domain.post.service.post.GeneralForumService.GENERAL_FORUM_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -35,12 +38,15 @@ class GeneralForumServiceTest {
     @Mock
     private GenericPostService<GeneralForum> postService;
 
+    @Mock
+    private GeneralForumRepository repository;
+
     private GeneralForumService generalForumService;
 
     @BeforeEach
     public void setup() {
-        generalForumService = new GeneralForumService(postService, postTimeMemoryRepository, clock,
-                writeCooltime);
+        generalForumService = new GeneralForumService(postService, postTimeMemoryRepository, repository,
+                clock, writeCooltime);
     }
 
     @Test
@@ -53,7 +59,7 @@ class GeneralForumServiceTest {
 
         when(postTimeMemoryRepository.isAlreadyContains(GENERAL_FORUM_KEY, 1L, now))
                 .thenReturn(false);
-        when(postService.create(1L, dto)).thenReturn(5L);
+        when(postService.create(repository, 1L, dto)).thenReturn(5L);
 
         // when
         Long result = generalForumService.create(1L, dto);
@@ -89,7 +95,7 @@ class GeneralForumServiceTest {
 
         when(postTimeMemoryRepository.isAlreadyContains(GENERAL_FORUM_KEY, 1L, now))
                 .thenReturn(false);
-        when(postService.create(1L, dto))
+        when(postService.create(repository, 1L, dto))
                 .thenThrow(new PostNotFoundException());
 
         // when
