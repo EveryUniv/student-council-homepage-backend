@@ -3,9 +3,11 @@ package com.dku.council.domain.post.model.dto;
 import com.dku.council.domain.post.model.entity.PostFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import org.springframework.http.MediaType;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -28,7 +30,9 @@ public class PostFileDto {
         this.id = file.getId();
         this.url = URI.create(baseUrl + "/").resolve(file.getFileId()).toString();
         this.originalName = file.getFileName();
-        this.mimeType = file.getMimeType();
+
+        String fileMimeType = file.getMimeType();
+        this.mimeType = Objects.requireNonNullElse(fileMimeType, MediaType.APPLICATION_OCTET_STREAM_VALUE);
     }
 
     public static List<PostFileDto> listOf(String baseFileUrl, List<PostFile> entities) {
