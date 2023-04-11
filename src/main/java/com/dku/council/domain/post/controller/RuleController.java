@@ -9,6 +9,7 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +44,7 @@ public class RuleController {
                                                 @RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, auth.getUserRole());
+        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, UserRole.from(auth));
         return new ResponsePage<>(list);
     }
 

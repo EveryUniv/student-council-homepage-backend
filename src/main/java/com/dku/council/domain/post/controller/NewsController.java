@@ -10,6 +10,7 @@ import com.dku.council.domain.post.service.post.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +51,7 @@ public class NewsController {
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
+        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize, UserRole.from(auth));
         return new ResponsePage<>(list);
     }
 

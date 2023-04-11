@@ -12,6 +12,7 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +52,7 @@ public class VocController {
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
-        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
+        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, UserRole.from(auth));
         return new ResponsePage<>(list);
     }
 
