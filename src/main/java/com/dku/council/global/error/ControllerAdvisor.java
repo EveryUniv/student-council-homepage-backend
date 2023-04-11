@@ -1,9 +1,11 @@
 package com.dku.council.global.error;
 
+import com.dku.council.debug.service.ErrorLogService;
 import com.dku.council.global.error.exception.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +26,16 @@ import java.util.Locale;
 public class ControllerAdvisor {
 
     private final MessageSource messageSource;
+    private final ErrorLogService errorLogService;
+
+    @Value("${app.enable-test-controller}")
+    private boolean isEnabledTest;
 
     @ExceptionHandler
     protected ResponseEntity<ErrorResponseDto> localizedException(LocalizedMessageException e, Locale locale) {
         ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, e);
         log.error("A problem has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
-        return ResponseEntity.status(e.getStatus()).body(dto);
+        return filter(e, ResponseEntity.status(e.getStatus()).body(dto));
     }
 
     @ExceptionHandler
@@ -71,6 +77,14 @@ public class ControllerAdvisor {
     protected ResponseEntity<ErrorResponseDto> unexpectedException(Exception e, Locale locale) {
         ErrorResponseDto dto = new ErrorResponseDto(messageSource, locale, LocalizedMessageException.of(e));
         log.error("Unexpected exception has occurred in controller advice: [id={}]", dto.getTrackingId(), e);
-        return ResponseEntity.internalServerError().body(dto);
+        return filter(e, ResponseEntity.internalServerError().body(dto));
+    }
+
+    private ResponseEntity<ErrorResponseDto> filter(Throwable t, ResponseEntity<ErrorResponseDto> entity) {
+        ErrorResponseDto dto = entity.getBody();
+        if (isEnabledTest && dto != null) {
+            errorLogService.logError(dto.getTrackingId(), t, dto);
+        }
+        return entity;
     }
 }

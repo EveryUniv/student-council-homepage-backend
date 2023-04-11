@@ -44,6 +44,9 @@ public class SummarizedGenericPostDto {
     private final List<TagDto> tag;
 
 
+    @Schema(description = "블라인드 여부", example = "false")
+    private final boolean isBlinded;
+
     public SummarizedGenericPostDto(String baseFileUrl, int bodySize, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
@@ -57,6 +60,8 @@ public class SummarizedGenericPostDto {
         this.tag = post.getPostTags().stream()
                 .map(e -> new TagDto(e.getTag()))
                 .collect(Collectors.toList());
+        this.isBlinded = post.isBlinded();
+
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
@@ -70,6 +75,7 @@ public class SummarizedGenericPostDto {
         this.views = copy.getViews();
         this.commentCount = copy.getCommentCount();
         this.tag = copy.getTag();
+        this.isBlinded = copy.isBlinded();
     }
 
     private static String slice(String text, int maxLen) {

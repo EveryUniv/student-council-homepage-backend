@@ -59,7 +59,6 @@ public class User extends BaseEntity {
     @Enumerated(STRING)
     private UserRole userRole;
 
-
     @Builder
     private User(@NonNull String studentId,
                  @NonNull String password,
@@ -107,4 +106,5 @@ public class User extends BaseEntity {
         this.yearOfAdmission = yearOfAdmission;
         this.academicStatus = studentState;
     }
+
 }

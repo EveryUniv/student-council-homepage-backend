@@ -48,16 +48,18 @@ public class GenericPostService<E extends Post> {
      * @param pageable 페이징 방법
      * @return 페이징된 목록
      */
+
+
     @Transactional(readOnly = true)
-    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize) {
-        Page<E> result = list(spec, pageable);
+    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId) {
+        Page<E> result = list(spec, pageable, userId);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
-    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize,
+    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId,
                             PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(spec, pageable);
+        Page<E> result = list(spec, pageable, userId);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -65,12 +67,17 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(Specification<E> spec, Pageable pageable) {
+    private Page<E> list(Specification<E> spec, Pageable pageable, Long userId) {
         if (spec == null) {
             spec = Specification.where(null);
         }
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        spec = spec.and(PostSpec.withActive());
+        if(user.getUserRole().isAdmin()) {
+            spec = spec.and(PostSpec.withActiveOrBlinded());
+        }else {
+            spec = spec.and(PostSpec.withActive());
+        }
         return postRepository.findAll(spec, pageable);
     }
 
@@ -109,14 +116,14 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional
     public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
-        E post = viewPost(postId, remoteAddress);
+        E post = viewPost(postId, userId, remoteAddress);
         return makePostDto(userId, post);
     }
 
     @Transactional
     public <T> T findOne(Long postId, Long userId, String remoteAddress,
                          PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
-        E post = viewPost(postId, remoteAddress);
+        E post = viewPost(postId, userId, remoteAddress);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
         return mapper.map(dto, post);
     }
@@ -136,8 +143,8 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    public E viewPost(Long postId, String remoteAddress) {
-        E post = findPost(postId);
+    public E viewPost(Long postId, Long userId, String remoteAddress) {
+        E post = findPost(postId, userId);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
     }
@@ -149,7 +156,11 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    public E findPost(Long postId) {
+    public E findPost(Long postId, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        if(user.getUserRole().isAdmin()){
+            return postRepository.findActiveAndBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        }
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 
@@ -183,6 +194,18 @@ public class GenericPostService<E extends Post> {
         E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         post.blind();
     }
+
+    /**
+     * 게시글을 unblind처리 합니다.
+     *
+     * @param postId 게시글 id
+     */
+    @Transactional
+    public void unblind(Long postId) {
+        E post = postRepository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        post.unblind();
+    }
+
 
     @FunctionalInterface
     public interface PostResultMapper<T, D, E extends Post> {
