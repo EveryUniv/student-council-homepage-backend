@@ -1,4 +1,4 @@
-package com.dku.council.debug;
+package com.dku.council.debug.controller;
 
 import com.dku.council.domain.mainpage.scheduler.ScheduleInfoScheduler;
 import com.dku.council.domain.timetable.scheduler.LectureDumpScheduler;

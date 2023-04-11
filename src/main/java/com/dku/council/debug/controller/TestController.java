@@ -1,5 +1,6 @@
-package com.dku.council.debug;
+package com.dku.council.debug.controller;
 
+import com.dku.council.debug.service.ErrorLogService;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyPhoneException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
@@ -27,6 +28,7 @@ public class TestController {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ErrorLogService errorLogService;
 
     /**
      * 학번으로 유저 삭제.
@@ -83,5 +85,10 @@ public class TestController {
                 .build();
 
         userRepository.save(user);
+    }
+
+    @GetMapping(value = "/error/{trackingId}", produces = "text/plain;charset=UTF-8")
+    public String findError(@PathVariable String trackingId) {
+        return errorLogService.findErrorLog(trackingId);
     }
 }
