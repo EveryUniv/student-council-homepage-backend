@@ -33,13 +33,14 @@ class ActualObjectStorageServiceTest {
                 .clientConnector(WebClientUtil.logger())
                 .build();
 
+        String defaultThumbnail = properties.get("app.post.thumbnail.default");
         String osApiPath = properties.get("nhn.os.api-path");
         String authApiPath = properties.get("nhn.auth.api-path");
         String tenantId = properties.get("nhn.auth.tenant-id");
         String username = properties.get("nhn.auth.username");
         String password = properties.get("nhn.auth.password");
 
-        ObjectUploadContext uploadContext = new ObjectUploadContext(osApiPath);
+        ObjectUploadContext uploadContext = new ObjectUploadContext(osApiPath, defaultThumbnail);
 
         this.storageService = new ObjectStorageService(webClient, uploadContext);
         this.authService = new NHNAuthServiceImpl(webClient, authApiPath, tenantId, username, password);

@@ -11,6 +11,7 @@ import com.dku.council.domain.post.service.post.GenericPostService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -45,9 +46,6 @@ class GenericPostServiceTest {
     @Mock
     private GenericPostRepository<News> newsRepository;
 
-    @InjectMocks
-    private GenericPostService<News> newsService;
-
     @Mock
     private UserRepository userRepository;
 
@@ -72,6 +70,9 @@ class GenericPostServiceTest {
     @Mock
     private CachedLikeServiceImpl postLikeService;
 
+    @InjectMocks
+    private GenericPostService<News> newsService;
+
 
     @Test
     @DisplayName("list가 잘 동작하는지?")
@@ -84,7 +85,8 @@ class GenericPostServiceTest {
         when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
-        Page<SummarizedGenericPostDto> allPage = newsService.list(newsRepository, null, Pageable.unpaged(), 500);
+        Page<SummarizedGenericPostDto> allPage = newsService.list(newsRepository, null, Pageable.unpaged(),
+                500, UserRole.USER);
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
@@ -182,7 +184,7 @@ class GenericPostServiceTest {
 
         // when
         ResponseSingleGenericPostDto dto = newsService.findOne(newsRepository, 4L,
-                news.getUser().getId(), "Addr");
+                news.getUser().getId(), news.getUser().getUserRole(), "Addr");
 
         // then
         verify(viewCountService).increasePostViews(argThat(post -> {
@@ -204,7 +206,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                newsService.findOne(newsRepository, 0L, 4L, "Addr"));
+                newsService.findOne(newsRepository, 0L, 4L, UserRole.USER, "Addr"));
     }
 
     @Test

@@ -2,14 +2,12 @@ package com.dku.council.global.auth.role;
 
 import com.dku.council.global.auth.jwt.JwtProvider;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.security.access.annotation.Secured;
 
 import java.lang.annotation.*;
 
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
-@Secured(UserAuthNames.ROLE_ADMIN)
-public @interface AdminOnly { // TODO 이름 AdminAuth로 변경 및 javadoc 추가
+public @interface GuestAuth {
 }

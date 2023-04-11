@@ -9,6 +9,7 @@ import com.dku.council.domain.post.service.ThumbnailService;
 import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.mock.GeneralForumMock;
@@ -68,12 +69,12 @@ class GeneralForumServiceTest {
         List<GeneralForum> allForumList = GeneralForumMock.createListDummy("generic-", 20);
         Page<GeneralForum> allGeneralForum = new DummyPage<>(allForumList, 20);
 
-
         when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(allGeneralForum);
         when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
-        Page<SummarizedGenericPostDto> allPage = generalForumService.list(generalForumRepository, null, Pageable.unpaged(), 500);
+        Page<SummarizedGenericPostDto> allPage = generalForumService.list(generalForumRepository, null,
+                Pageable.unpaged(), 500, UserRole.USER);
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allForumList.size());

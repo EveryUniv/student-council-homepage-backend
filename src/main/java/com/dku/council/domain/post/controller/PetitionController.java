@@ -9,12 +9,11 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -49,7 +48,7 @@ public class PetitionController {
      * @return 페이징 된 청원 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedPetitionDto> list(AppAuthentication auth,
                                                     @RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) List<Long> tagIds,
@@ -57,7 +56,7 @@ public class PetitionController {
                                                     @RequestParam(defaultValue = "50") int bodySize,
                                                     @ParameterObject Pageable pageable) {
         Page<SummarizedPetitionDto> list = petitionService.listPetition(keyword, tagIds, status,
-                bodySize, pageable, auth.isAdmin());
+                bodySize, pageable, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -84,7 +83,8 @@ public class PetitionController {
     public ResponsePetitionDto findOne(AppAuthentication auth,
                                        @PathVariable Long id,
                                        HttpServletRequest request) {
-        return petitionService.findOnePetition(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return petitionService.findOnePetition(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
@@ -99,7 +99,7 @@ public class PetitionController {
         petitionService.blind(id);
     }
 
-/**
+    /**
      * 게시글을 블라인드 해제
      * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
      *

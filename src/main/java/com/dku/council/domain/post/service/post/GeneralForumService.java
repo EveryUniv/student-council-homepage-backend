@@ -8,6 +8,7 @@ import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
 import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -46,14 +47,15 @@ public class GeneralForumService {
         return result;
     }
 
-    public Page<SummarizedGenericPostDto> list(String keyword, List<Long> tagIds, Pageable pageable, int bodySize) {
+    public Page<SummarizedGenericPostDto> list(String keyword, List<Long> tagIds, Pageable pageable,
+                                               int bodySize, UserRole role) {
         Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
         spec = spec.and(PostSpec.withTitleOrBody(keyword));
-        return postService.list(repository, spec, pageable, bodySize);
+        return postService.list(repository, spec, pageable, bodySize, role);
     }
 
-    public ResponseGeneralForumDto findOne(Long id, Long userId, String address) {
-        return postService.findOne(repository, id, userId, address, ResponseGeneralForumDto::new);
+    public ResponseGeneralForumDto findOne(Long id, Long userId, UserRole role, String address) {
+        return postService.findOne(repository, id, userId, role, address, ResponseGeneralForumDto::new);
     }
 
     public void delete(Long id, Long userId, boolean admin) {
@@ -62,5 +64,9 @@ public class GeneralForumService {
 
     public void blind(Long id) {
         postService.blind(repository, id);
+    }
+
+    public void unblind(Long id) {
+        postService.unblind(repository, id);
     }
 }

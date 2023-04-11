@@ -6,6 +6,7 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.entity.posttype.Conference;
 import com.dku.council.domain.post.repository.post.ConferenceRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,9 +20,9 @@ public class ConferenceService {
     private final ConferenceRepository repository;
 
 
-    public Page<SummarizedConferenceDto> list(String keyword, Pageable pageable, int bodySize) {
+    public Page<SummarizedConferenceDto> list(String keyword, Pageable pageable, int bodySize, UserRole role) {
         Specification<Conference> spec = PostSpec.withTitleOrBody(keyword);
-        return postService.list(repository, spec, pageable, bodySize, SummarizedConferenceDto::new);
+        return postService.list(repository, spec, pageable, bodySize, role, SummarizedConferenceDto::new);
     }
 
     public Long create(Long userId, RequestCreateConferenceDto request) {

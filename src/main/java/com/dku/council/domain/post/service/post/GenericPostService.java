@@ -15,6 +15,7 @@ import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.model.FileRequest;
@@ -46,24 +47,18 @@ public class GenericPostService<E extends Post> {
     protected final ObjectUploadContext uploadContext;
     protected final ThumbnailService thumbnailService;
 
-    /**
-     * 게시글 목록으로 조회
-     *
-     * @param spec     검색 방법
-     * @param pageable 페이징 방법
-     * @return 페이징된 목록
-     */
+
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> list(GenericPostRepository<E> repository, Specification<E> spec,
-                                               Pageable pageable, int bodySize, boolean withBlind) {
-        Page<E> result = list(repository, spec, pageable, withBlind);
+                                               Pageable pageable, int bodySize, UserRole role) {
+        Page<E> result = list(repository, spec, pageable, role);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
     public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
-                            boolean withBlind, PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(repository, spec, pageable, withBlind);
+                            UserRole role, PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
+        Page<E> result = list(repository, spec, pageable, role);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -71,12 +66,12 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, boolean withBlind) {
+    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, UserRole role) {
         if (spec == null) {
             spec = Specification.where(null);
         }
 
-        if (withBlind) {
+        if (role.isAdmin()) {
             spec = spec.and(PostSpec.withActiveOrBlinded());
         } else {
             spec = spec.and(PostSpec.withActive());
@@ -145,15 +140,15 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional
     public ResponseSingleGenericPostDto findOne(GenericPostRepository<E> repository, Long postId, Long userId,
-                                                String remoteAddress, boolean withBlinded) {
-        E post = viewPost(repository, postId, remoteAddress, withBlinded);
+                                                UserRole role, String remoteAddress) {
+        E post = viewPost(repository, postId, remoteAddress, role);
         return makePostDto(userId, post);
     }
 
     @Transactional
-    public <T> T findOne(GenericPostRepository<E> repository, Long postId, Long userId, String remoteAddress,
-                         boolean withBlinded, PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
-        E post = viewPost(repository, postId, remoteAddress, withBlinded);
+    public <T> T findOne(GenericPostRepository<E> repository, Long postId, Long userId, UserRole role,
+                         String remoteAddress, PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
+        E post = viewPost(repository, postId, remoteAddress, role);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
         return mapper.map(dto, post);
     }
@@ -173,8 +168,8 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    public E viewPost(GenericPostRepository<E> repository, Long postId, String remoteAddress, boolean withBlind) {
-        E post = findPost(repository, postId, withBlind);
+    public E viewPost(GenericPostRepository<E> repository, Long postId, String remoteAddress, UserRole role) {
+        E post = findPost(repository, postId, role);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
     }
@@ -187,9 +182,9 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    public E findPost(GenericPostRepository<E> repository, Long postId, boolean withBlind) {
+    public E findPost(GenericPostRepository<E> repository, Long postId, UserRole role) {
         Optional<E> post;
-        if (withBlind) {
+        if (role.isAdmin()) {
             post = repository.findWithBlindedById(postId);
         } else {
             post = repository.findById(postId);

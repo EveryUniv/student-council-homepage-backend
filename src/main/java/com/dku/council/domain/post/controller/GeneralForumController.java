@@ -13,12 +13,11 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.post.GeneralForumService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -51,13 +50,13 @@ public class GeneralForumController {
      * @return 페이징된 자유게시판 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION) // TODO 이거 공통화
+    @GuestAuth
     public ResponsePage<SummarizedGenericPostDto> list(AppAuthentication auth,
                                                        @RequestParam(required = false) String keyword,
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Page<SummarizedGenericPostDto> list = forumService.list(keyword, tagIds, pageable, bodySize, auth.isAdmin());
+        Page<SummarizedGenericPostDto> list = forumService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -83,7 +82,7 @@ public class GeneralForumController {
     public ResponseGeneralForumDto findOne(AppAuthentication auth,
                                            @PathVariable Long id,
                                            HttpServletRequest request) {
-        return forumService.findOne(id, auth.getUserId(),
+        return forumService.findOne(id, auth.getUserId(), auth.getUserRole(),
                 RemoteAddressUtil.getProxyableAddr(request));
     }
 

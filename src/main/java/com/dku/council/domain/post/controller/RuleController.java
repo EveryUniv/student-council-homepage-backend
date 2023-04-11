@@ -6,12 +6,11 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.service.post.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -39,12 +38,12 @@ public class RuleController {
      * @return 페이징된 회칙 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedRuleDto> list(AppAuthentication auth,
                                                 @RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, auth.isAdmin());
+        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -71,7 +70,8 @@ public class RuleController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return postService.findOne(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**

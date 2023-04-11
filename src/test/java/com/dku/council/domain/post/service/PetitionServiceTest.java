@@ -15,6 +15,7 @@ import com.dku.council.domain.post.service.post.GenericPostService.PostResultMap
 import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.PetitionStatisticMock;
@@ -45,7 +46,7 @@ public class PetitionServiceTest {
 
     private final Clock clock = ClockUtil.create();
     private final Duration writeCooltime = Duration.ofDays(1);
-    private final ObjectUploadContext uploadContext = new ObjectUploadContext("");
+    private final ObjectUploadContext uploadContext = new ObjectUploadContext("", "");
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
@@ -108,7 +109,8 @@ public class PetitionServiceTest {
 
         when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(top4);
         when(petitionStatisticService.count(petition.getId())).thenReturn(list.size());
-        when(postService.findOne(eq(repository), eq(petition.getId()), eq(0L), eq("Addr"), any()))
+        when(postService.findOne(eq(repository), eq(petition.getId()), eq(0L), eq(UserRole.USER),
+                eq("Addr"), any()))
                 .thenAnswer(ino -> {
                     ResponseSingleGenericPostDto dto =
                             new ResponseSingleGenericPostDto(uploadContext, 0, false, true, petition);
@@ -118,7 +120,7 @@ public class PetitionServiceTest {
                 });
 
         // when
-        ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
+        ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, UserRole.USER, "Addr");
 
         // then
         assertThat(dto.getId()).isEqualTo(petition.getId());

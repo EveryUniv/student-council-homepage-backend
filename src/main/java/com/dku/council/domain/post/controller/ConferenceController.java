@@ -5,10 +5,9 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.post.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -36,12 +35,12 @@ public class ConferenceController {
      * @return 페이징 된 회의록 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedConferenceDto> list(AppAuthentication auth,
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "50") int bodySize,
                                                       @ParameterObject Pageable pageable) {
-        Page<SummarizedConferenceDto> list = service.list(keyword, pageable, bodySize, auth.isAdmin());
+        Page<SummarizedConferenceDto> list = service.list(keyword, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 

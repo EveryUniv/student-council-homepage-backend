@@ -12,6 +12,7 @@ import com.dku.council.domain.post.repository.post.PetitionRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -51,12 +52,11 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds, PetitionStatus status,
-                                                    int bodySize, Pageable pageable, boolean withBlind) {
+                                                    int bodySize, Pageable pageable, UserRole role) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
-        xdrfhxdrh
-        return postService.list(repository, spec, pageable, bodySize, (dto, post) ->
+        return postService.list(repository, spec, pageable, bodySize, role, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
@@ -73,7 +73,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
+    public ResponsePetitionDto findOnePetition(Long postId, Long userId, UserRole role, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
 
@@ -84,20 +84,20 @@ public class PetitionService {
         }
 
         boolean agreed = statisticService.isAlreadyAgreed(postId, userId);
-        return postService.findOne(repository, postId, userId, remoteAddress, (dto, post) ->
+        return postService.findOne(repository, postId, userId, role, remoteAddress, (dto, post) ->
                 new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
     @Transactional
     public void reply(Long postId, String answer) {
-        Petition post = postService.findPost(repository, postId, false);
+        Petition post = postService.findPost(repository, postId, UserRole.ADMIN);
         post.replyAnswer(answer);
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
     }
 
     @Transactional
     public void agreePetition(Long postId, Long userId) {
-        Petition post = postService.findPost(repository, postId, false);
+        Petition post = postService.findPost(repository, postId, UserRole.USER);
         if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
         }
@@ -112,5 +112,9 @@ public class PetitionService {
 
     public void blind(Long id) {
         postService.blind(repository, id);
+    }
+
+    public void unblind(Long id) {
+        postService.unblind(repository, id);
     }
 }
