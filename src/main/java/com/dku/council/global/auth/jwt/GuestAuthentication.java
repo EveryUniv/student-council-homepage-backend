@@ -1,55 +1,48 @@
 package com.dku.council.global.auth.jwt;
 
 import com.dku.council.global.auth.role.UserRole;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-@AllArgsConstructor
-public class JwtAuthentication implements AppAuthentication {
+public class GuestAuthentication implements AppAuthentication {
 
-    private Long userId;
-    private UserRole userRole;
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        for (String authority : userRole.getName().split(",")) {
-            authorities.add(() -> authority);
-        }
-        return authorities;
-    }
+    public static final Long GUEST_USER_ID = -1L;
 
     @Override
     public Long getUserId() {
-        return userId;
+        return GUEST_USER_ID;
     }
 
     @Override
     public UserRole getUserRole() {
-        return userRole;
+        return UserRole.GUEST;
     }
 
     @Override
     public boolean isAdmin() {
-        return userRole.isAdmin();
+        return getUserRole().isAdmin();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
     }
 
     @Override
     public Object getCredentials() {
-        return userId;
+        return GUEST_USER_ID;
     }
 
     @Override
     public Object getDetails() {
-        return userId;
+        return GUEST_USER_ID;
     }
 
     @Override
     public Object getPrincipal() {
-        return userId;
+        return GUEST_USER_ID;
     }
 
     @Override
