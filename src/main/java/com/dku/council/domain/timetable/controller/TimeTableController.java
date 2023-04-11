@@ -11,7 +11,7 @@ import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.dku.council.domain.timetable.repository.spec.LectureTemplateSpec;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +49,7 @@ public class TimeTableController {
      * @return 시간표 목록
      */
     @GetMapping
-    @UserOnly
+    @UserAuth
     public List<ListTimeTableDto> list(AppAuthentication auth) {
         return timeTableService.list(auth.getUserId());
     }
@@ -62,7 +62,7 @@ public class TimeTableController {
      * @return 시간표 수업 목록
      */
     @GetMapping("/{tableId}")
-    @UserOnly
+    @UserAuth
     public TimeTableDto findOne(AppAuthentication auth, @PathVariable Long tableId) {
         return timeTableService.findOne(auth.getUserId(), tableId);
     }
@@ -75,7 +75,7 @@ public class TimeTableController {
      * @return 생성된 시간표 ID
      */
     @PostMapping
-    @UserOnly
+    @UserAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @RequestBody CreateTimeTableRequestDto dto) {
         Long id = timeTableService.create(auth.getUserId(), dto);
         return new ResponseIdDto(id);
@@ -91,7 +91,7 @@ public class TimeTableController {
      * @return 변경된 시간표 ID
      */
     @PatchMapping("/{tableId}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto update(AppAuthentication auth,
                                 @PathVariable Long tableId,
                                 @Valid @RequestBody UpdateTimeTableRequestDto dto) {
@@ -108,7 +108,7 @@ public class TimeTableController {
      * @return 변경된 시간표 ID
      */
     @PatchMapping("/name/{tableId}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto updateName(AppAuthentication auth,
                                     @PathVariable Long tableId,
                                     @Valid @RequestBody UpdateTimeTableNameRequestDto dto) {
@@ -124,7 +124,7 @@ public class TimeTableController {
      * @return 삭제된 시간표 ID
      */
     @DeleteMapping("/{tableId}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto delete(AppAuthentication auth, @PathVariable Long tableId) {
         Long id = timeTableService.delete(auth.getUserId(), tableId);
         return new ResponseIdDto(id);

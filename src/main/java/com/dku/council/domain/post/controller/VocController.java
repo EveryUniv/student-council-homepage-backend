@@ -9,9 +9,10 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseVocDto;
 import com.dku.council.domain.post.service.post.VocService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +52,7 @@ public class VocController {
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
-        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
+        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, UserRole.from(auth));
         return new ResponsePage<>(list);
     }
 
@@ -65,7 +66,7 @@ public class VocController {
      * @return 페이징 된 VOC 목록
      */
     @GetMapping("/my")
-    @UserOnly
+    @UserAuth
     public ResponsePage<SummarizedVocDto> listMine(AppAuthentication auth,
                                                    @RequestParam(required = false) String keyword,
                                                    @RequestParam(required = false) List<Long> tagIds,
@@ -82,7 +83,7 @@ public class VocController {
      * @return 생성된 게시글 id
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @UserOnly
+    @UserAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateVocDto request) {
         Long postId = vocService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -95,7 +96,7 @@ public class VocController {
      * @return VOC 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseVocDto findOne(AppAuthentication auth,
                                   @PathVariable Long id,
                                   HttpServletRequest request) {
@@ -110,7 +111,7 @@ public class VocController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @AdminOnly
+    @AdminAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         vocService.delete(id, auth.getUserId(), auth.isAdmin());
     }
@@ -122,7 +123,7 @@ public class VocController {
      * @param id 블라인드 처리할 게시글 id
      */
     @PatchMapping("/blind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void blind(@PathVariable Long id) {
         vocService.blind(id);
     }
@@ -134,7 +135,7 @@ public class VocController {
      * @param id 블라인드 해제할 게시글 id
      */
     @PatchMapping("/unblind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void unblind(@PathVariable Long id) {
         vocService.unblind(id);
     }
@@ -146,7 +147,7 @@ public class VocController {
      * @param dto    요청 body
      */
     @PostMapping("/reply/{postId}")
-    @AdminOnly
+    @AdminAuth
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
         vocService.reply(postId, dto.getAnswer());
@@ -159,7 +160,7 @@ public class VocController {
      * @param id 게시글 id
      */
     @PostMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void like(AppAuthentication auth, @PathVariable Long id) {
         likeService.like(id, auth.getUserId(), LikeTarget.POST);
     }
@@ -171,7 +172,7 @@ public class VocController {
      * @param id 게시글 id
      */
     @DeleteMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }

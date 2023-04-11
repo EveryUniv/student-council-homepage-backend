@@ -26,7 +26,7 @@ public class CommentDto {
     @Schema(description = "내가 쓴 게시물인지?", example = "true")
     private final boolean isMine;
 
-    @Schema(description = "생성날짜", example = "2023-01-01 11:11:11")
+    @Schema(description = "생성날짜")
     private final LocalDateTime createdAt;
 
     public CommentDto(Comment comment, String author, int likes, boolean isMine, boolean isLiked) {

@@ -2,7 +2,7 @@ package com.dku.council.debug.controller;
 
 import com.dku.council.domain.mainpage.scheduler.ScheduleInfoScheduler;
 import com.dku.council.domain.timetable.scheduler.LectureDumpScheduler;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,7 @@ public class AdminController {
      * <p>주기적으로 자동 업데이트되지만, 직접 업데이트할 수 있습니다. 처리에 시간이 좀 걸릴 수 있습니다.</p>
      */
     @PostMapping("/load/schedule")
-    @AdminOnly
+    @AdminAuth
     public void loadSchedule(){
         scheduleInfoScheduler.loadToDB();
     }
@@ -33,7 +33,7 @@ public class AdminController {
      * <p>주기적으로 자동 업데이트되지만, 직접 업데이트할 수 있습니다. 처리에 시간이 좀 걸릴 수 있습니다.</p>
      */
     @PostMapping("/load/lecture")
-    @AdminOnly
+    @AdminAuth
     public void loadLecture(){
         lectureDumpScheduler.loadToDB();
     }

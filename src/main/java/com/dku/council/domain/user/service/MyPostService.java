@@ -45,7 +45,7 @@ public class MyPostService {
 
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> listMyCommentedPosts(Long userId, Pageable pageable, int bodySize) {
-        return commentRepository.findAllCommentedPostId(userId, pageable)
+        return commentRepository.findAllCommentByUserId(userId, pageable)
                 .map(post -> mapToListDto(post, bodySize));
     }
 

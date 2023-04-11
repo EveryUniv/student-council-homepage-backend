@@ -3,7 +3,7 @@ package com.dku.council.domain.comment.controller;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +23,7 @@ public class CommentController {
      * @param id 게시글 id
      */
     @PostMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void like(AppAuthentication auth, @PathVariable Long id) {
         likeService.like(id, auth.getUserId(), LikeTarget.COMMENT);
     }
@@ -35,7 +35,7 @@ public class CommentController {
      * @param id 게시글 id
      */
     @DeleteMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         likeService.cancelLike(id, auth.getUserId(), LikeTarget.COMMENT);
     }

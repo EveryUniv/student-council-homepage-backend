@@ -1,5 +1,6 @@
 package com.dku.council.global.auth.role;
 
+import com.dku.council.global.auth.jwt.AppAuthentication;
 import lombok.Getter;
 
 import java.util.Map;
@@ -25,6 +26,13 @@ public enum UserRole {
 
     public static UserRole of(String name) {
         return BY_LABEL.get(name);
+    }
+
+    public static UserRole from(AppAuthentication auth) {
+        if (auth == null) {
+            return GUEST;
+        }
+        return auth.getUserRole();
     }
 
     public boolean isAdmin() {

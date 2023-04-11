@@ -9,7 +9,7 @@ import com.dku.council.domain.user.service.SignupService;
 import com.dku.council.domain.user.service.UserFindService;
 import com.dku.council.domain.user.service.UserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -38,7 +38,7 @@ public class UserController {
      * @return 내 정보
      */
     @GetMapping
-    @UserOnly
+    @UserAuth
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
         return userService.getUserInfo(auth.getUserId());
     }
@@ -99,7 +99,7 @@ public class UserController {
      * @return 핸드폰 번호 재설정 토큰
      */
     @PostMapping("/change/phone/verify")
-    @UserOnly
+    @UserAuth
     public ResponseChangeTokenDto sendChangePhoneCodeBySMS(AppAuthentication auth, @Valid @RequestBody RequestWithPhoneNumberDto dto) {
         return userFindService.sendChangePhoneCodeBySMS(auth.getUserId(), dto.getPhoneNumber());
     }
@@ -111,7 +111,7 @@ public class UserController {
      * @param dto 요청 body
      */
     @PatchMapping("/change/phone")
-    @UserOnly
+    @UserAuth
     public void changePhoneNumber(AppAuthentication auth, @Valid @RequestBody RequestVerifyTokenCodeDto dto) {
         userFindService.changePhoneNumber(auth.getUserId(), dto.getToken(), dto.getCode());
     }
@@ -123,7 +123,7 @@ public class UserController {
      * @param dto 요청 body
      */
     @PatchMapping("/change/nickname")
-    @UserOnly
+    @UserAuth
     public void changeNickName(AppAuthentication auth, @Valid @RequestBody RequestNickNameChangeDto dto) {
         userService.changeNickName(auth.getUserId(), dto);
     }
@@ -134,7 +134,7 @@ public class UserController {
      * @param dto 요청 body
      */
     @PatchMapping("/change/password")
-    @UserOnly
+    @UserAuth
     public void changeExistPassword(AppAuthentication auth, @Valid @RequestBody RequestExistPasswordChangeDto dto) {
         userService.changePassword(auth.getUserId(), dto);
     }
@@ -181,7 +181,7 @@ public class UserController {
      * @return 재발급된 로그인 인증 정보
      */
     @PostMapping("/reissue")
-    @UserOnly
+    @UserAuth
     public ResponseRefreshTokenDto refreshToken(HttpServletRequest request,
                                                 @Valid @RequestBody RequestRefreshTokenDto dto) {
         return userService.refreshToken(request, dto.getRefreshToken());
@@ -199,7 +199,7 @@ public class UserController {
      * 내가 쓴 글 모두 조회하기
      */
     @GetMapping("/post")
-    @UserOnly
+    @UserAuth
     public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
                                                               @ParameterObject Pageable pageable,
                                                               @RequestParam(defaultValue = "50") int bodySize) {
@@ -212,7 +212,7 @@ public class UserController {
      * 내가 댓글 단 글들 모두 조회하기
      */
     @GetMapping("/post/commented")
-    @UserOnly
+    @UserAuth
     public ResponsePage<SummarizedGenericPostDto> listMyCommentedPosts(AppAuthentication auth,
                                                                        @ParameterObject Pageable pageable,
                                                                        @RequestParam(defaultValue = "50") int bodySize) {
@@ -225,7 +225,7 @@ public class UserController {
      * 내가 좋아요 한 글들 모두 조회하기
      */
     @GetMapping("/post/liked")
-    @UserOnly
+    @UserAuth
     public ResponsePage<SummarizedGenericPostDto> listMyLikedPosts(AppAuthentication auth,
                                                                    @ParameterObject Pageable pageable,
                                                                    @RequestParam(defaultValue = "50") int bodySize) {

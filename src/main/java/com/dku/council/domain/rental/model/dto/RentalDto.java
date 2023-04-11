@@ -13,7 +13,7 @@ public class RentalDto {
     @Schema(description = "아이디", example = "1")
     private final Long id;
 
-    @Schema(description = "대여 시각", example = "2022-03-01 11:31:11")
+    @Schema(description = "대여 시각")
     private final LocalDateTime rentalAt;
 
     @Schema(description = "대여자 구분")
@@ -31,10 +31,10 @@ public class RentalDto {
     @Schema(description = "대여자 이름", example = "이름")
     private final String lender;
 
-    @Schema(description = "대여 시작", example = "2022-03-01 11:31:11")
+    @Schema(description = "대여 시작")
     private final LocalDateTime rentalStart;
 
-    @Schema(description = "대여 종료", example = "2022-03-03 10:00:00")
+    @Schema(description = "대여 종료")
     private final LocalDateTime rentalEnd;
 
 

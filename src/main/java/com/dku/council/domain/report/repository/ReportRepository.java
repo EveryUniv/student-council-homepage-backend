@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
+
     boolean existsByUserIdAndPostId(Long userId, Long postId);
+
     Long countByPostId(Long postId);
 
     @Query("SELECT r FROM Report r " +

@@ -13,9 +13,10 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.post.GeneralForumService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -56,7 +57,7 @@ public class GeneralForumController {
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Page<SummarizedGenericPostDto> list = forumService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
+        Page<SummarizedGenericPostDto> list = forumService.list(keyword, tagIds, pageable, bodySize, UserRole.from(auth));
         return new ResponsePage<>(list);
     }
 
@@ -64,7 +65,7 @@ public class GeneralForumController {
      * 게시글 등록
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @UserOnly
+    @UserAuth
     public ResponseIdDto create(AppAuthentication auth,
                                 @Valid @ModelAttribute RequestCreateGeneralForumDto request) {
         Long postId = forumService.create(auth.getUserId(), request);
@@ -78,7 +79,7 @@ public class GeneralForumController {
      * @return 자유게시판 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseGeneralForumDto findOne(AppAuthentication auth,
                                            @PathVariable Long id,
                                            HttpServletRequest request) {
@@ -94,7 +95,7 @@ public class GeneralForumController {
      * @param id   삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         forumService.delete(id, auth.getUserId(), auth.isAdmin());
     }
@@ -106,7 +107,7 @@ public class GeneralForumController {
      * @param id 블라인드 처리할 게시글 id
      */
     @PatchMapping("/blind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void blind(@PathVariable Long id) {
         forumService.blind(id);
     }
@@ -118,7 +119,7 @@ public class GeneralForumController {
      * @param id 블라인드 해제할 게시글 id
      */
     @PatchMapping("/unblind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void unblind(@PathVariable Long id) {
         forumService.unblind(id);
     }
@@ -129,7 +130,7 @@ public class GeneralForumController {
      * @param postId 댓글 생성할 게시글 id
      */
     @GetMapping("/comment/{postId}")
-    @UserOnly
+    @UserAuth
     public ResponsePage<CommentDto> listComment(AppAuthentication auth,
                                                 @PathVariable Long postId,
                                                 @ParameterObject Pageable pageable) {
@@ -148,7 +149,7 @@ public class GeneralForumController {
      * @param commentDto 댓글 내용(text)
      */
     @PostMapping("/comment/{postId}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto createComment(AppAuthentication auth,
                                        @PathVariable Long postId,
                                        @Valid @RequestBody RequestCreateCommentDto commentDto) {
@@ -164,7 +165,7 @@ public class GeneralForumController {
      * @param commentDto 수정할 댓글 내용(text)
      */
     @PatchMapping("/comment/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto editComment(AppAuthentication auth,
                                      @PathVariable Long id,
                                      @Valid @RequestBody RequestCreateCommentDto commentDto) {
@@ -179,7 +180,7 @@ public class GeneralForumController {
      * @param id 댓글 id
      */
     @DeleteMapping("/comment/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseIdDto deleteComment(AppAuthentication auth, @PathVariable Long id) {
         Long deleteId = commentService.delete(id, auth.getUserId(), auth.isAdmin());
         return new ResponseIdDto(deleteId);
@@ -192,7 +193,7 @@ public class GeneralForumController {
      * @param id 게시글 id
      */
     @PostMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void like(AppAuthentication auth, @PathVariable Long id) {
         likeService.like(id, auth.getUserId(), LikeTarget.POST);
     }
@@ -204,7 +205,7 @@ public class GeneralForumController {
      * @param id 게시글 id
      */
     @DeleteMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }

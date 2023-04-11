@@ -19,8 +19,8 @@ public class ResponseSingleReportedPostDto {
     @Schema(description = "작성자", example = "작성자")
     private final String author;
 
-    @Schema(description = "생성 날짜")
-    private final LocalDateTime createdAt;
+    @Schema(description = "최초 신고 시각")
+    private final LocalDateTime firstReportAt;
 
     @Schema(description = "신고된 횟수", example = "2")
     private final int reportedCount;
@@ -35,7 +35,7 @@ public class ResponseSingleReportedPostDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.author = post.getDisplayingUsername();
-        this.createdAt = post.getCreatedAt();
+        this.firstReportAt = post.getCreatedAt();
         this.reportedCount = reportedCount;
         this.isBlinded = post.isBlinded();
         this.reportedCategory = reportedCategory;

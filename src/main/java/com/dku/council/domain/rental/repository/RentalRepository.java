@@ -24,13 +24,15 @@ public interface RentalRepository extends JpaRepository<Rental, Long>, JpaSpecif
             "where r.id=:id and r.isActive=true")
     Optional<Rental> findById(Long id);
 
-    @Query("select r from Rental r " +
+    @Query(value = "select r from Rental r " +
             "join fetch r.item " +
             "join fetch r.user " +
-            "where r.item.id=:itemId and r.isActive=true")
+            "where r.item.id=:itemId and r.isActive=true",
+            countQuery = "select count(r) from Rental r " +
+                    "where r.item.id=:itemId and r.isActive=true")
     Page<Rental> findAllByItemId(Long itemId, Pageable pageable);
 
     @Override
-    @EntityGraph(attributePaths = {"user"})
+    @EntityGraph(attributePaths = {"user", "item"})
     Page<Rental> findAll(Specification<Rental> spec, Pageable pageable);
 }

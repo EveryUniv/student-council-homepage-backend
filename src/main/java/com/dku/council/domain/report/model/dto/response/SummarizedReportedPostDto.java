@@ -17,8 +17,8 @@ public class SummarizedReportedPostDto {
     @Schema(description = "작성자", example = "익명")
     private final String author;
 
-    @Schema(description = "생성 날짜")
-    private final LocalDateTime createdAt;
+    @Schema(description = "최초 신고 시각")
+    private final LocalDateTime firstReportAt;
 
     @Schema(description = "신고된 횟수", example = "2")
     private final int reportedCount;
@@ -30,7 +30,7 @@ public class SummarizedReportedPostDto {
         this.id = report.getPost().getId();
         this.title = report.getPost().getTitle();
         this.author = report.getPost().getDisplayingUsername();
-        this.createdAt = report.getPost().getCreatedAt();
+        this.firstReportAt = report.getPost().getCreatedAt();
         this.reportedCount = report.getPost().getReportedCount();
         this.isBlinded = report.getPost().isBlinded();
     }
