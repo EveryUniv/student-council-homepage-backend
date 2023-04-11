@@ -13,4 +13,5 @@ public class ResponseUserInfoDto {
     private final String yearOfAdmission;
     private final String major;
     private final String department;
+    private final boolean admin;
 }

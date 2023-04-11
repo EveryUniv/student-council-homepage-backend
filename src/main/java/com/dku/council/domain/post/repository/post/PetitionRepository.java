@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.repository;
+package com.dku.council.domain.post.repository.post;
 
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import org.springframework.data.jpa.repository.Modifying;

@@ -3,8 +3,8 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.GenericPostRepository;
-import com.dku.council.domain.statistic.PetitionStatistic;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
+import com.dku.council.domain.statistic.model.entity.PetitionStatistic;
 import com.dku.council.domain.statistic.repository.PetitionStatisticRepository;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
@@ -226,13 +226,13 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
     @DisplayName("통계 응답 확인")
     void agreeCommentOver150AndStatistic() throws Exception {
         // given
-        List<User> users1 = UserMock.createList(major, 50);
+        List<User> users1 = UserMock.createList(major, 60);
         List<User> users2 = UserMock.createList(major2, 50);
         List<User> users = Stream.concat(users1.stream(), users2.stream())
                 .collect(Collectors.toList());
         users = userRepository.saveAll(users);
 
-        List<PetitionStatistic> agreeComments = PetitionStatisticMock.createList(petition, users, 100);
+        List<PetitionStatistic> agreeComments = PetitionStatisticMock.createList(petition, users, 110);
         petitionStatisticRepository.saveAll(agreeComments);
 
         // when
@@ -250,9 +250,9 @@ class PetitionControllerTest extends AbstractContainerRedisTest {
                 .andExpect(jsonPath("mine", is(true)))
                 .andExpect(jsonPath("expiresAt", is(expiresAt)))
                 .andExpect(jsonPath("status", is(PetitionStatus.ACTIVE.name())))
-                .andExpect(jsonPath("agreeCount", is(100)))
+                .andExpect(jsonPath("agreeCount", is(110)))
                 .andExpect(jsonPath("statisticList.size()", is(2)))
-                .andExpect(jsonPath("statisticList[0].agreeCount", is(50)))
+                .andExpect(jsonPath("statisticList[0].agreeCount", is(60)))
                 .andExpect(jsonPath("statisticList[0].department", is(major.getDepartment())))
                 .andExpect(jsonPath("statisticList[1].agreeCount", is(50)))
                 .andExpect(jsonPath("statisticList[1].department", is(major2.getDepartment())));

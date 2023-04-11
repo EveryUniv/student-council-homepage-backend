@@ -26,6 +26,10 @@ public class LectureTemplate extends BaseEntity {
     @Column(name = "lec_id")
     private Long id;
 
+    private String major;
+
+    private int grade;
+
     private String lectureId;
 
     private String category;
@@ -42,8 +46,10 @@ public class LectureTemplate extends BaseEntity {
 
 
     @Builder
-    private LectureTemplate(String lectureId, String category, String name, String professor,
-                            Integer classNumber, Integer credit, String timesJson) {
+    private LectureTemplate(String major, int grade, String lectureId, String category, String name,
+                            String professor, Integer classNumber, Integer credit, String timesJson) {
+        this.major = major;
+        this.grade = grade;
         this.lectureId = lectureId;
         this.category = category;
         this.name = name;

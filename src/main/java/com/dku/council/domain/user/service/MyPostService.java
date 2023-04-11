@@ -5,7 +5,7 @@ import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.repository.PostRepository;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

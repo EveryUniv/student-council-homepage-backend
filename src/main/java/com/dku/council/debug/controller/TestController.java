@@ -1,5 +1,6 @@
-package com.dku.council.debug;
+package com.dku.council.debug.controller;
 
+import com.dku.council.debug.service.ErrorLogService;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyPhoneException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
@@ -9,7 +10,6 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +28,7 @@ public class TestController {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ErrorLogService errorLogService;
 
     /**
      * 학번으로 유저 삭제.
@@ -80,10 +81,14 @@ public class TestController {
                 .major(major)
                 .yearOfAdmission(yearOfAdmission)
                 .academicStatus("재학")
-                .duesStatus(StudentDuesStatus.PAID)
                 .phone(phone)
                 .build();
 
         userRepository.save(user);
+    }
+
+    @GetMapping(value = "/error/{trackingId}", produces = "text/plain;charset=UTF-8")
+    public String findError(@PathVariable String trackingId) {
+        return errorLogService.findErrorLog(trackingId);
     }
 }

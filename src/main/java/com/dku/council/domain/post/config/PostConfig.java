@@ -2,7 +2,7 @@ package com.dku.council.domain.post.config;
 
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.entity.posttype.*;
-import com.dku.council.domain.post.repository.*;
+import com.dku.council.domain.post.repository.post.*;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.tag.service.TagService;

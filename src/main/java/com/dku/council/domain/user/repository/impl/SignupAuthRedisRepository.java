@@ -15,15 +15,18 @@ import java.util.Optional;
 @Repository
 public class SignupAuthRedisRepository extends AbstractKeyValueCacheRepository implements SignupAuthRepository {
 
+    private final Duration cacheDuration;
+
     protected SignupAuthRedisRepository(StringRedisTemplate redisTemplate,
                                         ObjectMapper objectMapper,
                                         @Value("${app.auth.signup-expires}") Duration cacheDuration) {
-        super(redisTemplate, objectMapper, cacheDuration, RedisKeys.SIGNUP_AUTH_KEY);
+        super(redisTemplate, objectMapper, RedisKeys.SIGNUP_AUTH_KEY);
+        this.cacheDuration = cacheDuration;
     }
 
     public void setAuthPayload(String signupToken, String authName, Object data, Instant now) {
         String key = makeEntryKey(signupToken, authName);
-        set(key, data, now);
+        set(key, data, now, cacheDuration);
     }
 
     public <T> Optional<T> getAuthPayload(String signupToken, String authName, Class<T> clazz, Instant now) {
