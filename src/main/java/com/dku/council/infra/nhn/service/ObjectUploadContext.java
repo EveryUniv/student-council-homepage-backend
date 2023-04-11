@@ -13,6 +13,17 @@ public class ObjectUploadContext {
     @Value("${nhn.os.api-path}")
     private final String apiPath;
 
+    @Value("${app.post.thumbnail.default}")
+    private final String defaultThumbnailId;
+
+
+    public String getThumbnailUrl(String thumbnailId) {
+        if (thumbnailId == null || thumbnailId.isBlank()) {
+            return getObjectUrl(defaultThumbnailId);
+        } else {
+            return getObjectUrl(thumbnailId);
+        }
+    }
 
     public String getObjectUrl(String objectName) {
         return String.format(apiPath, objectName);

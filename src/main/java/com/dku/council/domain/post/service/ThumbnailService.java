@@ -24,13 +24,10 @@ public class ThumbnailService {
     @Value("${app.post.thumbnail.size}")
     private final int size;
 
-    @Value("${app.post.thumbnail.default}")
-    private final String defaultFileId;
-
 
     public String createThumbnail(FileUploadService.Context uploadCtx, UploadedFile file) {
         if (!file.getMimeType().getType().equalsIgnoreCase("image")) {
-            return defaultFileId;
+            return null;
         }
 
         try {
@@ -56,6 +53,6 @@ public class ThumbnailService {
             e.printStackTrace();
         }
 
-        return defaultFileId;
+        return null;
     }
 }

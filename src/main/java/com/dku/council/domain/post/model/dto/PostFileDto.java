@@ -32,7 +32,7 @@ public class PostFileDto {
     public PostFileDto(ObjectUploadContext context, PostFile file) {
         this.id = file.getId();
         this.url = context.getObjectUrl(file.getFileId());
-        this.thumbnailUrl = context.getObjectUrl(file.getThumbnailId());
+        this.thumbnailUrl = context.getThumbnailUrl(file.getThumbnailId());
         this.originalName = file.getFileName();
 
         String fileMimeType = file.getMimeType();
