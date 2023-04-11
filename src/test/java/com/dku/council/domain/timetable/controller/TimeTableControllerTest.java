@@ -1,5 +1,6 @@
 package com.dku.council.domain.timetable.controller;
 
+import com.dku.council.debug.service.ErrorLogService;
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(TimeTableController.class)
+@WebMvcTest({TimeTableController.class, ErrorLogService.class})
 class TimeTableControllerTest extends AbstractAuthControllerTest {
 
     @MockBean
@@ -75,7 +76,6 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 new RequestScheduleDto(3L, "", "", List.of(), "color3")
         );
     }
-
 
 
     @Test
