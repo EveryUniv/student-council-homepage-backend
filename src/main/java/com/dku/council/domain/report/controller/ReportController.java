@@ -7,8 +7,8 @@ import com.dku.council.domain.report.model.dto.response.ResponseSingleReportedPo
 import com.dku.council.domain.report.model.dto.response.SummarizedReportedPostDto;
 import com.dku.council.domain.report.service.ReportService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.AdminAuth;
+import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -33,7 +33,7 @@ public class ReportController {
      * @param dto 신고 카테고리 id
      */
     @PostMapping("{id}")
-    @UserOnly
+    @UserAuth
     public void report(@PathVariable Long id, AppAuthentication auth, RequestCreateReportDto dto) {
         reportService.report(id, auth.getUserId(), dto);
     }
@@ -52,7 +52,7 @@ public class ReportController {
      * @param pageable 페이징 정보
      */
     @GetMapping
-    @AdminOnly
+    @AdminAuth
     public ResponsePage<SummarizedReportedPostDto> getReportedPosts(@ParameterObject Pageable pageable) {
         Page<SummarizedReportedPostDto> reportedPosts = reportService.getReportedPosts(pageable);
         return new ResponsePage<>(reportedPosts);
@@ -62,7 +62,7 @@ public class ReportController {
      * 신고된 게시글 상세 조회 (Admin)
      */
     @GetMapping("/{id}")
-    @AdminOnly
+    @AdminAuth
     public ResponseSingleReportedPostDto getReportedPost(AppAuthentication auth, @PathVariable Long id) {
         return reportService.getReportedPost(auth.getUserId(), id);
     }

@@ -6,9 +6,9 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.service.post.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,7 +53,7 @@ public class RuleController {
      * @return 게시글 id
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @AdminOnly
+    @AdminAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateRuleDto request) {
         Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -66,7 +66,7 @@ public class RuleController {
      * @return 회칙 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
@@ -80,7 +80,7 @@ public class RuleController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @AdminOnly
+    @AdminAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
     }

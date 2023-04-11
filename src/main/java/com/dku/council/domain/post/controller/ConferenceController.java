@@ -5,7 +5,7 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.post.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -50,7 +50,7 @@ public class ConferenceController {
      * @return 생성된 게시글 id
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @AdminOnly
+    @AdminAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
         Long postId = service.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -62,7 +62,7 @@ public class ConferenceController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @AdminOnly
+    @AdminAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         service.delete(id, auth.getUserId(), auth.isAdmin());
     }

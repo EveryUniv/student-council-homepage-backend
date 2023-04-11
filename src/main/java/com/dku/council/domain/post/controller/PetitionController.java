@@ -9,9 +9,9 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,7 +66,7 @@ public class PetitionController {
      * @return 생성된 게시글 id
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @UserOnly
+    @UserAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreatePetitionDto request) {
         Long postId = petitionService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -79,7 +79,7 @@ public class PetitionController {
      * @return 청원 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public ResponsePetitionDto findOne(AppAuthentication auth,
                                        @PathVariable Long id,
                                        HttpServletRequest request) {
@@ -94,7 +94,7 @@ public class PetitionController {
      * @param id 블라인드 처리할 게시글 id
      */
     @PatchMapping("/blind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void blind(@PathVariable Long id) {
         petitionService.blind(id);
     }
@@ -106,7 +106,7 @@ public class PetitionController {
      * @param id 블라인드 해제할 게시글 id
      */
     @PatchMapping("/unblind/{id}")
-    @AdminOnly
+    @AdminAuth
     public void unblind(@PathVariable Long id) {
         petitionService.unblind(id);
     }
@@ -118,7 +118,7 @@ public class PetitionController {
      * @param dto    요청 body
      */
     @PostMapping("/reply/{postId}")
-    @AdminOnly
+    @AdminAuth
     public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
         petitionService.reply(postId, dto.getAnswer());
@@ -130,7 +130,7 @@ public class PetitionController {
      * @param postId 동의할 게시글 id
      */
     @PostMapping("/agree/{postId}")
-    @UserOnly
+    @UserAuth
     public void agreePetition(AppAuthentication auth,
                               @PathVariable Long postId) {
         petitionService.agreePetition(postId, auth.getUserId());
@@ -144,7 +144,7 @@ public class PetitionController {
      * @param id 게시글 id
      */
     @PostMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void like(AppAuthentication auth, @PathVariable Long id) {
         likeService.like(id, auth.getUserId(), POST);
     }
@@ -156,7 +156,7 @@ public class PetitionController {
      * @param id 게시글 id
      */
     @DeleteMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         likeService.cancelLike(id, auth.getUserId(), POST);
     }

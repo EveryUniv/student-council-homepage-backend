@@ -9,7 +9,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.service.post.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,7 +58,7 @@ public class NewsController {
      * 게시글 등록
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @UserOnly
+    @UserAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
         Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -71,7 +71,7 @@ public class NewsController {
      * @return 총학소식 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
@@ -85,7 +85,7 @@ public class NewsController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @UserOnly
+    @UserAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
@@ -97,7 +97,7 @@ public class NewsController {
      * @param id 게시글 id
      */
     @PostMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void like(AppAuthentication auth, @PathVariable Long id) {
         likeService.like(id, auth.getUserId(), POST);
     }
@@ -109,7 +109,7 @@ public class NewsController {
      * @param id 게시글 id
      */
     @DeleteMapping("/like/{id}")
-    @UserOnly
+    @UserAuth
     public void cancelLike(AppAuthentication auth, @PathVariable Long id) {
         likeService.cancelLike(id, auth.getUserId(), LikeTarget.POST);
     }
