@@ -33,10 +33,9 @@ public class Report extends BaseEntity {
     private ReportCategory reportCategory;
 
     @Builder
-    public Report(User user, Post post, ReportCategory reportCategory) {
+    private Report(User user, Post post, ReportCategory reportCategory) {
         this.user = user;
         this.post = post;
         this.reportCategory = reportCategory;
     }
-
 }

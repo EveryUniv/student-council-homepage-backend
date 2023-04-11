@@ -62,10 +62,6 @@ public class User extends BaseEntity {
     @Enumerated(STRING)
     private UserRole userRole;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Report> reports = new ArrayList<>();
-
-
     @Builder
     private User(@NonNull String studentId,
                  @NonNull String password,
@@ -117,7 +113,4 @@ public class User extends BaseEntity {
         this.duesStatus = duesStatus;
     }
 
-    public boolean isAdmin() {
-        return this.userRole == UserRole.ADMIN;
-    }
 }

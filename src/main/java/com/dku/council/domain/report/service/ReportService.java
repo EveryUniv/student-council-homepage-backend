@@ -63,20 +63,16 @@ public class ReportService {
     }
     public List<ResponseReportCategoryListDto> getCategoryNames() {
         List<ReportCategory> categories = Arrays.asList(ReportCategory.values());
-        return categories.stream().map(ResponseReportCategoryListDto::new).collect(Collectors.toList());
+        return categories.stream().map(category -> new ResponseReportCategoryListDto(category, messageSource)).collect(Collectors.toList());
     }
 
-    public Page<SummarizedReportedPostDto> getReportedPosts(Long userId, Pageable pageable) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if(!user.isAdmin()){
-            throw new UserNotFoundException();
-        }
+    public Page<SummarizedReportedPostDto> getReportedPosts(Pageable pageable) {
         return reportRepository.findAllReportedPosts(pageable).map(SummarizedReportedPostDto::new);
     }
 
     public ResponseSingleReportedPostDto getReportedPost(Long userId ,Long postId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if(!user.isAdmin()){
+        if(!user.getUserRole().isAdmin()){
             throw new UserNotFoundException();
         }
 

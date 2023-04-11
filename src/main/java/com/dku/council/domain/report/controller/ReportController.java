@@ -55,9 +55,8 @@ public class ReportController {
      */
     @GetMapping
     @AdminOnly
-    public ResponsePage<SummarizedReportedPostDto> getReportedPosts(AppAuthentication auth,
-                                                                    @ParameterObject Pageable pageable) {
-        Page<SummarizedReportedPostDto> reportedPosts = reportService.getReportedPosts(auth.getUserId(), pageable);
+    public ResponsePage<SummarizedReportedPostDto> getReportedPosts(@ParameterObject Pageable pageable) {
+        Page<SummarizedReportedPostDto> reportedPosts = reportService.getReportedPosts(pageable);
         return new ResponsePage<>(reportedPosts);
     }
 

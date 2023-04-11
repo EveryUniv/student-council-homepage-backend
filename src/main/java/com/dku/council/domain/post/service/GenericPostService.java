@@ -73,7 +73,7 @@ public class GenericPostService<E extends Post> {
         }
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if(user.isAdmin()) {
+        if(user.getUserRole().isAdmin()) {
             spec = spec.and(PostSpec.withActiveOrBlinded());
         }else {
             spec = spec.and(PostSpec.withActive());
@@ -158,10 +158,9 @@ public class GenericPostService<E extends Post> {
     @Transactional(readOnly = true)
     public E findPost(Long postId, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if(user.isAdmin()){
-            return postRepository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        if(user.getUserRole().isAdmin()){
+            return postRepository.findActiveAndBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
         }
-        //TODO admin인 경우는 blind된 게시글도 보여줘야함(active 또는 blind만)
         return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
     }
 

@@ -1,17 +1,11 @@
 package com.dku.council.domain.report.repository;
 
-import com.dku.council.domain.report.model.dto.response.SummarizedReportedPostDto;
 import com.dku.council.domain.report.model.entity.Report;
-import com.dku.council.domain.report.model.entity.ReportCategory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
     boolean existsByUserIdAndPostId(Long userId, Long postId);

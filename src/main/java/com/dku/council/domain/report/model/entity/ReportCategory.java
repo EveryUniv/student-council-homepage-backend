@@ -7,29 +7,19 @@ import java.util.Locale;
 
 public enum ReportCategory {
 
-    PROFANITY(0),
+    PROFANITY,
 
-    FISHING(1),
+    FISHING,
 
-    ADVERTISEMENT(2),
+    ADVERTISEMENT,
 
-    POLITICS(3),
+    POLITICS,
 
-    PORNOGRAPHY(4),
+    PORNOGRAPHY,
 
-    INAPPROPRIATE_CONTENT(5),
+    INAPPROPRIATE_CONTENT,
 
-    FRAUD(6);
-
-    private final int id;
-
-    ReportCategory(int id) {
-        this.id = id;
-    }
-
-    public int getId() {
-        return id;
-    }
+    FRAUD;
 
     public String getName(MessageSource messageSource) {
         Locale locale = LocaleContextHolder.getLocale();

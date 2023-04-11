@@ -17,6 +17,9 @@ public interface GenericPostRepository<T extends Post> extends JpaRepository<T, 
     @Query("select p from Post p where p.id=:id and p.status='ACTIVE'")
     Optional<T> findById(Long id);
 
+    @Query("select p from Post p where p.id=:id and (p.status='BLINDED' or p.status='ACTIVE')")
+    Optional<T> findActiveAndBlindedPostById(Long id);
+
     @Query("select p from Post p where p.id=:id and p.status='BLINDED'")
     Optional<T> findBlindedPostById(Long id);
 
