@@ -6,7 +6,6 @@ import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalItemNotFoundException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
-import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestCreateRentalDto;
 import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
@@ -35,10 +34,16 @@ public class RentalService {
     private final RentalItemRepository rentalItemRepository;
 
 
-    public ResponsePage<SummarizedRentalDto> list(Specification<Rental> spec, Pageable pageable) {
+    public ResponsePage<RentalDto> list(Specification<Rental> spec, Pageable pageable) {
         spec = RentalSpec.withRentalActive().and(spec);
-        Page<SummarizedRentalDto> page = rentalRepository.findAll(spec, pageable)
-                .map(SummarizedRentalDto::new);
+        Page<RentalDto> page = rentalRepository.findAll(spec, pageable)
+                .map(RentalDto::new);
+        return new ResponsePage<>(page);
+    }
+
+    public ResponsePage<RentalDto> list(Long productId, Pageable pageable) {
+        Page<RentalDto> page = rentalRepository.findAllByItemId(productId, pageable)
+                .map(RentalDto::new);
         return new ResponsePage<>(page);
     }
 
