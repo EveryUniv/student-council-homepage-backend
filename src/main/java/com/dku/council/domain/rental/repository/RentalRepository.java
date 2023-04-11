@@ -25,8 +25,6 @@ public interface RentalRepository extends JpaRepository<Rental, Long>, JpaSpecif
     Optional<Rental> findById(Long id);
 
     @Query("select r from Rental r " +
-            "join fetch r.item " +
-            "join fetch r.user " +
             "where r.item.id=:itemId and r.isActive=true")
     Page<Rental> findAllByItemId(Long itemId, Pageable pageable);
 

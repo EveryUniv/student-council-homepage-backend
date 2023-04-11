@@ -12,7 +12,6 @@ import com.dku.council.global.auth.role.UserOnly;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
-import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +25,6 @@ import java.util.List;
 public class ReportController {
 
     private final ReportService reportService;
-    private final MessageSource messageSource;
 
     /**
      * 게시글 신고
@@ -49,7 +47,7 @@ public class ReportController {
     }
 
     /**
-     * 신고된 게시글 목록 조회
+     * 신고된 게시글 목록 조회 (Admin)
      *
      * @param pageable 페이징 정보
      */
@@ -61,7 +59,7 @@ public class ReportController {
     }
 
     /**
-     * 신고된 게시글 상세 조회
+     * 신고된 게시글 상세 조회 (Admin)
      */
     @GetMapping("/{id}")
     @AdminOnly

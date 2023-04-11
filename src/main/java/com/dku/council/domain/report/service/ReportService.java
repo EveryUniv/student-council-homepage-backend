@@ -42,6 +42,7 @@ public class ReportService {
 
     @Value("${app.report.count}")
     private final int REPORT_COUNT;
+
     @Transactional
     public void report(Long postId, Long userId, RequestCreateReportDto dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
@@ -50,31 +51,35 @@ public class ReportService {
         if (reportRepository.existsByUserIdAndPostId(user.getId(), post.getId())) {
             throw new AlreadyReportedException();
         }
-        if(post.getUser().getUserRole().isAdmin()){
+
+        if (post.getUser().getUserRole().isAdmin()) {
             throw new PostedByAdminException();
-        }else if(post.getUser().getId().equals(user.getId())){
+        } else if (post.getUser().getId().equals(user.getId())) {
             throw new CannotReportMineException();
         }
-        Report report = dto.toEntity(user, post);
 
+        Report report = dto.toEntity(user, post);
         reportRepository.save(report);
 
-        if(reportRepository.countByPostId(postId) >= REPORT_COUNT) {
+        if (reportRepository.countByPostId(postId) >= REPORT_COUNT) {
             post.blind();
         }
     }
+
     public List<ResponseReportCategoryListDto> getCategoryNames() {
         List<ReportCategory> categories = Arrays.asList(ReportCategory.values());
-        return categories.stream().map(category -> new ResponseReportCategoryListDto(category, messageSource)).collect(Collectors.toList());
+        return categories.stream()
+                .map(category -> new ResponseReportCategoryListDto(category, messageSource))
+                .collect(Collectors.toList());
     }
 
     public Page<SummarizedReportedPostDto> getReportedPosts(Pageable pageable) {
         return reportRepository.findAllReportedPosts(pageable).map(SummarizedReportedPostDto::new);
     }
 
-    public ResponseSingleReportedPostDto getReportedPost(Long userId ,Long postId) {
+    public ResponseSingleReportedPostDto getReportedPost(Long userId, Long postId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if(!user.getUserRole().isAdmin()){
+        if (!user.getUserRole().isAdmin()) {
             throw new UserNotFoundException();
         }
 
@@ -84,13 +89,13 @@ public class ReportService {
         List<ResponseReportCategoryCountDto> categories = new ArrayList<>();
         for (ReportCategory category : ReportCategory.values()) {
             long count = reports.stream().filter(report -> report.getReportCategory() == category).count();
-            if(count != 0) {
+            if (count != 0) {
                 categories.add(new ResponseReportCategoryCountDto(category.getName(messageSource), count));
             }
         }
 
 
         int reportedCount = reportRepository.countByPostId(postId).intValue();
-        return new ResponseSingleReportedPostDto(post, reportedCount ,categories);
+        return new ResponseSingleReportedPostDto(post, reportedCount, categories);
     }
 }
