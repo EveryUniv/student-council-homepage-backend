@@ -3,7 +3,7 @@ package com.dku.council.domain.report.service;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReportDto;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.repository.PostRepository;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.report.exception.AlreadyReportedException;
 import com.dku.council.domain.report.exception.CannotReportMineException;
 import com.dku.council.domain.report.exception.PostedByAdminException;
