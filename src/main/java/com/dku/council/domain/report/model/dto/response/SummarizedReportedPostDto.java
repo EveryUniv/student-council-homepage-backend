@@ -17,7 +17,7 @@ public class SummarizedReportedPostDto {
     @Schema(description = "작성자", example = "익명")
     private final String author;
 
-    @Schema(description = "최초 신고 시각", example = "2021-01-01 01:10:10")
+    @Schema(description = "최초 신고 시각")
     private final LocalDateTime firstReportAt;
 
     @Schema(description = "신고된 횟수", example = "2")

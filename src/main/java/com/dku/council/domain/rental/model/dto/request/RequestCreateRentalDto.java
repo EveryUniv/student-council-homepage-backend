@@ -21,11 +21,11 @@ public class RequestCreateRentalDto {
     private final RentalUserClass userClass;
 
     @NotNull
-    @Schema(description = "사용 시작 시각", example = "2021-01-01 01:10:10")
+    @Schema(description = "사용 시작 시각")
     private final LocalDateTime rentalStart;
 
     @NotNull
-    @Schema(description = "사용 종료 시각", example = "2021-01-01 01:10:10")
+    @Schema(description = "사용 종료 시각")
     private final LocalDateTime rentalEnd;
 
     @NotNull
