@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.service;
+package com.dku.council.domain.post.service.post;
 
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
@@ -10,56 +10,55 @@ import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
+import com.dku.council.domain.post.service.ThumbnailService;
+import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
+import com.dku.council.infra.nhn.model.FileRequest;
+import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- * 기본 기능만 제공하는 게시판을 대상으로 하는 서비스입니다.
- * 기본 기능은 제목, 본문, 댓글, 파일, 태그를 포함한 게시판을 의미합니다.
- * 왠만한 게시판들은 이 서비스로 커버가 가능합니다. 복잡한 조회, 생성, 비즈니스 로직이 포함된 게시판은
- * 이걸 사용하지말고 따로 만드는 게 낫습니다.
- * 이걸 사용하려면, 반드시 Bean에 등록되어있어야 합니다. (PostConfig)
- *
- * @param <E> Entity 타입
- */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+@Service
 @RequiredArgsConstructor
 public class GenericPostService<E extends Post> {
 
-    protected final GenericPostRepository<E> postRepository;
     protected final UserRepository userRepository;
     protected final TagService tagService;
     protected final ViewCountService viewCountService;
-    protected final FileUploadService fileUploadService;
     protected final LikeService likeService;
 
-    /**
-     * 게시글 목록으로 조회
-     *
-     * @param spec     검색 방법
-     * @param pageable 페이징 방법
-     * @return 페이징된 목록
-     */
+    protected final FileUploadService fileUploadService;
+    protected final ObjectUploadContext uploadContext;
+    protected final ThumbnailService thumbnailService;
 
 
     @Transactional(readOnly = true)
-    public Page<SummarizedGenericPostDto> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId) {
-        Page<E> result = list(spec, pageable, userId);
+    public Page<SummarizedGenericPostDto> list(GenericPostRepository<E> repository, Specification<E> spec,
+                                               Pageable pageable, int bodySize, UserRole role) {
+        Page<E> result = list(repository, spec, pageable, role);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
-    public <T> Page<T> list(Specification<E> spec, Pageable pageable, int bodySize, Long userId,
-                            PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(spec, pageable, userId);
+    public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
+                            UserRole role, PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
+        Page<E> result = list(repository, spec, pageable, role);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -67,23 +66,23 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(Specification<E> spec, Pageable pageable, Long userId) {
+    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, UserRole role) {
         if (spec == null) {
             spec = Specification.where(null);
         }
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
-        if(user.getUserRole().isAdmin()) {
+        if (role.isAdmin()) {
             spec = spec.and(PostSpec.withActiveOrBlinded());
-        }else {
+        } else {
             spec = spec.and(PostSpec.withActive());
         }
-        return postRepository.findAll(spec, pageable);
+
+        return repository.findAll(spec, pageable);
     }
 
     private SummarizedGenericPostDto makeListDto(int bodySize, E post) {
         int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
-        return new SummarizedGenericPostDto(fileUploadService.getBaseURL(), bodySize, likes, post);
+        return new SummarizedGenericPostDto(uploadContext, bodySize, likes, post);
     }
 
     /**
@@ -93,17 +92,42 @@ public class GenericPostService<E extends Post> {
      * @param dto    게시글 dto
      */
     @Transactional
-    public Long create(Long userId, RequestCreateGenericPostDto<E> dto) {
+    public Long create(GenericPostRepository<E> repository, Long userId, RequestCreateGenericPostDto<E> dto) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         E post = dto.toEntity(user);
         tagService.addTagsToPost(post, dto.getTagIds());
 
-        fileUploadService.uploadFiles(dto.getFiles(), post.getClass().getSimpleName())
-                .forEach((file) -> new PostFile(file).changePost(post));
+        attachFiles(dto.getFiles(), post);
 
-        E savedPost = postRepository.save(post);
+        E savedPost = repository.save(post);
         return savedPost.getId();
+    }
+
+    private void attachFiles(List<MultipartFile> dtoFiles, E post) {
+        List<UploadedFile> files = fileUploadService.newContext().uploadFiles(
+                FileRequest.ofList(dtoFiles),
+                post.getClass().getSimpleName());
+
+        FileUploadService.Context uploadCtx = fileUploadService.newContext();
+        List<PostFile> postFiles = new ArrayList<>();
+
+        for (UploadedFile file : files) {
+            PostFile.PostFileBuilder builder = PostFile.builder()
+                    .fileName(file.getOriginalName())
+                    .mimeType(file.getMimeType().toString())
+                    .fileId(file.getFileId());
+
+            String thumbnailId = thumbnailService.createThumbnail(uploadCtx, file);
+            if (thumbnailId != null) {
+                builder.thumbnailId(thumbnailId);
+            }
+            postFiles.add(builder.build());
+        }
+
+        for (PostFile file : postFiles) {
+            file.changePost(post);
+        }
     }
 
     /**
@@ -115,15 +139,16 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 정보
      */
     @Transactional
-    public ResponseSingleGenericPostDto findOne(Long postId, Long userId, String remoteAddress) {
-        E post = viewPost(postId, userId, remoteAddress);
+    public ResponseSingleGenericPostDto findOne(GenericPostRepository<E> repository, Long postId, Long userId,
+                                                UserRole role, String remoteAddress) {
+        E post = viewPost(repository, postId, remoteAddress, role);
         return makePostDto(userId, post);
     }
 
     @Transactional
-    public <T> T findOne(Long postId, Long userId, String remoteAddress,
-                         PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
-        E post = viewPost(postId, userId, remoteAddress);
+    public <T> T findOne(GenericPostRepository<E> repository, Long postId, Long userId, UserRole role,
+                         String remoteAddress, PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
+        E post = viewPost(repository, postId, remoteAddress, role);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
         return mapper.map(dto, post);
     }
@@ -132,7 +157,7 @@ public class GenericPostService<E extends Post> {
         int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
         boolean isMine = post.getUser().getId().equals(userId);
         boolean isLiked = likeService.isLiked(post.getId(), userId, LikeTarget.POST);
-        return new ResponseSingleGenericPostDto(fileUploadService.getBaseURL(), likes, isMine, isLiked, post);
+        return new ResponseSingleGenericPostDto(uploadContext, likes, isMine, isLiked, post);
     }
 
     /**
@@ -143,8 +168,8 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    public E viewPost(Long postId, Long userId, String remoteAddress) {
-        E post = findPost(postId, userId);
+    public E viewPost(GenericPostRepository<E> repository, Long postId, String remoteAddress, UserRole role) {
+        E post = findPost(repository, postId, role);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
     }
@@ -152,30 +177,34 @@ public class GenericPostService<E extends Post> {
     /**
      * post를 가져옵니다.
      *
-     * @param postId 조회할 게시글 id
+     * @param repository 조회할 게시글 repository
+     * @param postId     조회할 게시글 id
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    public E findPost(Long postId, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        if(user.getUserRole().isAdmin()){
-            return postRepository.findActiveAndBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+    public E findPost(GenericPostRepository<E> repository, Long postId, UserRole role) {
+        Optional<E> post;
+        if (role.isAdmin()) {
+            post = repository.findWithBlindedById(postId);
+        } else {
+            post = repository.findById(postId);
         }
-        return postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+        return post.orElseThrow(PostNotFoundException::new);
     }
 
 
     /**
      * 게시글 삭제. 실제 DB에서 삭제처리되지 않고 표시만 해둔다.
      *
-     * @param postId      게시글 id
-     * @param userId      삭제하는 사용자 id
-     * @param isUserAdmin 사용자가 Admin인지?
+     * @param repository 게시글 repository
+     * @param postId     게시글 id
+     * @param userId     삭제하는 사용자 id
+     * @param isAdmin    사용자가 Admin인지?
      */
     @Transactional
-    public void delete(Long postId, Long userId, boolean isUserAdmin) {
-        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
-        if (isUserAdmin) {
+    public void delete(GenericPostRepository<E> repository, Long postId, Long userId, boolean isAdmin) {
+        E post = repository.findById(postId).orElseThrow(PostNotFoundException::new);
+        if (isAdmin) {
             post.markAsDeleted(true);
         } else if (post.getUser().getId().equals(userId)) {
             post.markAsDeleted(false);
@@ -190,8 +219,8 @@ public class GenericPostService<E extends Post> {
      * @param postId 게시글 id
      */
     @Transactional
-    public void blind(Long postId) {
-        E post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+    public void blind(GenericPostRepository<E> repository, Long postId) {
+        E post = repository.findById(postId).orElseThrow(PostNotFoundException::new);
         post.blind();
     }
 
@@ -201,8 +230,8 @@ public class GenericPostService<E extends Post> {
      * @param postId 게시글 id
      */
     @Transactional
-    public void unblind(Long postId) {
-        E post = postRepository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+    public void unblind(GenericPostRepository<E> repository, Long postId) {
+        E post = repository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
         post.unblind();
     }
 

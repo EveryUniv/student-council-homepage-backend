@@ -3,6 +3,7 @@ package com.dku.council.domain.post.model.dto.response;
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -49,7 +50,7 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "블라인드 여부", example = "false")
     private final boolean isBlinded;
 
-    public ResponseSingleGenericPostDto(String baseFileUrl, int likes, boolean isMine, boolean isLiked, Post post) {
+    public ResponseSingleGenericPostDto(ObjectUploadContext context, int likes, boolean isMine, boolean isLiked, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
@@ -60,7 +61,7 @@ public class ResponseSingleGenericPostDto {
         this.likes = likes;
         this.views = post.getViews();
         this.createdAt = post.getCreatedAt();
-        this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
+        this.files = PostFileDto.listOf(context, post.getFiles());
         this.isMine = isMine;
         this.isLiked = isLiked;
         this.isBlinded = post.isBlinded();

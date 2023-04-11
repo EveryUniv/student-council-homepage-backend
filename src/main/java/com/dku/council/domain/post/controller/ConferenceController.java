@@ -3,20 +3,16 @@ package com.dku.council.domain.post.controller;
 import com.dku.council.domain.post.model.dto.list.SummarizedConferenceDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateConferenceDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.entity.posttype.Conference;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +24,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class ConferenceController {
 
-    private final GenericPostService<Conference> postService;
+    private final ConferenceService service;
 
     /**
      * 게시글 목록으로 조회
@@ -39,13 +35,12 @@ public class ConferenceController {
      * @return 페이징 된 회의록 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedConferenceDto> list(AppAuthentication auth,
                                                       @RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "50") int bodySize,
                                                       @ParameterObject Pageable pageable) {
-        Specification<Conference> spec = PostSpec.withTitleOrBody(keyword);
-        Page<SummarizedConferenceDto> list = postService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedConferenceDto::new);
+        Page<SummarizedConferenceDto> list = service.list(keyword, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -57,7 +52,7 @@ public class ConferenceController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @AdminOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateConferenceDto request) {
-        Long postId = postService.create(auth.getUserId(), request);
+        Long postId = service.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -69,6 +64,6 @@ public class ConferenceController {
     @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        postService.delete(id, auth.getUserId(), auth.isAdmin());
+        service.delete(id, auth.getUserId(), auth.isAdmin());
     }
 }

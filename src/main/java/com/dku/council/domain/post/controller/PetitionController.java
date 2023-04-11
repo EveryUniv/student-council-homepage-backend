@@ -7,23 +7,18 @@ import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
-import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
-import com.dku.council.domain.post.service.PetitionService;
+import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +35,6 @@ import static com.dku.council.domain.like.model.LikeTarget.POST;
 public class PetitionController {
 
     private final PetitionService petitionService;
-    private final GenericPostService<Petition> petitionPostService;
     private final LikeService likeService;
 
     /**
@@ -54,17 +48,15 @@ public class PetitionController {
      * @return 페이징 된 청원 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedPetitionDto> list(AppAuthentication auth,
                                                     @RequestParam(required = false) String keyword,
                                                     @RequestParam(required = false) List<Long> tagIds,
                                                     @RequestParam(required = false) PetitionStatus status,
                                                     @RequestParam(defaultValue = "50") int bodySize,
                                                     @ParameterObject Pageable pageable) {
-        Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withPetitionStatus(status));
-        spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedPetitionDto> list = petitionService.listPetition(spec, bodySize, pageable, auth.getUserId());
+        Page<SummarizedPetitionDto> list = petitionService.listPetition(keyword, tagIds, status,
+                bodySize, pageable, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -91,7 +83,8 @@ public class PetitionController {
     public ResponsePetitionDto findOne(AppAuthentication auth,
                                        @PathVariable Long id,
                                        HttpServletRequest request) {
-        return petitionService.findOnePetition(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return petitionService.findOnePetition(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
@@ -103,10 +96,10 @@ public class PetitionController {
     @PatchMapping("/blind/{id}")
     @AdminOnly
     public void blind(@PathVariable Long id) {
-        petitionPostService.blind(id);
+        petitionService.blind(id);
     }
 
-/**
+    /**
      * 게시글을 블라인드 해제
      * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
      *
@@ -115,7 +108,7 @@ public class PetitionController {
     @PatchMapping("/unblind/{id}")
     @AdminOnly
     public void unblind(@PathVariable Long id) {
-        petitionPostService.unblind(id);
+        petitionService.unblind(id);
     }
 
     /**
@@ -126,10 +119,9 @@ public class PetitionController {
      */
     @PostMapping("/reply/{postId}")
     @AdminOnly
-    public void reply(AppAuthentication auth,
-                      @PathVariable Long postId,
+    public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
-        petitionService.reply(postId, dto.getAnswer(), auth.getUserId());
+        petitionService.reply(postId, dto.getAnswer());
     }
 
     /**

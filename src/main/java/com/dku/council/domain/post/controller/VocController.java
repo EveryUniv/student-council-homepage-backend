@@ -7,23 +7,18 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateReplyDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateVocDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseVocDto;
-import com.dku.council.domain.post.model.entity.posttype.Voc;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
-import com.dku.council.domain.post.service.VocService;
+import com.dku.council.domain.post.service.post.VocService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,7 +33,6 @@ import java.util.List;
 public class VocController {
 
     private final VocService vocService;
-    private final GenericPostService<Voc> vocPostService;
     private final LikeService likeService;
 
     /**
@@ -51,16 +45,13 @@ public class VocController {
      * @return 페이징 된 VOC 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedVocDto> list(AppAuthentication auth,
                                                @RequestParam(required = false) String keyword,
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
-        Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withTags(tagIds));
-        System.out.println(auth.getUserId());
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedVocDto::new);
+        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -80,12 +71,8 @@ public class VocController {
                                                    @RequestParam(required = false) List<Long> tagIds,
                                                    @RequestParam(defaultValue = "50") int bodySize,
                                                    @ParameterObject Pageable pageable) {
-        Long userId = auth.getUserId();
-        Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withTags(tagIds));
-        spec = spec.and(PostSpec.withAuthor(userId));
-
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedVocDto::new);
+        Page<SummarizedVocDto> list = vocService.listMine(keyword, tagIds, auth.getUserId(), pageable,
+                bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -97,7 +84,7 @@ public class VocController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @UserOnly
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateVocDto request) {
-        Long postId = vocPostService.create(auth.getUserId(), request);
+        Long postId = vocService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
     }
 
@@ -112,7 +99,8 @@ public class VocController {
     public ResponseVocDto findOne(AppAuthentication auth,
                                   @PathVariable Long id,
                                   HttpServletRequest request) {
-        return vocService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return vocService.findOne(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
@@ -124,7 +112,7 @@ public class VocController {
     @DeleteMapping("/{id}")
     @AdminOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        vocPostService.delete(id, auth.getUserId(), auth.isAdmin());
+        vocService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
     /**
@@ -136,7 +124,7 @@ public class VocController {
     @PatchMapping("/blind/{id}")
     @AdminOnly
     public void blind(@PathVariable Long id) {
-        vocPostService.blind(id);
+        vocService.blind(id);
     }
 
     /**
@@ -148,7 +136,7 @@ public class VocController {
     @PatchMapping("/unblind/{id}")
     @AdminOnly
     public void unblind(@PathVariable Long id) {
-        vocPostService.unblind(id);
+        vocService.unblind(id);
     }
 
     /**
@@ -159,10 +147,9 @@ public class VocController {
      */
     @PostMapping("/reply/{postId}")
     @AdminOnly
-    public void reply(AppAuthentication auth,
-                      @PathVariable Long postId,
+    public void reply(@PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
-        vocService.reply(postId, dto.getAnswer(), auth.getUserId());
+        vocService.reply(postId, dto.getAnswer());
     }
 
     /**

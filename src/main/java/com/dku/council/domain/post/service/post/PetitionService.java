@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.service;
+package com.dku.council.domain.post.service.post;
 
 import com.dku.council.domain.post.exception.DuplicateAgreementException;
 import com.dku.council.domain.post.exception.PostCooltimeException;
@@ -8,8 +8,11 @@ import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
+import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -26,7 +29,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PetitionService {
 
     public static final String PETITION_KEY = "petition";
@@ -34,6 +36,7 @@ public class PetitionService {
     private final GenericPostService<Petition> postService;
     private final PetitionStatisticService statisticService;
     private final PostTimeMemoryRepository postTimeMemoryRepository;
+    private final PetitionRepository repository;
 
     private final Clock clock;
 
@@ -48,8 +51,12 @@ public class PetitionService {
 
 
     @Transactional(readOnly = true)
-    public Page<SummarizedPetitionDto> listPetition(Specification<Petition> spec, int bodySize, Pageable pageable, Long userId) {
-        return postService.list(spec, pageable, bodySize, userId, (dto, post) ->
+    public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds, PetitionStatus status,
+                                                    int bodySize, Pageable pageable, UserRole role) {
+        Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withPetitionStatus(status));
+        spec = spec.and(PostSpec.withTags(tagIds));
+        return postService.list(repository, spec, pageable, bodySize, role, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
@@ -60,13 +67,13 @@ public class PetitionService {
             throw new PostCooltimeException("petition");
         }
 
-        Long result = postService.create(userId, dto);
+        Long result = postService.create(repository, userId, dto);
         postTimeMemoryRepository.put(PETITION_KEY, userId, writeCooltime, now);
         return result;
     }
 
     @Transactional(readOnly = true)
-    public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
+    public ResponsePetitionDto findOnePetition(Long postId, Long userId, UserRole role, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
 
@@ -77,18 +84,20 @@ public class PetitionService {
         }
 
         boolean agreed = statisticService.isAlreadyAgreed(postId, userId);
-        return postService.findOne(postId, userId, remoteAddress, (dto, post) ->
+        return postService.findOne(repository, postId, userId, role, remoteAddress, (dto, post) ->
                 new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
-    public void reply(Long postId, String answer, Long userId) {
-        Petition post = postService.findPost(postId, userId);
+    @Transactional
+    public void reply(Long postId, String answer) {
+        Petition post = postService.findPost(repository, postId, UserRole.ADMIN);
         post.replyAnswer(answer);
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
     }
 
+    @Transactional
     public void agreePetition(Long postId, Long userId) {
-        Petition post = postService.findPost(postId, userId);
+        Petition post = postService.findPost(repository, postId, UserRole.USER);
         if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
         }
@@ -99,5 +108,13 @@ public class PetitionService {
         }
 
         statisticService.save(postId, userId);
+    }
+
+    public void blind(Long id) {
+        postService.blind(repository, id);
+    }
+
+    public void unblind(Long id) {
+        postService.unblind(repository, id);
     }
 }

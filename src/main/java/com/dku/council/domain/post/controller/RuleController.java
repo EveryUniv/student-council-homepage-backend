@@ -4,22 +4,18 @@ import com.dku.council.domain.post.model.dto.list.SummarizedRuleDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateRuleDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.posttype.Rule;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +28,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class RuleController {
 
-    private final GenericPostService<Rule> postService;
+    private final RuleService postService;
 
     /**
      * 게시글 목록으로 조회
@@ -42,13 +38,12 @@ public class RuleController {
      * @return 페이징된 회칙 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedRuleDto> list(AppAuthentication auth,
                                                 @RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
-        Page<SummarizedRuleDto> list = postService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedRuleDto::new);
+        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -75,7 +70,8 @@ public class RuleController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return postService.findOne(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**

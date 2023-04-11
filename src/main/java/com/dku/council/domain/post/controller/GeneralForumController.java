@@ -10,24 +10,19 @@ import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDt
 import com.dku.council.domain.post.model.dto.response.GeneralForumCommentDto;
 import com.dku.council.domain.post.model.dto.response.ResponseGeneralForumDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GeneralForumService;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.GeneralForumService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +37,6 @@ import java.util.List;
 public class GeneralForumController {
 
     private final CommentService commentService;
-    private final GenericPostService<GeneralForum> postService;
     private final GeneralForumService forumService;
     private final LikeService likeService;
 
@@ -56,16 +50,13 @@ public class GeneralForumController {
      * @return 페이징된 자유게시판 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedGenericPostDto> list(AppAuthentication auth,
                                                        @RequestParam(required = false) String keyword,
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
-        spec = spec.and(PostSpec.withTitleOrBody(keyword));
-        System.out.println(auth.getUserId());
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize, auth.getUserId());
+        Page<SummarizedGenericPostDto> list = forumService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -91,9 +82,8 @@ public class GeneralForumController {
     public ResponseGeneralForumDto findOne(AppAuthentication auth,
                                            @PathVariable Long id,
                                            HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(),
-                RemoteAddressUtil.getProxyableAddr(request),
-                ResponseGeneralForumDto::new);
+        return forumService.findOne(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
@@ -106,7 +96,7 @@ public class GeneralForumController {
     @DeleteMapping("/{id}")
     @UserOnly
     public void delete(AppAuthentication auth, @PathVariable Long id) {
-        postService.delete(id, auth.getUserId(), auth.isAdmin());
+        forumService.delete(id, auth.getUserId(), auth.isAdmin());
     }
 
     /**
@@ -118,7 +108,7 @@ public class GeneralForumController {
     @PatchMapping("/blind/{id}")
     @AdminOnly
     public void blind(@PathVariable Long id) {
-        postService.blind(id);
+        forumService.blind(id);
     }
 
     /**
@@ -130,7 +120,7 @@ public class GeneralForumController {
     @PatchMapping("/unblind/{id}")
     @AdminOnly
     public void unblind(@PathVariable Long id) {
-        postService.unblind(id);
+        forumService.unblind(id);
     }
 
     /**

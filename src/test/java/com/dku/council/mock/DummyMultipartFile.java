@@ -10,10 +10,12 @@ public class DummyMultipartFile implements MultipartFile {
 
     private final String parameterName;
     private final String originalFileName;
+    private final String contentType;
 
-    public DummyMultipartFile(@NotNull String parameterName, String originalFileName) {
+    public DummyMultipartFile(@NotNull String parameterName, String originalFileName, String contentType) {
         this.parameterName = parameterName;
         this.originalFileName = originalFileName;
+        this.contentType = contentType;
     }
 
     @NotNull
@@ -29,7 +31,7 @@ public class DummyMultipartFile implements MultipartFile {
 
     @Override
     public String getContentType() {
-        return "";
+        return contentType;
     }
 
     @Override
@@ -42,9 +44,8 @@ public class DummyMultipartFile implements MultipartFile {
         return 0;
     }
 
-    @NotNull
     @Override
-    public byte[] getBytes() {
+    public byte @NotNull [] getBytes() {
         return new byte[0];
     }
 

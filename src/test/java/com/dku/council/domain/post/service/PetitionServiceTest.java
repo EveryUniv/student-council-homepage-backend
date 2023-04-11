@@ -9,9 +9,14 @@ import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.posttype.Petition;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
-import com.dku.council.domain.post.service.GenericPostService.PostResultMapper;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
+import com.dku.council.domain.post.service.post.GenericPostService;
+import com.dku.council.domain.post.service.post.GenericPostService.PostResultMapper;
+import com.dku.council.domain.post.service.post.PetitionService;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
 import com.dku.council.domain.statistic.service.PetitionStatisticService;
+import com.dku.council.global.auth.role.UserRole;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import com.dku.council.mock.PetitionMock;
 import com.dku.council.mock.PetitionStatisticMock;
 import com.dku.council.util.ClockUtil;
@@ -30,7 +35,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.dku.council.domain.post.service.PetitionService.PETITION_KEY;
+import static com.dku.council.domain.post.service.post.PetitionService.PETITION_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,6 +46,7 @@ public class PetitionServiceTest {
 
     private final Clock clock = ClockUtil.create();
     private final Duration writeCooltime = Duration.ofDays(1);
+    private final ObjectUploadContext uploadContext = new ObjectUploadContext("", "");
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
@@ -51,14 +57,17 @@ public class PetitionServiceTest {
     @Mock
     private GenericPostService<Petition> postService;
 
+    @Mock
+    private PetitionRepository repository;
+
     private PetitionService petitionService;
 
 
     @BeforeEach
     public void setup() {
         petitionService = new PetitionService(postService, petitionStatisticService,
-                postTimeMemoryRepository, clock, 150, Duration.ofDays(30),
-                writeCooltime);
+                postTimeMemoryRepository, repository, clock, 150,
+                Duration.ofDays(30), writeCooltime);
     }
 
     @Test
@@ -71,7 +80,7 @@ public class PetitionServiceTest {
 
         // when
         Page<SummarizedPetitionDto> allPage = allPost.map((ent) -> {
-            SummarizedGenericPostDto dto = new SummarizedGenericPostDto("", 100, 15, ent);
+            SummarizedGenericPostDto dto = new SummarizedGenericPostDto(uploadContext, 100, 15, ent);
             return new SummarizedPetitionDto(dto, ent, expiresTime, 10);
         });
 
@@ -100,17 +109,18 @@ public class PetitionServiceTest {
 
         when(petitionStatisticService.findTop4Department(petition.getId())).thenReturn(top4);
         when(petitionStatisticService.count(petition.getId())).thenReturn(list.size());
-        when(postService.findOne(eq(petition.getId()), eq(0L), eq("Addr"), any()))
+        when(postService.findOne(eq(repository), eq(petition.getId()), eq(0L), eq(UserRole.USER),
+                eq("Addr"), any()))
                 .thenAnswer(ino -> {
                     ResponseSingleGenericPostDto dto =
-                            new ResponseSingleGenericPostDto("", 0, false, true, petition);
+                            new ResponseSingleGenericPostDto(uploadContext, 0, false, true, petition);
                     PostResultMapper<ResponsePetitionDto, ResponseSingleGenericPostDto, Petition> mapper =
-                            ino.getArgument(3);
+                            ino.getArgument(4);
                     return mapper.map(dto, petition);
                 });
 
         // when
-        ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, "Addr");
+        ResponsePetitionDto dto = petitionService.findOnePetition(petition.getId(), 0L, UserRole.USER, "Addr");
 
         // then
         assertThat(dto.getId()).isEqualTo(petition.getId());
@@ -137,7 +147,7 @@ public class PetitionServiceTest {
 
         when(postTimeMemoryRepository.isAlreadyContains(PETITION_KEY, 1L, now))
                 .thenReturn(false);
-        when(postService.create(1L, dto)).thenReturn(5L);
+        when(postService.create(repository, 1L, dto)).thenReturn(5L);
 
         // when
         Long result = petitionService.create(1L, dto);
@@ -173,7 +183,7 @@ public class PetitionServiceTest {
 
         when(postTimeMemoryRepository.isAlreadyContains(PETITION_KEY, 1L, now))
                 .thenReturn(false);
-        when(postService.create(1L, dto))
+        when(postService.create(repository, 1L, dto))
                 .thenThrow(new PostNotFoundException());
 
         // when

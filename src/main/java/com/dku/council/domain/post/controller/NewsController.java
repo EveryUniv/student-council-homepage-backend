@@ -6,21 +6,17 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.repository.spec.PostSpec;
-import com.dku.council.domain.post.service.GenericPostService;
+import com.dku.council.domain.post.service.post.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +32,7 @@ import static com.dku.council.domain.like.model.LikeTarget.POST;
 @RequiredArgsConstructor
 public class NewsController {
 
-    private final GenericPostService<News> postService;
+    private final NewsService postService;
     private final LikeService likeService;
 
     /**
@@ -48,15 +44,13 @@ public class NewsController {
      * @return 페이징된 총학 소식 목록
      */
     @GetMapping
-    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    @GuestAuth
     public ResponsePage<SummarizedGenericPostDto> list(AppAuthentication auth,
                                                        @RequestParam(required = false) String keyword,
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Specification<News> spec = PostSpec.withTitleOrBody(keyword);
-        spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize, auth.getUserId());
+        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize, auth.getUserRole());
         return new ResponsePage<>(list);
     }
 
@@ -81,7 +75,8 @@ public class NewsController {
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), RemoteAddressUtil.getProxyableAddr(request));
+        return postService.findOne(id, auth.getUserId(), auth.getUserRole(),
+                RemoteAddressUtil.getProxyableAddr(request));
     }
 
     /**
