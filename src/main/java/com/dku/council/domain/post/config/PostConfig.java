@@ -52,4 +52,5 @@ public class PostConfig {
     public GenericPostService<Voc> vocPostService(VocRepository repository) {
         return new GenericPostService<>(repository, userRepository, tagService, viewCountService, fileUploadService, likeService);
     }
+
 }

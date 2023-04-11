@@ -20,8 +20,8 @@ public class VocService {
         return postService.findOne(postId, userId, remoteAddress, ResponseVocDto::new);
     }
 
-    public void reply(Long postId, String answer) {
-        Voc post = postService.findPost(postId);
+    public void reply(Long postId, String answer, Long userId) {
+        Voc post = postService.findPost(postId, userId);
         post.replyAnswer(answer);
         post.updateVocStatus(VocStatus.ANSWERED);
     }

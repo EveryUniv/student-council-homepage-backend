@@ -22,7 +22,7 @@ public class ViewCountService {
     @Value("${app.post.view-counting-expires}")
     private final Duration expiresAfter;
 
-    // TODO 조회수 자체 처리도 캐싱하면 좋을 듯! (현재는 동일인물 구분에만 사용)
+    //TODO 조회수 자체 처리도 캐싱하면 좋을 듯! (현재는 동일인물 구분에만 사용)
 
     /**
      * 조회수 증가 처리. 동일성은 (remoteAddress, postId)로 구분하며, n분에 1회씩만 증가시킬 수 있다.

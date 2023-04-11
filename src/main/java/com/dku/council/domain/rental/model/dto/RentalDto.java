@@ -16,14 +16,17 @@ public class RentalDto {
     @Schema(description = "대여 시각", example = "2022-03-01 11:31:11")
     private final LocalDateTime rentalAt;
 
-    @Schema(description = "행사명", example = "물품 행사")
-    private final String title;
-
     @Schema(description = "대여자 구분")
     private final RentalUserClass userClass;
 
+    @Schema(description = "행사명", example = "물품 행사")
+    private final String title;
+
     @Schema(description = "행사 내용", example = "행사입니다.")
     private final String body;
+
+    @Schema(description = "대여 물품명", example = "우산")
+    private final String itemName;
 
     @Schema(description = "대여자 이름", example = "이름")
     private final String lender;
@@ -41,6 +44,7 @@ public class RentalDto {
         this.title = rental.getTitle();
         this.body = rental.getBody();
         this.userClass = rental.getUserClass();
+        this.itemName = rental.getItem().getName();
         this.lender = rental.getUser().getName();
         this.rentalStart = rental.getRentalStart();
         this.rentalEnd = rental.getRentalEnd();
