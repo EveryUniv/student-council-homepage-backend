@@ -9,10 +9,12 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseVocDto;
 import com.dku.council.domain.post.service.post.VocService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -44,11 +46,13 @@ public class VocController {
      * @return 페이징 된 VOC 목록
      */
     @GetMapping
-    public ResponsePage<SummarizedVocDto> list(@RequestParam(required = false) String keyword,
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public ResponsePage<SummarizedVocDto> list(AppAuthentication auth,
+                                               @RequestParam(required = false) String keyword,
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
-        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize);
+        Page<SummarizedVocDto> list = vocService.list(keyword, tagIds, pageable, bodySize, auth.isAdmin());
         return new ResponsePage<>(list);
     }
 
@@ -120,6 +124,18 @@ public class VocController {
     @AdminOnly
     public void blind(@PathVariable Long id) {
         vocService.blind(id);
+    }
+
+    /**
+     * 게시글을 블라인드 해제
+     * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
+     *
+     * @param id 블라인드 해제할 게시글 id
+     */
+    @PatchMapping("/unblind/{id}")
+    @AdminOnly
+    public void unblind(@PathVariable Long id) {
+        vocService.unblind(id);
     }
 
     /**

@@ -25,4 +25,15 @@ public interface GenericPostRepository<T extends Post> extends JpaRepository<T, 
     @Override
     @EntityGraph(attributePaths = {"user", "user.major"})
     Page<T> findAll(Specification<T> spec, Pageable pageable);
+
+    @Query("select p from Post p " +
+            "join fetch p.user u " +
+            "join fetch u.major " +
+            "where p.id=:id and (p.status='BLINDED' or p.status='ACTIVE')")
+    Optional<T> findWithBlindedById(Long id);
+
+    @Query("select p from Post p " +
+            "where p.id=:id and p.status='BLINDED'")
+    Optional<T> findBlindedPostById(Long id);
+
 }

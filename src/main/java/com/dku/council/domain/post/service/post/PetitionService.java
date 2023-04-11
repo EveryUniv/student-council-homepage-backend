@@ -50,11 +50,12 @@ public class PetitionService {
 
 
     @Transactional(readOnly = true)
-    public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds,
-                                                    PetitionStatus status, int bodySize, Pageable pageable) {
+    public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds, PetitionStatus status,
+                                                    int bodySize, Pageable pageable, boolean withBlind) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
+        xdrfhxdrh
         return postService.list(repository, spec, pageable, bodySize, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
@@ -72,7 +73,7 @@ public class PetitionService {
     }
 
     @Transactional(readOnly = true)
-    public ResponsePetitionDto findOnePetition(Long postId, Long userId, String address) {
+    public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
 
@@ -83,20 +84,20 @@ public class PetitionService {
         }
 
         boolean agreed = statisticService.isAlreadyAgreed(postId, userId);
-        return postService.findOne(repository, postId, userId, address, (dto, post) ->
+        return postService.findOne(repository, postId, userId, remoteAddress, (dto, post) ->
                 new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
     @Transactional
     public void reply(Long postId, String answer) {
-        Petition post = postService.findPost(repository, postId);
+        Petition post = postService.findPost(repository, postId, false);
         post.replyAnswer(answer);
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
     }
 
     @Transactional
     public void agreePetition(Long postId, Long userId) {
-        Petition post = postService.findPost(repository, postId);
+        Petition post = postService.findPost(repository, postId, false);
         if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
         }

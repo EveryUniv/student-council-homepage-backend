@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,15 +55,15 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> list(GenericPostRepository<E> repository, Specification<E> spec,
-                                               Pageable pageable, int bodySize) {
-        Page<E> result = list(repository, spec, pageable);
+                                               Pageable pageable, int bodySize, boolean withBlind) {
+        Page<E> result = list(repository, spec, pageable, withBlind);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
     public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
-                            PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(repository, spec, pageable);
+                            boolean withBlind, PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
+        Page<E> result = list(repository, spec, pageable, withBlind);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -70,12 +71,17 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable) {
+    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, boolean withBlind) {
         if (spec == null) {
             spec = Specification.where(null);
         }
 
-        spec = spec.and(PostSpec.withActive());
+        if (withBlind) {
+            spec = spec.and(PostSpec.withActiveOrBlinded());
+        } else {
+            spec = spec.and(PostSpec.withActive());
+        }
+
         return repository.findAll(spec, pageable);
     }
 
@@ -139,15 +145,15 @@ public class GenericPostService<E extends Post> {
      */
     @Transactional
     public ResponseSingleGenericPostDto findOne(GenericPostRepository<E> repository, Long postId, Long userId,
-                                                String remoteAddress) {
-        E post = viewPost(repository, postId, remoteAddress);
+                                                String remoteAddress, boolean withBlinded) {
+        E post = viewPost(repository, postId, remoteAddress, withBlinded);
         return makePostDto(userId, post);
     }
 
     @Transactional
     public <T> T findOne(GenericPostRepository<E> repository, Long postId, Long userId, String remoteAddress,
-                         PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
-        E post = viewPost(repository, postId, remoteAddress);
+                         boolean withBlinded, PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
+        E post = viewPost(repository, postId, remoteAddress, withBlinded);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
         return mapper.map(dto, post);
     }
@@ -167,8 +173,8 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional
-    public E viewPost(GenericPostRepository<E> repository, Long postId, String remoteAddress) {
-        E post = findPost(repository, postId);
+    public E viewPost(GenericPostRepository<E> repository, Long postId, String remoteAddress, boolean withBlind) {
+        E post = findPost(repository, postId, withBlind);
         viewCountService.increasePostViews(post, remoteAddress);
         return post;
     }
@@ -181,8 +187,14 @@ public class GenericPostService<E extends Post> {
      * @return 게시글 Entity
      */
     @Transactional(readOnly = true)
-    public E findPost(GenericPostRepository<E> repository, Long postId) {
-        return repository.findById(postId).orElseThrow(PostNotFoundException::new);
+    public E findPost(GenericPostRepository<E> repository, Long postId, boolean withBlind) {
+        Optional<E> post;
+        if (withBlind) {
+            post = repository.findWithBlindedById(postId);
+        } else {
+            post = repository.findById(postId);
+        }
+        return post.orElseThrow(PostNotFoundException::new);
     }
 
 
@@ -216,6 +228,18 @@ public class GenericPostService<E extends Post> {
         E post = repository.findById(postId).orElseThrow(PostNotFoundException::new);
         post.blind();
     }
+
+    /**
+     * 게시글을 unblind처리 합니다.
+     *
+     * @param postId 게시글 id
+     */
+    @Transactional
+    public void unblind(GenericPostRepository<E> repository, Long postId) {
+        E post = repository.findBlindedPostById(postId).orElseThrow(PostNotFoundException::new);
+        post.unblind();
+    }
+
 
     @FunctionalInterface
     public interface PostResultMapper<T, D, E extends Post> {
