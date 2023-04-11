@@ -6,7 +6,7 @@ import com.dku.council.domain.user.model.dto.response.ResponseScrappedStudentInf
 import com.dku.council.domain.user.model.dto.response.ResponseVerifyStudentDto;
 import com.dku.council.domain.user.service.DKUAuthService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
-import com.dku.council.global.auth.role.UserOnly;
+import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -39,7 +39,7 @@ public class DKUController {
      * @param dto 요청 body
      */
     @PatchMapping
-    @UserOnly
+    @UserAuth
     public ResponseScrappedStudentInfoDto updateDKUStudent(AppAuthentication auth,
                                                            @Valid @RequestBody RequestDkuStudentDto dto) {
         return service.updateDKUStudent(auth.getUserId(), dto);

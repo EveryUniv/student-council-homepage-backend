@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class PetitionStatisticService {
@@ -60,6 +60,6 @@ public class PetitionStatisticService {
     }
 
     public boolean isAlreadyAgreed(Long postId, Long userId) {
-        return repository.findByPetitionIdAndUserId(postId, userId).isPresent();
+        return repository.countByPetitionIdAndUserId(postId, userId) > 0;
     }
 }

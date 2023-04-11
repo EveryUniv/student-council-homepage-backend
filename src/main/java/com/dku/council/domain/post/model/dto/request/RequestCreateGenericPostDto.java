@@ -14,7 +14,7 @@ import java.util.Objects;
 public abstract class RequestCreateGenericPostDto<T> {
 
     @NotBlank
-    @Schema(description = "본문 제목", example = "제목")
+    @Schema(description = "제목", example = "제목")
     private final String title;
 
     @NotBlank

@@ -6,7 +6,7 @@ import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.post.PostRepository;
-import com.dku.council.infra.nhn.service.FileUploadService;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class MyPostService {
 
     private final PostRepository postRepository;
-    private final FileUploadService fileUploadService;
+    private final ObjectUploadContext uploadContext;
     private final LikeService likeService;
     private final CommentRepository commentRepository;
 
@@ -45,13 +45,12 @@ public class MyPostService {
 
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> listMyCommentedPosts(Long userId, Pageable pageable, int bodySize) {
-        return commentRepository.findAllCommentedPostId(userId, pageable)
+        return commentRepository.findAllCommentByUserId(userId, pageable)
                 .map(post -> mapToListDto(post, bodySize));
     }
 
     private SummarizedGenericPostDto mapToListDto(Post post, int bodySize) {
-        return new SummarizedGenericPostDto(fileUploadService.getBaseURL(),
-                bodySize,
+        return new SummarizedGenericPostDto(uploadContext, bodySize,
                 likeService.getCountOfLikes(post.getId(), LikeTarget.POST), post);
     }
 }

@@ -41,7 +41,6 @@ public class Rental extends BaseEntity {
 
     private String title;
 
-    @Lob
     private String body;
 
     private boolean isActive;

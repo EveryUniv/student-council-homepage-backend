@@ -1,7 +1,7 @@
 package com.dku.council.infra.nhn.model;
 
-import com.dku.council.domain.post.model.entity.PostFile;
 import lombok.Getter;
+import org.springframework.http.MediaType;
 
 @Getter
 public class UploadedFile {
@@ -9,12 +9,14 @@ public class UploadedFile {
 
     private final String originalName;
 
-    public UploadedFile(String fileId, String originalName) {
-        this.fileId = fileId;
-        this.originalName = originalName;
-    }
+    private final MediaType mimeType;
 
-    public static UploadedFile of(PostFile entity) {
-        return new UploadedFile(entity.getFileId(), entity.getFileName());
+    private final FileRequest file;
+
+    public UploadedFile(String fileId, FileRequest file) {
+        this.fileId = fileId;
+        this.originalName = file.getOriginalFilename();
+        this.mimeType = file.getContentType();
+        this.file = file;
     }
 }

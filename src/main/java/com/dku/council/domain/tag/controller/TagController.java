@@ -4,7 +4,7 @@ import com.dku.council.domain.tag.model.dto.RequestCreateTagDto;
 import com.dku.council.domain.tag.model.dto.RequestRenameTagDto;
 import com.dku.council.domain.tag.model.dto.TagDto;
 import com.dku.council.domain.tag.service.TagService;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class TagController {
      * @return 생성된 태그 아이디
      */
     @PostMapping
-    @AdminOnly
+    @AdminAuth
     public ResponseIdDto create(@Valid @RequestBody RequestCreateTagDto dto) {
         Long id = tagService.create(dto.getName());
         return new ResponseIdDto(id);
@@ -52,7 +52,7 @@ public class TagController {
      * @return 변경된 태그 아이디 (입력받은 tagId와 동일)
      */
     @PatchMapping("/{tagId}")
-    @AdminOnly
+    @AdminAuth
     public ResponseIdDto rename(@PathVariable Long tagId,
                                 @Valid @RequestBody RequestRenameTagDto dto) {
         Long id = tagService.rename(tagId, dto.getName());
@@ -67,7 +67,7 @@ public class TagController {
      * @return 삭제된 태그 아이디 (입력받은 tagId와 동일)
      */
     @DeleteMapping("/{tagId}")
-    @AdminOnly
+    @AdminAuth
     public ResponseIdDto delete(@PathVariable Long tagId) {
         Long id = tagService.delete(tagId);
         return new ResponseIdDto(id);

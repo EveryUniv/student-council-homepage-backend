@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -59,8 +58,8 @@ class PetitionStatisticServiceTest {
         // given
         Petition petition = PetitionMock.createWithDummy();
         PetitionStatistic stat = PetitionStatisticMock.create(petition);
-        when(petitionStatisticRepository.findByPetitionIdAndUserId(petition.getId(), stat.getUser().getId()))
-                .thenReturn(Optional.of(stat));
+        when(petitionStatisticRepository.countByPetitionIdAndUserId(petition.getId(), stat.getUser().getId()))
+                .thenReturn(1L);
 
         // when & then
         assertThat(service.isAlreadyAgreed(petition.getId(), stat.getUser().getId())).isTrue();
