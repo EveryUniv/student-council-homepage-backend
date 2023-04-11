@@ -19,7 +19,7 @@ public class PostFileDto {
     @Schema(description = "파일 url", example = "http://1.2.3.4/1ddee68d-6afb-48d0-9cb6-04a8d8fea4ae.png")
     private final String url;
 
-    @Schema(description = "썸네일 url", example = "http://1.2.3.4/thumb-1ddee68d-6afb-48d0-9cb6-04a8d8fea4ae.png")
+    @Schema(description = "썸네일 url (없으면 기본 이미지)", example = "http://1.2.3.4/thumb-1ddee68d-6afb-48d0-9cb6-04a8d8fea4ae.png")
     private final String thumbnailUrl;
 
     @Schema(description = "원본파일 이름", example = "my_image.png")
@@ -32,7 +32,7 @@ public class PostFileDto {
     public PostFileDto(ObjectUploadContext context, PostFile file) {
         this.id = file.getId();
         this.url = context.getObjectUrl(file.getFileId());
-        this.thumbnailUrl = context.getThumbnailURL(file.getFileId());
+        this.thumbnailUrl = context.getObjectUrl(file.getThumbnailId());
         this.originalName = file.getFileName();
 
         String fileMimeType = file.getMimeType();

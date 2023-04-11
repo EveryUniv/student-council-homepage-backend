@@ -7,49 +7,55 @@ import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ThumbnailService {
 
-    private final FileUploadService fileUploadService;
     private final ObjectUploadContext uploadContext;
 
     @Value("${app.post.thumbnail.size}")
     private final int size;
 
+    @Value("${app.post.thumbnail.default}")
+    private final String defaultFileId;
 
-    public void createThumbnails(List<UploadedFile> files) {
-        FileUploadService.Context uploadCtx = fileUploadService.newContext();
-        for (UploadedFile file : files) {
-            try {
-                if (file.getMimeType().getType().equalsIgnoreCase("image")) {
-                    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                    InputStream fileInStream = file.getFile().getInputStream();
-                    Thumbnails.of(fileInStream)
-                            .size(size, size) // todo 비율 맞춰 줄이기
-                            .toOutputStream(outStream);
 
-                    InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
-                    FileRequest req = new FileRequest(file.getOriginalName(), file.getMimeType(), () -> inStream);
-
-                    String thumbnailId = uploadContext.makeThumbnailId(file.getFileId());
-                    uploadCtx.uploadFileWithName(req, thumbnailId);
-
-                    fileInStream.close();
-                    inStream.close();
-                    outStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public String createThumbnail(FileUploadService.Context uploadCtx, UploadedFile file) {
+        if (!file.getMimeType().getType().equalsIgnoreCase("image")) {
+            return defaultFileId;
         }
+
+        try {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            InputStream fileInStream = file.getFile().getInputStream();
+            Thumbnails.of(fileInStream)
+                    .size(size, size)
+                    .outputFormat("png")
+                    .toOutputStream(outStream);
+
+            InputStream inStream = new ByteArrayInputStream(outStream.toByteArray());
+            FileRequest req = new FileRequest(file.getOriginalName(), MediaType.IMAGE_PNG, () -> inStream);
+
+            String thumbnailId = uploadContext.makeObjectId("thumb", "png");
+            uploadCtx.uploadFileWithName(req, thumbnailId);
+
+            fileInStream.close();
+            inStream.close();
+            outStream.close();
+
+            return thumbnailId;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return defaultFileId;
     }
 }

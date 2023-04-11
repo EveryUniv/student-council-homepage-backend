@@ -7,6 +7,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.model.entity.PostFile;
 import com.dku.council.domain.post.repository.post.GenericPostRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.ThumbnailService;
@@ -26,7 +27,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -94,18 +97,36 @@ public class GenericPostService<E extends Post> {
         E post = dto.toEntity(user);
         tagService.addTagsToPost(post, dto.getTagIds());
 
-        List<UploadedFile> files = fileUploadService.newContext().uploadFiles(
-                FileRequest.ofList(dto.getFiles()),
-                post.getClass().getSimpleName());
-
-        for (UploadedFile file : files) {
-            file.toEntity().changePost(post);
-        }
-
-        thumbnailService.createThumbnails(files);
+        attachFiles(dto.getFiles(), post);
 
         E savedPost = repository.save(post);
         return savedPost.getId();
+    }
+
+    private void attachFiles(List<MultipartFile> dtoFiles, E post) {
+        List<UploadedFile> files = fileUploadService.newContext().uploadFiles(
+                FileRequest.ofList(dtoFiles),
+                post.getClass().getSimpleName());
+
+        FileUploadService.Context uploadCtx = fileUploadService.newContext();
+        List<PostFile> postFiles = new ArrayList<>();
+
+        for (UploadedFile file : files) {
+            PostFile.PostFileBuilder builder = PostFile.builder()
+                    .fileName(file.getOriginalName())
+                    .mimeType(file.getMimeType().toString())
+                    .fileId(file.getFileId());
+
+            String thumbnailId = thumbnailService.createThumbnail(uploadCtx, file);
+            if (thumbnailId != null) {
+                builder.thumbnailId(thumbnailId);
+            }
+            postFiles.add(builder.build());
+        }
+
+        for (PostFile file : postFiles) {
+            file.changePost(post);
+        }
     }
 
     /**

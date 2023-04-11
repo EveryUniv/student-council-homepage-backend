@@ -25,7 +25,7 @@ class ObjectStorageServiceTest extends AbstractMockServerTest {
     public void beforeEach() {
         WebClient webClient = WebClient.create();
         this.apiPath = "http://localhost:" + mockServer.getPort();
-        this.uploadContext = new ObjectUploadContext("prefix", apiPath);
+        this.uploadContext = new ObjectUploadContext(apiPath);
         this.service = new ObjectStorageService(webClient, uploadContext);
     }
 

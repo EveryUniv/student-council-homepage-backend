@@ -10,9 +10,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ObjectUploadContext {
 
-    @Value("${app.post.thumbnail.prefix}")
-    private final String thumbnailPrefix;
-
     @Value("${nhn.os.api-path}")
     private final String apiPath;
 
@@ -23,14 +20,6 @@ public class ObjectUploadContext {
 
     public String makeObjectId(String prefix, String extension) {
         return makeObjName(prefix, UUID.randomUUID() + "." + extension);
-    }
-
-    public String getThumbnailURL(String fileId) {
-        return getObjectUrl(makeThumbnailId(fileId));
-    }
-
-    public String makeThumbnailId(String fileId) {
-        return makeObjName(thumbnailPrefix, fileId);
     }
 
     private String makeObjName(String prefix, String id) {

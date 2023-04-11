@@ -1,6 +1,5 @@
 package com.dku.council.infra.nhn.model;
 
-import com.dku.council.domain.post.model.entity.PostFile;
 import lombok.Getter;
 import org.springframework.http.MediaType;
 
@@ -19,9 +18,5 @@ public class UploadedFile {
         this.originalName = file.getOriginalFilename();
         this.mimeType = file.getContentType();
         this.file = file;
-    }
-
-    public PostFile toEntity() {
-        return new PostFile(fileId, originalName, mimeType.toString());
     }
 }

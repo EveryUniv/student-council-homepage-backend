@@ -45,7 +45,7 @@ public class PetitionServiceTest {
 
     private final Clock clock = ClockUtil.create();
     private final Duration writeCooltime = Duration.ofDays(1);
-    private final ObjectUploadContext uploadContext = new ObjectUploadContext("", "");
+    private final ObjectUploadContext uploadContext = new ObjectUploadContext("");
 
     @Mock
     private PetitionStatisticService petitionStatisticService;
