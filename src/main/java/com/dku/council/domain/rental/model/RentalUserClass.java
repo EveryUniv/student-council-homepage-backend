@@ -15,4 +15,9 @@ public enum RentalUserClass {
      * 과(학부) 학생회
      */
     MAJOR_STUDENT_COUNCIL,
+
+    /**
+     * 동아리
+     */
+    CLUB,
 }
