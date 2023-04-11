@@ -1,6 +1,5 @@
 package com.dku.council.domain.user.model.entity;
 
-import com.dku.council.domain.report.model.entity.Report;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
@@ -10,14 +9,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-@Table(name = "dku_user")
+@Table(name = "dku_user",
+        indexes = {
+                @Index(name = "idx_user_student_id", columnList = "studentId"),
+                @Index(name = "idx_user_phone", columnList = "phone"),
+                @Index(name = "idx_user_nickname", columnList = "nickname")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {

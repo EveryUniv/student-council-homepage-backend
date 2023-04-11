@@ -1,15 +1,11 @@
 package com.dku.council.domain.report.model.dto.response;
 
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.report.model.entity.Report;
-import com.dku.council.domain.report.model.entity.ReportCategory;
-import com.dku.council.domain.tag.model.dto.TagDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class ResponseSingleReportedPostDto {

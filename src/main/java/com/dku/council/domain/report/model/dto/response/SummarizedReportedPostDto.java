@@ -3,6 +3,7 @@ package com.dku.council.domain.report.model.dto.response;
 import com.dku.council.domain.report.model.entity.Report;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Getter

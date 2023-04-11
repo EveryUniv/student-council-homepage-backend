@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PetitionStatisticRepository extends JpaRepository<PetitionStatistic, Long> {
     @Query("select new com.dku.council.domain.statistic.model.dto.PetitionStatisticDto(department, count(department)) " +
@@ -19,5 +18,8 @@ public interface PetitionStatisticRepository extends JpaRepository<PetitionStati
 
     Integer countByPetitionId(Long petitionId);
 
-    Optional<PetitionStatistic> findByPetitionIdAndUserId(Long petitionId, Long userId);
+    @Query("select count(*) " +
+            "from PetitionStatistic " +
+            "where petition.id=:petitionId and user.id=:userId")
+    Long countByPetitionIdAndUserId(Long petitionId, Long userId);
 }

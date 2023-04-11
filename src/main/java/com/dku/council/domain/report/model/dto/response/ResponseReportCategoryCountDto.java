@@ -1,8 +1,6 @@
 package com.dku.council.domain.report.model.dto.response;
 
-import com.dku.council.domain.report.model.entity.Report;
 import lombok.Getter;
-import org.springframework.context.MessageSource;
 
 @Getter
 public class ResponseReportCategoryCountDto {
