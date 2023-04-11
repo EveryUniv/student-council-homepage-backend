@@ -10,9 +10,11 @@ import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -46,13 +48,15 @@ public class NewsController {
      * @return 페이징된 총학 소식 목록
      */
     @GetMapping
-    public ResponsePage<SummarizedGenericPostDto> list(@RequestParam(required = false) String keyword,
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public ResponsePage<SummarizedGenericPostDto> list(AppAuthentication auth,
+                                                       @RequestParam(required = false) String keyword,
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
         Specification<News> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize);
+        Page<SummarizedGenericPostDto> list = postService.list(spec, pageable, bodySize, auth.getUserId());
         return new ResponsePage<>(list);
     }
 

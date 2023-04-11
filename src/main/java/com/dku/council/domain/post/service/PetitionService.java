@@ -48,8 +48,8 @@ public class PetitionService {
 
 
     @Transactional(readOnly = true)
-    public Page<SummarizedPetitionDto> listPetition(Specification<Petition> spec, int bodySize, Pageable pageable) {
-        return postService.list(spec, pageable, bodySize, (dto, post) ->
+    public Page<SummarizedPetitionDto> listPetition(Specification<Petition> spec, int bodySize, Pageable pageable, Long userId) {
+        return postService.list(spec, pageable, bodySize, userId, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
@@ -65,6 +65,7 @@ public class PetitionService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public ResponsePetitionDto findOnePetition(Long postId, Long userId, String remoteAddress) {
         List<PetitionStatisticDto> top4Department = statisticService.findTop4Department(postId);
         int totalCount = statisticService.count(postId);
@@ -80,14 +81,14 @@ public class PetitionService {
                 new ResponsePetitionDto(dto, post, expiresTime, totalCount, top4Department, agreed));
     }
 
-    public void reply(Long postId, String answer) {
-        Petition post = postService.findPost(postId);
+    public void reply(Long postId, String answer, Long userId) {
+        Petition post = postService.findPost(postId, userId);
         post.replyAnswer(answer);
         post.updatePetitionStatus(PetitionStatus.ANSWERED);
     }
 
     public void agreePetition(Long postId, Long userId) {
-        Petition post = postService.findPost(postId);
+        Petition post = postService.findPost(postId, userId);
         if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
         }

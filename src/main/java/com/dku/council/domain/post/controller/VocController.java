@@ -12,10 +12,12 @@ import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.GenericPostService;
 import com.dku.council.domain.post.service.VocService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.auth.role.AdminOnly;
 import com.dku.council.global.auth.role.UserOnly;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -49,13 +51,16 @@ public class VocController {
      * @return 페이징 된 VOC 목록
      */
     @GetMapping
-    public ResponsePage<SummarizedVocDto> list(@RequestParam(required = false) String keyword,
+    @SecurityRequirement(name = JwtProvider.AUTHORIZATION)
+    public ResponsePage<SummarizedVocDto> list(AppAuthentication auth,
+                                               @RequestParam(required = false) String keyword,
                                                @RequestParam(required = false) List<Long> tagIds,
                                                @RequestParam(defaultValue = "50") int bodySize,
                                                @ParameterObject Pageable pageable) {
         Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
+        System.out.println(auth.getUserId());
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -80,7 +85,7 @@ public class VocController {
         spec = spec.and(PostSpec.withTags(tagIds));
         spec = spec.and(PostSpec.withAuthor(userId));
 
-        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, SummarizedVocDto::new);
+        Page<SummarizedVocDto> list = vocPostService.list(spec, pageable, bodySize, auth.getUserId(), SummarizedVocDto::new);
         return new ResponsePage<>(list);
     }
 
@@ -135,6 +140,18 @@ public class VocController {
     }
 
     /**
+     * 게시글을 블라인드 해제
+     * 블라인드 처리된 게시글은 운영진만 볼 수 있습니다.
+     *
+     * @param id 블라인드 해제할 게시글 id
+     */
+    @PatchMapping("/unblind/{id}")
+    @AdminOnly
+    public void unblind(@PathVariable Long id) {
+        vocPostService.unblind(id);
+    }
+
+    /**
      * 운영진 답변 등록 (Admin)
      *
      * @param postId 답변할 게시글 ID
@@ -142,9 +159,10 @@ public class VocController {
      */
     @PostMapping("/reply/{postId}")
     @AdminOnly
-    public void reply(@PathVariable Long postId,
+    public void reply(AppAuthentication auth,
+                      @PathVariable Long postId,
                       @Valid @RequestBody RequestCreateReplyDto dto) {
-        vocService.reply(postId, dto.getAnswer());
+        vocService.reply(postId, dto.getAnswer(), auth.getUserId());
     }
 
     /**

@@ -40,7 +40,7 @@ public class RentalController {
      * @param keyword 대여 품목 이름, 대여자 이름, 제목, 본문 공통 검색어. 지정하지않으면 모든 대여 현황 조회.
      */
     @GetMapping
-    @AdminOnly
+//    @AdminOnly
     public ResponsePage<SummarizedRentalDto> list(@RequestParam(required = false) String keyword,
                                                   @ParameterObject Pageable pageable) {
         Specification<Rental> spec = RentalSpec.withTitleOrBody(keyword);
