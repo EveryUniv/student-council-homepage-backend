@@ -2,11 +2,14 @@ package com.dku.council.domain.post.model.dto.list;
 
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 public class SummarizedGenericPostDto {
@@ -38,16 +41,28 @@ public class SummarizedGenericPostDto {
     @Schema(description = "댓글 개수", example = "2")
     private final int commentCount;
 
-    public SummarizedGenericPostDto(String baseFileUrl, int bodySize, int likes, Post post) {
+    @Schema(description = "태그 목록")
+    private final List<TagDto> tag;
+
+    @Schema(description = "블라인드 여부", example = "false")
+    private final boolean isBlinded;
+
+
+    public SummarizedGenericPostDto(ObjectUploadContext context, int bodySize, int likes, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.author = post.getDisplayingUsername();
         this.body = slice(post.getBody(), bodySize);
         this.createdAt = post.getCreatedAt();
         this.likes = likes;
-        this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
+        this.files = PostFileDto.listOf(context, post.getFiles());
         this.views = post.getViews();
         this.commentCount = post.getComments().size(); // 댓글 개수 캐싱 필요
+        this.tag = post.getPostTags().stream()
+                .map(e -> new TagDto(e.getTag()))
+                .collect(Collectors.toList());
+        this.isBlinded = post.isBlinded();
+
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
@@ -60,9 +75,14 @@ public class SummarizedGenericPostDto {
         this.files = copy.getFiles();
         this.views = copy.getViews();
         this.commentCount = copy.getCommentCount();
+        this.tag = copy.getTag();
+        this.isBlinded = copy.isBlinded();
     }
 
     private static String slice(String text, int maxLen) {
+        if (text == null) {
+            return null;
+        }
         return text.substring(0, Math.min(text.length(), maxLen));
     }
 }

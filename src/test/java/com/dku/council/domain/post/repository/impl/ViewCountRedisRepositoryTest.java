@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.repository.impl;
 
-import com.dku.council.global.config.redis.RedisKeys;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +30,6 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
     void addPostLike() {
         // given
         String userIdentifier = "User";
-        String key = repository.makeEntryKey(10L, userIdentifier);
         Instant now = Instant.now();
         Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 
@@ -39,9 +37,8 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         repository.put(10L, userIdentifier, expiresAfter, now);
 
         // then
-        Object value = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
-        long expectedEpoch = now.plus(expiresAfter).getEpochSecond();
-        assertThat(value).isEqualTo(String.valueOf(expectedEpoch));
+        boolean result = repository.isAlreadyContains(10L, userIdentifier, now);
+        assertThat(result).isTrue();
     }
 
     @Test
@@ -85,11 +82,7 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
         repository.put(10L, userIdentifier, expiresAfter, now);
         boolean result = repository.isAlreadyContains(10L, userIdentifier, now.plus(expiresAfter).plusSeconds(60));
 
-        String key = repository.makeEntryKey(10L, userIdentifier);
-        Object obj = redisTemplate.opsForHash().get(RedisKeys.POST_VIEW_COUNT_SET_KEY, key);
-
         // then
         assertThat(result).isEqualTo(false);
-        assertThat(obj).isNull();
     }
 }

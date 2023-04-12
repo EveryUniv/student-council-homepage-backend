@@ -3,6 +3,7 @@ package com.dku.council.domain.post.model.dto.response;
 import com.dku.council.domain.post.model.dto.PostFileDto;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.tag.model.dto.TagDto;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
@@ -28,7 +29,7 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "태그 목록")
     private final List<TagDto> tag;
 
-    @Schema(description = "생성 시각", example = "2022-03-01 11:31:11")
+    @Schema(description = "생성 시각")
     private final LocalDateTime createdAt;
 
     @Schema(description = "파일 목록")
@@ -46,7 +47,10 @@ public class ResponseSingleGenericPostDto {
     @Schema(description = "내가 좋아요를 눌렀는지?", example = "false")
     private final boolean isLiked;
 
-    public ResponseSingleGenericPostDto(String baseFileUrl, int likes, boolean isMine, boolean isLiked, Post post) {
+    @Schema(description = "블라인드 여부", example = "false")
+    private final boolean isBlinded;
+
+    public ResponseSingleGenericPostDto(ObjectUploadContext context, int likes, boolean isMine, boolean isLiked, Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.body = post.getBody();
@@ -57,9 +61,10 @@ public class ResponseSingleGenericPostDto {
         this.likes = likes;
         this.views = post.getViews();
         this.createdAt = post.getCreatedAt();
-        this.files = PostFileDto.listOf(baseFileUrl, post.getFiles());
+        this.files = PostFileDto.listOf(context, post.getFiles());
         this.isMine = isMine;
         this.isLiked = isLiked;
+        this.isBlinded = post.isBlinded();
     }
 
     public ResponseSingleGenericPostDto(ResponseSingleGenericPostDto copy) {
@@ -74,6 +79,7 @@ public class ResponseSingleGenericPostDto {
         this.files = copy.files;
         this.isMine = copy.isMine;
         this.isLiked = copy.isLiked;
+        this.isBlinded = copy.isBlinded;
     }
 
 }

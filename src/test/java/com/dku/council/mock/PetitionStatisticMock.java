@@ -2,8 +2,8 @@ package com.dku.council.mock;
 
 
 import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.statistic.PetitionStatistic;
 import com.dku.council.domain.statistic.model.dto.PetitionStatisticDto;
+import com.dku.council.domain.statistic.model.entity.PetitionStatistic;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.util.EntityUtil;
 
@@ -21,52 +21,39 @@ public class PetitionStatisticMock {
         return build;
     }
 
-    public static PetitionStatistic create(User user) {
-        return create(user, PetitionMock.createWithDummy());
-    }
-
     public static PetitionStatistic create(Petition petition) {
         return create(UserMock.createDummyMajor(), petition);
     }
 
-    public static PetitionStatistic create(Petition petition, String department) {
+    public static PetitionStatistic createDummy(Petition petition, String department) {
         return create(UserMock.createMajor("major", department), petition);
     }
 
-    public static PetitionStatistic create(String major, String department) {
-        return create(UserMock.createMajor(major, department));
-    }
-
-    public static PetitionStatistic create(String department) {
-        return create(UserMock.createMajor("major", department));
-    }
-
-    public static List<PetitionStatisticDto> createList() {
+    public static List<PetitionStatisticDto> createList(int size) {
         List<PetitionStatisticDto> dtoList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            dtoList.add(new PetitionStatisticDto("major" + i, i));
+        for (int i = 0; i < size; i++) {
+            dtoList.add(new PetitionStatisticDto("major" + i, (long) i));
         }
         return dtoList;
     }
 
     public static List<PetitionStatistic> list(Petition petition) {
+        return list(null, petition);
+    }
+
+    public static List<PetitionStatistic> list(List<User> users, Petition petition) {
         List<PetitionStatistic> ret = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            ret.add(create(petition, "department10"));
-        }
-
-        for (int i = 0; i < 100; i++) {
-            ret.add(create(petition, "department100"));
-        }
-
-        for (int i = 0; i < 40; i++) {
-            ret.add(create(petition, "department40"));
-        }
-        for (int i = 0; i < 39; i++) {
-            ret.add(create(petition, "department39"));
-        }
-        for (int i = 0; i < 41; i++) {
-            ret.add(create(petition, "department41"));
+        int[] counts = {10, 100, 40, 39, 41};
+        for (int i = 0; i < counts.length; i++) {
+            for (int j = 0; j < counts[i]; j++) {
+                PetitionStatistic ent;
+                if (users != null) {
+                    ent = create(users.get(i), petition);
+                } else {
+                    ent = createDummy(petition, "department" + counts[i]);
+                }
+                ret.add(ent);
+            }
         }
         return ret;
 

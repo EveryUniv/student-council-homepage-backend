@@ -6,11 +6,12 @@ import com.dku.council.domain.mainpage.model.dto.response.MainPageResponseDto;
 import com.dku.council.domain.mainpage.model.dto.response.ScheduleResponseDto;
 import com.dku.council.domain.mainpage.service.MainPageService;
 import com.dku.council.domain.mainpage.service.ScheduleService;
-import com.dku.council.global.auth.role.AdminOnly;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.config.jackson.JacksonDateTimeFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -32,7 +33,7 @@ public class MainPageController {
      */
     @GetMapping
     public MainPageResponseDto index() {
-        return mainPageService.getMainPage();
+        return mainPageService.mainPageInfo();
     }
 
     /**
@@ -55,8 +56,8 @@ public class MainPageController {
      *
      * @param dto 이미지 파일 & 리다이렉트 URL
      */
-    @PostMapping("/carousel")
-    @AdminOnly
+    @PostMapping(value = "/carousel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @AdminAuth
     public void uploadCarouselImage(@Valid @ModelAttribute RequestCarouselImageDto dto) {
         mainPageService.addCarouselImage(dto);
     }
@@ -77,7 +78,7 @@ public class MainPageController {
      * @param carouselId 캐러셀 ID로 삭제합니다. ONLY FOR ADMIN
      */
     @DeleteMapping("/carousel/{id}")
-    @AdminOnly
+    @AdminAuth
     public void deleteCarouselImage(@PathVariable("id") Long carouselId) {
         mainPageService.deleteCarouselImage(carouselId);
     }

@@ -27,11 +27,11 @@ public class JacksonDateTimeFormatter implements JacksonFormatConfigurer {
     public static final String TIME_FORMAT_PATTERN = "HH:mm:ss";
     public static final String DATE_TIME_FORMAT_PATTERN = "yyyy-MM-dd HH:mm:ss";
 
-    private static final DateTimeFormatter DATE_FORMAT =
+    public static final DateTimeFormatter DATE_FORMAT =
             DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN);
-    private static final DateTimeFormatter TIME_FORMAT =
+    public static final DateTimeFormatter TIME_FORMAT =
             DateTimeFormatter.ofPattern(TIME_FORMAT_PATTERN);
-    private static final DateTimeFormatter DATE_TIME_FORMAT =
+    public static final DateTimeFormatter DATE_TIME_FORMAT =
             DateTimeFormatter.ofPattern(DATE_TIME_FORMAT_PATTERN);
 
     @Override

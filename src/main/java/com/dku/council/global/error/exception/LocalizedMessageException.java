@@ -17,14 +17,14 @@ public class LocalizedMessageException extends RuntimeException {
     private String customMessage = null;
 
     public LocalizedMessageException(HttpStatus status, String messageId, Object... arguments) {
-        super(messageId);
+        super(formatMessage(messageId, arguments));
         this.status = status;
         this.messageId = messageId;
         this.arguments = arguments;
     }
 
     public LocalizedMessageException(Throwable cause, HttpStatus status, String messageId, Object... arguments) {
-        super(messageId, cause);
+        super(formatMessage(messageId, arguments), cause);
         this.status = status;
         this.messageId = messageId;
         this.arguments = arguments;
@@ -44,5 +44,21 @@ public class LocalizedMessageException extends RuntimeException {
 
     public static LocalizedMessageException of(Exception e) {
         return new UnexpectedException(e);
+    }
+
+    private static String formatMessage(String messageId, Object... arguments) {
+        if (arguments.length == 0) {
+            return messageId;
+        }
+
+        StringBuilder sb = new StringBuilder(messageId);
+        sb.append(": ");
+        for (int i = 0; i < arguments.length; i++) {
+            sb.append(arguments[i]);
+            if (i != arguments.length - 1) {
+                sb.append(", ");
+            }
+        }
+        return sb.toString();
     }
 }

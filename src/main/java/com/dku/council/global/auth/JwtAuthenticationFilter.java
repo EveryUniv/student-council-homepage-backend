@@ -27,9 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         ContentCachingResponseWrapper responseWrapper = new ContentCachingResponseWrapper(response);
 
         String accessToken = authenticationTokenProvider.getAccessTokenFromHeader(request);
-        //인증 시작
         if (accessToken != null) {
-            //Authentication 등록
             Authentication authentication = authenticationTokenProvider.getAuthentication(accessToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

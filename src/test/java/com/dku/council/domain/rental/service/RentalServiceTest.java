@@ -6,7 +6,6 @@ import com.dku.council.domain.rental.exception.AlreadyRentalException;
 import com.dku.council.domain.rental.exception.NotAvailableItemException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.dto.RentalDto;
-import com.dku.council.domain.rental.model.dto.SummarizedRentalDto;
 import com.dku.council.domain.rental.model.dto.request.RequestCreateRentalDto;
 import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
@@ -79,7 +78,7 @@ class RentalServiceTest {
                 .thenReturn(rentals);
 
         // when
-        ResponsePage<SummarizedRentalDto> dto = service.list(null, Pageable.unpaged());
+        ResponsePage<RentalDto> dto = service.list((Specification<Rental>) null, Pageable.unpaged());
 
         // then
         assertThat(dto.getTotalElements()).isEqualTo(20);

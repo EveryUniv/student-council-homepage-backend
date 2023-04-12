@@ -3,25 +3,26 @@ package com.dku.council.domain.post.service;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
-import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
-import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.model.entity.posttype.News;
-import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.repository.GenericPostRepository;
+import com.dku.council.domain.post.repository.post.GenericPostRepository;
+import com.dku.council.domain.post.service.post.GenericPostService;
 import com.dku.council.domain.tag.service.TagService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.FileUploadService;
-import com.dku.council.mock.*;
-import org.junit.jupiter.api.BeforeEach;
+import com.dku.council.infra.nhn.service.ObjectUploadContext;
+import com.dku.council.mock.MultipartFileMock;
+import com.dku.council.mock.NewsMock;
+import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -29,7 +30,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +45,6 @@ class GenericPostServiceTest {
 
     @Mock
     private GenericPostRepository<News> newsRepository;
-    @Mock
-    private GenericPostRepository<GeneralForum> generalForumRepository;
-
-    @Mock
-    private GenericPostRepository<Petition> petitionRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -64,16 +59,19 @@ class GenericPostServiceTest {
     private FileUploadService fileUploadService;
 
     @Mock
+    private FileUploadService.Context fileUploadContext;
+
+    @Mock
+    private ObjectUploadContext uploadContext;
+
+    @Mock
+    private ThumbnailService thumbnailService;
+
+    @Mock
     private CachedLikeServiceImpl postLikeService;
 
+    @InjectMocks
     private GenericPostService<News> newsService;
-    private GenericPostService<GeneralForum> generalForumService;
-
-    @BeforeEach
-    public void setup() {
-        newsService = new GenericPostService<>(newsRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
-        generalForumService = new GenericPostService<>(generalForumRepository, userRepository, tagService, viewCountService, fileUploadService, postLikeService);
-    }
 
 
     @Test
@@ -87,7 +85,8 @@ class GenericPostServiceTest {
         when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
 
         // when
-        Page<SummarizedGenericPostDto> allPage = newsService.list(null, Pageable.unpaged(), 500);
+        Page<SummarizedGenericPostDto> allPage = newsService.list(newsRepository, null, Pageable.unpaged(),
+                500, UserRole.USER);
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());
@@ -102,35 +101,6 @@ class GenericPostServiceTest {
         }
     }
 
-
-    @Test
-    @DisplayName("list에 작성자가 잘 들어가는지?")
-    public void list_GeneralForum() {
-        // given
-        List<GeneralForum> allForumList = GeneralForumMock.createListDummy("generic-", 20);
-        Page<GeneralForum> allGeneralForum = new DummyPage<>(allForumList, 20);
-
-
-        when(generalForumRepository.findAll((Specification<GeneralForum>) any(), (Pageable) any())).thenReturn(allGeneralForum);
-        when(postLikeService.getCountOfLikes(any(), eq(POST))).thenReturn(15);
-
-        // when
-        Page<SummarizedGenericPostDto> allPage = generalForumService.list(null, Pageable.unpaged(), 500);
-
-        // then
-        assertThat(allPage.getTotalElements()).isEqualTo(allForumList.size());
-        for (int i = 0; i < allPage.getTotalElements(); i++) {
-            SummarizedGenericPostDto dto = allPage.getContent().get(i);
-            GeneralForum generalForum = allForumList.get(i);
-            assertThat(dto.getId()).isEqualTo(generalForum.getId());
-            assertThat(dto.getTitle()).isEqualTo(generalForum.getTitle());
-            assertThat(dto.getBody()).isEqualTo(generalForum.getBody());
-            assertThat(dto.getLikes()).isEqualTo(15);
-            assertThat(dto.getViews()).isEqualTo(generalForum.getViews());
-            assertThat(dto.getAuthor()).isEqualTo(generalForum.getUser().getNickname());
-        }
-    }
-
     @Test
     @DisplayName("새롭게 잘 생성되는지?")
     public void create() {
@@ -140,17 +110,22 @@ class GenericPostServiceTest {
 
         List<MultipartFile> files = MultipartFileMock.createList(10);
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", null, files);
+
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
+        when(fileUploadService.newContext()).thenReturn(fileUploadContext);
 
         // when
-        Long newsId = newsService.create(2L, dto);
+        Long newsId = newsService.create(newsRepository, 2L, dto);
 
         // then
         assertThat(newsId).isEqualTo(3L);
 
-        verify(fileUploadService).uploadFiles(argThat(fileList -> {
-            assertThat(fileList).isEqualTo(files);
+        verify(fileUploadContext).uploadFiles(argThat(fileList -> {
+            assertThat(fileList).hasSize(files.size());
+            for (int i = 0; i < files.size(); i++) {
+                assertThat(fileList.get(i).getOriginalFilename()).isEqualTo(files.get(i).getOriginalFilename());
+            }
             return true;
         }), any());
 
@@ -171,9 +146,10 @@ class GenericPostServiceTest {
         RequestCreateNewsDto dto = new RequestCreateNewsDto("title", "body", tagIds, List.of());
         when(userRepository.findById(any())).thenReturn(Optional.of(user));
         when(newsRepository.save(any())).thenReturn(news);
+        when(fileUploadService.newContext()).thenReturn(fileUploadContext);
 
         // when
-        Long newsId = newsService.create(2L, dto);
+        Long newsId = newsService.create(newsRepository, 2L, dto);
 
         // then
         assertThat(newsId).isEqualTo(3L);
@@ -194,7 +170,8 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(UserNotFoundException.class, () ->
-                newsService.create(2L, new RequestCreateNewsDto("title", "body", List.of(), List.of())));
+                newsService.create(newsRepository, 2L,
+                        new RequestCreateNewsDto("title", "body", List.of(), List.of())));
     }
 
     @Test
@@ -206,7 +183,8 @@ class GenericPostServiceTest {
         when(postLikeService.isLiked(any(), any(), eq(POST))).thenReturn(false);
 
         // when
-        ResponseSingleGenericPostDto dto = newsService.findOne(4L, news.getUser().getId(), "Addr");
+        ResponseSingleGenericPostDto dto = newsService.findOne(newsRepository, 4L,
+                news.getUser().getId(), news.getUser().getUserRole(), "Addr");
 
         // then
         verify(viewCountService).increasePostViews(argThat(post -> {
@@ -228,7 +206,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                newsService.findOne(0L, 4L, "Addr"));
+                newsService.findOne(newsRepository, 0L, 4L, UserRole.USER, "Addr"));
     }
 
     @Test
@@ -239,7 +217,7 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(PostNotFoundException.class, () ->
-                newsService.delete(0L, 0L, false));
+                newsService.delete(newsRepository, 0L, 0L, false));
     }
 
     @Test
@@ -251,6 +229,6 @@ class GenericPostServiceTest {
 
         // when & then
         assertThrows(NotGrantedException.class, () ->
-                newsService.delete(0L, 0L, false));
+                newsService.delete(newsRepository, 0L, 0L, false));
     }
 }

@@ -1,6 +1,6 @@
 package com.dku.council.domain.post.scheduler;
 
-import com.dku.council.domain.post.repository.PetitionRepository;
+import com.dku.council.domain.post.repository.post.PetitionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

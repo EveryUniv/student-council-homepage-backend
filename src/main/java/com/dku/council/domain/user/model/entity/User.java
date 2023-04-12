@@ -3,7 +3,6 @@ package com.dku.council.domain.user.model.entity;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
-import com.dku.council.infra.dku.model.StudentDuesStatus;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -14,7 +13,12 @@ import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 
 @Entity
-@Table(name = "dku_user")
+@Table(name = "dku_user",
+        indexes = {
+                @Index(name = "idx_user_student_id", columnList = "studentId"),
+                @Index(name = "idx_user_phone", columnList = "phone"),
+                @Index(name = "idx_user_nickname", columnList = "nickname")
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
@@ -46,9 +50,6 @@ public class User extends BaseEntity {
 
     private String academicStatus;
 
-    @Enumerated(STRING)
-    private StudentDuesStatus duesStatus;
-
     @NotNull
     private String phone;
 
@@ -58,7 +59,6 @@ public class User extends BaseEntity {
     @Enumerated(STRING)
     private UserRole userRole;
 
-
     @Builder
     private User(@NonNull String studentId,
                  @NonNull String password,
@@ -67,7 +67,6 @@ public class User extends BaseEntity {
                  @NonNull String phone,
                  @NonNull String nickname,
                  @NonNull String academicStatus,
-                 @NonNull StudentDuesStatus duesStatus,
                  Integer yearOfAdmission,
                  UserStatus status,
                  UserRole role) {
@@ -79,7 +78,6 @@ public class User extends BaseEntity {
         this.nickname = nickname;
         this.academicStatus = academicStatus;
         this.yearOfAdmission = yearOfAdmission;
-        this.duesStatus = duesStatus;
         this.status = status;
         this.userRole = role;
     }
@@ -101,12 +99,12 @@ public class User extends BaseEntity {
         this.phone = phone;
     }
 
-    public void changeGenericInfo(String studentId, String studentName, Major major, int yearOfAdmission, String studentState, StudentDuesStatus duesStatus) {
+    public void changeGenericInfo(String studentId, String studentName, Major major, int yearOfAdmission, String studentState) {
         this.studentId = studentId;
         this.name = studentName;
         this.major = major;
         this.yearOfAdmission = yearOfAdmission;
         this.academicStatus = studentState;
-        this.duesStatus = duesStatus;
     }
+
 }

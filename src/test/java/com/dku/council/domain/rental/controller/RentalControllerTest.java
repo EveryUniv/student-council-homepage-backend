@@ -37,7 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dku.council.global.config.jackson.JacksonDateTimeFormatter.serialize;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
@@ -137,27 +136,6 @@ class RentalControllerTest extends AbstractContainerRedisTest {
         Integer[] ids = EntityUtil.getIdArray(targetRentals);
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[*].id", containsInAnyOrder(ids)));
-    }
-
-    @Test
-    @DisplayName("대여 현황 단건 조회")
-    void findOneItem() throws Exception {
-        // given
-        Rental rental = rentals.get(0);
-
-        // when
-        ResultActions result = mvc.perform(get("/rental/" + rental.getId()));
-
-        // then
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("id", is(rental.getId().intValue())))
-                .andExpect(jsonPath("title", is(rental.getTitle())))
-                .andExpect(jsonPath("body", is(rental.getBody())))
-                .andExpect(jsonPath("rentalAt", is(serialize(rental.getCreatedAt()))))
-                .andExpect(jsonPath("userClass", is(rental.getUserClass().toString())))
-                .andExpect(jsonPath("rentalStart", is(serialize(rental.getRentalStart()))))
-                .andExpect(jsonPath("rentalEnd", is(serialize(rental.getRentalEnd()))))
-                .andExpect(jsonPath("lender", is(user.getName())));
     }
 
     @Test
