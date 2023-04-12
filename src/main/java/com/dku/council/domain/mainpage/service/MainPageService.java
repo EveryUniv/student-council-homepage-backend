@@ -16,6 +16,7 @@ import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -83,12 +84,15 @@ public class MainPageService {
     }
 
     public MainPageResponseDto mainPageInfo() {
-        List<PetitionSummary> petitions = petitionRepository.findTop5ByOrderByCreatedAtDesc().stream()
-                .map(PetitionSummary::new).collect(Collectors.toList());
+        List<PetitionSummary> petitions = petitionRepository.findTopByOrderByCreatedAtDesc(PageRequest.of(0, 5)).stream()
+                .map(PetitionSummary::new)
+                .collect(Collectors.toList());
         List<PostSummary> news = newsRepository.findTop5ByOrderByCreatedAtDesc().stream()
-                .map(PostSummary::new).collect(Collectors.toList());
+                .map(PostSummary::new)
+                .collect(Collectors.toList());
         List<PostSummary> conferences = conferenceRepository.findTop5ByOrderByCreatedAtDesc().stream()
-                .map(PostSummary::new).collect(Collectors.toList());
+                .map(PostSummary::new)
+                .collect(Collectors.toList());
 
         List<CarouselImageResponse> carouselImages = getCarouselImages();
 

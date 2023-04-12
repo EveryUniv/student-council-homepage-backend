@@ -12,7 +12,7 @@ import com.dku.council.domain.timetable.model.dto.response.ListTimeTableDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeScheduleDto;
 import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
-import com.dku.council.mock.LectureTemplateMock;
+import com.dku.council.mock.LectureMock;
 import com.dku.council.util.base.AbstractAuthControllerTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
 
     @BeforeEach
     void setup() {
-        testLectures = LectureTemplateMock.createList(3).stream()
+        testLectures = LectureMock.createLectureTemplateList().stream()
                 .map(e -> new LectureTemplateDto(objectMapper, e))
                 .collect(Collectors.toList());
 
@@ -88,7 +88,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         // when
         mvc.perform(get("/timetable/lecture"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content.size()").value(3))
+                .andExpect(jsonPath("$.content.size()").value(testLectures.size()))
                 .andExpect(jsonPath("$.content[0].id").value(0))
                 .andExpect(jsonPath("$.content[0].lectureCode").value("539250"))
                 .andExpect(jsonPath("$.content[0].category").value("세계시민역량"))
@@ -98,14 +98,14 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.content[0].credit").value(3))
                 .andExpect(jsonPath("$.content[0].major").isEmpty())
                 .andExpect(jsonPath("$.content[0].grade").isEmpty())
-                .andExpect(jsonPath("$.content[0].times[0].start").value("16:00:00"))
-                .andExpect(jsonPath("$.content[0].times[0].end").value("17:30:00"))
+                .andExpect(jsonPath("$.content[0].times[0].start").value("00:00:00"))
+                .andExpect(jsonPath("$.content[0].times[0].end").value("06:00:00"))
                 .andExpect(jsonPath("$.content[0].times[0].week").value(DayOfWeek.TUESDAY.name()))
                 .andExpect(jsonPath("$.content[0].times[0].place").value("place1"))
-                .andExpect(jsonPath("$.content[0].times[1].start").value("12:00:00"))
-                .andExpect(jsonPath("$.content[0].times[1].end").value("15:30:00"))
-                .andExpect(jsonPath("$.content[0].times[1].week").value(DayOfWeek.THURSDAY.name()))
-                .andExpect(jsonPath("$.content[0].times[1].place").value("place2"));
+                .andExpect(jsonPath("$.content[1].times[0].start").value("06:00:00"))
+                .andExpect(jsonPath("$.content[1].times[0].end").value("12:00:00"))
+                .andExpect(jsonPath("$.content[1].times[0].week").value(DayOfWeek.TUESDAY.name()))
+                .andExpect(jsonPath("$.content[1].times[0].place").value("place1"));
 
     }
 
