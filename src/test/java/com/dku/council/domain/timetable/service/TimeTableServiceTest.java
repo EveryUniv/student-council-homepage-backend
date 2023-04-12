@@ -1,8 +1,9 @@
 package com.dku.council.domain.timetable.service;
 
 import com.dku.council.domain.post.service.DummyPage;
+import com.dku.council.domain.timetable.exception.TimeConflictException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
-import com.dku.council.domain.timetable.model.dto.TimePromise;
+import com.dku.council.domain.timetable.exception.TooSmallTimeException;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
 import com.dku.council.domain.timetable.model.dto.response.LectureTemplateDto;
@@ -19,7 +20,6 @@ import com.dku.council.domain.timetable.repository.spec.LectureTemplateSpec;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.LectureMock;
-import com.dku.council.mock.LectureTemplateMock;
 import com.dku.council.mock.TimeTableMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.util.ObjectMapperGenerator;
@@ -35,14 +35,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.dku.council.mock.LectureMock.createTooSmallLectureTemplateList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -68,16 +66,19 @@ class TimeTableServiceTest {
 
     private final ObjectMapper mapper = ObjectMapperGenerator.create();
     private TimeTable table;
+    private TimeTable overlappedTable;
     private List<TimeSchedule> schedules;
+    private List<TimeSchedule> overlappedSchedules;
     private List<TimeScheduleDto> schedulesDto;
     private List<LectureTemplate> lectures;
+    private List<LectureTemplate> overlappedLectures;
 
     @BeforeEach
     void setup() {
         service = new TimeTableService(mapper, userRepository, lectureTemplateRepository, timeTableRepository, timeScheduleRepository);
         table = TimeTableMock.createDummy();
 
-        schedules = LectureMock.createLectureList(10);
+        schedules = LectureMock.createLectureList();
         for (TimeSchedule schedule : schedules) {
             schedule.changeTimeTable(table);
         }
@@ -86,7 +87,14 @@ class TimeTableServiceTest {
                 .map(e -> new TimeScheduleDto(mapper, e))
                 .collect(Collectors.toList());
 
-        lectures = LectureTemplateMock.createList(10);
+        overlappedTable = TimeTableMock.createDummy();
+        overlappedSchedules = LectureMock.createOverlappedLectureList();
+        for (TimeSchedule schedule : overlappedSchedules) {
+            schedule.changeTimeTable(overlappedTable);
+        }
+
+        lectures = LectureMock.createLectureTemplateList();
+        overlappedLectures = LectureMock.createOverlappedLectureTemplateList();
     }
 
 
@@ -179,43 +187,56 @@ class TimeTableServiceTest {
     }
 
     @Test
-    @DisplayName("시간표 생성 - 일정 추가")
-    void createWithSchedule() {
+    @DisplayName("시간표 생성 실패 - 겹치는 일정")
+    void failedCreateOverlapped() {
         // given
-        List<RequestScheduleDto> reqDtos = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            RequestScheduleDto dto = new RequestScheduleDto(null, "name-" + i, "memo-" + i,
-                    List.of(
-                            new TimePromise(LocalTime.of(9, 0), LocalTime.of(10, 0),
-                                    DayOfWeek.MONDAY, "place")
-                    ),
-                    "color-" + i);
-            reqDtos.add(dto);
-        }
+        List<RequestScheduleDto> reqDtos = overlappedSchedules.stream()
+                .map(e -> new RequestScheduleDto(e.getId(), null, null, List.of(), e.getColor()))
+                .collect(Collectors.toList());
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(overlappedTable.getName(), reqDtos);
 
-        table.getSchedules().clear();
-        table.getSchedules().addAll(reqDtos.stream()
-                .map(e -> TimeSchedule.builder()
-                        .name(e.getName())
-                        .memo(e.getMemo())
-                        .color(e.getColor())
-                        .timesJson(TimePromise.serialize(mapper, e.getTimes()))
-                        .build())
-                .collect(Collectors.toList()));
+        given(userRepository.findById(overlappedTable.getUser().getId())).willReturn(Optional.of(overlappedTable.getUser()));
+        given(lectureTemplateRepository.findAllById(any())).willReturn(overlappedLectures);
+        given(timeScheduleRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
 
+        // when & then
+        Assertions.assertThrows(TimeConflictException.class, () ->
+                service.create(overlappedTable.getUser().getId(), dto));
+    }
+
+    @Test
+    @DisplayName("시간표 생성 실패 - 너무 작은 범위")
+    void failedCreateTooSmall() {
+        // given
+        List<RequestScheduleDto> reqDtos = overlappedSchedules.stream()
+                .map(e -> new RequestScheduleDto(e.getId(), null, null, List.of(), e.getColor()))
+                .collect(Collectors.toList());
         CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), reqDtos);
 
         given(userRepository.findById(table.getUser().getId())).willReturn(Optional.of(table.getUser()));
+        given(lectureTemplateRepository.findAllById(any())).willReturn(createTooSmallLectureTemplateList(30));
+
+        // when & then
+        Assertions.assertThrows(TooSmallTimeException.class, () ->
+                service.create(table.getUser().getId(), dto));
+    }
+
+    @Test
+    @DisplayName("시간표 생성 - 일정 추가")
+    void createWithSchedule() {
+        // given
+        CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(overlappedTable.getName(), List.of());
+
+        given(userRepository.findById(overlappedTable.getUser().getId())).willReturn(Optional.of(overlappedTable.getUser()));
         given(lectureTemplateRepository.findAllById(any())).willReturn(List.of());
-        given(timeTableRepository.save(tableCheckArgThat())).willReturn(table);
-        given(timeScheduleRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
+        given(timeTableRepository.save(tableCheckArgThat())).willReturn(overlappedTable);
 
         // when
-        Long id = service.create(table.getUser().getId(), dto);
+        Long id = service.create(overlappedTable.getUser().getId(), dto);
 
         // then
         verify(lectureTemplateRepository).findAllById(any());
-        assertThat(id).isEqualTo(table.getId());
+        assertThat(id).isEqualTo(overlappedTable.getId());
     }
 
     @Test
