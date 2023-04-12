@@ -7,10 +7,9 @@ COPY build/libs/*.jar application.jar
 EXPOSE 8080
 
 ENTRYPOINT java -Duser.timezone="Asia/Seoul" -jar\
-#    Pinpoint 일시 중단
-#    -javaagent:./pinpoint/pinpoint-bootstrap-2.5.0.jar\
-#    -Dpinpoint.agentId=dev\
-#    -Dpinpoint.applicationName=$AGENT_NAME\
-#    -Dpinpoint.config=./pinpoint/pinpoint-root.config\
+    -javaagent:./pinpoint/pinpoint-bootstrap-2.5.0.jar\
+    -Dpinpoint.agentId=dev\
+    -Dpinpoint.applicationName=$AGENT_NAME\
+    -Dpinpoint.config=./pinpoint/pinpoint-root.config\
     application.jar\
     --spring.config.location=file:///usr/app/application.yml
