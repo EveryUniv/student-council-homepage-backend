@@ -1,6 +1,6 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.comment.CommentRepository;
+import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
