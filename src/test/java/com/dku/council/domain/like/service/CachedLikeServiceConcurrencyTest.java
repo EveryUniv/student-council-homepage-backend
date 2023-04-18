@@ -1,5 +1,6 @@
 package com.dku.council.domain.like.service;
 
+import com.dku.council.domain.like.repository.LikeMemoryRepository;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.post.NewsRepository;
@@ -10,6 +11,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.NewsMock;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,13 +27,16 @@ import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-//@FullIntegrationTest todo
+@FullIntegrationTest
 class CachedLikeServiceConcurrencyTest extends AbstractContainerRedisTest {
 
     private static final int THREAD_COUNT = 100;
 
     @Autowired
     private CachedLikeServiceImpl service;
+
+    @Autowired
+    private LikeMemoryRepository memoryRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -78,5 +83,6 @@ class CachedLikeServiceConcurrencyTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(service.getCountOfLikes(post.getId(), POST)).isEqualTo(THREAD_COUNT);
+        assertThat(memoryRepository.getAllLikesAndClear(POST).size()).isEqualTo(THREAD_COUNT);
     }
 }
