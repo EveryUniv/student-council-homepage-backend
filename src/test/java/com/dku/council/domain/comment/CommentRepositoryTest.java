@@ -1,6 +1,8 @@
 package com.dku.council.domain.comment;
 
+import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.user.model.entity.Major;

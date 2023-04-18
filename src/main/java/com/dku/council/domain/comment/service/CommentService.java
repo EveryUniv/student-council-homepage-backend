@@ -1,12 +1,12 @@
 package com.dku.council.domain.comment.service;
 
-import com.dku.council.domain.comment.CommentLogRepository;
-import com.dku.council.domain.comment.CommentRepository;
-import com.dku.council.domain.comment.CommentStatus;
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
+import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.comment.model.dto.CommentDto;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.comment.model.entity.CommentLog;
+import com.dku.council.domain.comment.repository.CommentLogRepository;
+import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.exception.PostNotFoundException;

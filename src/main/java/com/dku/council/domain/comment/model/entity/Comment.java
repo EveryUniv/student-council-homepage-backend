@@ -1,6 +1,6 @@
 package com.dku.council.domain.comment.model.entity;
 
-import com.dku.council.domain.comment.CommentStatus;
+import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;

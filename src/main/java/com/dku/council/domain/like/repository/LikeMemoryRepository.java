@@ -68,6 +68,22 @@ public interface LikeMemoryRepository {
     void setLikeCount(Long elementId, int count, LikeTarget target);
 
     /**
+     * 좋아요 개수 1 증가
+     *
+     * @param elementId 요소 ID
+     * @param target    요소 타입
+     */
+    void increaseLikeCount(Long elementId, LikeTarget target);
+
+    /**
+     * 좋아요 개수 1 감소
+     *
+     * @param elementId 요소 ID
+     * @param target    요소 타입
+     */
+    void decreaseLikeCount(Long elementId, LikeTarget target);
+
+    /**
      * 캐싱된 모든 '좋아요' 데이터중에서 특정 유저의 것들만 가져오고, 모두 삭제한다.
      *
      * @param userId 사용자 ID
