@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container" style="max-width: 1000px">
+    <div class="py-5 text-center">
+        <h2>게시글 목록</h2>
+    </div>
+    <td>
+        <button class="btn btn-primary float-end" type="button">전체</button>
+    </td>
+    <td>
+        <button class="btn btn-primary float-end" type="button">자유게시판</button>
+    </td>
+    <td>
+        <button class="btn btn-primary float-end" type="button">청원게시판</button>
+    </td>
+    <td>
+        <button class="btn btn-primary float-end" type="button">Q&A</button>
+    </td>
+
+    <hr class="my-4">
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">제목</th>
+                <th scope="col">작성일</th>
+                <th scope="col">상태</th>
+                <th scop="col">신고 횟수</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post : ${posts}">
+                <td><a th:href="@{|/manage/post/${post.id}|}"
+                       th:text="${post.title}"></a></td>
+                <td th:text="${post.createdAt}"></td>
+                <td th:text="${post.status}"></td>
+                <td th:text="${post.reports.size()}"></td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">비활성화</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">활성화</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">삭제</button>
+                </td>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

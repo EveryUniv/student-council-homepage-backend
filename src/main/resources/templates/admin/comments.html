@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container" style="max-width: 1000px">
+    <div class="py-5 text-center">
+        <h2>댓글 목록</h2>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">게시물 제목</th>
+                <th scope="col">댓글 내용</th>
+                <th scope="col">댓글 상태</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="comment : ${comments}">
+                <td><a th:href="@{|/manage/post/${comment.getPost().id}|}"
+                       th:text="${comment.post.title}"></a></td>
+                <td th:text="${comment.text}"></td>
+                <td th:text="${comment.status}"></td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">비활성화</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">활성화</button>
+                </td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">삭제</button>
+                </td>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

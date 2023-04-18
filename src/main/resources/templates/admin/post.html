@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet"
+        th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container" style="max-width: 1000px">
+  <div class="py-5 text-center">
+    <h2>게시글</h2>
+  </div>
+
+  <div class="card text-center">
+    <div class="card-header" th:text="${post.title}">타이틀</div>
+
+    <div class="card-body">
+      <p class="card-text" th:text="${post.body}">텍스트</p>
+    </div>
+
+    <td>
+      <button class="btn btn-primary float-end" type="button">비활성화</button>
+    </td>
+
+    <br>
+
+    <td>
+      <button class="btn btn-primary float-end" type="button">활성화</button>
+    </td>
+
+    <br>
+
+    <td>
+      <button class="btn btn-primary float-end" type="button">삭제</button>
+    </td>
+
+    <div class="card-footer text-body-secondary" th:text="${post.user.getName() + post.user.getStudentId()}">작성자</div>
+  </div>
+</div>
+</body>
+</html>

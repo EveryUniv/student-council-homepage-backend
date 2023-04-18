@@ -28,4 +28,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "on p.id = c.post.id and c.user.id=:userId and c.status='ACTIVE' " +
             "group by p.id)")
     Page<Post> findAllCommentByUserId(Long userId, Pageable pageable);
+
+    /**
+     * 관리자만 사용 가능합니다.
+     */
+    @Query("select c from Comment c where c.user.id=:userId order by c.createdAt desc")
+    List<Comment> findAllByUserId(Long userId);
 }

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -23,4 +24,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query("select p from Post p where p.user.id=:userId and p.status='ACTIVE'")
     Page<Post> findAllByUserId(@Param("userId")Long userId, Pageable pageable);
+
+    /**
+     * 관리자만 사용 가능합니다.
+     */
+    @Query("select p from Post p where p.user.id=:userId order by p.createdAt desc")
+    List<Post> findAllByUserId(Long userId);
+    /**
+     * 관리자만 사용 가능합니다.
+     */
+    List<Post> findAllByOrderByCreatedAtDesc();
 }
