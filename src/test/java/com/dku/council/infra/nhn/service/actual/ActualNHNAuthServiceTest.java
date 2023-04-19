@@ -1,7 +1,6 @@
 package com.dku.council.infra.nhn.service.actual;
 
 import com.dku.council.infra.nhn.service.NHNAuthService;
-import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
@@ -34,10 +33,10 @@ class ActualNHNAuthServiceTest {
         String username = properties.get("nhn.auth.username");
         String password = properties.get("nhn.auth.password");
 
-        this.service = new NHNAuthServiceImpl(webClient, apiPath, tenantId, username, password);
+        this.service = new NHNAuthService(webClient, apiPath, tenantId, username, password);
 
         // call @postconstruct manually
-        Method init = NHNAuthServiceImpl.class.getDeclaredMethod("initialize");
+        Method init = NHNAuthService.class.getDeclaredMethod("initialize");
         init.setAccessible(true);
         init.invoke(service);
     }

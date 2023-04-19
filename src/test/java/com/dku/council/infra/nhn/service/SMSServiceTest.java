@@ -1,7 +1,6 @@
 package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.CannotSendSMSException;
-import com.dku.council.infra.nhn.service.impl.SMSServiceImpl;
 import com.dku.council.util.base.AbstractMockServerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +17,7 @@ class SMSServiceTest extends AbstractMockServerTest {
     public void beforeEach() {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new SMSServiceImpl(webClient, apiPath, "secretKey", "senderPhone");
+        this.service = new SMSService(webClient, apiPath, "secretKey", "senderPhone");
     }
 
     @Test

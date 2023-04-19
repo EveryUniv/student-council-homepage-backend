@@ -2,7 +2,6 @@ package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.model.UploadedFile;
-import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.mock.MultipartFileMock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ class FileUploadServiceTest {
     private static final Pattern UUID_PATTERN = Pattern.compile("^[0-9a-f]{8}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{4}\\b-[0-9a-f]{12}$");
 
     @Mock
-    private NHNAuthServiceImpl authService;
+    private NHNAuthService authService;
 
     @Mock
     private ObjectStorageService storageService;

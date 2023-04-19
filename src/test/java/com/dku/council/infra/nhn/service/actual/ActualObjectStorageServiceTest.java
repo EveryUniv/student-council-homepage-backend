@@ -3,7 +3,6 @@ package com.dku.council.infra.nhn.service.actual;
 import com.dku.council.infra.nhn.service.NHNAuthService;
 import com.dku.council.infra.nhn.service.ObjectStorageService;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
-import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
@@ -43,10 +42,10 @@ class ActualObjectStorageServiceTest {
         ObjectUploadContext uploadContext = new ObjectUploadContext(osApiPath, defaultThumbnail);
 
         this.storageService = new ObjectStorageService(webClient, uploadContext);
-        this.authService = new NHNAuthServiceImpl(webClient, authApiPath, tenantId, username, password);
+        this.authService = new NHNAuthService(webClient, authApiPath, tenantId, username, password);
 
         // call @postconstruct manually
-        Method init = NHNAuthServiceImpl.class.getDeclaredMethod("initialize");
+        Method init = NHNAuthService.class.getDeclaredMethod("initialize");
         init.setAccessible(true);
         init.invoke(authService);
     }

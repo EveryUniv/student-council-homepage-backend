@@ -2,7 +2,6 @@ package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
-import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.util.base.AbstractMockServerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,11 +22,11 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new NHNAuthServiceImpl(webClient, apiPath, "tenantId", "username", "password");
-        this.notInitializedService = new NHNAuthServiceImpl(webClient, apiPath, "tenantId", "username", "password");
+        this.service = new NHNAuthService(webClient, apiPath, "tenantId", "username", "password");
+        this.notInitializedService = new NHNAuthService(webClient, apiPath, "tenantId", "username", "password");
 
         // call @postconstruct manually
-        Method init = NHNAuthServiceImpl.class.getDeclaredMethod("initialize");
+        Method init = NHNAuthService.class.getDeclaredMethod("initialize");
         init.setAccessible(true);
         init.invoke(service);
     }

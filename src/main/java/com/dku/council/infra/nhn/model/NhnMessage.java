@@ -1,4 +1,4 @@
-package com.dku.council.infra.nhn.model.dto;
+package com.dku.council.infra.nhn.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
