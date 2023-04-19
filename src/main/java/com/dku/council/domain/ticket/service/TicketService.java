@@ -33,6 +33,7 @@ public class TicketService {
         return memoryRepository.saveEvents(eventEntities);
     }
 
+    @Transactional(readOnly = true)
     public TicketDto myTicket(Long userId, Long ticketEventId) {
         int turn = memoryRepository.getMyTicket(userId, ticketEventId);
         if (turn == -1) {
