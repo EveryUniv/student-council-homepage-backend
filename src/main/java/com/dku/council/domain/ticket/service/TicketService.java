@@ -2,6 +2,7 @@ package com.dku.council.domain.ticket.service;
 
 import com.dku.council.domain.ticket.exception.AlreadyIssuedTicketException;
 import com.dku.council.domain.ticket.exception.NoTicketException;
+import com.dku.council.domain.ticket.model.dto.RequestNewTicketEventDto;
 import com.dku.council.domain.ticket.model.dto.TicketDto;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
@@ -31,6 +32,16 @@ public class TicketService {
         }
         List<TicketEvent> eventEntities = ticketEventRepository.findAll();
         return memoryRepository.saveEvents(eventEntities);
+    }
+
+    @Transactional
+    public void newTicketEvent(RequestNewTicketEventDto dto) {
+        ticketEventRepository.save(dto.createEntity());
+    }
+
+    @Transactional
+    public void deleteTicketEvent(Long ticketEventId) {
+        ticketEventRepository.deleteById(ticketEventId);
     }
 
     @Transactional(readOnly = true)

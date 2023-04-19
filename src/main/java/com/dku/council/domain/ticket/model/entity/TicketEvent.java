@@ -4,11 +4,10 @@ import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -29,6 +28,9 @@ public class TicketEvent extends BaseEntity {
     private LocalDateTime end;
 
     private int totalTickets;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<Ticket> tickets = new ArrayList<>();
 
     public TicketEvent(String name, LocalDateTime begin, LocalDateTime end, int totalTickets) {
         this.name = name;

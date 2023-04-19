@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
             throw new RuntimeException(e);
         }
         redisTemplate.opsForValue().set(TICKET_EVENTS_KEY, value);
+        redisTemplate.expire(TICKET_EVENTS_KEY, Duration.ofSeconds(10));
         return list;
     }
 
@@ -57,8 +59,13 @@ public class TicketRedisRepository implements TicketMemoryRepository {
         String nextNumberKey = RedisKeys.combine(TICKET_NUMBER_KEY, ticketEventId);
         Long size = redisTemplate.opsForValue().increment(nextNumberKey);
 
+        if (size == null) {
+            redisTemplate.opsForValue().set(nextNumberKey, "1");
+            size = 1L;
+        }
+
         String key = RedisKeys.combine(TICKET_KEY, ticketEventId);
-        if (!redisTemplate.opsForHash().putIfAbsent(key, userId, size)) {
+        if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
             redisTemplate.opsForValue().decrement(nextNumberKey);
             return -1;
         }
@@ -69,7 +76,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
     @Override
     public int getMyTicket(Long userId, Long ticketEventId) {
         String key = RedisKeys.combine(TICKET_KEY, ticketEventId);
-        Object value = redisTemplate.opsForHash().get(key, userId);
+        Object value = redisTemplate.opsForHash().get(key, userId.toString());
         if (value == null) {
             return -1;
         }

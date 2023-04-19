@@ -1,11 +1,9 @@
 package com.dku.council.domain.ticket.controller;
 
-import com.dku.council.domain.ticket.model.dto.CaptchaDto;
-import com.dku.council.domain.ticket.model.dto.RequestEnrollDto;
-import com.dku.council.domain.ticket.model.dto.TicketDto;
-import com.dku.council.domain.ticket.model.dto.TicketEventDto;
+import com.dku.council.domain.ticket.model.dto.*;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.infra.captcha.model.Captcha;
 import com.dku.council.infra.captcha.service.CaptchaService;
@@ -13,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Tag(name = "티켓", description = "티켓 관련 API")
@@ -30,10 +29,32 @@ public class TicketController {
      *
      * @return 티켓 이벤트 목록
      */
-    @GetMapping
-    @UserAuth
+    @GetMapping("/event")
     public List<TicketEventDto> list() {
         return ticketService.list();
+    }
+
+    /**
+     * 티켓 이벤트 등록하기
+     *
+     * @param dto 티켓 이벤트 정보
+     */
+    @PostMapping("/event")
+    @AdminAuth
+    public void newTicketEvent(@Valid @RequestBody RequestNewTicketEventDto dto) {
+        ticketService.newTicketEvent(dto);
+    }
+
+    /**
+     * 티켓 이벤트 삭제하기
+     * <p>티켓 이벤트를 삭제합니다. 이벤트에 등록된 사용자들의 티켓도 함께 삭제됩니다.</p>
+     *
+     * @param ticketEventId 티켓 이벤트 아이디
+     */
+    @DeleteMapping("/event/{ticketEventId}")
+    @AdminAuth
+    public void deleteTicketEvent(@PathVariable Long ticketEventId) {
+        ticketService.deleteTicketEvent(ticketEventId);
     }
 
     /**
@@ -69,7 +90,8 @@ public class TicketController {
      */
     @PostMapping
     @UserAuth
-    public TicketDto enroll(AppAuthentication auth, @RequestBody RequestEnrollDto dto) {
+    public TicketDto enroll(AppAuthentication auth,
+                            @Valid @RequestBody RequestEnrollDto dto) {
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
         return ticketService.enroll(auth.getUserId(), dto.getEventId());
     }
