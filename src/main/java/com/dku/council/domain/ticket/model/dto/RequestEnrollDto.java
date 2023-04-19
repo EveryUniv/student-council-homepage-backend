@@ -5,10 +5,15 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @RequiredArgsConstructor
 public class RequestEnrollDto {
+
+    @NotNull
+    @Schema(description = "참여 이벤트 ID")
+    private final Long eventId;
 
     @NotEmpty
     @Schema(description = "Captcha 키")

@@ -7,8 +7,8 @@ import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserAuth;
-import com.dku.council.infra.nhn.model.Captcha;
-import com.dku.council.infra.nhn.service.CaptchaService;
+import com.dku.council.infra.captcha.model.Captcha;
+import com.dku.council.infra.captcha.service.CaptchaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -71,6 +71,6 @@ public class TicketController {
     @UserAuth
     public TicketDto enroll(AppAuthentication auth, @RequestBody RequestEnrollDto dto) {
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
-        return ticketService.enroll(auth.getUserId());
+        return ticketService.enroll(auth.getUserId(), dto.getEventId());
     }
 }

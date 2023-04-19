@@ -28,12 +28,12 @@ public class TicketEvent extends BaseEntity {
 
     private LocalDateTime end;
 
-    private int available;
+    private int totalTickets;
 
-    public TicketEvent(String name, LocalDateTime begin, LocalDateTime end, int available) {
+    public TicketEvent(String name, LocalDateTime begin, LocalDateTime end, int totalTickets) {
         this.name = name;
         this.begin = begin;
         this.end = end;
-        this.available = available;
+        this.totalTickets = totalTickets;
     }
 }

@@ -1,4 +1,4 @@
-package com.dku.council.infra.nhn.model;
+package com.dku.council.infra.captcha.model;
 
 import lombok.Getter;
 

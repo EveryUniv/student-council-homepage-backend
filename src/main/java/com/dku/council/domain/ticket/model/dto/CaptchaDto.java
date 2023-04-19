@@ -1,6 +1,6 @@
 package com.dku.council.domain.ticket.model.dto;
 
-import com.dku.council.infra.nhn.model.Captcha;
+import com.dku.council.infra.captcha.model.Captcha;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

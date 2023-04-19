@@ -6,14 +6,10 @@ import lombok.Getter;
 @Getter
 public class TicketDto {
 
-    @Schema(description = "티켓 이벤트 이름", example = "티켓 이벤트")
-    private final String name;
-
     @Schema(description = "대기 순번", example = "5")
     private final int turn;
 
-    public TicketDto(String name, int turn) {
-        this.name = name;
+    public TicketDto(int turn) {
         this.turn = turn;
     }
 }
