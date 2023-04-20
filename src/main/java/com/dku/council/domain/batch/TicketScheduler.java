@@ -11,7 +11,7 @@ public class TicketScheduler {
     private final TicketService ticketService;
 
     @Scheduled(fixedDelayString = "${app.ticket.dump-delay}")
-    public void schedule() {
+    public void dumpToDb() {
         ticketService.dumpToDb();
     }
 }
