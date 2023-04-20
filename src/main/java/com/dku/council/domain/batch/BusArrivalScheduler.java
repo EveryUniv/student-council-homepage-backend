@@ -1,4 +1,4 @@
-package com.dku.council.domain.bus.scheduler;
+package com.dku.council.domain.batch;
 
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.domain.bus.service.BusService;

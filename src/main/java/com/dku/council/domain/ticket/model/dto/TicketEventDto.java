@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class TicketEventDto {
+
     @Schema(description = "티켓 이벤트 아이디")
     private final Long id;
 

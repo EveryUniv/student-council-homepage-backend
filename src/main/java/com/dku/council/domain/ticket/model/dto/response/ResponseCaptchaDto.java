@@ -1,11 +1,11 @@
-package com.dku.council.domain.ticket.model.dto;
+package com.dku.council.domain.ticket.model.dto.response;
 
 import com.dku.council.infra.captcha.model.Captcha;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-public class CaptchaDto {
+public class ResponseCaptchaDto {
 
     @Schema(description = "Captcha 키")
     private final String key;
@@ -13,7 +13,7 @@ public class CaptchaDto {
     @Schema(description = "Captcha 이미지 URL")
     private final String imageUrl;
 
-    public CaptchaDto(Captcha captcha) {
+    public ResponseCaptchaDto(Captcha captcha) {
         this.key = captcha.getKey();
         this.imageUrl = captcha.getImageUrl();
     }

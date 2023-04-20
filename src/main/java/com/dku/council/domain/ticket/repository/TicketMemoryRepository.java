@@ -1,5 +1,6 @@
 package com.dku.council.domain.ticket.repository;
 
+import com.dku.council.domain.ticket.model.dto.TicketDto;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 
@@ -48,4 +49,10 @@ public interface TicketMemoryRepository {
      * @return 티켓 순번.
      */
     int saveMyTicket(Long userId, Long ticketEventId, int turn);
+
+    /**
+     * 모든 티켓을 가져오고, 캐시를 비운다.
+     * @return 티켓 목록
+     */
+    List<TicketDto> flushAllTickets();
 }

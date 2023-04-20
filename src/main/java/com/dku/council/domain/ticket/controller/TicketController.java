@@ -1,6 +1,10 @@
 package com.dku.council.domain.ticket.controller;
 
-import com.dku.council.domain.ticket.model.dto.*;
+import com.dku.council.domain.ticket.model.dto.TicketEventDto;
+import com.dku.council.domain.ticket.model.dto.request.RequestEnrollDto;
+import com.dku.council.domain.ticket.model.dto.request.RequestNewTicketEventDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseCaptchaDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
@@ -66,7 +70,7 @@ public class TicketController {
      */
     @GetMapping("/{ticketEventId}")
     @UserAuth
-    public TicketDto myTicket(AppAuthentication auth, @PathVariable Long ticketEventId) {
+    public ResponseTicketDto myTicket(AppAuthentication auth, @PathVariable Long ticketEventId) {
         return ticketService.myTicket(auth.getUserId(), ticketEventId);
     }
 
@@ -77,9 +81,9 @@ public class TicketController {
      * @return Captcha 이미지
      */
     @GetMapping("/captcha")
-    public CaptchaDto captcha() {
+    public ResponseCaptchaDto captcha() {
         Captcha captcha = captchaService.requestCaptcha();
-        return new CaptchaDto(captcha);
+        return new ResponseCaptchaDto(captcha);
     }
 
     /**
@@ -90,8 +94,8 @@ public class TicketController {
      */
     @PostMapping
     @UserAuth
-    public TicketDto enroll(AppAuthentication auth,
-                            @Valid @RequestBody RequestEnrollDto dto) {
+    public ResponseTicketDto enroll(AppAuthentication auth,
+                                    @Valid @RequestBody RequestEnrollDto dto) {
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
         return ticketService.enroll(auth.getUserId(), dto.getEventId());
     }

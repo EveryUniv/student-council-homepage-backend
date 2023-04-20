@@ -1,4 +1,4 @@
-package com.dku.council.domain.ticket.model.dto;
+package com.dku.council.domain.ticket.model.dto.request;
 
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import io.swagger.v3.oas.annotations.media.Schema;

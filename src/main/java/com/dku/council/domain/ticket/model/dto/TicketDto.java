@@ -1,15 +1,12 @@
 package com.dku.council.domain.ticket.model.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
+@RequiredArgsConstructor
 public class TicketDto {
-
-    @Schema(description = "대기 순번", example = "5")
+    private final Long userId;
+    private final Long eventId;
     private final int turn;
-
-    public TicketDto(int turn) {
-        this.turn = turn;
-    }
 }
