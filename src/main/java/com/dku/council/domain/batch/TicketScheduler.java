@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class TicketScheduler {
     private final TicketService ticketService;
 
-    @Scheduled(fixedDelayString = "${bus.cache-time}")
+    @Scheduled(fixedDelayString = "${app.ticket.dump-delay}")
     public void schedule() {
         ticketService.dumpToDb();
     }
