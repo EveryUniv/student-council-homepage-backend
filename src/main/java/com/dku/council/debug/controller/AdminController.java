@@ -1,7 +1,7 @@
 package com.dku.council.debug.controller;
 
-import com.dku.council.domain.mainpage.scheduler.ScheduleInfoScheduler;
-import com.dku.council.domain.timetable.scheduler.LectureDumpScheduler;
+import com.dku.council.domain.batch.LectureDumpScheduler;
+import com.dku.council.domain.batch.ScheduleInfoScheduler;
 import com.dku.council.global.auth.role.AdminAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

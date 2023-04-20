@@ -1,4 +1,4 @@
-package com.dku.council.domain.like.scheduler;
+package com.dku.council.domain.batch;
 
 import com.dku.council.domain.like.model.LikeTarget;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;

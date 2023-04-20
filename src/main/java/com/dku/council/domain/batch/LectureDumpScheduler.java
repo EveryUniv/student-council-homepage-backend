@@ -1,4 +1,4 @@
-package com.dku.council.domain.timetable.scheduler;
+package com.dku.council.domain.batch;
 
 import com.dku.council.domain.timetable.service.LectureRetrieveService;
 import lombok.RequiredArgsConstructor;

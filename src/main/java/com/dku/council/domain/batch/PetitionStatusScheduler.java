@@ -1,4 +1,4 @@
-package com.dku.council.domain.post.scheduler;
+package com.dku.council.domain.batch;
 
 import com.dku.council.domain.post.repository.post.PetitionRepository;
 import lombok.RequiredArgsConstructor;

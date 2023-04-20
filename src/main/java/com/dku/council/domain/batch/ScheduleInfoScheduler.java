@@ -1,4 +1,4 @@
-package com.dku.council.domain.mainpage.scheduler;
+package com.dku.council.domain.batch;
 
 import com.dku.council.domain.mainpage.service.ScheduleService;
 import lombok.RequiredArgsConstructor;
