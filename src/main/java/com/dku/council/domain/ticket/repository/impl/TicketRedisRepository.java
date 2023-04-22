@@ -32,7 +32,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
     public List<TicketEventDto> findAllEvents() {
         String value = redisTemplate.opsForValue().get(TICKET_EVENTS_KEY);
         if (value == null) {
-            return null;
+            return List.of();
         }
         try {
             CollectionType type = objectMapper.getTypeFactory().constructCollectionType(List.class, TicketEventDto.class);
@@ -72,9 +72,10 @@ public class TicketRedisRepository implements TicketMemoryRepository {
         if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
             redisTemplate.opsForValue().decrement(nextNumberKey);
             return -1;
+        } else {
+            redisTemplate.opsForSet().add(TICKET_CACHE_SET_KEY, ticketEventId.toString());
         }
 
-        redisTemplate.opsForSet().add(TICKET_CACHE_SET_KEY, ticketEventId.toString());
         return size.intValue();
     }
 
@@ -91,7 +92,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
     @Override
     public int saveMyTicket(Long userId, Long ticketEventId, int turn) {
         String key = RedisKeys.combine(TICKET_KEY, ticketEventId);
-        redisTemplate.opsForHash().put(key, userId, turn);
+        redisTemplate.opsForHash().put(key, userId.toString(), String.valueOf(turn));
         return turn;
     }
 
@@ -109,10 +110,12 @@ public class TicketRedisRepository implements TicketMemoryRepository {
             String key = RedisKeys.combine(TICKET_KEY, ticketEventId);
             for (Map.Entry<Object, Object> entry : redisTemplate.opsForHash().entries(key).entrySet()) {
                 Long userId = Long.parseLong((String) entry.getKey());
-                int turn = Integer.parseInt((String) entry.getKey());
+                int turn = Integer.parseInt((String) entry.getValue());
                 tickets.add(new TicketDto(userId, ticketEventId, turn));
             }
+            redisTemplate.delete(key);
         }
+        redisTemplate.delete(TICKET_CACHE_SET_KEY);
 
         return tickets;
     }

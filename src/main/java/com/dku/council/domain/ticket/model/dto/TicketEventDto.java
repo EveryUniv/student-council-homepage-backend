@@ -2,11 +2,15 @@ package com.dku.council.domain.ticket.model.dto;
 
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
+@EqualsAndHashCode
+@RequiredArgsConstructor
 public class TicketEventDto {
 
     @Schema(description = "티켓 이벤트 아이디")

@@ -59,6 +59,7 @@ public class TicketService {
         return new ResponseTicketDto(turn);
     }
 
+    // TODO 시작 시간 확인
     public ResponseTicketDto enroll(Long userId, Long ticketEventId) {
         int turn = memoryRepository.enroll(userId, ticketEventId);
         if (turn == -1) {
