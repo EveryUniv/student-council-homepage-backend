@@ -1,8 +1,6 @@
 package com.dku.council.domain.ticket.repository.impl;
 
 import com.dku.council.domain.ticket.model.dto.TicketDto;
-import com.dku.council.domain.ticket.model.dto.TicketEventDto;
-import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import org.junit.jupiter.api.DisplayName;
@@ -10,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,26 +18,6 @@ class TicketRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private TicketRedisRepository repository;
-
-    @Test
-    @DisplayName("이벤트 목록 캐싱")
-    void findAllEvents() {
-        // given
-        TicketEvent event = new TicketEvent("name",
-                LocalDateTime.of(2022, 3, 1, 0, 0),
-                LocalDateTime.of(2022, 3, 1, 0, 0),
-                100);
-
-        // when
-        int prevSize = repository.findAllEvents().size();
-        List<TicketEventDto> savedEvents = repository.saveEvents(List.of(event));
-        List<TicketEventDto> events = repository.findAllEvents();
-
-        // then
-        assertThat(prevSize).isEqualTo(0);
-        assertThat(savedEvents).containsExactlyInAnyOrderElementsOf(events);
-        assertThat(events.get(0).getName()).isEqualTo(event.getName());
-    }
 
     @Test
     @DisplayName("티켓팅 데이터 잘 입력되는가")

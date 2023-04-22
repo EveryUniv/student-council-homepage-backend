@@ -1,23 +1,16 @@
 package com.dku.council.domain.ticket.repository.impl;
 
 import com.dku.council.domain.ticket.model.dto.TicketDto;
-import com.dku.council.domain.ticket.model.dto.TicketEventDto;
-import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.global.config.redis.RedisKeys;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.dku.council.global.config.redis.RedisKeys.*;
 
@@ -26,37 +19,6 @@ import static com.dku.council.global.config.redis.RedisKeys.*;
 public class TicketRedisRepository implements TicketMemoryRepository {
 
     private final StringRedisTemplate redisTemplate;
-    private final ObjectMapper objectMapper;
-
-    @Override
-    public List<TicketEventDto> findAllEvents() {
-        String value = redisTemplate.opsForValue().get(TICKET_EVENTS_KEY);
-        if (value == null) {
-            return List.of();
-        }
-        try {
-            CollectionType type = objectMapper.getTypeFactory().constructCollectionType(List.class, TicketEventDto.class);
-            return objectMapper.readValue(value, type);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<TicketEventDto> saveEvents(List<TicketEvent> events) {
-        List<TicketEventDto> list = events.stream()
-                .map(TicketEventDto::new)
-                .collect(Collectors.toList());
-        String value;
-        try {
-            value = objectMapper.writeValueAsString(list);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        redisTemplate.opsForValue().set(TICKET_EVENTS_KEY, value);
-        redisTemplate.expire(TICKET_EVENTS_KEY, Duration.ofSeconds(10));
-        return list;
-    }
 
     @Override
     public int enroll(Long userId, Long ticketEventId) {

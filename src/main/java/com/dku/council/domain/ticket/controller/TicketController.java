@@ -5,6 +5,7 @@ import com.dku.council.domain.ticket.model.dto.request.RequestEnrollDto;
 import com.dku.council.domain.ticket.model.dto.request.RequestNewTicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseCaptchaDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
+import com.dku.council.domain.ticket.service.TicketEventService;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Instant;
 import java.util.List;
 
 @Tag(name = "티켓", description = "티켓 관련 API")
@@ -25,6 +27,7 @@ import java.util.List;
 public class TicketController {
 
     private final TicketService ticketService;
+    private final TicketEventService ticketEventService;
     private final CaptchaService captchaService;
 
     /**
@@ -35,7 +38,7 @@ public class TicketController {
      */
     @GetMapping("/event")
     public List<TicketEventDto> list() {
-        return ticketService.list();
+        return ticketEventService.list();
     }
 
     /**
@@ -46,7 +49,7 @@ public class TicketController {
     @PostMapping("/event")
     @AdminAuth
     public void newTicketEvent(@Valid @RequestBody RequestNewTicketEventDto dto) {
-        ticketService.newTicketEvent(dto);
+        ticketEventService.newTicketEvent(dto);
     }
 
     /**
@@ -58,7 +61,7 @@ public class TicketController {
     @DeleteMapping("/event/{ticketEventId}")
     @AdminAuth
     public void deleteTicketEvent(@PathVariable Long ticketEventId) {
-        ticketService.deleteTicketEvent(ticketEventId);
+        ticketEventService.deleteTicketEvent(ticketEventId);
     }
 
     /**
@@ -96,7 +99,8 @@ public class TicketController {
     @UserAuth
     public ResponseTicketDto enroll(AppAuthentication auth,
                                     @Valid @RequestBody RequestEnrollDto dto) {
+        Instant now = Instant.now();
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
-        return ticketService.enroll(auth.getUserId(), dto.getEventId());
+        return ticketService.enroll(auth.getUserId(), dto.getEventId(), now);
     }
 }
