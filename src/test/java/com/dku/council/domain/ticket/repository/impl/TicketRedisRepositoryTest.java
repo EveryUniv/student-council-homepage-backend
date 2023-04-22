@@ -1,8 +1,8 @@
 package com.dku.council.domain.ticket.repository.impl;
 
 import com.dku.council.domain.ticket.model.dto.TicketDto;
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.dku.council.util.test.FullIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
