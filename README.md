@@ -46,12 +46,12 @@
 
 ## 기능 상세
 
-### 모든 게시판
+### 모든 게시판 ([설계 고민](https://won983212.github.io/posts/post-architecture/))
 
  - 제목과 본문을 작성할 수 있다.
  - 파일을 첨부할 수 있다.
  - 댓글을 작성할 수 있다. (일부 게시판 제외)
- - 글과 댓글에 좋아요를 누를 수 있다. ([관련 글](https://won983212.github.io/posts/how-to-implement-like/))
+ - 글과 댓글에 좋아요를 누를 수 있다. ([좋아요 관련 글](https://won983212.github.io/posts/how-to-implement-like/))
  - 신고할 수 있다. (일부 게시판 제외, [관련 Issue](https://github.com/EveryUniv/student-council-homepage-backend/issues/177))
  - 태그를 달 수 있다.
  - 글 CRUD
@@ -59,7 +59,7 @@
  - 내가 작성한 글, 댓글단 글, 좋아요한 글을 볼 수 있다. ([관련 Issue](https://github.com/EveryUniv/student-council-homepage-backend/issues/174))
  - 도배 방지 기능이 있다.
  - 조회수 기능이 있다. (IP로 구분, 30분당 1회 조회수)
-
+   
 ### 자유 게시판
  - 사용자 이름이 닉네임으로 표시된다.
 
@@ -69,9 +69,9 @@
  - 90일이 지나면 만료된다. 만료된 글은 동의 및 답변을 할 수 없다.
  - 동의한 경우 학과별 통계에 누적된다. 학과별 동의 현황을 볼 수 있다. ([관련 Issue](https://github.com/EveryUniv/student-council-homepage-backend/issues/212#issuecomment-1492945898))
 
-### 시간표
+### 시간표 ([관련 고민 글](https://won983212.github.io/posts/how-to-implement-timetable/))
  - 내 시간표를 앱에 저장하고, 공유할 수 있다.
- - ERD 구상 ([관련 고민 글](https://won983212.github.io/posts/how-to-implement-timetable-%EB%B3%B5%EC%82%AC%EB%B3%B8/))
+ - ERD 구상
  - 시간표를 CRUD할 수 있다.
  - 학교 수업 목록을 볼 수 있다. (스크래핑)
  - 수업은 custom color를 지정할 수 있다.
@@ -81,7 +81,7 @@
  - 학교 학사일정을 주기적으로 스크래핑하고, api로 제공한다.
  - 특정 기간을 지정하면 그 기간에 걸친 모든 학사 일정을 보여준다.
 
-### 버스 도착시각 예측
+### 버스 도착시각 예측 ([관련 고민 글](https://won983212.github.io/posts/bus-collector/))
  - 학교 정문은 버스 기점과 가까워 버스 정보 앱에서도 도착 시각을 볼 수 없다.
  - 버스 도착 시각을 수집한 데이터를 바탕으로 시간표를 만들어 다음 버스를 예측한다.
  - 시간표를 기준으로 버스 도착 정보를 제공한다.

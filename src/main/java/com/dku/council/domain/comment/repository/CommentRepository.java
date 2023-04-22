@@ -1,4 +1,4 @@
-package com.dku.council.domain.comment;
+package com.dku.council.domain.comment.repository;
 
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
