@@ -1,7 +1,7 @@
 package com.dku.council.admin.page;
 
-import com.dku.council.domain.comment.CommentRepository;
 import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.model.UserStatus;

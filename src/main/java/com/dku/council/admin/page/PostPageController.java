@@ -2,7 +2,6 @@ package com.dku.council.admin.page;
 
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.post.*;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import lombok.RequiredArgsConstructor;

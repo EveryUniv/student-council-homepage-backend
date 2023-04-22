@@ -1,8 +1,8 @@
 package com.dku.council.admin.page;
 
-import com.dku.council.domain.comment.CommentRepository;
-import com.dku.council.domain.comment.CommentStatus;
+import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
