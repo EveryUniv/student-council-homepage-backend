@@ -2,6 +2,7 @@ package com.dku.council.domain.comment;
 
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,6 +33,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     /**
      * 관리자만 사용 가능합니다.
      */
-    @Query("select c from Comment c where c.user.id=:userId order by c.createdAt desc")
-    List<Comment> findAllByUserId(Long userId);
+    @Query("select c from Comment c where c.user.id=:userId")
+    Page<Comment> findAllByUserIdWithAdmin(@Param("userId")Long userId, Pageable pageable);
 }

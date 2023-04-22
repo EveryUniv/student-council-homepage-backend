@@ -30,9 +30,8 @@ public class PostSpec {
         return (root, query, builder) ->
                 builder.equal(root.get("extraStatus"), status);
     }
-
     public static <T extends Post> Specification<T> withTitleOrBody(String keyword) {
-        if (keyword == null) {
+        if (keyword == null || keyword.equals("null")) {
             return Specification.where(null);
         }
 
@@ -55,6 +54,24 @@ public class PostSpec {
                         builder.equal(root.get("status"), PostStatus.BLINDED),
                         builder.equal(root.get("status"), PostStatus.ACTIVE)
                 );
+    }
+
+    public static <T extends Post> Specification<T> withStatus(String status) {
+        if(status == null || status.equals("null")) {
+            return Specification.where(null);
+        } else if(status.equals("ACTIVE")){
+            return (root, query, builder) ->
+                    builder.equal(root.get("status"), PostStatus.ACTIVE);
+        }
+        else if(status.equals("BLINDED")) {
+            return (root, query, builder) ->
+                    builder.equal(root.get("status"), PostStatus.BLINDED);
+        } else if(status.equals("DELETED")) {
+            return (root, query, builder) ->
+                    builder.equal(root.get("status"), PostStatus.DELETED);
+        } else {
+            return Specification.where(null);
+        }
     }
 
     public static <T extends Post> Specification<T> withTag(Long tagId) {

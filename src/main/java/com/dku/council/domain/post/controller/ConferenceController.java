@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.DiscriminatorColumn;
 import javax.validation.Valid;
 
 @Tag(name = "회의록 게시판", description = "회의록 게시판 관련 api")

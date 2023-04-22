@@ -7,22 +7,37 @@
           th:href="@{/css/bootstrap.min.css}">
 </head>
 <body>
-<div class="container" style="max-width: 1000px">
+<div class="container" style="max-width: 1500px">
     <div class="py-5 text-center">
         <h2>게시글 목록</h2>
+        <p class="btn btn-secondary rounded-pill px-3" type="button">
+            <a th:href="@{|/manage|}" style="color: white">Home</a>
+        </p>
     </div>
-    <td>
-        <button class="btn btn-primary float-end" type="button">전체</button>
-    </td>
-    <td>
-        <button class="btn btn-primary float-end" type="button">자유게시판</button>
-    </td>
-    <td>
-        <button class="btn btn-primary float-end" type="button">청원게시판</button>
-    </td>
-    <td>
-        <button class="btn btn-primary float-end" type="button">Q&A</button>
-    </td>
+    <div class="btn-group">
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit">전체</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="type" value="Voc">Q&A</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="type" value="GeneralForum">자유게시판</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="type" value="Petition">청원게시판</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="status" value="BLINDED">블라인드게시물</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="status" value="DELETED">삭제게시물</button>
+        </form>
+        <form method = "get" th:action="@{/manage/posts}">
+            <button class="btn btn-outline-secondary" type="submit" name="status" value="ACTIVE">활성게시물</button>
+        </form>
+    </div>
+
 
     <hr class="my-4">
     <div>
@@ -33,24 +48,61 @@
                 <th scope="col">작성일</th>
                 <th scope="col">상태</th>
                 <th scop="col">신고 횟수</th>
+                <th scope="col">버튼</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="post : ${posts}">
-                <td><a th:href="@{|/manage/post/${post.id}|}"
+                <td><a th:href="@{|/manage/posts/${post.id}|}"
                        th:text="${post.title}"></a></td>
                 <td th:text="${post.createdAt}"></td>
                 <td th:text="${post.status}"></td>
                 <td th:text="${post.reports.size()}"></td>
                 <td>
-                    <button class="btn btn-primary float-end" type="button">비활성화</button>
+                    <div class="btn-group">
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/activate|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">활성화</button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/blind|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">blind</button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/delete|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">삭제</button>
+                        </form>
+                    </div>
                 </td>
-                <td>
-                    <button class="btn btn-primary float-end" type="button">활성화</button>
-                </td>
-                <td>
-                    <button class="btn btn-primary float-end" type="button">삭제</button>
-                </td>
+            </tr>
+
+            <nav aria-label="Page navigation example">
+                <div class="input-group mb-3">
+                    <form method = "get" th:action="@{/manage/posts}">
+                        <input type="text" name="keyword" class="form-control" placeholder="Enter keyword">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Button</button>
+                    </form>
+                </div>
+
+                <ul class="pagination" th:with="start=${(posts.number/maxPage)*maxPage + 1}, end = ${(posts.totalPages == 0) ? 1 : ((start + (maxPage - 1) < posts.totalPages) ? (start + (maxPage - 1)) : posts.totalPages)}">
+                    <li class="page-item" th:if="${start > 1}">
+                        <a class="page-link" th:href="@{|/manage/posts?page=0&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'<<'"></a>
+                    </li>
+                    <li class="page-item" th:if="${start > 1}">
+                        <a class="page-link" th:href="@{|/manage/posts?page=${start - maxPage}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'<'"></a>
+                    </li>
+
+                    <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
+                        <a class="page-link" th:href="@{|/manage/posts?page=${page - 1}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="${page}"></a>
+                    </li>
+
+                    <li class="page-item" th:if="${end < posts.totalPages}">
+                        <a class="page-link" th:href="@{|/manage/posts?page=${start + maxPage}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'>'"></a>
+                    </li>
+                    <li class="page-item" th:if="${end < posts.totalPages}">
+                        <a class="page-link" th:href="@{|/manage/posts?page=${posts.totalPages - 1}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'>>'"></a>
+                    </li>
+                </ul>
+            </nav>
+
+            </tbody>
         </table>
     </div>
 </div>

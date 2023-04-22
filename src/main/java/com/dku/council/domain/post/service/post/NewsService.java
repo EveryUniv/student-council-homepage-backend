@@ -4,6 +4,7 @@ package com.dku.council.domain.post.service.post;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateNewsDto;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
+import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.News;
 import com.dku.council.domain.post.repository.post.NewsRepository;
 import com.dku.council.domain.post.repository.spec.PostSpec;

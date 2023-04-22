@@ -5,6 +5,8 @@ import com.dku.council.domain.post.model.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -33,5 +35,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * 관리자만 사용 가능합니다.
      */
-    List<Post> findAllByOrderByCreatedAtDesc();
+    @Query("select p from Post p where p.id=:id")
+    Optional<Post> findByIdWithAdmin(Long id);
+
+
+    @Query("select p from Post p where p.user.id=:userId")
+    Page<Post> findAllByUserIdWithAdmin(@Param("userId")Long userId, Pageable pageable);
+
 }
