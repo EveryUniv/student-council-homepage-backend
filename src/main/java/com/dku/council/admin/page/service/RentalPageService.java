@@ -1,4 +1,4 @@
-package com.dku.council.admin.service;
+package com.dku.council.admin.page.service;
 
 import com.dku.council.admin.page.dto.RentalItemPageDto;
 import com.dku.council.admin.page.dto.RentalPageDto;

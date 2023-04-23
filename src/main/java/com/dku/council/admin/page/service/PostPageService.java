@@ -1,4 +1,4 @@
-package com.dku.council.admin.service;
+package com.dku.council.admin.page.service;
 
 import com.dku.council.admin.page.dto.PostPageDto;
 import com.dku.council.domain.post.exception.PostNotFoundException;

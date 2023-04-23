@@ -1,4 +1,4 @@
-package com.dku.council.admin.service;
+package com.dku.council.admin.page.service;
 
 import com.dku.council.admin.page.dto.CommentPageDto;
 import com.dku.council.admin.page.dto.PostPageDto;

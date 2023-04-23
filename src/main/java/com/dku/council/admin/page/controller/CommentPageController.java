@@ -1,6 +1,6 @@
 package com.dku.council.admin.page.controller;
 
-import com.dku.council.admin.service.CommentPageService;
+import com.dku.council.admin.page.service.CommentPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;

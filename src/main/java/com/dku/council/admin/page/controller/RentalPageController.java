@@ -2,12 +2,7 @@ package com.dku.council.admin.page.controller;
 
 import com.dku.council.admin.page.dto.RentalItemPageDto;
 import com.dku.council.admin.page.dto.RentalPageDto;
-import com.dku.council.admin.service.RentalPageService;
-import com.dku.council.domain.rental.exception.RentalNotFoundException;
-import com.dku.council.domain.rental.model.entity.Rental;
-import com.dku.council.domain.rental.model.entity.RentalItem;
-import com.dku.council.domain.rental.repository.RentalItemRepository;
-import com.dku.council.domain.rental.repository.RentalRepository;
+import com.dku.council.admin.page.service.RentalPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

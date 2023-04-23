@@ -1,7 +1,7 @@
 package com.dku.council.admin.page.controller;
 
 import com.dku.council.admin.page.dto.TagPageDto;
-import com.dku.council.admin.service.TagPageService;
+import com.dku.council.admin.page.service.TagPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

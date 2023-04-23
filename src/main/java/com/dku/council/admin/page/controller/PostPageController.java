@@ -1,7 +1,7 @@
 package com.dku.council.admin.page.controller;
 
 import com.dku.council.admin.page.dto.PostPageDto;
-import com.dku.council.admin.service.PostPageService;
+import com.dku.council.admin.page.service.PostPageService;
 import com.dku.council.domain.post.model.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

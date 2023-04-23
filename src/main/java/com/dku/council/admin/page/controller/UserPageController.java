@@ -3,7 +3,7 @@ package com.dku.council.admin.page.controller;
 import com.dku.council.admin.page.dto.CommentPageDto;
 import com.dku.council.admin.page.dto.PostPageDto;
 import com.dku.council.admin.page.dto.UserPageDto;
-import com.dku.council.admin.service.UserPageService;
+import com.dku.council.admin.page.service.UserPageService;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
