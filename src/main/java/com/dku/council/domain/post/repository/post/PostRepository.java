@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -29,7 +28,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query("select p from Post p where p.id=:id")
     Optional<Post> findByIdWithAdmin(Long id);
-
 
     /**
      * 활성화 여부와 상관없이 작성자의 모든 게시글을 가져옵니다. 관리자만 사용할 수 있습니다.

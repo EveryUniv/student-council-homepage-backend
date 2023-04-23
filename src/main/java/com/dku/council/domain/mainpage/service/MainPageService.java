@@ -38,10 +38,10 @@ public class MainPageService {
     private final ConferenceRepository conferenceRepository;
 
     /**
-     * 캐러셀 이미지 목록을 가져옵니다.
+     * 캐러셀 이미지 목록을 가져옵니다. 정렬기준 : 최신 등록일
      */
     public List<CarouselImageResponse> getCarouselImages() {
-        return carouselImageRepository.findAll().stream()
+        return carouselImageRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(image -> new CarouselImageResponse(uploadContext, image))
                 .collect(Collectors.toList());
     }
