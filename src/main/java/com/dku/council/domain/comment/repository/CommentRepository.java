@@ -31,7 +31,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Post> findAllCommentByUserId(Long userId, Pageable pageable);
 
     /**
-     * 관리자만 사용 가능합니다.
+     * 활성 상태와 상관없이 모든 유저의 댓글을 가져옵니다. 관리자만 사용 가능합니다.
      */
     @Query("select c from Comment c where c.user.id=:userId")
     Page<Comment> findAllByUserIdWithAdmin(@Param("userId")Long userId, Pageable pageable);
