@@ -1,8 +1,6 @@
-package com.dku.council.admin.page;
+package com.dku.council.admin.page.controller;
 
-import com.dku.council.domain.comment.model.CommentStatus;
-import com.dku.council.domain.comment.model.entity.Comment;
-import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.admin.service.CommentPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -13,19 +11,15 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/manage/comment")
 @RequiredArgsConstructor
 public class CommentPageController {
-    private final CommentRepository commentRepository;
+    private final CommentPageService service;
     @PostMapping("/{commentId}/delete")
     public String deActivate(HttpServletRequest request, @PathVariable Long commentId){
-        Comment comment = commentRepository.findById(commentId).get();
-        comment.updateStatus(CommentStatus.DELETED_BY_ADMIN);
-        commentRepository.save(comment);
+        service.delete(commentId);
         return "redirect:" + request.getHeader("Referer");
     }
     @PostMapping("/{commentId}/activate")
     public String activeComment(HttpServletRequest request, @PathVariable Long commentId){
-        Comment comment = commentRepository.findById(commentId).get();
-        comment.updateStatus(CommentStatus.ACTIVE);
-        commentRepository.save(comment);
+        service.active(commentId);
         return "redirect:" + request.getHeader("Referer");
     }
 

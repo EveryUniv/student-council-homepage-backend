@@ -31,7 +31,7 @@ public class SecurityConfig {
     };
 
     private static final String[] ADMIN_URI = {
-            "/admin/**", "/test/auth", "/manage/**"
+            "/admin/**", "/test/auth"
     };
 
 

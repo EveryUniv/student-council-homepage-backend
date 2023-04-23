@@ -1,5 +1,8 @@
-package com.dku.council.admin.page;
+package com.dku.council.admin.page.controller;
 
+import com.dku.council.admin.page.dto.RentalItemPageDto;
+import com.dku.council.admin.page.dto.RentalPageDto;
+import com.dku.council.admin.service.RentalPageService;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.entity.Rental;
 import com.dku.council.domain.rental.model.entity.RentalItem;
@@ -25,12 +28,11 @@ import java.util.List;
 public class RentalPageController {
     private final int DEFAULT_PAGE_SIZE = 15;
     private final int DEFAULT_MAX_PAGE = 5;
-    private final RentalRepository rentalRepository;
-    private final RentalItemRepository rentalItemRepository;
+    private final RentalPageService service;
 
     @GetMapping
     public String rentals(Model model, @PageableDefault(size = DEFAULT_PAGE_SIZE) Pageable pageable){
-        Page<Rental> all = rentalRepository.findAll(pageable);
+        Page<RentalPageDto> all = service.rentalList(pageable);
         model.addAttribute("rentals", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         return "rental/rental";
@@ -38,50 +40,38 @@ public class RentalPageController {
 
     @PostMapping("/{rentalId}/return")
     public String returnRental(HttpServletRequest request, @PathVariable Long rentalId){
-        Rental rental = rentalRepository.findById(rentalId).orElseThrow(RentalNotFoundException::new);
-        RentalItem item = rental.getItem();
-        rental.markAsDeleted();
-        item.increaseRemaining();
-        rentalRepository.save(rental);
-        rentalItemRepository.save(item);
+        service.returnRental(rentalId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @GetMapping("/items")
     public String rentalItems(Model model){
-        List<RentalItem> all = rentalItemRepository.findAll();
+        List<RentalItemPageDto> all = service.rentalItemList();
         model.addAttribute("rentalItems", all);
         return "rental/items";
     }
 
     @PostMapping("/item")
     public String createItem(HttpServletRequest request, String name, Integer count){
-        RentalItem rentalItem = new RentalItem(name, count);
-        rentalItemRepository.save(rentalItem);
+        service.createItem(name, count);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/items/{itemId}/delete")
     public String itemDelete(HttpServletRequest request, @PathVariable Long itemId){
-        RentalItem rentalItem = rentalItemRepository.findById(itemId).get();
-        rentalItem.markAsDeleted();
-        rentalItemRepository.save(rentalItem);
+        service.deleteItem(itemId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/items/{itemId}/rename")
     public String itemRename(HttpServletRequest request, @PathVariable Long itemId, String name){
-        RentalItem rentalItem = rentalItemRepository.findById(itemId).get();
-        rentalItem.updateItemName(name);
-        rentalItemRepository.save(rentalItem);
+        service.renameItem(itemId, name);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/items/{itemId}/update")
     public String rentalUpdate(HttpServletRequest request, @PathVariable Long itemId, Integer count){
-        RentalItem rentalItem = rentalItemRepository.findById(itemId).get();
-        rentalItem.updateAvailable(count);
-        rentalItemRepository.save(rentalItem);
+        service.updateItem(itemId, count);
         return "redirect:" + request.getHeader("Referer");
     }
 

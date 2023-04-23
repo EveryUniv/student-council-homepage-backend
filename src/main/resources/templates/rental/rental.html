@@ -35,10 +35,10 @@
             <tbody>
             <tr th:each="rental : ${rentals}">
                 <td th:text="${rental.createdAt}"></td>
-                <td th:text="${rental.userClass.name()}"></td>
+                <td th:text="${rental.userClass}"></td>
                 <td th:text="${rental.title}"></td>
-                <td th:text="${rental.item.name}"></td>
-                <td th:text="${rental.user.name}"></td>
+                <td th:text="${rental.itemName}"></td>
+                <td th:text="${rental.userName}"></td>
                 <td th:text="${rental.rentalStart}"></td>
                 <td th:text="${rental.rentalEnd}"></td>
                 <td th:if="${rental.active} == true">

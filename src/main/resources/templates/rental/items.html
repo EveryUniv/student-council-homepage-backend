@@ -33,7 +33,7 @@
       <tr th:each="rentalItem : ${rentalItems}">
         <td th:text="${rentalItem.name}"></td>
         <td th:text="${rentalItem.remaining}"></td>
-        <td th:text="${rentalItem.isActive()}"></td>
+        <td th:text="${rentalItem.active}"></td>
         <td th:if="${rentalItem.active} == true">
           <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/rename|}">
             <input type="text" name="name" placeholder="품목 이름 변경">

@@ -1,7 +1,7 @@
-package com.dku.council.admin.page;
+package com.dku.council.admin.page.controller;
 
-import com.dku.council.domain.tag.model.entity.Tag;
-import com.dku.council.domain.tag.repository.TagRepository;
+import com.dku.council.admin.page.dto.TagPageDto;
+import com.dku.council.admin.service.TagPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,34 +17,30 @@ import java.util.List;
 @RequestMapping("/manage/tags")
 @RequiredArgsConstructor
 public class TagPageController {
-    private final TagRepository tagRepository;
+    private final TagPageService service;
 
     @GetMapping
     public String tags(Model model){
-        List<Tag> all = tagRepository.findAll();
+        List<TagPageDto> all = service.list();
         model.addAttribute("tags", all);
         return "tag/tags";
     }
 
     @PostMapping("/{tagId}/delete")
     public String tagDelete(HttpServletRequest request, @PathVariable Long tagId){
-        Tag tag = tagRepository.findById(tagId).get();
-        tagRepository.delete(tag);
+        service.delete(tagId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{tagId}/rename")
     public String tagRename(HttpServletRequest request, @PathVariable Long tagId, String name){
-        Tag tag = tagRepository.findById(tagId).get();
-        tag.updateName(name);
-        tagRepository.save(tag);
+        service.rename(tagId, name);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping
     public String createTag(HttpServletRequest request, String name){
-        Tag tag = new Tag(name);
-        tagRepository.save(tag);
+        service.create(name);
         return "redirect:" + request.getHeader("Referer");
     }
 }

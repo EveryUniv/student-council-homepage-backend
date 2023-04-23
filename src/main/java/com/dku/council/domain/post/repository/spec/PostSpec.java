@@ -59,19 +59,11 @@ public class PostSpec {
     public static <T extends Post> Specification<T> withStatus(String status) {
         if(status == null || status.equals("null")) {
             return Specification.where(null);
-        } else if(status.equals("ACTIVE")){
-            return (root, query, builder) ->
-                    builder.equal(root.get("status"), PostStatus.ACTIVE);
         }
-        else if(status.equals("BLINDED")) {
-            return (root, query, builder) ->
-                    builder.equal(root.get("status"), PostStatus.BLINDED);
-        } else if(status.equals("DELETED")) {
-            return (root, query, builder) ->
-                    builder.equal(root.get("status"), PostStatus.DELETED);
-        } else {
-            return Specification.where(null);
-        }
+
+        PostStatus postStatus = PostStatus.valueOf(status);
+        return (root, query, builder) ->
+                builder.equal(root.get("status"), postStatus);
     }
 
     public static <T extends Post> Specification<T> withTag(Long tagId) {

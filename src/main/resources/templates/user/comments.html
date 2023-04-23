@@ -27,8 +27,8 @@
             </thead>
             <tbody>
             <tr th:each="comment : ${comments}">
-                <td><a th:href="@{|/manage/posts/${comment.post.id}|}"
-                       th:text="${comment.post.title}"></a></td>
+                <td><a th:href="@{|/manage/posts/${comment.postId}|}"
+                       th:text="${comment.postTitle}"></a></td>
                 <td th:text="${comment.text}"></td>
                 <td th:text="${comment.status}"></td>
                 <td>

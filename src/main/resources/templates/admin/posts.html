@@ -57,17 +57,17 @@
                        th:text="${post.title}"></a></td>
                 <td th:text="${post.createdAt}"></td>
                 <td th:text="${post.status}"></td>
-                <td th:text="${post.reports.size()}"></td>
+                <td th:text="${post.reportCount}"></td>
                 <td>
                     <div class="btn-group">
                         <form method="post" th:action="@{|/manage/posts/${post.id}/activate|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">활성화</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">활성화</button>
                         </form>
                         <form method="post" th:action="@{|/manage/posts/${post.id}/blind|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">blind</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">blind</button>
                         </form>
                         <form method="post" th:action="@{|/manage/posts/${post.id}/delete|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.user.id}" type="submit">삭제</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">삭제</button>
                         </form>
                     </div>
                 </td>

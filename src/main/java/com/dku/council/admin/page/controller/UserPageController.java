@@ -1,12 +1,10 @@
-package com.dku.council.admin.page;
+package com.dku.council.admin.page.controller;
 
-import com.dku.council.domain.comment.model.entity.Comment;
-import com.dku.council.domain.comment.repository.CommentRepository;
-import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.repository.post.PostRepository;
-import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.admin.page.dto.CommentPageDto;
+import com.dku.council.admin.page.dto.PostPageDto;
+import com.dku.council.admin.page.dto.UserPageDto;
+import com.dku.council.admin.service.UserPageService;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Controller
 @RequestMapping("/manage/users")
@@ -29,18 +26,11 @@ import java.util.List;
 public class UserPageController {
     private final int DEFAULT_PAGE_SIZE = 15;
     private final int DEFAULT_MAX_PAGE = 5;
-    private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final UserPageService service;
 
     @GetMapping
     public String users(Model model, @PageableDefault(size = DEFAULT_PAGE_SIZE) Pageable pageable, @Nullable String nickname){
-        Page<User> all;
-        if(nickname == null){
-            all = userRepository.findAll(pageable);
-        }else{
-            all = userRepository.findAllByNicknameContaining(nickname, pageable);
-        }
+        Page<UserPageDto> all = service.list(nickname, pageable);
         model.addAttribute("users", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("nickname", nickname);
@@ -49,25 +39,21 @@ public class UserPageController {
 
     @PostMapping("/{userId}/activate")
     public String active(HttpServletRequest request, @PathVariable Long userId){
-        User user = userRepository.findById(userId).get();
-        user.changeStatus(UserStatus.ACTIVE);
-        userRepository.save(user);
+        service.activeUser(userId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{userId}/deactivate")
     public String deActive(HttpServletRequest request, @PathVariable Long userId){
-        User user = userRepository.findById(userId).orElseThrow();
-        user.changeStatus(UserStatus.INACTIVE);
-        userRepository.save(user);
+        service.deActiveUser(userId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @GetMapping("/{userId}/comments")
     public String comments(Model model, @PathVariable Long userId, @PageableDefault(size = DEFAULT_PAGE_SIZE,
             sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Comment> all = commentRepository.findAllByUserIdWithAdmin(userId, pageable);
-        User user = userRepository.findById(userId).get();
+        Page<CommentPageDto> all = service.commentList(userId, pageable);
+        User user = service.findUser(userId);
         model.addAttribute("comments", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("user", user);
@@ -77,8 +63,8 @@ public class UserPageController {
     @GetMapping("/{userId}/posts")
     public String posts(Model model, @PathVariable Long userId, @PageableDefault(size = DEFAULT_PAGE_SIZE,
             sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
-        Page<Post> all = postRepository.findAllByUserIdWithAdmin(userId, pageable);
-        User user = userRepository.findById(userId).get();
+        Page<PostPageDto> all = service.postList(userId, pageable);
+        User user = service.findUser(userId);
         model.addAttribute("posts", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("user", user);
