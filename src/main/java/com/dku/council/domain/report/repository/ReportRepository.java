@@ -13,6 +13,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Long countByPostId(Long postId);
 
+    // TODO SQL 리팩토링 필요
     @Query("SELECT r FROM Report r " +
             "WHERE r.id NOT IN (" +
             "    SELECT r2.id FROM Report r2 " +
