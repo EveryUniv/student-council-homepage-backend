@@ -1,6 +1,7 @@
 package com.dku.council.util.test;
 
 import com.dku.council.debug.service.ErrorLogService;
+import com.dku.council.global.auth.jwt.JwtProvider;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -11,6 +12,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(ErrorLogService.class)
+@Import({ErrorLogService.class, JwtProvider.class})
 public @interface ImportsForMvc {
 }

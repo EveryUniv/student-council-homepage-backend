@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @RequiredArgsConstructor
-public class PostPageDto <E extends Post>{
+public class PostPageDto {
     private final Long id;
     private final Long userId;
     private final String title;
@@ -16,7 +16,7 @@ public class PostPageDto <E extends Post>{
     private final String status;
     private final int reportCount;
 
-    public PostPageDto(E post) {
+    public PostPageDto(Post post) {
         this.id = post.getId();
         this.userId = post.getUser().getId();
         this.title = post.getTitle();
@@ -24,5 +24,4 @@ public class PostPageDto <E extends Post>{
         this.status = post.getStatus().toString();
         this.reportCount = post.getReportedCount();
     }
-
 }

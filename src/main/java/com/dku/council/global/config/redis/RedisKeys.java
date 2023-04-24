@@ -20,6 +20,7 @@ public class RedisKeys {
 
     public static final String SIGNUP_AUTH_KEY = "signupAuth";
     public static final String USER_FIND_AUTH_KEY = "userFindAuth";
+    public static final String USER_INFO_CACHE_KEY = "userInfo";
 
 
     public static String combine(Object key1, Object key2) {

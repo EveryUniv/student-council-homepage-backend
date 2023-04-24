@@ -8,9 +8,12 @@ import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.domain.ticket.repository.TicketRepository;
+import com.dku.council.domain.user.exception.NotAttendingException;
 import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.service.UserInfoCacheService;
 import com.dku.council.global.util.DateUtil;
 import com.dku.council.mock.TicketEventMock;
+import com.dku.council.mock.UserInfoMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.Assertions;
@@ -26,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +45,9 @@ class TicketServiceTest {
 
     @Mock
     private TicketEventService ticketEventService;
+
+    @Mock
+    private UserInfoCacheService infoCacheService;
 
     @InjectMocks
     private TicketService service;
@@ -79,6 +86,23 @@ class TicketServiceTest {
     }
 
     @Test
+    @DisplayName("티켓 발급 실패 - 재학중이 아닌 경우")
+    void failedEnrollByNotAttending() {
+        // given
+        LocalDateTime now = LocalDateTime.now(clock);
+        TicketEventDto event = new TicketEventDto(1L, "test",
+                now.minusSeconds(1), now.plusSeconds(1));
+
+        when(ticketEventService.findEventById(1L)).thenReturn(event);
+        when(infoCacheService.getUserInfo(eq(1L)))
+                .thenReturn(UserInfoMock.create("졸업"));
+
+        // when & then
+        Assertions.assertThrows(NotAttendingException.class,
+                () -> service.enroll(1L, 1L, DateUtil.toInstant(now)));
+    }
+
+    @Test
     @DisplayName("티켓 발급 실패 - 이벤트 기간이 아닌 경우")
     void failedEnrollByNotPeriod() {
         // given
@@ -102,6 +126,8 @@ class TicketServiceTest {
                 now.minusSeconds(1), now.plusSeconds(1));
 
         when(ticketEventService.findEventById(1L)).thenReturn(event);
+        when(infoCacheService.getUserInfo(eq(1L)))
+                .thenReturn(UserInfoMock.create());
         when(memoryRepository.enroll(1L, 1L)).thenReturn(-1);
 
         // when & then
@@ -118,6 +144,8 @@ class TicketServiceTest {
                 now.minusNanos(1), now.plusNanos(1));
 
         when(ticketEventService.findEventById(1L)).thenReturn(event);
+        when(infoCacheService.getUserInfo(eq(1L)))
+                .thenReturn(UserInfoMock.create());
         when(memoryRepository.enroll(1L, 1L)).thenReturn(5);
 
         // when

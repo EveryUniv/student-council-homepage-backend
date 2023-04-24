@@ -79,14 +79,14 @@ class TicketEventServiceTest {
 
         when(persistenceRepository.save(any(TicketEvent.class)))
                 .thenReturn(testEntity);
+        when(memoryRepository.save(testEntity)).thenReturn(testDto);
 
         // when
-        service.newTicketEvent(dto);
+        Long id = service.newTicketEvent(dto);
 
         // then
+        assertThat(id).isEqualTo(testDto.getId());
         verify(persistenceRepository, times(1))
-                .save(argThat(argument -> isSameTicketRequest(dto, argument)));
-        verify(memoryRepository, times(1))
                 .save(argThat(argument -> isSameTicketRequest(dto, argument)));
     }
 

@@ -8,6 +8,10 @@ import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.domain.ticket.repository.TicketRepository;
+import com.dku.council.domain.user.exception.NotAttendingException;
+import com.dku.council.domain.user.model.AcademicStatus;
+import com.dku.council.domain.user.model.UserInfo;
+import com.dku.council.domain.user.service.UserInfoCacheService;
 import com.dku.council.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ public class TicketService {
     private final TicketRepository persistenceRepository;
     private final TicketMemoryRepository memoryRepository;
     private final TicketEventService ticketEventService;
+    private final UserInfoCacheService userInfoCacheService;
 
     @Transactional(readOnly = true)
     public ResponseTicketDto myTicket(Long userId, Long ticketEventId) {
@@ -48,6 +53,11 @@ public class TicketService {
 
         if (now.isBefore(eventFrom) || now.isAfter(eventTo)) {
             throw new InvalidTicketPeriodException();
+        }
+
+        UserInfo userInfo = userInfoCacheService.getUserInfo(userId);
+        if (!userInfo.getAcademicStatus().equals(AcademicStatus.ATTENDING.getLabel())) {
+            throw new NotAttendingException();
         }
 
         int turn = memoryRepository.enroll(userId, ticketEventId);

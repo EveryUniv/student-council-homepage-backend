@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
@@ -15,6 +15,7 @@ import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,15 +34,17 @@ public class UserService {
 
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
+    private final UserInfoCacheService userInfoCacheService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
     public ResponseLoginDto login(RequestLoginDto dto) {
         User user = userRepository.findByStudentId(dto.getStudentId())
-                .orElseThrow(LoginUserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new);
 
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             AuthenticationToken token = jwtProvider.issue(user);
+            userInfoCacheService.cacheUserInfo(user.getId(), user);
             return new ResponseLoginDto(token);
         } else {
             throw new WrongPasswordException();
@@ -55,8 +58,7 @@ public class UserService {
     }
 
     public ResponseUserInfoDto getUserInfo(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(LoginUserNotFoundException::new);
+        User user = findUser(userId);
 
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();
@@ -73,19 +75,38 @@ public class UserService {
 
     @Transactional
     public void changeNickName(Long userId, RequestNickNameChangeDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
+        User user = findUser(userId);
         user.changeNickName(dto.getNickname());
+        userInfoCacheService.invalidateUserInfo(userId);
     }
 
     @Transactional
     public void changePassword(Long userId, RequestExistPasswordChangeDto dto) {
-        User user = userRepository.findById(userId).orElseThrow(LoginUserNotFoundException::new);
+        User user = findUser(userId);
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
             user.changePassword(encodedPassword);
+            userInfoCacheService.invalidateUserInfo(userId);
         } else {
             throw new WrongPasswordException();
         }
     }
 
+    @Transactional
+    public void activateUser(Long userId) {
+        User user = findUser(userId);
+        user.changeStatus(UserStatus.ACTIVE);
+        userInfoCacheService.invalidateUserInfo(userId);
+    }
+
+    @Transactional
+    public void deactivateUser(Long userId) {
+        User user = findUser(userId);
+        user.changeStatus(UserStatus.INACTIVE);
+        userInfoCacheService.invalidateUserInfo(userId);
+    }
+
+    private User findUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    }
 }
