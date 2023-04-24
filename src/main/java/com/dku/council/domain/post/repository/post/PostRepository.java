@@ -1,6 +1,5 @@
 package com.dku.council.domain.post.repository.post;
 
-import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
@@ -23,4 +22,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query("select p from Post p where p.user.id=:userId and p.status='ACTIVE'")
     Page<Post> findAllByUserId(@Param("userId")Long userId, Pageable pageable);
+
+    /**
+     * 활성화 여부와 상관없이 게시글을 가져옵니다. 관리자만 사용할 수 있습니다.
+     */
+    @Query("select p from Post p where p.id=:id")
+    Optional<Post> findByIdWithAdmin(Long id);
+
+    /**
+     * 활성화 여부와 상관없이 작성자의 모든 게시글을 가져옵니다. 관리자만 사용할 수 있습니다.
+     */
+    @Query("select p from Post p where p.user.id=:userId")
+    Page<Post> findAllByUserIdWithAdmin(@Param("userId")Long userId, Pageable pageable);
+
 }

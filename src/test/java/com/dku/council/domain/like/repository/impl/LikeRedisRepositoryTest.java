@@ -170,6 +170,34 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
     }
 
     @Test
+    @DisplayName("좋아요 수 증가")
+    void increaseLikes() {
+        // given
+        PostLikeKey key = new PostLikeKey();
+        key.setCount(redisTemplate, "10");
+
+        // when
+        repository.increaseLikeCount(key.elementId, POST);
+
+        // then
+        assertThat(key.getCount(redisTemplate)).isEqualTo("11");
+    }
+
+    @Test
+    @DisplayName("좋아요 수 감소")
+    void decreaseLikes() {
+        // given
+        PostLikeKey key = new PostLikeKey();
+        key.setCount(redisTemplate, "10");
+
+        // when
+        repository.decreaseLikeCount(key.elementId, POST);
+
+        // then
+        assertThat(key.getCount(redisTemplate)).isEqualTo("9");
+    }
+
+    @Test
     @DisplayName("캐싱된 모든 좋아요 가져오고 삭제가 잘 되는지?")
     void getAllPostLikesAndClear() {
         // given

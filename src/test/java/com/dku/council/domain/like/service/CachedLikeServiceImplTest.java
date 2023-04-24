@@ -47,32 +47,14 @@ class CachedLikeServiceImplTest {
     private CachedLikeServiceImpl service;
 
     @Test
-    @DisplayName("좋아요 - 캐시에 count가 없는 경우")
+    @DisplayName("좋아요")
     void likeNoCached() {
-        // given
-        when(memoryRepository.getCachedLikeCount(10L, POST)).thenReturn(-1);
-        when(persistenceRepository.countByElementIdAndTarget(10L, POST)).thenReturn(5);
-
         // when
         service.like(10L, 10L, POST);
 
         // then
         verify(memoryRepository).like(10L, 10L, POST);
-        verify(memoryRepository).setLikeCount(any(), eq(6), eq(POST));
-    }
-
-    @Test
-    @DisplayName("좋아요 - 캐시에 count가 있는 경우")
-    void likeCached() {
-        // given
-        when(memoryRepository.getCachedLikeCount(10L, POST)).thenReturn(5);
-
-        // when
-        service.like(10L, 10L, POST);
-
-        // then
-        verify(memoryRepository).like(10L, 10L, POST);
-        verify(memoryRepository).setLikeCount(any(), eq(6), eq(POST));
+        verify(memoryRepository).increaseLikeCount(10L, POST);
     }
 
     @Test
@@ -90,11 +72,9 @@ class CachedLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("좋아요 취소 - 캐시에 count가 없는 경우")
+    @DisplayName("좋아요 취소")
     void cancelLikeNoCached() {
         // given
-        when(memoryRepository.getCachedLikeCount(10L, POST)).thenReturn(-1);
-        when(persistenceRepository.countByElementIdAndTarget(10L, POST)).thenReturn(5);
         when(memoryRepository.isLiked(10L, 10L, POST)).thenReturn(true);
 
         // when
@@ -102,22 +82,7 @@ class CachedLikeServiceImplTest {
 
         // then
         verify(memoryRepository).cancelLike(10L, 10L, POST);
-        verify(memoryRepository).setLikeCount(any(), eq(4), eq(POST));
-    }
-
-    @Test
-    @DisplayName("좋아요 취소 - 캐시에 count가 있는 경우")
-    void cancelLikeCached() {
-        // given
-        when(memoryRepository.getCachedLikeCount(10L, POST)).thenReturn(5);
-        when(memoryRepository.isLiked(10L, 10L, POST)).thenReturn(true);
-
-        // when
-        service.cancelLike(10L, 10L, POST);
-
-        // then
-        verify(memoryRepository).cancelLike(10L, 10L, POST);
-        verify(memoryRepository).setLikeCount(any(), eq(4), eq(POST));
+        verify(memoryRepository).decreaseLikeCount(10L, POST);
     }
 
     @Test

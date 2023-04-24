@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface PetitionRepository extends GenericPostRepository<Petition> {
+public interface PetitionRepository extends GenericPostRepository<Petition>{
     @Query("select p from Petition p " +
             "where p.status != 'BLINDED' " +
             "order by p.createdAt desc")
@@ -19,4 +19,5 @@ public interface PetitionRepository extends GenericPostRepository<Petition> {
             "where p.extraStatus = 'ACTIVE' " +
             "and p.createdAt <= :lessThanCreatedAt")
     void updateExpiredPetition(LocalDateTime lessThanCreatedAt);
+
 }
