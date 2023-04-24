@@ -10,6 +10,7 @@ import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.UserAuth;
+import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.infra.captcha.model.Captcha;
 import com.dku.council.infra.captcha.service.CaptchaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,8 +49,9 @@ public class TicketController {
      */
     @PostMapping("/event")
     @AdminAuth
-    public void newTicketEvent(@Valid @RequestBody RequestNewTicketEventDto dto) {
-        ticketEventService.newTicketEvent(dto);
+    public ResponseIdDto newTicketEvent(@Valid @RequestBody RequestNewTicketEventDto dto) {
+        Long id = ticketEventService.newTicketEvent(dto);
+        return new ResponseIdDto(id);
     }
 
     /**

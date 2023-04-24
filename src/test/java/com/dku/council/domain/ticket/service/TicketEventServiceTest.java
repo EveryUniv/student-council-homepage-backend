@@ -92,8 +92,8 @@ class TicketEventServiceTest {
 
     private boolean isSameTicketRequest(RequestNewTicketEventDto dto, TicketEvent ticketEvent) {
         assertThat(dto.getName()).isEqualTo(ticketEvent.getName());
-        assertThat(dto.getStartAt()).isEqualTo(ticketEvent.getBegin());
-        assertThat(dto.getEndAt()).isEqualTo(ticketEvent.getEnd());
+        assertThat(dto.getStartAt()).isEqualTo(ticketEvent.getStartAt());
+        assertThat(dto.getEndAt()).isEqualTo(ticketEvent.getEndAt());
         assertThat(dto.getTotalTickets()).isEqualTo(ticketEvent.getTotalTickets());
         return true;
     }

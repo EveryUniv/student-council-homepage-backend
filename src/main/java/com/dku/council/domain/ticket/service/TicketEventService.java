@@ -30,9 +30,9 @@ public class TicketEventService {
     }
 
     @Transactional
-    public void newTicketEvent(RequestNewTicketEventDto dto) {
+    public Long newTicketEvent(RequestNewTicketEventDto dto) {
         TicketEvent event = persistenceRepository.save(dto.createEntity());
-        memoryRepository.save(event);
+        return memoryRepository.save(event).getId();
     }
 
     @Transactional

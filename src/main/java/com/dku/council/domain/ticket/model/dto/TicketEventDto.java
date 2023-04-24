@@ -29,7 +29,7 @@ public class TicketEventDto {
     public TicketEventDto(TicketEvent e) {
         this.id = e.getId();
         this.name = e.getName();
-        this.from = e.getBegin();
-        this.to = e.getEnd();
+        this.from = e.getStartAt();
+        this.to = e.getEndAt();
     }
 }

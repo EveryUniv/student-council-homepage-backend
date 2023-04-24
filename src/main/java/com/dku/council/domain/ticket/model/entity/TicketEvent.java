@@ -23,19 +23,19 @@ public class TicketEvent extends BaseEntity {
 
     private String name;
 
-    private LocalDateTime begin;
+    private LocalDateTime startAt;
 
-    private LocalDateTime end;
+    private LocalDateTime endAt;
 
     private int totalTickets;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Ticket> tickets = new ArrayList<>();
 
-    public TicketEvent(String name, LocalDateTime begin, LocalDateTime end, int totalTickets) {
+    public TicketEvent(String name, LocalDateTime startAt, LocalDateTime endAt, int totalTickets) {
         this.name = name;
-        this.begin = begin;
-        this.end = end;
+        this.startAt = startAt;
+        this.endAt = endAt;
         this.totalTickets = totalTickets;
     }
 }
