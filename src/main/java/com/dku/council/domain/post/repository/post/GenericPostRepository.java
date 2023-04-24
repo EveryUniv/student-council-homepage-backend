@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -20,7 +21,8 @@ public interface GenericPostRepository<T extends Post> extends JpaRepository<T, 
             "join fetch p.user u " +
             "join fetch u.major " +
             "where p.id=:id and p.status='ACTIVE' ")
-    Optional<T> findById(Long id);
+    // TODO NamedParameter에 @Param 모두 붙이기
+    Optional<T> findById(@Param("id") Long id);
 
     @Override
     @EntityGraph(attributePaths = {"user", "user.major"})
