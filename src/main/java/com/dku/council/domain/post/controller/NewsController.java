@@ -8,6 +8,7 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostDto;
 import com.dku.council.domain.post.service.post.NewsService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
+import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.auth.role.UserRole;
@@ -59,7 +60,7 @@ public class NewsController {
      * 게시글 등록
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @UserAuth
+    @AdminAuth
     public ResponseIdDto create(AppAuthentication auth, @Valid @ModelAttribute RequestCreateNewsDto request) {
         Long postId = postService.create(auth.getUserId(), request);
         return new ResponseIdDto(postId);
@@ -72,12 +73,15 @@ public class NewsController {
      * @return 총학소식 게시글 정보
      */
     @GetMapping("/{id}")
-    @UserAuth
+    @GuestAuth
     public ResponseSingleGenericPostDto findOne(AppAuthentication auth,
                                                 @PathVariable Long id,
                                                 HttpServletRequest request) {
-        return postService.findOne(id, auth.getUserId(), auth.getUserRole(),
-                RemoteAddressUtil.getProxyableAddr(request));
+        String address = RemoteAddressUtil.getProxyableAddr(request);
+        if (auth == null) {
+            return postService.findOneForGuest(id, address);
+        }
+        return postService.findOne(id, auth.getUserId(), UserRole.from(auth), address);
     }
 
     /**
@@ -86,7 +90,7 @@ public class NewsController {
      * @param id 삭제할 게시글 id
      */
     @DeleteMapping("/{id}")
-    @UserAuth
+    @AdminAuth
     public void delete(AppAuthentication auth, @PathVariable Long id) {
         postService.delete(id, auth.getUserId(), auth.isAdmin());
     }
