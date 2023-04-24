@@ -25,6 +25,7 @@ public class TicketEventService {
         if (!events.isEmpty()) {
             return events;
         }
+
         List<TicketEvent> eventEntities = persistenceRepository.findAll();
         return memoryRepository.saveAll(eventEntities);
     }

@@ -2,11 +2,13 @@ package com.dku.council.domain.user.model;
 
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class UserInfo {
     private final String name;
     private final String nickname;
@@ -30,6 +32,7 @@ public class UserInfo {
 
     @Getter
     @RequiredArgsConstructor
+    @EqualsAndHashCode
     public static class MajorInfo {
         private final String name;
         private final String department;
