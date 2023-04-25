@@ -1,8 +1,8 @@
-package com.dku.council.admin.page.controller;
+package com.dku.council.domain.admin.controller;
 
-import com.dku.council.admin.page.dto.RentalItemPageDto;
-import com.dku.council.admin.page.dto.RentalPageDto;
-import com.dku.council.admin.page.service.RentalPageService;
+import com.dku.council.domain.admin.dto.RentalItemPageDto;
+import com.dku.council.domain.admin.dto.RentalPageDto;
+import com.dku.council.domain.admin.service.RentalPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

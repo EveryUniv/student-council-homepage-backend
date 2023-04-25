@@ -1,7 +1,7 @@
-package com.dku.council.admin.page.service;
+package com.dku.council.domain.admin.service;
 
-import com.dku.council.admin.page.dto.RentalItemPageDto;
-import com.dku.council.admin.page.dto.RentalPageDto;
+import com.dku.council.domain.admin.dto.RentalItemPageDto;
+import com.dku.council.domain.admin.dto.RentalPageDto;
 import com.dku.council.domain.rental.exception.RentalItemNotFoundException;
 import com.dku.council.domain.rental.exception.RentalNotFoundException;
 import com.dku.council.domain.rental.model.entity.Rental;

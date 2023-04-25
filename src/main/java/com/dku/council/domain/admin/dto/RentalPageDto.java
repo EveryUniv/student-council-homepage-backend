@@ -1,4 +1,4 @@
-package com.dku.council.admin.page.dto;
+package com.dku.council.domain.admin.dto;
 
 import com.dku.council.domain.rental.model.entity.Rental;
 import lombok.Getter;

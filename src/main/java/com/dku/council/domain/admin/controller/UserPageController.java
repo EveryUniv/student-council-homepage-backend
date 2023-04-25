@@ -1,9 +1,9 @@
-package com.dku.council.admin.page.controller;
+package com.dku.council.domain.admin.controller;
 
-import com.dku.council.admin.page.dto.CommentPageDto;
-import com.dku.council.admin.page.dto.PostPageDto;
-import com.dku.council.admin.page.dto.UserPageDto;
-import com.dku.council.admin.page.service.UserPageService;
+import com.dku.council.domain.admin.dto.CommentPageDto;
+import com.dku.council.domain.admin.dto.PostPageDto;
+import com.dku.council.domain.admin.dto.UserPageDto;
+import com.dku.council.domain.admin.service.UserPageService;
 import com.dku.council.domain.user.model.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

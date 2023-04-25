@@ -1,6 +1,6 @@
-package com.dku.council.admin.page.service;
+package com.dku.council.domain.admin.service;
 
-import com.dku.council.admin.page.dto.TagPageDto;
+import com.dku.council.domain.admin.dto.TagPageDto;
 import com.dku.council.domain.tag.exception.TagNotFoundException;
 import com.dku.council.domain.tag.model.entity.Tag;
 import com.dku.council.domain.tag.repository.TagRepository;

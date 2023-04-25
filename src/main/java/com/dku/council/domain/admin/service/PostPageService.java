@@ -1,6 +1,6 @@
-package com.dku.council.admin.page.service;
+package com.dku.council.domain.admin.service;
 
-import com.dku.council.admin.page.dto.PostPageDto;
+import com.dku.council.domain.admin.dto.PostPageDto;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;

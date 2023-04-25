@@ -1,4 +1,4 @@
-package com.dku.council.admin.page.service;
+package com.dku.council.domain.admin.service;
 
 import com.dku.council.domain.comment.exception.CommentNotFoundException;
 import com.dku.council.domain.comment.model.CommentStatus;

@@ -1,4 +1,4 @@
-package com.dku.council.admin.page.controller;
+package com.dku.council.domain.admin.controller;
 
 import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
 import com.dku.council.domain.mainpage.model.dto.response.CarouselImageResponse;

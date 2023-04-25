@@ -1,8 +1,8 @@
-package com.dku.council.admin.page.service;
+package com.dku.council.domain.admin.service;
 
-import com.dku.council.admin.page.dto.CommentPageDto;
-import com.dku.council.admin.page.dto.PostPageDto;
-import com.dku.council.admin.page.dto.UserPageDto;
+import com.dku.council.domain.admin.dto.CommentPageDto;
+import com.dku.council.domain.admin.dto.PostPageDto;
+import com.dku.council.domain.admin.dto.UserPageDto;
 import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.model.entity.User;

@@ -1,9 +1,11 @@
-package com.dku.council.admin.page.controller;
+package com.dku.council.domain.admin.controller;
 
-import com.dku.council.admin.page.service.CommentPageService;
+import com.dku.council.domain.admin.service.CommentPageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -1,4 +1,4 @@
-package com.dku.council.admin.page.dto;
+package com.dku.council.domain.admin.dto;
 
 import com.dku.council.domain.post.model.entity.Post;
 import lombok.Getter;
