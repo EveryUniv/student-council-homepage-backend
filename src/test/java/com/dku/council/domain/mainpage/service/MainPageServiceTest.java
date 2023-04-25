@@ -88,7 +88,7 @@ public class MainPageServiceTest {
 
         when(fileUploadService.newContext()).thenReturn(context);
         when(context.uploadFile(any(), eq("carousel"))).thenReturn(uploadedFile);
-        when(carouselImageRepository.findAll()).thenReturn(List.of(
+        when(carouselImageRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of(
                 CarouselImage.builder()
                         .redirectUrl("test/test")
                         .fileId("1234")
