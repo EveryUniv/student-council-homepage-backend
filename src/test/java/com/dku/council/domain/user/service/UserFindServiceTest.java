@@ -51,12 +51,15 @@ class UserFindServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private UserInfoCacheService userInfoCacheService;
+
     private UserFindService service;
 
     @BeforeEach
     void setUp() {
         service = new UserFindService(clock, smsService, userRepository, userFindRepository,
-                messageSource, passwordEncoder, 6);
+                userInfoCacheService, messageSource, passwordEncoder, 6);
     }
 
 
@@ -158,6 +161,7 @@ class UserFindServiceTest {
         // then
         assertThat(user.getPassword()).isEqualTo("encodedPassword");
         verify(userFindRepository).deleteAuthCode(token);
+        verify(userInfoCacheService).invalidateUserInfo(user.getId());
     }
 
     @Test
@@ -192,7 +196,7 @@ class UserFindServiceTest {
 
     @Test
     @DisplayName("핸드폰 변경 - 유저 없는 오류")
-    void checkPhoneCodeUser(){
+    void checkPhoneCodeUser() {
         String phone = "010-1234-1234";
         //given
         User user = UserMock.createDummyMajor();
@@ -205,26 +209,30 @@ class UserFindServiceTest {
 
     @Test
     @DisplayName("핸드폰 변경 - 성공 테스트")
-    void checkCode(){
+    void changePhone() {
+        // given
         String phone = "010-1234-1234";
         String newPhone = "01012341234";
         String token = "asdfasdf";
         String code = "123456";
-        //given
+
         User user = UserMock.createDummyMajor();
         SMSAuth auth = new SMSAuth(phone, code);
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userFindRepository.getAuthCode(eq(token), any())).thenReturn(Optional.of(auth));
 
+        // when
         service.changePhoneNumber(user.getId(), token, code);
 
+        // then
         assertThat(user.getPhone()).isEqualTo(newPhone);
+        verify(userInfoCacheService).invalidateUserInfo(user.getId());
     }
 
     @Test
     @DisplayName("핸드폰 변경 - 실패 테스트(코드오류)")
-    void failedChangePhoneNumber_Code(){
+    void failedChangePhoneNumber_Code() {
         String phone = "010-1234-1234";
         String token = "asdfasdf";
         String code = "code";
@@ -240,7 +248,7 @@ class UserFindServiceTest {
 
     @Test
     @DisplayName("핸드폰 변경 - 실패 테스트(토큰오류)")
-    void failedChangePhoneNumber_token(){
+    void failedChangePhoneNumber_token() {
         //given
         User user = UserMock.createDummyMajor();
 

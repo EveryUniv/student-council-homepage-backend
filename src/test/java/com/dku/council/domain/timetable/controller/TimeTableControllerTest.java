@@ -1,6 +1,5 @@
 package com.dku.council.domain.timetable.controller;
 
-import com.dku.council.debug.service.ErrorLogService;
 import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
@@ -14,11 +13,10 @@ import com.dku.council.domain.timetable.model.dto.response.TimeTableDto;
 import com.dku.council.domain.timetable.service.TimeTableService;
 import com.dku.council.mock.LectureMock;
 import com.dku.council.util.base.AbstractAuthControllerTest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dku.council.util.test.ImportsForMvc;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -37,14 +35,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest({TimeTableController.class, ErrorLogService.class})
+@WebMvcTest(TimeTableController.class)
+@ImportsForMvc
 class TimeTableControllerTest extends AbstractAuthControllerTest {
 
     @MockBean
     private TimeTableService timeTableService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     private final LocalTime start = LocalTime.of(10, 0);
     private final LocalTime end = LocalTime.of(13, 0);
