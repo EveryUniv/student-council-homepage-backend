@@ -49,7 +49,6 @@ public class NHNAuthService {
 
         ResponseToken response;
         try {
-            // TODO 비동기 방식으로 처리해보기
             response = webClient.post()
                     .uri(apiPath)
                     .header("Content-Type", "application/json")
