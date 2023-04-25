@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
@@ -16,7 +17,9 @@ public interface LikePersistenceRepository extends JpaRepository<LikeElement, Lo
             "where l.elementId = :elementId " +
             "and l.user.id = :userId " +
             "and l.target = :target")
-    Optional<LikeElement> findByElementIdAndUserId(Long elementId, Long userId, LikeTarget target);
+    Optional<LikeElement> findByElementIdAndUserId(@Param("elementId") Long elementId,
+                                                   @Param("userId") Long userId,
+                                                   @Param("target") LikeTarget target);
 
     int countByElementIdAndTarget(Long elementId, LikeTarget target);
 
@@ -25,9 +28,13 @@ public interface LikePersistenceRepository extends JpaRepository<LikeElement, Lo
             "where l.elementId = :elementId " +
             "and l.user.id = :userId " +
             "and l.target = :target")
-    void deleteByElementIdAndUserId(Long elementId, Long userId, LikeTarget target);
+    void deleteByElementIdAndUserId(@Param("elementId") Long elementId,
+                                    @Param("userId") Long userId,
+                                    @Param("target") LikeTarget target);
 
     @Query("select l from LikeElement l " +
             "where l.user.id = :userId and l.target = :target")
-    Page<LikeElement> findAllByUserId(Long userId, LikeTarget target, Pageable pageable);
+    Page<LikeElement> findAllByUserId(@Param("userId") Long userId,
+                                      @Param("target") LikeTarget target,
+                                      Pageable pageable);
 }

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 대여물품', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>대여 물품 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+            <p class="btn btn-primary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/rentals|}" style="color: white">대여 현황</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <div>
+            대여 품목 삭제시 연관된 학생들의 대여 현황도 삭제됩니다!
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <nav aria-label="Page navigation example">
+            <div class="input-group mb-3">
+                <form method="post" th:action="@{/manage/rentals/item}">
+                    <div class="input-group flex-nowrap">
+                        <input class="form-control" type="text" name="name" placeholder="품목명">
+                        <input class="form-control" type="text" name="count" placeholder="수량">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">추가</button>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">품목</th>
+                <th scope="col">잔여수량</th>
+                <th scope="col">상태</th>
+                <th scope="col">이름변경</th>
+                <th scope="col">수량변경</th>
+                <th scope="col">삭제</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rentalItem : ${rentalItems}">
+                <td th:text="${rentalItem.name}"></td>
+                <td th:text="${rentalItem.remaining}"></td>
+                <td th:text="${rentalItem.active}"></td>
+                <td th:if="${rentalItem.active} == true">
+                    <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/rename|}">
+                        <div class="input-group flex-nowrap">
+                            <input class="form-control" type="text" name="name" placeholder="품목 이름 변경">
+                            <button class="btn btn-primary" type="submit">변경</button>
+                        </div>
+                    </form>
+                </td>
+                <td th:if="${rentalItem.active} == true">
+                    <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/update|}">
+                        <div class="input-group flex-nowrap">
+                            <input class="form-control" type="text" name="count" placeholder="품목 수량 변경">
+                            <button class="btn btn-primary" type="submit">변경</button>
+                        </div>
+                    </form>
+                </td>
+                <td th:if="${rentalItem.active} == true">
+                    <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/delete|}">
+                        <button class="btn btn-primary" type="submit">삭제</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

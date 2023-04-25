@@ -10,19 +10,21 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
 public interface RentalRepository extends JpaRepository<Rental, Long>, JpaSpecificationExecutor<Rental> {
     @Query("select r from Rental r " +
             "where r.user=:user and r.item=:item and r.isActive=true")
-    Optional<Rental> findByUserAndItem(User user, RentalItem item);
+    Optional<Rental> findByUserAndItem(@Param("user") User user,
+                                       @Param("item") RentalItem item);
 
     @Query("select r from Rental r " +
             "join fetch r.item " +
             "join fetch r.user " +
             "where r.id=:id and r.isActive=true")
-    Optional<Rental> findById(Long id);
+    Optional<Rental> findById(@Param("id") Long id);
 
     @Query(value = "select r from Rental r " +
             "join fetch r.item " +
@@ -30,7 +32,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long>, JpaSpecif
             "where r.item.id=:itemId and r.isActive=true",
             countQuery = "select count(r) from Rental r " +
                     "where r.item.id=:itemId and r.isActive=true")
-    Page<Rental> findAllByItemId(Long itemId, Pageable pageable);
+    Page<Rental> findAllByItemId(@Param("itemId") Long itemId, Pageable pageable);
 
     @Override
     @EntityGraph(attributePaths = {"user", "item"})
