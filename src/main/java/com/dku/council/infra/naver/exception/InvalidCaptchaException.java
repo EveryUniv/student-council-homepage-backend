@@ -1,4 +1,4 @@
-package com.dku.council.infra.captcha.exception;
+package com.dku.council.infra.naver.exception;
 
 import com.dku.council.global.error.exception.LocalizedMessageException;
 import org.springframework.http.HttpStatus;

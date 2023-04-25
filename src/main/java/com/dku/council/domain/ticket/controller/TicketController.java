@@ -3,7 +3,7 @@ package com.dku.council.domain.ticket.controller;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.dto.request.RequestEnrollDto;
 import com.dku.council.domain.ticket.model.dto.request.RequestNewTicketEventDto;
-import com.dku.council.domain.ticket.model.dto.response.ResponseCaptchaDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseCaptchaKeyDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.service.TicketEventService;
 import com.dku.council.domain.ticket.service.TicketService;
@@ -11,10 +11,10 @@ import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
 import com.dku.council.global.auth.role.UserAuth;
 import com.dku.council.global.model.dto.ResponseIdDto;
-import com.dku.council.infra.captcha.model.Captcha;
-import com.dku.council.infra.captcha.service.CaptchaService;
+import com.dku.council.infra.naver.service.CaptchaService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -80,20 +80,35 @@ public class TicketController {
     }
 
     /**
-     * captcha 인증 요청
-     * <p>매크로 방지를 위한 Captcha 이미지를 요청합니다.</p>
+     * captcha 인증 키 요청
+     * <p>새로운 Captcha 키를 요청합니다.</p>
      *
-     * @return Captcha 이미지
+     * @return Captcha 키
      */
-    @GetMapping("/captcha")
-    public ResponseCaptchaDto captcha() {
-        Captcha captcha = captchaService.requestCaptcha();
-        return new ResponseCaptchaDto(captcha);
+    @GetMapping("/captcha/key")
+    @UserAuth
+    public ResponseCaptchaKeyDto captchaKey() {
+        String captchaKey = captchaService.requestCaptchaKey();
+        return new ResponseCaptchaKeyDto(captchaKey);
+    }
+
+    /**
+     * captcha 이미지 요청
+     * <p>새로운 Captcha 이미지를 요청합니다.</p>
+     * <p>하나의 키로 여러 번 이미지를 요청할 수 있습니다. 요청마다 다른 이미지가 전달됩니다.</p>
+     *
+     * @return Captcha JPEG 이미지 binary
+     */
+    @GetMapping(value = "/captcha/image/{key}",
+            produces = MediaType.IMAGE_JPEG_VALUE)
+    @UserAuth
+    public byte[] captchaImage(@PathVariable String key) {
+        return captchaService.requestCaptchaImage(key);
     }
 
     /**
      * 티켓 신청하기
-     * <p>티켓 이벤트에 신청합니다.</p>
+     * <p>티켓 이벤트에 신청합니다. Captcha는 인증 실패시 키부터 다시 요청해야합니다.</p>
      *
      * @param dto 티켓 신청 정보
      */

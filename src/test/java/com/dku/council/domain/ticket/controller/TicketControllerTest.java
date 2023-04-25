@@ -7,8 +7,7 @@ import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.service.TicketEventService;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.domain.user.repository.UserInfoMemoryRepository;
-import com.dku.council.infra.captcha.model.Captcha;
-import com.dku.council.infra.captcha.service.CaptchaService;
+import com.dku.council.infra.naver.service.CaptchaService;
 import com.dku.council.mock.TicketEventMock;
 import com.dku.council.mock.UserInfoMock;
 import com.dku.council.mock.user.UserAuth;
@@ -20,12 +19,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -130,27 +131,41 @@ class TicketControllerTest extends AbstractAuthControllerTest {
 
     @Test
     @DisplayName("Captcha 인증 요청")
-    void captcha() throws Exception {
+    void captchaKey() throws Exception {
         // given
-        Captcha captcha = new Captcha("key", "image");
-        when(captchaService.requestCaptcha()).thenReturn(captcha);
+        when(captchaService.requestCaptchaKey()).thenReturn("KEY");
 
         // when
-        ResultActions actions = mvc.perform(get("/ticket/captcha"));
+        ResultActions actions = mvc.perform(get("/ticket/captcha/key"));
 
         // then
         actions.andExpect(status().isOk())
-                .andExpect(jsonPath("$.key").value(captcha.getKey()))
-                .andExpect(jsonPath("$.imageUrl").value(captcha.getImageUrl()));
+                .andExpect(jsonPath("$.key").value("KEY"));
+    }
+
+    @Test
+    @DisplayName("Captcha 이미지 요청")
+    void captchaImage() throws Exception {
+        // given
+        when(captchaService.requestCaptchaImage("KEY")).thenReturn(new byte[5]);
+
+        // when
+        ResultActions actions = mvc.perform(get("/ticket/captcha/image/KEY"));
+
+        // then
+        MockHttpServletResponse response = actions.andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        assertThat(response.getContentType()).isEqualTo(MediaType.IMAGE_JPEG_VALUE);
+        assertThat(response.getContentAsByteArray()).hasSize(5);
     }
 
     @Test
     @DisplayName("티켓 신청하기")
     void enroll() throws Exception {
         // given
-        Captcha captcha = new Captcha("key", "image");
         RequestEnrollDto dto = new RequestEnrollDto(5L,
-                captcha.getKey(), captcha.getImageUrl());
+                "KEY", "VALUE");
 
         when(ticketService.enroll(eq(USER_ID), eq(5L), any()))
                 .thenReturn(new ResponseTicketDto(5));
@@ -165,6 +180,6 @@ class TicketControllerTest extends AbstractAuthControllerTest {
         // then
         actions.andExpect(status().isOk())
                 .andExpect(jsonPath("$.turn").value(5));
-        verify(captchaService).verifyCaptcha(captcha.getKey(), captcha.getImageUrl());
+        verify(captchaService).verifyCaptcha("KEY", "VALUE");
     }
 }
