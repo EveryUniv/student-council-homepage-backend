@@ -4,16 +4,37 @@
 <body>
 <section>
     <div class="py-5 text-center">
-        <h2>rental 아이템 목록</h2>
-        <p class="btn btn-secondary rounded-pill px-3" type="button">
-            <a th:href="@{|/manage|}" style="color: white">Home</a>
-        </p>
+        <h2>대여 물품 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+            <p class="btn btn-primary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/rentals|}" style="color: white">대여 현황</a>
+            </p>
+        </div>
     </div>
-    <p>*주의* 대여 품목 삭제시 연관된 학생들의 대여 현황도 삭제됩니다!</p>
-    <p><a th:href="@{|/manage/rentals|}">Rental 현황</a>
-    <p>
+
+    <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <div>
+            대여 품목 삭제시 연관된 학생들의 대여 현황도 삭제됩니다!
+        </div>
+    </div>
+
     <hr class="my-4">
     <div>
+        <nav aria-label="Page navigation example">
+            <div class="input-group mb-3">
+                <form method="post" th:action="@{/manage/rentals/item}">
+                    <div class="input-group flex-nowrap">
+                        <input class="form-control" type="text" name="name" placeholder="품목명">
+                        <input class="form-control" type="text" name="count" placeholder="수량">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">추가</button>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
         <table class="table">
             <thead>
             <tr>
@@ -32,14 +53,18 @@
                 <td th:text="${rentalItem.active}"></td>
                 <td th:if="${rentalItem.active} == true">
                     <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/rename|}">
-                        <input type="text" name="name" placeholder="품목 이름 변경">
-                        <button class="btn btn-primary" type="submit">변경</button>
+                        <div class="input-group flex-nowrap">
+                            <input class="form-control" type="text" name="name" placeholder="품목 이름 변경">
+                            <button class="btn btn-primary" type="submit">변경</button>
+                        </div>
                     </form>
                 </td>
                 <td th:if="${rentalItem.active} == true">
                     <form method="post" th:action="@{|/manage/rentals/items/${rentalItem.id}/update|}">
-                        <input type="text" name="count" placeholder="품목 수량 변경">
-                        <button class="btn btn-primary" type="submit">변경</button>
+                        <div class="input-group flex-nowrap">
+                            <input class="form-control" type="text" name="count" placeholder="품목 수량 변경">
+                            <button class="btn btn-primary" type="submit">변경</button>
+                        </div>
                     </form>
                 </td>
                 <td th:if="${rentalItem.active} == true">
@@ -48,17 +73,6 @@
                     </form>
                 </td>
             </tr>
-
-            <nav aria-label="Page navigation example">
-                <div class="input-group mb-3">
-                    <form method="post" th:action="@{/manage/rentals/item}">
-                        <input type="text" name="name" placeholder="품목명">
-                        <input type="text" name="count" placeholder="수량">
-                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">추가</button>
-                    </form>
-                </div>
-            </nav>
-
             </tbody>
         </table>
     </div>

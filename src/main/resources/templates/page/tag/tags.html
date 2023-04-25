@@ -5,14 +5,27 @@
 <section>
     <div class="py-5 text-center">
         <h2>태그 목록</h2>
-        <p class="btn btn-secondary rounded-pill px-3" type="button">
-            <a th:href="@{|/manage|}" style="color: white">Home</a>
-        </p>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
     </div>
-
 
     <hr class="my-4">
     <div>
+        <nav aria-label="Page navigation example">
+            <div class="input-group mb-3">
+                <form method="post" th:action="@{/manage/tags}">
+                    <div class="input-group flex-nowrap">
+                        <input class="form-control" type="text" name="name" placeholder="태그 추가하기">
+                        <button class="btn btn-outline-secondary float-end" type="submit" id="button-addon2">추가
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
         <table class="table">
             <thead>
             <tr>
@@ -27,8 +40,10 @@
                 <td>
                     <div class="input-group">
                         <form method="post" th:action="@{|/manage/tags/${tag.id}/rename|}">
-                            <input type="text" class="form-control" name="name" placeholder="태그 이름 변경">
-                            <button class="btn btn-primary float-end" type="submit">변경</button>
+                            <div class="input-group flex-nowrap">
+                                <input type="text" class="form-control" name="name" placeholder="태그 이름 변경">
+                                <button class="btn btn-primary float-end" type="submit">변경</button>
+                            </div>
                         </form>
                     </div>
                 </td>
@@ -38,16 +53,6 @@
                     </form>
                 </td>
             </tr>
-
-            <nav aria-label="Page navigation example">
-                <div class="input-group mb-3">
-                    <form method="post" th:action="@{/manage/tags}">
-                        <input type="text" name="name" placeholder="태그 추가하기">
-                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Submit</button>
-                    </form>
-                </div>
-            </nav>
-
             </tbody>
         </table>
     </div>
