@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(PUBLIC_URI).permitAll()
-                //.antMatchers(ADMIN_URI).access("hasRole('ADMIN')")
+                .antMatchers(ADMIN_URI).access("hasRole('ADMIN')")
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class)
