@@ -31,6 +31,10 @@
           <div class="card-body">
             <h5>Redirect URL</h5>
             <p class="card-text" th:text="${banner.redirectUrl}"></p>
+            <form method="post" th:action="@{|/manage/banner/${banner.id}/edit|}">
+              <input type="text", name="redirectUrl">
+              <button class="btn btn-primary" type="submit">변경</button>
+            </form>
             <form method="post" th:action="@{|/manage/banner/${banner.id}/delete|}">
               <button class="btn btn-primary" type="submit">삭제</button>
             </form>

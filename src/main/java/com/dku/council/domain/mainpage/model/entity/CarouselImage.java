@@ -28,4 +28,8 @@ public class CarouselImage extends BaseEntity {
         this.fileId = fileId;
         this.redirectUrl = redirectUrl;
     }
+
+    public void editRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
 }

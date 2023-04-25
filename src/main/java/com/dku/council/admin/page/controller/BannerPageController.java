@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -31,15 +32,21 @@ public class BannerPageController {
     }
 
     @PostMapping("/{bannerId}/delete")
-    public String deleteBanner(@PathVariable Long bannerId){
+    public String deleteBanner(HttpServletRequest request,@PathVariable Long bannerId){
         service.deleteCarouselImage(bannerId);
-        return "redirect:/manage/banner";
+        return "redirect:" + request.getHeader("Referer");
+    }
+
+    @PostMapping("/{bannerId}/edit")
+    public String editBanner(HttpServletRequest request, @PathVariable Long bannerId, String redirectUrl){
+        service.changeRedirectUrl(bannerId, redirectUrl);
+        return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/add")
-    public String addBanner(RequestCarouselImageDto dto){
+    public String addBanner(HttpServletRequest request,RequestCarouselImageDto dto){
         service.addCarouselImage(dto);
-        return "redirect:/manage/banner";
+        return "redirect:" + request.getHeader("Referer");
     }
 
 }
