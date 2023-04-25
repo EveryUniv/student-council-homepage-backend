@@ -109,4 +109,11 @@ public class MainPageService {
                 originName.endsWith(".svg") ||
                 originName.endsWith(".webp");
     }
+
+    @Transactional
+    public void changeRedirectUrl(Long carouselId, String redirectUrl) {
+        CarouselImage carouselImage = carouselImageRepository.findById(carouselId)
+                .orElseThrow(CarouselNotFoundException::new);
+        carouselImage.editRedirectUrl(redirectUrl);
+    }
 }
