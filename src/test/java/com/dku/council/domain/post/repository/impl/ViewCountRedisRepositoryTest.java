@@ -1,12 +1,11 @@
 package com.dku.council.domain.post.repository.impl;
 
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.dku.council.util.test.FullIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.StringRedisTemplate;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,9 +19,6 @@ class ViewCountRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
     private ViewCountRedisRepository repository;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
 
 
     @Test

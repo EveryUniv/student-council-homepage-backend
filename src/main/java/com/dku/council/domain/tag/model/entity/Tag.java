@@ -4,10 +4,9 @@ import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -23,6 +22,8 @@ public class Tag extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostTag> postTag;
 
     public Tag(String name) {
         this.name = name;

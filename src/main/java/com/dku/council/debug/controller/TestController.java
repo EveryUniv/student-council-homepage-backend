@@ -87,6 +87,13 @@ public class TestController {
         userRepository.save(user);
     }
 
+    /**
+     * 에러 로그 조회
+     * <p>trackingId를 통해 에러 로그를 조회합니다.</p>
+     *
+     * @param trackingId 에러 로그의 trackingId
+     * @return 에러 로그
+     */
     @GetMapping(value = "/error/{trackingId}", produces = "text/plain;charset=UTF-8")
     public String findError(@PathVariable String trackingId) {
         return errorLogService.findErrorLog(trackingId);

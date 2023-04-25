@@ -3,14 +3,14 @@ package com.dku.council.global.auth.jwt;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.ExpiredTokenException;
-import com.dku.council.global.error.exception.IllegalTypeException;
+import com.dku.council.global.error.exception.IllegalTokenTypeException;
 import com.dku.council.global.error.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -37,10 +37,24 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     @Override
     public String getAccessTokenFromHeader(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equalsIgnoreCase("access-token")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
         String header = request.getHeader(AUTHORIZATION);
-        if (!StringUtils.hasText(header)) return null;
-        if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
-        return header.substring(7);
+        if (header != null) {
+            if (!header.toLowerCase().startsWith("bearer ")) {
+                throw new IllegalTokenTypeException();
+            }
+            return header.substring(7);
+        }
+
+        return null;
     }
 
     @Override

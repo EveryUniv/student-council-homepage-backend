@@ -55,12 +55,16 @@ class DKUAuthServiceTest {
     @Mock
     private MajorRepository majorRepository;
 
+    @Mock
+    private UserInfoCacheService userInfoCacheService;
+
     private DKUAuthService service;
 
     @BeforeEach
     public void setup() {
         this.service = new DKUAuthService(clock, crawlerService,
-                authenticationService, userRepository, dkuAuthRepository, majorRepository);
+                authenticationService, userRepository, userInfoCacheService,
+                dkuAuthRepository, majorRepository);
     }
 
 
@@ -180,5 +184,7 @@ class DKUAuthServiceTest {
         assertThat(user.getMajor().getDepartment()).isEqualTo(info.getDepartmentName());
         assertThat(user.getYearOfAdmission()).isEqualTo(info.getYearOfAdmission());
         assertThat(user.getAcademicStatus()).isEqualTo(info.getStudentState());
+
+        verify(userInfoCacheService).invalidateUserInfo(user.getId());
     }
 }

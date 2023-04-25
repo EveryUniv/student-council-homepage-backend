@@ -1,7 +1,6 @@
 package com.dku.council.infra.nhn.service.actual;
 
 import com.dku.council.infra.nhn.service.SMSService;
-import com.dku.council.infra.nhn.service.impl.SMSServiceImpl;
 import com.dku.council.util.WebClientUtil;
 import com.dku.council.util.YamlProperties;
 import org.junit.jupiter.api.*;
@@ -29,7 +28,7 @@ class ActualSMSServiceTest {
         String apiPath = properties.get("nhn.sms.api-path");
         String secretKey = properties.get("nhn.sms.secret-key");
         String senderPhone = properties.get("nhn.sms.sender-phone");
-        this.service = new SMSServiceImpl(webClient, apiPath, secretKey, senderPhone);
+        this.service = new SMSService(webClient, apiPath, secretKey, senderPhone);
     }
 
     @Test

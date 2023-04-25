@@ -29,7 +29,7 @@ public class UserPageController {
     private final UserPageService service;
 
     @GetMapping
-    public String users(Model model, @PageableDefault(size = DEFAULT_PAGE_SIZE) Pageable pageable, @Nullable String nickname){
+    public String users(Model model, @PageableDefault(size = DEFAULT_PAGE_SIZE) Pageable pageable, @Nullable String nickname) {
         Page<UserPageDto> all = service.list(nickname, pageable);
         model.addAttribute("users", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
@@ -38,20 +38,20 @@ public class UserPageController {
     }
 
     @PostMapping("/{userId}/activate")
-    public String active(HttpServletRequest request, @PathVariable Long userId){
+    public String active(HttpServletRequest request, @PathVariable Long userId) {
         service.activeUser(userId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{userId}/deactivate")
-    public String deActive(HttpServletRequest request, @PathVariable Long userId){
+    public String deActive(HttpServletRequest request, @PathVariable Long userId) {
         service.deActiveUser(userId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @GetMapping("/{userId}/comments")
     public String comments(Model model, @PathVariable Long userId, @PageableDefault(size = DEFAULT_PAGE_SIZE,
-            sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<CommentPageDto> all = service.commentList(userId, pageable);
         User user = service.findUser(userId);
         model.addAttribute("comments", all);
@@ -62,7 +62,7 @@ public class UserPageController {
 
     @GetMapping("/{userId}/posts")
     public String posts(Model model, @PathVariable Long userId, @PageableDefault(size = DEFAULT_PAGE_SIZE,
-            sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostPageDto> all = service.postList(userId, pageable);
         User user = service.findUser(userId);
         model.addAttribute("posts", all);

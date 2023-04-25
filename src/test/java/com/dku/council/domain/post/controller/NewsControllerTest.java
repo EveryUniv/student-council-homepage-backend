@@ -16,9 +16,9 @@ import com.dku.council.mock.TagMock;
 import com.dku.council.mock.UserMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.EntityUtil;
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.MvcMockResponse;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.dku.council.util.test.FullIntegrationTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -180,6 +180,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 생성")
     void create() throws Exception {
         // when
+        UserAuth.withAdmin(user.getId());
+
         ResultActions result = mvc.perform(multipart("/post/news")
                 .param("title", "제목")
                 .param("body", "본문"));
@@ -200,6 +202,8 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 생성 - 태그 명시")
     void createWithTag() throws Exception {
         // given
+        UserAuth.withAdmin(user.getId());
+
         Tag tag = new Tag("tag");
         tagRepository.save(tag);
         Tag tag2 = new Tag("tag2");
@@ -248,6 +252,7 @@ class NewsControllerTest extends AbstractContainerRedisTest {
     @DisplayName("News 삭제")
     void delete() throws Exception {
         // given
+        UserAuth.withAdmin(user.getId());
         News news = allNews.get(0);
 
         // when

@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.user.exception.LoginUserNotFoundException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
 import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
@@ -12,6 +12,7 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.jwt.AuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtAuthenticationToken;
 import com.dku.council.global.auth.jwt.JwtProvider;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +40,9 @@ class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserInfoCacheService cacheService;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -65,6 +72,7 @@ class UserServiceTest {
         // then
         assertThat(response.getAccessToken()).isEqualTo("access");
         assertThat(response.getRefreshToken()).isEqualTo("refresh");
+        verify(cacheService).cacheUserInfo(eq(user.getId()), any());
     }
 
     @Test
@@ -75,7 +83,7 @@ class UserServiceTest {
         when(userRepository.findByStudentId(dto.getStudentId())).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(LoginUserNotFoundException.class, () ->
+        assertThrows(UserNotFoundException.class, () ->
                 service.login(dto));
     }
 
@@ -142,22 +150,54 @@ class UserServiceTest {
         when(userRepository.findById(0L)).thenReturn(Optional.empty());
 
         // when
-        assertThrows(LoginUserNotFoundException.class, () ->
+        assertThrows(UserNotFoundException.class, () ->
                 service.getUserInfo(0L));
     }
 
     @Test
     @DisplayName("닉네임 변경")
     void changeUserNickName() {
-        //given
+        // given
         User user = UserMock.createDummyMajor();
         RequestNickNameChangeDto dto = new RequestNickNameChangeDto("바꾸는 이름");
 
-        //when & then
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
+        // when
         service.changeNickName(user.getId(), dto);
+
+        // then
         assertThat(user.getNickname()).isEqualTo(dto.getNickname());
+        verify(cacheService).invalidateUserInfo(user.getId());
     }
 
+    @Test
+    @DisplayName("유저 활성화")
+    void activateUser() {
+        // given
+        User user = UserMock.createDummyMajor();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // when
+        service.activateUser(user.getId());
+
+        // then
+        assertThat(user.getStatus()).isEqualTo(UserStatus.ACTIVE);
+        verify(cacheService).invalidateUserInfo(user.getId());
+    }
+
+    @Test
+    @DisplayName("유저 비활성화")
+    void deactivateUser() {
+        // given
+        User user = UserMock.createDummyMajor();
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        // when
+        service.deactivateUser(user.getId());
+
+        // then
+        assertThat(user.getStatus()).isEqualTo(UserStatus.INACTIVE);
+        verify(cacheService).invalidateUserInfo(user.getId());
+    }
 }

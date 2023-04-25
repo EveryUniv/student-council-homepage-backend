@@ -88,7 +88,6 @@ public class GGBusProvider implements BusArrivalProvider {
                 .build()
                 .toUri();
 
-        // TODO 비동기 방식으로 처리해보기
         return webClient.get()
                 .uri(uri)
                 .accept(MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML)

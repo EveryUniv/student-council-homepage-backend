@@ -35,7 +35,11 @@ public class LocalizedMessageException extends RuntimeException {
     }
 
     public List<Object> getMessages(MessageSource messageSource, Locale locale) {
-        return List.of(Objects.requireNonNullElseGet(customMessage, () -> messageSource.getMessage(messageId, arguments, locale)));
+        return List.of(Objects.requireNonNullElseGet(customMessage, () -> getDefaultMessage(messageSource, locale)));
+    }
+
+    public String getDefaultMessage(MessageSource messageSource, Locale locale) {
+        return messageSource.getMessage(messageId, arguments, locale);
     }
 
     public String getCode() {

@@ -1,6 +1,7 @@
 package com.dku.council.domain.user.model.entity;
 
 import com.dku.council.domain.user.model.UserStatus;
+import com.dku.council.domain.user.service.UserInfoCacheService;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.base.BaseEntity;
 import lombok.*;
@@ -91,17 +92,46 @@ public class User extends BaseEntity {
         this.password = encodedPassword;
     }
 
+    /**
+     * 닉네임을 변경합니다.
+     * User정보 캐시를 삭제하기위해 {@link UserInfoCacheService}.invalidateUserInfo를 호출해야 합니다.
+     *
+     * @param nickname 닉네임
+     */
     public void changeNickName(String nickname) {
         this.nickname = nickname;
     }
 
+    /**
+     * 휴대폰 번호를 변경합니다.
+     * User정보 캐시를 삭제하기위해 {@link UserInfoCacheService}.invalidateUserInfo를 호출해야 합니다.
+     *
+     * @param phone 전화번호
+     */
     public void changePhone(String phone) {
         this.phone = phone;
     }
+
+    /**
+     * User 상태를 변경합니다.
+     * User정보 캐시를 삭제하기위해 {@link UserInfoCacheService}.invalidateUserInfo를 호출해야 합니다.
+     *
+     * @param status 상태
+     */
     public void changeStatus(UserStatus status) {
         this.status = status;
     }
 
+    /**
+     * 공통 User 정보를 수정합니다.
+     * User정보 캐시를 삭제하기위해 {@link UserInfoCacheService}.invalidateUserInfo를 호출해야 합니다.
+     *
+     * @param studentId       학번
+     * @param studentName     이름
+     * @param major           전공
+     * @param yearOfAdmission 입학년도
+     * @param studentState    학적상태
+     */
     public void changeGenericInfo(String studentId, String studentName, Major major, int yearOfAdmission, String studentState) {
         this.studentId = studentId;
         this.name = studentName;

@@ -1,0 +1,5 @@
+{
+    "result": false,
+    "errorMessage": "Unissued image.",
+    "errorCode": "CT002"
+}
