@@ -11,13 +11,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -38,7 +37,10 @@ public class JwtProvider implements AuthenticationTokenProvider {
     @Override
     public String getAccessTokenFromHeader(HttpServletRequest request) {
         String header = request.getHeader(AUTHORIZATION);
-        if (!StringUtils.hasText(header)) return null;
+        if (!StringUtils.hasText(header)) {
+            Optional<Cookie> accessToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access-token")).findAny();
+            return accessToken.map(Cookie::getValue).orElse(null);
+        }
         if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
         return header.substring(7);
     }
