@@ -71,8 +71,6 @@
                 <th scope="col">활성화 여부</th>
                 <th scope="col">권한</th>
                 <th scope="col"></th>
-                <th scope="col"></th>
-                <th scope="col"></th>
             </tr>
             </thead>
 
@@ -87,21 +85,21 @@
                 <td th:text="${user.status}"></td>
                 <td th:text="${user.userRole}"></td>
                 <td>
-                    <form method="post" th:if="${user.userRole} != 'ADMIN'"
-                          th:action="@{|/manage/users/${user.id}/deactivate|}">
-                        <button class="btn btn-primary float-end" type="submit">비활성화</button>
-                    </form>
-                </td>
-                <td>
-                    <form method="post" th:if="${user.userRole} != 'ADMIN'"
-                          th:action="@{|/manage/users/${user.id}/activate|}">
-                        <button class="btn btn-primary float-end" type="submit">활성화</button>
-                    </form>
-                </td>
-                <td>
-                    <button class="btn btn-primary float-end" type="button">
-                        <a th:href="@{|/manage/users/${user.id}/comments|}" style="color: white">댓글</a>
-                    </button>
+                    <div class="btn-group">
+                        <form method="post" th:if="${user.userRole} != 'ADMIN'"
+                              th:action="@{|/manage/users/${user.id}/deactivate|}">
+                            <button class="btn btn-primary me-md-2" type="submit">비활성화</button>
+                        </form>
+                        <form method="post" th:if="${user.userRole} != 'ADMIN'"
+                              th:action="@{|/manage/users/${user.id}/activate|}">
+                            <button class="btn btn-primary me-md-2" type="submit">활성화</button>
+                        </form>
+                        <div>
+                            <button class="btn btn-primary me-md-2" type="button">
+                                <a th:href="@{|/manage/users/${user.id}/comments|}" style="color: white">댓글</a>
+                            </button>
+                        </div>
+                    </div>
                 </td>
             </tr>
             </tbody>

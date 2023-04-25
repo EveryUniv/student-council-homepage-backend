@@ -5,10 +5,17 @@
 <section>
     <div class="py-5 text-center">
         <h2>배너</h2>
-        <p class="btn btn-secondary rounded-pill px-3" type="button">
-            <a th:href="@{|/manage|}" style="color: white">홈으로</a>
-        </p>
-        <p>배너는 최신순으로 정렬되어 있습니다.</p>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <div>
+            배너는 최신순으로 정렬되어 있습니다.
+        </div>
     </div>
 
     <hr class="my-4">
@@ -28,14 +35,15 @@
 
         <ul style="list-style: none">
             <li th:each="banner : ${banners}" style="float: left">
-                <div class="card" style="width: 18rem;">
+                <div class="card">
                     <img th:src="${banner.url}" class="card-img-top">
                     <div class="card-body">
                         <h5>Redirect URL</h5>
                         <p class="card-text" th:text="${banner.redirectUrl}"></p>
                         <form method="post" th:action="@{|/manage/banner/${banner.id}/edit|}">
-                            <input type="text" , name="redirectUrl">
-                            <button class="btn btn-primary" type="submit">변경</button>
+                            <input class="form-control" type="text" name="redirectUrl"
+                                   placeholder="바꿀 Redirect URL">
+                            <button class="btn btn-primary me-md-2" type="submit">변경</button>
                         </form>
                         <form method="post" th:action="@{|/manage/banner/${banner.id}/delete|}">
                             <button class="btn btn-primary" type="submit">삭제</button>

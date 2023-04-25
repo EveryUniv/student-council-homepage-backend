@@ -5,9 +5,12 @@
 <section>
     <div class="py-5 text-center">
         <h2 th:text="|${user.name}(${user.nickname}) 의 댓글 목록|">댓글 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/users|}" style="color: white">목록으로</a>
+            </p>
+        </div>
     </div>
-
-    <p><a th:href="@{|/manage/users|}">목록으로</a>
 
     <hr class="my-4">
     <div>
