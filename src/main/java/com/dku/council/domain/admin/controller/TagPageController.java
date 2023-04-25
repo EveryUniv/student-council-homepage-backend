@@ -20,26 +20,26 @@ public class TagPageController {
     private final TagPageService service;
 
     @GetMapping
-    public String tags(Model model){
+    public String tags(Model model) {
         List<TagPageDto> all = service.list();
         model.addAttribute("tags", all);
-        return "tag/tags";
+        return "page/tag/tags";
     }
 
     @PostMapping("/{tagId}/delete")
-    public String tagDelete(HttpServletRequest request, @PathVariable Long tagId){
+    public String tagDelete(HttpServletRequest request, @PathVariable Long tagId) {
         service.delete(tagId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{tagId}/rename")
-    public String tagRename(HttpServletRequest request, @PathVariable Long tagId, String name){
+    public String tagRename(HttpServletRequest request, @PathVariable Long tagId, String name) {
         service.rename(tagId, name);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping
-    public String createTag(HttpServletRequest request, String name){
+    public String createTag(HttpServletRequest request, String name) {
         service.create(name);
         return "redirect:" + request.getHeader("Referer");
     }

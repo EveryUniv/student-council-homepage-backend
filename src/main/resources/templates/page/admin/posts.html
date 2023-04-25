@@ -1,13 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet"
-          th:href="@{/css/bootstrap.min.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 게시글', ~{::section})}">
 <body>
-<div class="container" style="max-width: 1500px">
+<section>
     <div class="py-5 text-center">
         <h2>게시글 목록</h2>
         <p class="btn btn-secondary rounded-pill px-3" type="button">
@@ -15,25 +10,25 @@
         </p>
     </div>
     <div class="btn-group">
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit">전체</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="type" value="Voc">Q&A</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="type" value="GeneralForum">자유게시판</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="type" value="Petition">청원게시판</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="status" value="BLINDED">블라인드게시물</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="status" value="DELETED">삭제게시물</button>
         </form>
-        <form method = "get" th:action="@{/manage/posts}">
+        <form method="get" th:action="@{/manage/posts}">
             <button class="btn btn-outline-secondary" type="submit" name="status" value="ACTIVE">활성게시물</button>
         </form>
     </div>
@@ -47,7 +42,7 @@
                 <th scope="col">제목</th>
                 <th scope="col">작성일</th>
                 <th scope="col">상태</th>
-                <th scop="col">신고 횟수</th>
+                <th scope="col">신고 횟수</th>
                 <th scope="col">버튼</th>
             </tr>
             </thead>
@@ -61,13 +56,19 @@
                 <td>
                     <div class="btn-group">
                         <form method="post" th:action="@{|/manage/posts/${post.id}/activate|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">활성화</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">활성화
+                            </button>
                         </form>
                         <form method="post" th:action="@{|/manage/posts/${post.id}/blind|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">blind</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">blind
+                            </button>
                         </form>
                         <form method="post" th:action="@{|/manage/posts/${post.id}/delete|}">
-                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}" type="submit">삭제</button>
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">삭제
+                            </button>
                         </form>
                     </div>
                 </td>
@@ -75,29 +76,40 @@
 
             <nav aria-label="Page navigation example">
                 <div class="input-group mb-3">
-                    <form method = "get" th:action="@{/manage/posts}">
+                    <form method="get" th:action="@{/manage/posts}">
                         <input type="text" name="keyword" class="form-control" placeholder="Enter keyword">
                         <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Button</button>
                     </form>
                 </div>
 
-                <ul class="pagination" th:with="start=${(posts.number/maxPage)*maxPage + 1}, end = ${(posts.totalPages == 0) ? 1 : ((start + (maxPage - 1) < posts.totalPages) ? (start + (maxPage - 1)) : posts.totalPages)}">
+                <ul class="pagination"
+                    th:with="start=${(posts.number/maxPage)*maxPage + 1}, end = ${(posts.totalPages == 0) ? 1 : ((start + (maxPage - 1) < posts.totalPages) ? (start + (maxPage - 1)) : posts.totalPages)}">
                     <li class="page-item" th:if="${start > 1}">
-                        <a class="page-link" th:href="@{|/manage/posts?page=0&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'<<'"></a>
+                        <a class="page-link"
+                           th:href="@{|/manage/posts?page=0&keyword=${keyword}&type=${type}&status=${status}|}"
+                           th:text="'<<'"></a>
                     </li>
                     <li class="page-item" th:if="${start > 1}">
-                        <a class="page-link" th:href="@{|/manage/posts?page=${start - maxPage}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'<'"></a>
+                        <a class="page-link"
+                           th:href="@{|/manage/posts?page=${start - maxPage - 1}&keyword=${keyword}&type=${type}&status=${status}|}"
+                           th:text="'<'"></a>
                     </li>
 
                     <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
-                        <a class="page-link" th:href="@{|/manage/posts?page=${page - 1}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="${page}"></a>
+                        <a class="page-link"
+                           th:href="@{|/manage/posts?page=${page - 1}&keyword=${keyword}&type=${type}&status=${status}|}"
+                           th:text="${page}"></a>
                     </li>
 
                     <li class="page-item" th:if="${end < posts.totalPages}">
-                        <a class="page-link" th:href="@{|/manage/posts?page=${start + maxPage}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'>'"></a>
+                        <a class="page-link"
+                           th:href="@{|/manage/posts?page=${start + maxPage - 1}&keyword=${keyword}&type=${type}&status=${status}|}"
+                           th:text="'>'"></a>
                     </li>
                     <li class="page-item" th:if="${end < posts.totalPages}">
-                        <a class="page-link" th:href="@{|/manage/posts?page=${posts.totalPages - 1}&keyword=${keyword}&type=${type}&status=${status}|}" th:text="'>>'"></a>
+                        <a class="page-link"
+                           th:href="@{|/manage/posts?page=${posts.totalPages - 1}&keyword=${keyword}&type=${type}&status=${status}|}"
+                           th:text="'>>'"></a>
                     </li>
                 </ul>
             </nav>
@@ -105,7 +117,6 @@
             </tbody>
         </table>
     </div>
-</div>
-
+</section>
 </body>
 </html>

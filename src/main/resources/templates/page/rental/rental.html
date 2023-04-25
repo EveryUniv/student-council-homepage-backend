@@ -1,13 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet"
-          th:href="@{/css/bootstrap.min.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 대여물품', ~{::section})}">
 <body>
-<div class="container" style="max-width: 1500px">
+<section>
     <div class="py-5 text-center">
         <h2>rental 현황</h2>
         <p class="btn btn-secondary rounded-pill px-3" type="button">
@@ -15,7 +10,8 @@
         </p>
     </div>
 
-    <p><a th:href="@{|/manage/rentals/items|}">Rental 아이템 목록</a><p>
+    <p><a th:href="@{|/manage/rentals/items|}">Rental 아이템 목록</a>
+    <p>
 
     <hr class="my-4">
     <div>
@@ -50,7 +46,8 @@
             </tbody>
 
             <nav aria-label="Page navigation example">
-                <ul class="pagination" th:with="start=${(rentals.number/maxPage)*maxPage + 1}, end = ${(rentals.totalPages == 0) ? 1 : ((start + (maxPage - 1) < rentals.totalPages) ? (start + (maxPage - 1)) : rentals.totalPages)}">
+                <ul class="pagination"
+                    th:with="start=${(rentals.number/maxPage)*maxPage + 1}, end = ${(rentals.totalPages == 0) ? 1 : ((start + (maxPage - 1) < rentals.totalPages) ? (start + (maxPage - 1)) : rentals.totalPages)}">
                     <li class="page-item" th:if="${start > 1}">
                         <a class="page-link" th:href="@{|/manage/rentals?page=0|}" th:text="'<<'"></a>
                     </li>
@@ -66,14 +63,13 @@
                         <a class="page-link" th:href="@{|/manage/rentals?page=${start + maxPage}|}" th:text="'>'"></a>
                     </li>
                     <li class="page-item" th:if="${end < rentals.totalPages}">
-                        <a class="page-link" th:href="@{|/manage/rentals?page=${rentals.totalPages - 1}|}" th:text="'>>'"></a>
+                        <a class="page-link" th:href="@{|/manage/rentals?page=${rentals.totalPages - 1}|}"
+                           th:text="'>>'"></a>
                     </li>
                 </ul>
             </nav>
         </table>
-
     </div>
-</div>
-
+</section>
 </body>
 </html>

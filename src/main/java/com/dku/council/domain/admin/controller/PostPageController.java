@@ -2,6 +2,7 @@ package com.dku.council.domain.admin.controller;
 
 import com.dku.council.domain.admin.dto.PostPageDto;
 import com.dku.council.domain.admin.service.PostPageService;
+import com.dku.council.domain.admin.util.PageConstants;
 import com.dku.council.domain.post.model.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,48 +15,52 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.dku.council.domain.admin.util.PageConstants.DEFAULT_MAX_PAGE;
+
 @Controller
 @RequestMapping("/manage/posts")
 @RequiredArgsConstructor
 public class PostPageController {
-    private final int DEFAULT_PAGE_SIZE = 15;
-    private final int DEFAULT_MAX_PAGE = 5;
     private final PostPageService service;
+
     @GetMapping
-    public String posts(Model model, @PageableDefault(size = DEFAULT_PAGE_SIZE, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+    public String posts(Model model,
+                        @PageableDefault(size = PageConstants.DEFAULT_PAGE_SIZE,
+                                sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                         @RequestParam(required = false) String keyword,
                         @RequestParam(required = false) String type,
                         @RequestParam(required = false) String status
-    ){
+    ) {
         Page<PostPageDto> all = service.list(keyword, type, status, pageable);
         model.addAttribute("posts", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
         model.addAttribute("status", status);
-        return "admin/posts";
+        return "page/admin/posts";
     }
 
     @GetMapping("/{postId}")
-    public String post(Model model, @PathVariable Long postId){
+    public String post(Model model, @PathVariable Long postId) {
         Post post = service.findOne(postId);
         model.addAttribute("post", post);
-        return "admin/post";
+        return "page/admin/post";
     }
 
     @PostMapping("/{postId}/delete")
-    public String postDelete(HttpServletRequest request, @PathVariable Long postId){
+    public String postDelete(HttpServletRequest request, @PathVariable Long postId) {
         service.delete(postId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{postId}/blind")
-    public String blind(HttpServletRequest request, @PathVariable Long postId){
+    public String blind(HttpServletRequest request, @PathVariable Long postId) {
         service.blind(postId);
         return "redirect:" + request.getHeader("Referer");
     }
+
     @PostMapping("/{postId}/activate")
-    public String activate(HttpServletRequest request, @PathVariable Long postId){
+    public String activate(HttpServletRequest request, @PathVariable Long postId) {
         service.active(postId);
         return "redirect:" + request.getHeader("Referer");
     }

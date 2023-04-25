@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.dku.council.domain.admin.util.PageConstants.DEFAULT_MAX_PAGE;
+import static com.dku.council.domain.admin.util.PageConstants.DEFAULT_PAGE_SIZE;
+
 @Controller
 @RequestMapping("/manage/users")
 @RequiredArgsConstructor
 public class UserPageController {
-    private final int DEFAULT_PAGE_SIZE = 15;
-    private final int DEFAULT_MAX_PAGE = 5;
     private final UserPageService service;
 
     @GetMapping
@@ -34,7 +35,7 @@ public class UserPageController {
         model.addAttribute("users", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("nickname", nickname);
-        return "user/users";
+        return "page/user/users";
     }
 
     @PostMapping("/{userId}/activate")
@@ -57,7 +58,7 @@ public class UserPageController {
         model.addAttribute("comments", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("user", user);
-        return "user/comments";
+        return "page/user/comments";
     }
 
     @GetMapping("/{userId}/posts")
@@ -68,6 +69,6 @@ public class UserPageController {
         model.addAttribute("posts", all);
         model.addAttribute("maxPage", DEFAULT_MAX_PAGE);
         model.addAttribute("user", user);
-        return "user/posts";
+        return "page/user/posts";
     }
 }

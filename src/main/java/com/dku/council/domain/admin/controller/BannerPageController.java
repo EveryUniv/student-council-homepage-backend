@@ -24,27 +24,27 @@ public class BannerPageController {
     private final MainPageService service;
 
     @GetMapping
-    public String banner(Model model, RequestCarouselImageDto dto){
+    public String banner(Model model, RequestCarouselImageDto dto) {
         List<CarouselImageResponse> all = service.getCarouselImages();
         model.addAttribute("banners", all);
         model.addAttribute("object", dto);
-        return "banner/banner";
+        return "page/banner/banner";
     }
 
     @PostMapping("/{bannerId}/delete")
-    public String deleteBanner(HttpServletRequest request,@PathVariable Long bannerId){
+    public String deleteBanner(HttpServletRequest request, @PathVariable Long bannerId) {
         service.deleteCarouselImage(bannerId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/{bannerId}/edit")
-    public String editBanner(HttpServletRequest request, @PathVariable Long bannerId, String redirectUrl){
+    public String editBanner(HttpServletRequest request, @PathVariable Long bannerId, String redirectUrl) {
         service.changeRedirectUrl(bannerId, redirectUrl);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/add")
-    public String addBanner(HttpServletRequest request,RequestCarouselImageDto dto){
+    public String addBanner(HttpServletRequest request, RequestCarouselImageDto dto) {
         service.addCarouselImage(dto);
         return "redirect:" + request.getHeader("Referer");
     }

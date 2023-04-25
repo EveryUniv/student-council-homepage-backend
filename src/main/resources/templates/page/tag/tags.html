@@ -1,13 +1,8 @@
 <!DOCTYPE html>
-<html lang="ko">
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet"
-          th:href="@{/css/bootstrap.min.css}">
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 태그', ~{::section})}">
 <body>
-<div class="container" style="max-width: 1500px">
+<section>
     <div class="py-5 text-center">
         <h2>태그 목록</h2>
         <p class="btn btn-secondary rounded-pill px-3" type="button">
@@ -32,7 +27,7 @@
                 <td>
                     <div class="input-group">
                         <form method="post" th:action="@{|/manage/tags/${tag.id}/rename|}">
-                            <input type="text" class="form-control" name = "name" placeholder="태그 이름 변경">
+                            <input type="text" class="form-control" name="name" placeholder="태그 이름 변경">
                             <button class="btn btn-primary float-end" type="submit">변경</button>
                         </form>
                     </div>
@@ -46,7 +41,7 @@
 
             <nav aria-label="Page navigation example">
                 <div class="input-group mb-3">
-                    <form method = "post" th:action="@{/manage/tags}">
+                    <form method="post" th:action="@{/manage/tags}">
                         <input type="text" name="name" placeholder="태그 추가하기">
                         <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Submit</button>
                     </form>
@@ -56,7 +51,6 @@
             </tbody>
         </table>
     </div>
-</div>
-
+</section>
 </body>
 </html>
