@@ -33,4 +33,5 @@ public class News extends Post {
     public String getDisplayingUsername() {
         return Post.ANONYMITY;
     }
+
 }

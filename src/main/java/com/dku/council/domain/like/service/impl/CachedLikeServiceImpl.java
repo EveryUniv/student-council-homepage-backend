@@ -28,18 +28,20 @@ public class CachedLikeServiceImpl implements LikeService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public void like(Long elementId, Long userId, LikeTarget target) {
         if (!isLiked(elementId, userId, target)) {
             memoryRepository.like(elementId, userId, target);
-            memoryRepository.setLikeCount(elementId, getCountOfLikes(elementId, target) + 1, target); // TODO 동시성 문제
+            memoryRepository.increaseLikeCount(elementId, target);
         }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void cancelLike(Long elementId, Long userId, LikeTarget target) {
         if (isLiked(elementId, userId, target)) {
             memoryRepository.cancelLike(elementId, userId, target);
-            memoryRepository.setLikeCount(elementId, getCountOfLikes(elementId, target) - 1, target);
+            memoryRepository.decreaseLikeCount(elementId, target);
         }
     }
 

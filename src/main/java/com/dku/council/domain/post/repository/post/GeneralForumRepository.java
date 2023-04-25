@@ -2,5 +2,8 @@ package com.dku.council.domain.post.repository.post;
 
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 
+
+
 public interface GeneralForumRepository extends GenericPostRepository<GeneralForum> {
+
 }

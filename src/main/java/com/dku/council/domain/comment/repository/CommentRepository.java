@@ -1,7 +1,8 @@
-package com.dku.council.domain.comment;
+package com.dku.council.domain.comment.repository;
 
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.post.model.entity.Post;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,4 +29,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "on p.id = c.post.id and c.user.id=:userId and c.status='ACTIVE' " +
             "group by p.id)")
     Page<Post> findAllCommentByUserId(Long userId, Pageable pageable);
+
+    /**
+     * 활성 상태와 상관없이 모든 유저의 댓글을 가져옵니다. 관리자만 사용 가능합니다.
+     */
+    @Query("select c from Comment c where c.user.id=:userId")
+    Page<Comment> findAllByUserIdWithAdmin(@Param("userId")Long userId, Pageable pageable);
 }

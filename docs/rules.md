@@ -1,5 +1,5 @@
 ## 개요
-- **Naming Convention은 반드시 준수** (Bold 처리), 그 외에는 권장 사항으로 반드시 지키지 않아도 된다.
+- **Naming Convention 준수** (Bold 처리), 그 외에는 권장 사항으로 반드시 지키지 않아도 된다.
 
 ## Java
  - **일반 Java Naming Convention을 따름**

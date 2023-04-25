@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+          th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container" style="max-width: 1500px">
+    <div class="py-5 text-center">
+        <h2>회원 목록</h2>
+        <p class="btn btn-secondary rounded-pill px-3" type="button">
+            <a th:href="@{|/manage|}" style="color: white">Home</a>
+        </p>
+    </div>
+
+
+    <hr class="my-4">
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">이름</th>
+                <th scope="col">닉네임</th>
+                <th scope="col">학번</th>
+                <th scope="col">학과</th>
+                <th scope="col">전화번호</th>
+                <th scope="col">활성화 여부</th>
+                <th scope="col">권한</th>
+
+
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td><a th:href="@{|/manage/users/${user.id}/posts|}"
+                th:text="${user.name}"></a></td>
+                <td th:text="${user.nickname}"></td>
+                <td th:text="${user.studentId}"></td>
+                <td th:text="${user.major}"></td>
+                <td th:text="${user.phone}"></td>
+                <td th:text="${user.status}"></td>
+                <td th:text="${user.userRole}"></td>
+                <td>
+                    <form method="post" th:action="@{|/manage/users/${user.id}/deactivate|}">
+                        <button class="btn btn-primary float-end" type="submit">비활성화</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" th:action="@{|/manage/users/${user.id}/activate|}">
+                        <button class="btn btn-primary float-end" type="submit">활성화</button>
+                    </form>
+                </td>
+                <td>
+                    <button class="btn btn-primary float-end" type="button">
+                        <a th:href="@{|/manage/users/${user.id}/comments|}" style="color: white">댓글</a>
+                    </button>
+                </td>
+
+            </tr>
+
+            <nav aria-label="Page navigation example">
+                <div class="input-group mb-3">
+                    <form method = "get" th:action="@{/manage/users}">
+                        <input type="text" name="nickname" class="form-control" placeholder="user nickname">
+                        <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Click</button>
+                    </form>
+                </div>
+
+                <ul class="pagination" th:with="start=${(users.number/maxPage)*maxPage + 1}, end = ${(users.totalPages == 0) ? 1 : ((start + (maxPage - 1) < users.totalPages) ? (start + (maxPage - 1)) : users.totalPages)}">
+                    <li class="page-item" th:if="${start > 1}">
+                        <a class="page-link" th:if="${nickname != null}"
+                           th:href="@{|/manage/users?page=0&nickname=${nickname}|}" th:text="'<<'"></a>
+                        <a class="page-link" th:if="${nickname == null}"
+                           th:href="@{|/manage/users?page=0|}" th:text="'<<'"></a>
+                    </li>
+                    <li class="page-item" th:if="${start > 1}">
+                        <a class="page-link" th:if="${nickname != null}"
+                           th:href="@{|/manage/users?page=${start - maxPage}&nickname=${nickname}|}" th:text="'<'"></a>
+                        <a class="page-link" th:if="${nickname == null}"
+                           th:href="@{|/manage/users?page=${start - maxPage}|}" th:text="'<'"></a>
+                    </li>
+
+                    <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
+                        <a class="page-link" th:if="${nickname != null}"
+                           th:href="@{|/manage/users?page=${page - 1}&nickname=${nickname}|}" th:text="${page}"></a>
+                        <a class="page-link" th:if="${nickname == null}"
+                            th:href="@{|/manage/users?page=${page - 1}|}" th:text="${page}"></a>
+                    </li>
+
+                    <li class="page-item" th:if="${end < users.totalPages}">
+                        <a class="page-link" th:if="${nickname != null}"
+                           th:href="@{|/manage/users?page=${start + maxPage}&nickname=${nickname}|}" th:text="'>'"></a>
+                        <a class="page-link" th:if="${nickname == null}"
+                            th:href="@{|/manage/users?page=${start + maxPage}|}" th:text="'>'"></a>
+                    </li>
+                    <li class="page-item" th:if="${end < users.totalPages}">
+                        <a class="page-link" th:if="${nickname != null}"
+                           th:href="@{|/manage/users?page=${users.totalPages - 1}&nickname=${nickname}|}" th:text="'>>'"></a>
+                        <a class="page-link" th:if="${nickname == null}"
+                            th:href="@{|/manage/users?page=${users.totalPages - 1}|}" th:text="'>>'"></a>
+                    </li>
+                </ul>
+            </nav>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

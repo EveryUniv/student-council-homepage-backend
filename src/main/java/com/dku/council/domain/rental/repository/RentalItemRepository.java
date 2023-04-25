@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface RentalItemRepository extends JpaRepository<RentalItem, Long>, JpaSpecificationExecutor<RentalItem> {
     @Query("select r from RentalItem r where r.id=:id and r.isActive=true")
     Optional<RentalItem> findById(Long id);
+
 }

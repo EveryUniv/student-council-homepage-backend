@@ -80,6 +80,18 @@ public class LikeRedisRepository implements LikeMemoryRepository {
     }
 
     @Override
+    public void increaseLikeCount(Long elementId, LikeTarget target) {
+        String key = combine(RedisKeys.LIKE_COUNT_KEY, target, elementId);
+        redisTemplate.opsForValue().increment(key);
+    }
+
+    @Override
+    public void decreaseLikeCount(Long elementId, LikeTarget target) {
+        String key = combine(RedisKeys.LIKE_COUNT_KEY, target, elementId);
+        redisTemplate.opsForValue().decrement(key);
+    }
+
+    @Override
     public List<LikeEntry> getAllLikesAndClear(Long userId, LikeTarget target) {
         String key = combine(RedisKeys.LIKE_KEY, target, userId);
         Map<Object, Object> entries = redisTemplate.opsForHash().entries(key);

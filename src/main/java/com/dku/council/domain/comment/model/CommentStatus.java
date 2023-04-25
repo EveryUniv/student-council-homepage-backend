@@ -1,4 +1,4 @@
-package com.dku.council.domain.comment;
+package com.dku.council.domain.comment.model;
 
 public enum CommentStatus {
     /**
