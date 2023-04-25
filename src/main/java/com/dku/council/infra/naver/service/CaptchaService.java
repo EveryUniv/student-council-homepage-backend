@@ -20,6 +20,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class CaptchaService {
 
+    public static final String DISABLED_CAPTCHA_KEY = "disabled";
+
     @Value("${naver.captcha.enable}")
     private final boolean enableCaptcha;
 
@@ -30,7 +32,7 @@ public class CaptchaService {
 
     public String requestCaptchaKey() {
         if (!enableCaptcha) {
-            return "captcha-key";
+            return DISABLED_CAPTCHA_KEY;
         }
 
         try {
@@ -95,6 +97,8 @@ public class CaptchaService {
         } catch (WebClientResponseException e) {
             handleResponseError(e);
             throw new CannotRequestCaptchaException(e);
+        } catch (InvalidCaptchaException e) {
+            throw e;
         } catch (Throwable e) {
             throw new CannotRequestCaptchaException(e);
         }

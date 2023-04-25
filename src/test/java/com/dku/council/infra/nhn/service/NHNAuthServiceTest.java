@@ -3,7 +3,6 @@ package com.dku.council.infra.nhn.service;
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
 import com.dku.council.util.base.AbstractMockServerTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +11,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NHNAuthServiceTest extends AbstractMockServerTest {
 
@@ -34,7 +35,7 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
     @Test
     @DisplayName("초기화하지 않았을 때 에러 발생")
     public void failedByNotInitialized() {
-        Assertions.assertThrows(NotInitializedException.class, () -> notInitializedService.requestToken());
+        assertThrows(NotInitializedException.class, () -> notInitializedService.requestToken());
     }
 
     @Test
@@ -54,7 +55,7 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
         mockJson(HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
 
         // when & then(no error)
-        Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
+        assertThrows(CannotGetTokenException.class, () -> service.requestToken());
     }
 
     @Test
@@ -64,6 +65,6 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
         mockJson("nhn/auth/response-fail1");
 
         // when & then
-        Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
+        assertThrows(CannotGetTokenException.class, () -> service.requestToken());
     }
 }
