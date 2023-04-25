@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 배너', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>배너</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="alert alert-info d-flex align-items-center" role="alert">
+        <div>
+            배너는 최신순으로 정렬되어 있습니다.
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <form method="post" th:object="${object}" th:action="@{|/manage/banner/add|}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="banner-file" class="form-label">배너 파일</label>
+                <input id="banner-file" class="form-control" type="file" th:field="*{imageFile}">
+            </div>
+            <div class="mb-3">
+                <label for="redirect-text" class="form-label">클릭시 이동 URL</label>
+                <input id="redirect-text" type="text" class="form-control" th:field="*{redirectUrl}"
+                       placeholder="Redirect Url">
+            </div>
+            <button class="btn btn-primary float-end" type="submit">추가</button>
+        </form>
+
+        <ul style="list-style: none">
+            <li th:each="banner : ${banners}" style="float: left">
+                <div class="card">
+                    <img th:src="${banner.url}" class="card-img-top">
+                    <div class="card-body">
+                        <h5>Redirect URL</h5>
+                        <p class="card-text" th:text="${banner.redirectUrl}"></p>
+                        <form method="post" th:action="@{|/manage/banner/${banner.id}/edit|}">
+                            <input class="form-control" type="text" name="redirectUrl"
+                                   placeholder="바꿀 Redirect URL">
+                            <button class="btn btn-primary me-md-2" type="submit">변경</button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/banner/${banner.id}/delete|}">
+                            <button class="btn btn-primary" type="submit">삭제</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+</section>
+</body>
+</html>

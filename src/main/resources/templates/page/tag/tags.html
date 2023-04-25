@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 태그', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>태그 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <nav aria-label="Page navigation example">
+            <div class="input-group mb-3">
+                <form method="post" th:action="@{/manage/tags}">
+                    <div class="input-group flex-nowrap">
+                        <input class="form-control" type="text" name="name" placeholder="태그 추가하기">
+                        <button class="btn btn-outline-secondary float-end" type="submit" id="button-addon2">추가
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">태그명</th>
+                <th scope="col">변경</th>
+                <th scope="col">삭제</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="tag : ${tags}">
+                <td th:text="${tag.name}"></td>
+                <td>
+                    <div class="input-group">
+                        <form method="post" th:action="@{|/manage/tags/${tag.id}/rename|}">
+                            <div class="input-group flex-nowrap">
+                                <input type="text" class="form-control" name="name" placeholder="태그 이름 변경">
+                                <button class="btn btn-primary float-end" type="submit">변경</button>
+                            </div>
+                        </form>
+                    </div>
+                </td>
+                <td>
+                    <form method="post" th:action="@{|/manage/tags/${tag.id}/delete|}">
+                        <button class="btn btn-primary" type="submit">삭제</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
