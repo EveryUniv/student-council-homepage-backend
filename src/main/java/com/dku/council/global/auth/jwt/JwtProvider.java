@@ -3,20 +3,21 @@ package com.dku.council.global.auth.jwt;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.ExpiredTokenException;
-import com.dku.council.global.error.exception.IllegalTypeException;
+import com.dku.council.global.error.exception.IllegalTokenTypeException;
 import com.dku.council.global.error.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -36,13 +37,24 @@ public class JwtProvider implements AuthenticationTokenProvider {
 
     @Override
     public String getAccessTokenFromHeader(HttpServletRequest request) {
-        String header = request.getHeader(AUTHORIZATION);
-        if (!StringUtils.hasText(header)) {
-            Optional<Cookie> accessToken = Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("access-token")).findAny();
-            return accessToken.map(Cookie::getValue).orElse(null);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equalsIgnoreCase("access-token")) {
+                    return cookie.getValue();
+                }
+            }
         }
-        if (!header.startsWith("Bearer ")) throw new IllegalTypeException();
-        return header.substring(7);
+
+        String header = request.getHeader(AUTHORIZATION);
+        if (header != null) {
+            if (!header.toLowerCase().startsWith("bearer ")) {
+                throw new IllegalTokenTypeException();
+            }
+            return header.substring(7);
+        }
+
+        return null;
     }
 
     @Override
