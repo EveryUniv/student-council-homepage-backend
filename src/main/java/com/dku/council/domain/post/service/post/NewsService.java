@@ -32,6 +32,10 @@ public class NewsService {
         return postService.create(repository, userId, request);
     }
 
+    public ResponseSingleGenericPostDto findOneForGuest(Long id, String address) {
+        return postService.findOne(repository, id, null, UserRole.GUEST, address);
+    }
+
     public ResponseSingleGenericPostDto findOne(Long id, Long userId, UserRole role, String address) {
         return postService.findOne(repository, id, userId, role, address);
     }

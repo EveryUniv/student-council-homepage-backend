@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -135,11 +136,12 @@ public class GenericPostService<E extends Post> {
      *
      * @param postId        조회할 게시글 id
      * @param userId        조회하는 사용자 id. 내 게시글인지 판단하는데 사용된다.
+     *                      null인 경우 무조건 내 게시글이 아니라고 판단한다.
      * @param remoteAddress 요청자 IP Address. 조회수 카운팅에 사용된다.
      * @return 게시글 정보
      */
     @Transactional
-    public ResponseSingleGenericPostDto findOne(GenericPostRepository<E> repository, Long postId, Long userId,
+    public ResponseSingleGenericPostDto findOne(GenericPostRepository<E> repository, Long postId, @Nullable Long userId,
                                                 UserRole role, String remoteAddress) {
         E post = viewPost(repository, postId, remoteAddress, role);
         return makePostDto(userId, post);
@@ -153,10 +155,16 @@ public class GenericPostService<E extends Post> {
         return mapper.map(dto, post);
     }
 
-    private ResponseSingleGenericPostDto makePostDto(Long userId, E post) {
+    private ResponseSingleGenericPostDto makePostDto(@Nullable Long userId, E post) {
         int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
-        boolean isMine = post.getUser().getId().equals(userId);
-        boolean isLiked = likeService.isLiked(post.getId(), userId, LikeTarget.POST);
+        boolean isMine = false;
+        boolean isLiked = false;
+
+        if (userId != null) {
+            isMine = post.getUser().getId().equals(userId);
+            isLiked = likeService.isLiked(post.getId(), userId, LikeTarget.POST);
+        }
+
         return new ResponseSingleGenericPostDto(uploadContext, likes, isMine, isLiked, post);
     }
 
