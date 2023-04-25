@@ -25,7 +25,6 @@ public class Tag extends BaseEntity {
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostTag> postTag;
 
-
     public Tag(String name) {
         this.name = name;
     }

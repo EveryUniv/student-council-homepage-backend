@@ -28,6 +28,7 @@
                 <th scope="col">전화번호</th>
                 <th scope="col">활성화 여부</th>
                 <th scope="col">권한</th>
+                <th scope="col">Button</th>
 
 
             </tr>
@@ -42,12 +43,12 @@
                 <td th:text="${user.phone}"></td>
                 <td th:text="${user.status}"></td>
                 <td th:text="${user.userRole}"></td>
-                <td>
+                <td th:if="${user.userRole} != 'ADMIN'">
                     <form method="post" th:action="@{|/manage/users/${user.id}/deactivate|}">
                         <button class="btn btn-primary float-end" type="submit">비활성화</button>
                     </form>
                 </td>
-                <td>
+                <td th:if="${user.userRole} != 'ADMIN'">
                     <form method="post" th:action="@{|/manage/users/${user.id}/activate|}">
                         <button class="btn btn-primary float-end" type="submit">활성화</button>
                     </form>
