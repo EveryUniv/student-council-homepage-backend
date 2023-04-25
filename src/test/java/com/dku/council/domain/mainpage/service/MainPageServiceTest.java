@@ -1,11 +1,11 @@
 package com.dku.council.domain.mainpage.service;
 
 import com.dku.council.domain.mainpage.exception.CarouselNotFoundException;
+import com.dku.council.domain.mainpage.exception.InvalidCarouselTypeException;
 import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
 import com.dku.council.domain.mainpage.model.dto.response.CarouselImageResponse;
 import com.dku.council.domain.mainpage.model.entity.CarouselImage;
 import com.dku.council.domain.mainpage.repository.CarouselImageRepository;
-import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.model.UploadedFile;
 import com.dku.council.infra.nhn.service.FileUploadService;
@@ -55,7 +55,7 @@ public class MainPageServiceTest {
         RequestCarouselImageDto request = new RequestCarouselImageDto(file, "test/test");
 
         // when & then
-        assertThrows(IllegalTypeException.class, () -> service.addCarouselImage(request));
+        assertThrows(InvalidCarouselTypeException.class, () -> service.addCarouselImage(request));
     }
 
     @Test
