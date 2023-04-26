@@ -1,5 +1,6 @@
 package com.dku.council.domain.timetable.model.dto.request;
 
+import com.dku.council.domain.timetable.model.TimeScheduleType;
 import com.dku.council.domain.timetable.model.dto.TimePromise;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.EqualsAndHashCode;
@@ -20,6 +21,9 @@ public class RequestScheduleDto {
 
     @Schema(description = "메모. 수업이면 무시됩니다.", example = "일정 메모")
     private final String memo;
+
+    @Schema(description = "일정 타입")
+    private final TimeScheduleType type;
 
     @Schema(description = "시간과 장소 목록. 수업이면 무시됩니다.")
     private final List<TimePromise> times;

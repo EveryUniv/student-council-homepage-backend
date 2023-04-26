@@ -1,5 +1,6 @@
 package com.dku.council.domain.timetable.model.entity;
 
+import com.dku.council.domain.timetable.model.TimeScheduleType;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,15 +29,18 @@ public class TimeSchedule extends BaseEntity {
 
     private String memo;
 
+    private TimeScheduleType type;
+
     private String color;
 
     private String timesJson;
 
 
     @Builder
-    private TimeSchedule(String name, String memo, String color, String timesJson) {
+    private TimeSchedule(String name, String memo, TimeScheduleType type, String color, String timesJson) {
         this.name = name;
         this.memo = memo;
+        this.type = type;
         this.color = color;
         this.timesJson = timesJson;
     }

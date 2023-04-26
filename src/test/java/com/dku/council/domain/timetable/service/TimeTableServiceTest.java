@@ -4,6 +4,7 @@ import com.dku.council.domain.post.service.DummyPage;
 import com.dku.council.domain.timetable.exception.TimeConflictException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.exception.TooSmallTimeException;
+import com.dku.council.domain.timetable.model.TimeScheduleType;
 import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
@@ -187,7 +188,7 @@ class TimeTableServiceTest {
     @NotNull
     private RequestScheduleDto scheduleDtoMapper(TimeSchedule e) {
         List<TimePromise> timeList = TimePromise.parse(mapper, e.getTimesJson());
-        return new RequestScheduleDto(e.getName(), e.getMemo(), timeList, e.getColor());
+        return new RequestScheduleDto(e.getName(), e.getMemo(), e.getType(), timeList, e.getColor());
     }
 
     @Test
@@ -213,7 +214,7 @@ class TimeTableServiceTest {
         // given
         LocalTime start = LocalTime.of(10, 0, 0);
         List<RequestScheduleDto> reqDtos = List.of(
-                new RequestScheduleDto("name", "memo", List.of(
+                new RequestScheduleDto("name", "memo", TimeScheduleType.SCHEDULE, List.of(
                         new TimePromise(
                                 start, start.plus(TimeTableService.MINIMUM_DURATION).minusSeconds(1),
                                 DayOfWeek.FRIDAY, "place"
