@@ -45,7 +45,7 @@ public class UserFindService {
         phone = eliminateDash(phone);
         User user = userRepository.findByPhone(phone).orElseThrow(UserNotFoundException::new);
         String studentId = user.getStudentId();
-        sendSMS(phone, "sms.find.id-message", studentId);
+        sendSMS(phone, "sms.auth-message", studentId);
     }
 
     @Transactional(readOnly = true)
@@ -58,7 +58,7 @@ public class UserFindService {
 
         String token = CodeGenerator.generateUUIDCode();
         userFindRepository.setAuthCode(token, code, phone, now);
-        sendSMS(phone, "sms.find.pwd-auth-message", code);
+        sendSMS(phone, "sms.auth-message", code);
 
         return new ResponseChangeTokenDto(token);
     }
@@ -73,7 +73,7 @@ public class UserFindService {
 
         String token = CodeGenerator.generateUUIDCode();
         userFindRepository.setAuthCode(token, code, phone, now);
-        sendSMS(phone, "sms.change.phone-auth-message", code);
+        sendSMS(phone, "sms.auth-message", code);
 
         return new ResponseChangeTokenDto(token);
     }

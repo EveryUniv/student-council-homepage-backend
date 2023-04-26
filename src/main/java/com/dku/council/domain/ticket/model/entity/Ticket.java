@@ -1,5 +1,6 @@
 package com.dku.council.domain.ticket.model.entity;
 
+import com.dku.council.domain.ticket.model.TicketStatus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.Getter;
@@ -30,9 +31,20 @@ public class Ticket extends BaseEntity {
 
     private int turn;
 
+    private TicketStatus status;
+
     public Ticket(User user, TicketEvent event, int turn) {
         this.user = user;
         this.event = event;
         this.turn = turn;
+        this.status = TicketStatus.WAITING;
+    }
+
+    public void markAsIssued() {
+        this.status = TicketStatus.ISSUED;
+    }
+
+    public void markAsIssuable() {
+        this.status = TicketStatus.ISSUABLE;
     }
 }
