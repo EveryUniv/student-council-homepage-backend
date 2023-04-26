@@ -6,10 +6,8 @@ import com.dku.council.domain.ticket.model.dto.request.RequestNewTicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.service.TicketEventService;
 import com.dku.council.domain.ticket.service.TicketService;
-import com.dku.council.domain.user.repository.UserInfoMemoryRepository;
 import com.dku.council.infra.naver.service.CaptchaService;
 import com.dku.council.mock.TicketEventMock;
-import com.dku.council.mock.UserInfoMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.DateStringUtil;
 import com.dku.council.util.base.AbstractAuthControllerTest;
@@ -24,7 +22,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -48,9 +45,6 @@ class TicketControllerTest extends AbstractAuthControllerTest {
 
     @MockBean
     private CaptchaService captchaService;
-
-    @MockBean
-    private UserInfoMemoryRepository userMemoryRepository;
 
     @Test
     @DisplayName("티켓 이벤트 목록 가져오기")
@@ -169,8 +163,6 @@ class TicketControllerTest extends AbstractAuthControllerTest {
 
         when(ticketService.enroll(eq(USER_ID), eq(5L), any()))
                 .thenReturn(new ResponseTicketTurnDto(5));
-        when(userMemoryRepository.getUserInfo(eq(USER_ID), any()))
-                .thenReturn(Optional.of(UserInfoMock.create()));
 
         // when
         ResultActions actions = mvc.perform(post("/ticket").with(csrf())
