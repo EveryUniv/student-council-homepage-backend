@@ -15,9 +15,6 @@ import java.util.List;
 @ToString
 public class RequestScheduleDto {
 
-    @Schema(description = "수업 ID. 지정하면 수업으로 간주합니다.", example = "1")
-    private final Long lectureId;
-
     @Schema(description = "일정 이름. 수업이면 무시됩니다.", example = "알바")
     private final String name;
 

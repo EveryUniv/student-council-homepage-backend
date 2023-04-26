@@ -67,9 +67,9 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         );
 
         requestScheduleDto = List.of(
-                new RequestScheduleDto(1L, "", "", List.of(), "color1"),
-                new RequestScheduleDto(null, "name", "memo", List.of(), "color2"),
-                new RequestScheduleDto(3L, "", "", List.of(), "color3")
+                new RequestScheduleDto("na", "me", List.of(), "color1"),
+                new RequestScheduleDto("name", "memo", List.of(), "color2"),
+                new RequestScheduleDto("na", "me", List.of(), "color3")
         );
     }
 
@@ -85,7 +85,6 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         mvc.perform(get("/timetable/lecture"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(testLectures.size()))
-                .andExpect(jsonPath("$.content[0].id").value(0))
                 .andExpect(jsonPath("$.content[0].lectureCode").value("539250"))
                 .andExpect(jsonPath("$.content[0].category").value("세계시민역량"))
                 .andExpect(jsonPath("$.content[0].name").value("lecture0"))

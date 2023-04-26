@@ -13,9 +13,6 @@ import java.util.List;
 @EqualsAndHashCode
 public class LectureTemplateDto {
 
-    @Schema(description = "아이디", example = "2")
-    private final Long id;
-
     @Schema(description = "학과 (전공만)", example = "SW융합 소프트웨어학과")
     private final String major;
 
@@ -45,7 +42,6 @@ public class LectureTemplateDto {
 
 
     public LectureTemplateDto(ObjectMapper mapper, LectureTemplate template) {
-        this.id = template.getId();
         this.lectureCode = template.getLectureId();
         this.category = template.getCategory();
         this.name = template.getName();
