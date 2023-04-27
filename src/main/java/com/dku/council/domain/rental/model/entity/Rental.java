@@ -47,7 +47,8 @@ public class Rental extends BaseEntity {
 
 
     @Builder
-    private Rental(User user, RentalItem item, RentalUserClass userClass, LocalDateTime rentalStart, LocalDateTime rentalEnd, String title, String body) {
+    private Rental(User user, RentalItem item, RentalUserClass userClass,
+                   LocalDateTime rentalStart, LocalDateTime rentalEnd, String title, String body) {
         this.user = user;
         this.item = item;
         this.userClass = userClass;

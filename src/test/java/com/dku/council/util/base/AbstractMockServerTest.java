@@ -31,6 +31,25 @@ public abstract class AbstractMockServerTest {
 
 
     /**
+     * MockWebServer에 text/plain타입의 body 응답을 추가합니다.
+     *
+     * @param bodyDataFileName body 파일 위치. /test/resources/mockdata/부터 시작합니다.
+     */
+    public void mockPlain(String bodyDataFileName) {
+        enqueueResponse(HttpStatus.OK, bodyDataFileName, MediaType.TEXT_PLAIN);
+    }
+
+    /**
+     * MockWebServer에 text/plain타입의 body 응답을 추가합니다.
+     *
+     * @param responseCode     응답 코드
+     * @param bodyDataFileName body 파일 위치. /test/resources/mockdata/부터 시작합니다.
+     */
+    public void mockPlain(HttpStatus responseCode, String bodyDataFileName) {
+        enqueueResponse(responseCode, bodyDataFileName, MediaType.TEXT_PLAIN);
+    }
+
+    /**
      * MockWebServer에 json타입의 body 응답을 추가합니다.
      *
      * @param bodyDataFileName json body 파일 위치. /test/resources/mockdata/부터 시작합니다. 확장자 .json은 생략합니다.

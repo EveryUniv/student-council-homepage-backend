@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>관리자 페이지</h2>
+    </div>
+    <div class="d-flex gap-2 justify-content-center py-5">
+        <p class="btn btn-primary rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/users|}" style="color: white">유저</a>
+        </p>
+        <p class="btn btn-secondary rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/posts|}" style="color: white">게시글</a>
+        </p>
+        <p class="btn btn-success rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/tags|}" style="color: white">태그</a>
+        </p>
+        <p class="btn btn-danger rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/rentals|}" style="color: white">렌탈</a>
+        </p>
+        <p class="btn btn-dark rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/banner|}" style="color: white">배너</a>
+        </p>
+        <p class="btn btn-dark rounded-pill px-3" type="button">
+            <a th:href="@{|/manage/ticket|}" style="color: white">티켓팅</a>
+        </p>
+    </div>
+</section>
+</body>
+</html>

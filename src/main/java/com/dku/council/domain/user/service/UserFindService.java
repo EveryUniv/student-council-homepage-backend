@@ -33,6 +33,7 @@ public class UserFindService {
     private final SMSService smsService;
     private final UserRepository userRepository;
     private final UserFindRepository userFindRepository;
+    private final UserInfoCacheService userInfoCacheService;
     private final MessageSource messageSource;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,7 +45,7 @@ public class UserFindService {
         phone = eliminateDash(phone);
         User user = userRepository.findByPhone(phone).orElseThrow(UserNotFoundException::new);
         String studentId = user.getStudentId();
-        sendSMS(phone, "sms.find.id-message", studentId);
+        sendSMS(phone, "sms.auth-message", studentId);
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +58,7 @@ public class UserFindService {
 
         String token = CodeGenerator.generateUUIDCode();
         userFindRepository.setAuthCode(token, code, phone, now);
-        sendSMS(phone, "sms.find.pwd-auth-message", code);
+        sendSMS(phone, "sms.auth-message", code);
 
         return new ResponseChangeTokenDto(token);
     }
@@ -72,7 +73,7 @@ public class UserFindService {
 
         String token = CodeGenerator.generateUUIDCode();
         userFindRepository.setAuthCode(token, code, phone, now);
-        sendSMS(phone, "sms.change.phone-auth-message", code);
+        sendSMS(phone, "sms.auth-message", code);
 
         return new ResponseChangeTokenDto(token);
     }
@@ -88,9 +89,9 @@ public class UserFindService {
         }
         String phone = eliminateDash(auth.getPhone());
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new).changePhone(phone);
+        userInfoCacheService.invalidateUserInfo(userId);
         userFindRepository.deleteAuthCode(token);
     }
-
 
     public void verifyPwdCode(String token, String code) {
         Instant now = Instant.now(clock);
@@ -104,7 +105,6 @@ public class UserFindService {
 
         userFindRepository.setAuthCode(token, CODE_AUTH_COMPLETED, auth.getPhone(), now);
     }
-
 
     @Transactional
     public void changePassword(String token, String password) {
@@ -120,6 +120,7 @@ public class UserFindService {
         password = passwordEncoder.encode(password);
         user.changePassword(password);
 
+        userInfoCacheService.invalidateUserInfo(user.getId());
         userFindRepository.deleteAuthCode(token);
     }
 

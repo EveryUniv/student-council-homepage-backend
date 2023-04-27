@@ -1,6 +1,7 @@
 package com.dku.council.domain.mainpage.service;
 
 import com.dku.council.domain.mainpage.exception.CarouselNotFoundException;
+import com.dku.council.domain.mainpage.exception.InvalidCarouselTypeException;
 import com.dku.council.domain.mainpage.model.dto.PetitionSummary;
 import com.dku.council.domain.mainpage.model.dto.PostSummary;
 import com.dku.council.domain.mainpage.model.dto.request.RequestCarouselImageDto;
@@ -11,7 +12,6 @@ import com.dku.council.domain.mainpage.repository.CarouselImageRepository;
 import com.dku.council.domain.post.repository.post.ConferenceRepository;
 import com.dku.council.domain.post.repository.post.NewsRepository;
 import com.dku.council.domain.post.repository.post.PetitionRepository;
-import com.dku.council.global.error.exception.IllegalTypeException;
 import com.dku.council.infra.nhn.model.FileRequest;
 import com.dku.council.infra.nhn.service.FileUploadService;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
@@ -38,10 +38,10 @@ public class MainPageService {
     private final ConferenceRepository conferenceRepository;
 
     /**
-     * 캐러셀 이미지 목록을 가져옵니다.
+     * 캐러셀 이미지 목록을 가져옵니다. 정렬기준 : 최신 등록일
      */
     public List<CarouselImageResponse> getCarouselImages() {
-        return carouselImageRepository.findAll().stream()
+        return carouselImageRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(image -> new CarouselImageResponse(uploadContext, image))
                 .collect(Collectors.toList());
     }
@@ -56,7 +56,7 @@ public class MainPageService {
         String originalFilename = file.getOriginalFilename();
 
         if (!verifyImageExtension(originalFilename)) {
-            throw new IllegalTypeException();
+            throw new InvalidCarouselTypeException(originalFilename);
         }
 
         String fileId = fileUploadService.newContext()
@@ -108,5 +108,12 @@ public class MainPageService {
                 originName.endsWith(".gif") ||
                 originName.endsWith(".svg") ||
                 originName.endsWith(".webp");
+    }
+
+    @Transactional
+    public void changeRedirectUrl(Long carouselId, String redirectUrl) {
+        CarouselImage carouselImage = carouselImageRepository.findById(carouselId)
+                .orElseThrow(CarouselNotFoundException::new);
+        carouselImage.editRedirectUrl(redirectUrl);
     }
 }

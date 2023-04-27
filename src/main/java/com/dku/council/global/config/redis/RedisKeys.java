@@ -13,8 +13,14 @@ public class RedisKeys {
 
     public static final String BUS_ARRIVAL_KEY = "busArrival";
 
+    public static final String TICKET_EVENTS_KEY = "ticketEvents";
+    public static final String TICKET_CACHE_SET_KEY = "ticketCaches";
+    public static final String TICKET_NUMBER_KEY = "ticketNextNumber";
+    public static final String TICKET_KEY = "ticket";
+
     public static final String SIGNUP_AUTH_KEY = "signupAuth";
     public static final String USER_FIND_AUTH_KEY = "userFindAuth";
+    public static final String USER_INFO_CACHE_KEY = "userInfo";
 
 
     public static String combine(Object key1, Object key2) {

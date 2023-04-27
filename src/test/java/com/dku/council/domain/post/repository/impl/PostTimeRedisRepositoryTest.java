@@ -1,7 +1,7 @@
 package com.dku.council.domain.post.repository.impl;
 
-import com.dku.council.util.FullIntegrationTest;
 import com.dku.council.util.base.AbstractContainerRedisTest;
+import com.dku.council.util.test.FullIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,6 @@ class PostTimeRedisRepositoryTest extends AbstractContainerRedisTest {
     @DisplayName("유저가 이미 조회한 적 있는지? - 없는 경우")
     void isAlreadyContainsNoCached() {
         // given
-        String userIdentifier = "User";
         Instant now = Instant.now();
 
         // when
@@ -54,7 +53,6 @@ class PostTimeRedisRepositoryTest extends AbstractContainerRedisTest {
     @DisplayName("유저가 이미 조회한 적 있는지? - 있는 경우")
     void isAlreadyContainsCached() {
         // given
-        String userIdentifier = "User";
         Instant now = Instant.now();
 
         // when
@@ -69,7 +67,6 @@ class PostTimeRedisRepositoryTest extends AbstractContainerRedisTest {
     @DisplayName("유저가 이미 조회한 적 있는지? - 있지만 만료된 경우")
     void isAlreadyContainsExpired() {
         // given
-        String userIdentifier = "User";
         Instant now = Instant.now();
         Duration expiresAfter = Duration.of(100, ChronoUnit.MINUTES);
 

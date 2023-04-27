@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 회원', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2 th:text="|${user.name}(${user.nickname}) 의 댓글 목록|">댓글 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/users|}" style="color: white">목록으로</a>
+            </p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination"
+                th:with="start=${(comments.number/maxPage)*maxPage + 1}, end = ${(comments.totalPages == 0) ? 1 : ((start + (maxPage - 1) < comments.totalPages) ? (start + (maxPage - 1)) : comments.totalPages)}">
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/comments?page=0|}" th:text="'<<'"></a>
+                </li>
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/comments?page=${start - maxPage - 1}|}"
+                       th:text="'<'"></a>
+                </li>
+
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/comments?page=${page - 1}|}"
+                       th:text="${page}"></a>
+                </li>
+
+                <li class="page-item" th:if="${end < comments.totalPages}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/comments?page=${start + maxPage - 1}|}"
+                       th:text="'>'"></a>
+                </li>
+                <li class="page-item" th:if="${end < comments.totalPages}">
+                    <a class="page-link"
+                       th:href="@{|/manage/users/${user.id}/comments?page=${comments.totalPages - 1}|}"
+                       th:text="'>>'"></a>
+                </li>
+            </ul>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">게시물 제목</th>
+                <th scope="col">댓글 내용</th>
+                <th scope="col">댓글 상태</th>
+                <th scope="col">관리</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="comment : ${comments}">
+                <td><a th:href="@{|/manage/posts/${comment.postId}|}"
+                       th:text="${comment.postTitle}"></a></td>
+                <td th:text="${comment.text}"></td>
+                <td th:text="${comment.status}"></td>
+                <td>
+                    <div class="btn-group">
+                        <form method="post" th:action="@{|/manage/comment/${comment.id}/activate|}">
+                            <button class="btn btn-primary me-md-2" type="submit">활성화</button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/comment/${comment.id}/delete|}">
+                            <button class="btn btn-primary me-md-2" type="submit">삭제</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

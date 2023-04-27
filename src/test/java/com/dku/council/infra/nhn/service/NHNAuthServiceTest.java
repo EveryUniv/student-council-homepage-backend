@@ -2,9 +2,7 @@ package com.dku.council.infra.nhn.service;
 
 import com.dku.council.infra.nhn.exception.CannotGetTokenException;
 import com.dku.council.infra.nhn.exception.NotInitializedException;
-import com.dku.council.infra.nhn.service.impl.NHNAuthServiceImpl;
 import com.dku.council.util.base.AbstractMockServerTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +11,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NHNAuthServiceTest extends AbstractMockServerTest {
 
@@ -23,11 +23,11 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
     public void beforeEach() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         WebClient webClient = WebClient.create();
         String apiPath = "http://localhost:" + mockServer.getPort();
-        this.service = new NHNAuthServiceImpl(webClient, apiPath, "tenantId", "username", "password");
-        this.notInitializedService = new NHNAuthServiceImpl(webClient, apiPath, "tenantId", "username", "password");
+        this.service = new NHNAuthService(webClient, apiPath, "tenantId", "username", "password");
+        this.notInitializedService = new NHNAuthService(webClient, apiPath, "tenantId", "username", "password");
 
         // call @postconstruct manually
-        Method init = NHNAuthServiceImpl.class.getDeclaredMethod("initialize");
+        Method init = NHNAuthService.class.getDeclaredMethod("initialize");
         init.setAccessible(true);
         init.invoke(service);
     }
@@ -35,7 +35,7 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
     @Test
     @DisplayName("초기화하지 않았을 때 에러 발생")
     public void failedByNotInitialized() {
-        Assertions.assertThrows(NotInitializedException.class, () -> notInitializedService.requestToken());
+        assertThrows(NotInitializedException.class, () -> notInitializedService.requestToken());
     }
 
     @Test
@@ -55,7 +55,7 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
         mockJson(HttpStatus.BAD_REQUEST, "nhn/auth/response-success");
 
         // when & then(no error)
-        Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
+        assertThrows(CannotGetTokenException.class, () -> service.requestToken());
     }
 
     @Test
@@ -65,6 +65,6 @@ class NHNAuthServiceTest extends AbstractMockServerTest {
         mockJson("nhn/auth/response-fail1");
 
         // when & then
-        Assertions.assertThrows(CannotGetTokenException.class, () -> service.requestToken());
+        assertThrows(CannotGetTokenException.class, () -> service.requestToken());
     }
 }
