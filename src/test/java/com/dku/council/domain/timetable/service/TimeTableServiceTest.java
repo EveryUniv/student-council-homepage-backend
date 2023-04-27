@@ -72,8 +72,6 @@ class TimeTableServiceTest {
     private TimeTable overlappedTable;
     private List<TimeSchedule> schedules;
     private List<TimeSchedule> overlappedSchedules;
-    private List<TimeScheduleDto> schedulesDto;
-    private List<LectureTemplate> lectures;
 
     @BeforeEach
     void setup() {
@@ -85,17 +83,11 @@ class TimeTableServiceTest {
             schedule.changeTimeTable(table);
         }
 
-        schedulesDto = schedules.stream()
-                .map(e -> new TimeScheduleDto(mapper, e))
-                .collect(Collectors.toList());
-
         overlappedTable = TimeTableMock.createDummy();
         overlappedSchedules = LectureMock.createOverlappedLectureList();
         for (TimeSchedule schedule : overlappedSchedules) {
             schedule.changeTimeTable(overlappedTable);
         }
-
-        lectures = LectureMock.createLectureTemplateList();
     }
 
 
@@ -103,6 +95,7 @@ class TimeTableServiceTest {
     @DisplayName("수업 목록 조회")
     void listLectures() {
         // given
+        List<LectureTemplate> lectures = LectureMock.createLectureTemplateList();
         Specification<LectureTemplate> spec = LectureTemplateSpec.withTitle("");
         Pageable pageable = Pageable.unpaged();
         Page<LectureTemplate> pages = new DummyPage<>(lectures);
@@ -143,6 +136,9 @@ class TimeTableServiceTest {
     @DisplayName("시간표 단건 조회")
     void findOne() {
         // given
+        List<TimeScheduleDto> schedulesDto = schedules.stream()
+                .map(e -> new TimeScheduleDto(mapper, e))
+                .collect(Collectors.toList());
         given(timeTableRepository.findById(table.getId())).willReturn(Optional.of(table));
 
         // when
@@ -175,14 +171,18 @@ class TimeTableServiceTest {
         CreateTimeTableRequestDto dto = new CreateTimeTableRequestDto(table.getName(), reqDtos);
 
         given(userRepository.findById(table.getUser().getId())).willReturn(Optional.of(table.getUser()));
-        given(timeTableRepository.save(tableCheckArgThat())).willReturn(table);
+        given(timeTableRepository.save(tableCheckArgThat())).willAnswer(invocation -> invocation.getArgument(0));
         given(timeScheduleRepository.save(any())).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         Long id = service.create(table.getUser().getId(), dto);
 
         // then
+        List<RequestScheduleDto> tableLectures = table.getSchedules().stream()
+                .map(this::scheduleDtoMapper)
+                .collect(Collectors.toList());
         assertThat(id).isEqualTo(table.getId());
+        assertThat(tableLectures).containsExactlyInAnyOrderElementsOf(reqDtos);
     }
 
     @NotNull
@@ -341,6 +341,7 @@ class TimeTableServiceTest {
                 assertThat(actual.getName()).isEqualTo(expect.getName());
                 assertThat(actual.getMemo()).isEqualTo(expect.getMemo());
                 assertThat(actual.getColor()).isEqualTo(expect.getColor());
+                assertThat(actual.getType()).isEqualTo(expect.getType());
 
                 List<TimePromise> promise1 = TimePromise.parse(mapper, actual.getTimesJson());
                 List<TimePromise> promise2 = TimePromise.parse(mapper, expect.getTimesJson());
