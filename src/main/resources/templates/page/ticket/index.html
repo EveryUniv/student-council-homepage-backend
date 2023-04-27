@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 티켓팅', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>티켓팅</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <form method="post" th:action="@{|/manage/ticket/cancelPermit|}" th:object="${ticket}">
+            <label class="form-label">티켓 발급 취소</label>
+            <div class="input-group flex-nowrap">
+                <input class="form-control" type="text" th:field="*{ticketId}" placeholder="티켓 ID">
+                <button class="btn btn-primary float-end" type="submit">발급 취소</button>
+            </div>
+        </form>
+        <hr class="my-4">
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <div>
+                ※ DB로 덤프하는 과정은 오래걸릴 수 있습니다.
+            </div>
+        </div>
+        <label class="form-label">티켓팅 도구</label>
+        <form method="post" onsubmit="alert('덤프되었습니다.')" th:action="@{|/manage/ticket/dump|}">
+            <button class="btn btn-primary" type="submit">DB로 덤프</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

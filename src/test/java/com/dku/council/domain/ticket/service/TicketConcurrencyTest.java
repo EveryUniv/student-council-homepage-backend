@@ -1,6 +1,6 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import com.dku.council.domain.ticket.repository.TicketEventRepository;
 import com.dku.council.domain.user.model.entity.Major;
@@ -77,7 +77,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
         for (int i = 0; i < THREAD_COUNT; i++) {
             final int index = i;
             new Thread(() -> {
-                ResponseTicketDto dto = service.enroll(users.get(index).getId(), event.getId(), now);
+                ResponseTicketTurnDto dto = service.enroll(users.get(index).getId(), event.getId(), now);
                 map.put(dto.getTurn(), 0);
                 latch.countDown();
             }).start();

@@ -69,7 +69,7 @@ class UserFindServiceTest {
         // given
         String phone = "01012345678";
         User user = UserMock.createDummyMajor();
-        when(messageSource.getMessage(eq("sms.find.id-message"),
+        when(messageSource.getMessage(eq("sms.auth-message"),
                 argThat(arg -> arg.length == 1 && arg[0].equals(user.getStudentId())), any()))
                 .thenReturn("Message");
         when(userRepository.findByPhone(phone)).thenReturn(Optional.of(user));
@@ -87,7 +87,7 @@ class UserFindServiceTest {
         // given
         User user = UserMock.createDummyMajor();
         when(userRepository.findByPhone(user.getPhone())).thenReturn(Optional.of(user));
-        when(messageSource.getMessage(eq("sms.find.pwd-auth-message"), any(), any())).thenReturn("Message");
+        when(messageSource.getMessage(eq("sms.auth-message"), any(), any())).thenReturn("Message");
 
         // when
         service.sendPwdCodeBySMS(user.getPhone());
@@ -186,7 +186,7 @@ class UserFindServiceTest {
         // given
         User user = UserMock.createDummyMajor();
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(messageSource.getMessage(eq("sms.change.phone-auth-message"), any(), any())).thenReturn("Message");
+        when(messageSource.getMessage(eq("sms.auth-message"), any(), any())).thenReturn("Message");
 
         // when
         service.sendChangePhoneCodeBySMS(user.getId(), phone);

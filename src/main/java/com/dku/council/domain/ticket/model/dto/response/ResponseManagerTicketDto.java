@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
-public class ResponseTicketDto {
+public class ResponseManagerTicketDto {
 
     @Schema(description = "티켓 ID", example = "8225")
     private final Long id;
@@ -24,13 +24,16 @@ public class ResponseTicketDto {
     @Schema(description = "예매 순서", example = "5")
     private final int turn;
 
-    public ResponseTicketDto(Long id, String name, String major,
-                             String studentId, boolean issued, int turn) {
-        this.id = id;
-        this.name = name;
-        this.major = major;
-        this.studentId = studentId;
-        this.issued = issued;
-        this.turn = turn;
+    @Schema(description = "전송된 인증 코드. 이미 발급된 티켓의 경우 빈 문자열 반환", example = "123456")
+    private final String code;
+
+    public ResponseManagerTicketDto(ResponseTicketDto ticket, String code) {
+        this.id = ticket.getId();
+        this.name = ticket.getName();
+        this.major = ticket.getMajor();
+        this.studentId = ticket.getStudentId();
+        this.issued = ticket.isIssued();
+        this.turn = ticket.getTurn();
+        this.code = code;
     }
 }

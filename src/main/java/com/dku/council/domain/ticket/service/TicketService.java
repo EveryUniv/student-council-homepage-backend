@@ -1,10 +1,10 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.AlreadyIssuedTicketException;
+import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
 import com.dku.council.domain.ticket.exception.NoTicketException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
-import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.domain.ticket.repository.TicketRepository;
@@ -29,24 +29,19 @@ public class TicketService {
     private final UserInfoCacheService userInfoCacheService;
 
     @Transactional(readOnly = true)
-    public ResponseTicketDto myTicket(Long userId, Long ticketEventId) {
+    public ResponseTicketTurnDto myReservationOrder(Long userId, Long ticketEventId) {
         int turn = memoryRepository.getMyTicket(userId, ticketEventId);
+
         if (turn == -1) {
             Ticket ticket = persistenceRepository.findByUserIdAndEventId(userId, ticketEventId)
                     .orElseThrow(NoTicketException::new);
             turn = memoryRepository.saveMyTicket(userId, ticketEventId, ticket.getTurn());
         }
-        return new ResponseTicketDto(turn);
+
+        return new ResponseTicketTurnDto(turn);
     }
 
-    /**
-     * 티켓 발급
-     *
-     * @param userId        사용자 ID. 실제 사용자인지 확인하지 않습니다.
-     * @param ticketEventId 티켓 이벤트 ID
-     * @return 발급된 티켓 정보
-     */
-    public ResponseTicketDto enroll(Long userId, Long ticketEventId, Instant now) {
+    public ResponseTicketTurnDto enroll(Long userId, Long ticketEventId, Instant now) {
         TicketEventDto event = ticketEventService.findEventById(ticketEventId);
         Instant eventFrom = DateUtil.toInstant(event.getFrom());
         Instant eventTo = DateUtil.toInstant(event.getTo());
@@ -62,9 +57,9 @@ public class TicketService {
 
         int turn = memoryRepository.enroll(userId, ticketEventId);
         if (turn == -1) {
-            throw new AlreadyIssuedTicketException();
+            throw new AlreadyRequestedTicketException();
         }
 
-        return new ResponseTicketDto(turn);
+        return new ResponseTicketTurnDto(turn);
     }
 }
