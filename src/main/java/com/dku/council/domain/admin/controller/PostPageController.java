@@ -37,14 +37,15 @@ public class PostPageController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("type", type);
         model.addAttribute("status", status);
-        return "page/admin/posts";
+        return "page/post/posts";
     }
 
     @GetMapping("/{postId}")
     public String post(Model model, @PathVariable Long postId) {
         Post post = service.findOne(postId);
+        System.out.println(post.getUser().getName());
         model.addAttribute("post", post);
-        return "page/admin/post";
+        return "page/post/post";
     }
 
     @PostMapping("/{postId}/delete")

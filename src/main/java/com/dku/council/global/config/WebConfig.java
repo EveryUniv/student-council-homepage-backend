@@ -2,8 +2,10 @@ package com.dku.council.global.config;
 
 import com.dku.council.global.interceptor.VoidSuccessResponseInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -29,6 +31,14 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedMethods("*")
                 .allowCredentials(false)
                 .maxAge(3600);
+    }
+
+    @Bean
+    public FilterRegistrationBean<OpenEntityManagerInViewFilter> openEntityManagerInViewFilter() {
+        FilterRegistrationBean<OpenEntityManagerInViewFilter> filter = new FilterRegistrationBean<>();
+        filter.addUrlPatterns("/manage/*");
+        filter.setFilter(new OpenEntityManagerInViewFilter());
+        return filter;
     }
 
     @Bean
