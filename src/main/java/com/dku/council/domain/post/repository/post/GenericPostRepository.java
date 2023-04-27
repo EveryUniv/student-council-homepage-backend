@@ -32,10 +32,10 @@ public interface GenericPostRepository<T extends Post> extends JpaRepository<T, 
             "join fetch p.user u " +
             "join fetch u.major " +
             "where p.id=:id and (p.status='BLINDED' or p.status='ACTIVE')")
-    Optional<T> findWithBlindedById(Long id);
+    Optional<T> findWithBlindedById(@Param("id") Long id);
 
     @Query("select p from Post p " +
             "where p.id=:id and p.status='BLINDED'")
-    Optional<T> findBlindedPostById(Long id);
+    Optional<T> findBlindedPostById(@Param("id") Long id);
 
 }

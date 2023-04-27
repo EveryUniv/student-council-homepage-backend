@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 대여물품', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>대여 현황</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+            <p class="btn btn-primary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/rentals/items|}" style="color: white">물품 목록</a>
+            </p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+    <div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination"
+                th:with="start=${(rentals.number/maxPage)*maxPage + 1}, end = ${(rentals.totalPages == 0) ? 1 : ((start + (maxPage - 1) < rentals.totalPages) ? (start + (maxPage - 1)) : rentals.totalPages)}">
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/rentals?page=0|}" th:text="'<<'"></a>
+                </li>
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/rentals?page=${start - maxPage - 1}|}"
+                       th:text="'<'"></a>
+                </li>
+
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
+                    <a class="page-link" th:href="@{|/manage/rentals?page=${page - 1}|}" th:text="${page}"></a>
+                </li>
+
+                <li class="page-item" th:if="${end < rentals.totalPages}">
+                    <a class="page-link" th:href="@{|/manage/rentals?page=${start + maxPage - 1}|}"
+                       th:text="'>'"></a>
+                </li>
+                <li class="page-item" th:if="${end < rentals.totalPages}">
+                    <a class="page-link" th:href="@{|/manage/rentals?page=${rentals.totalPages - 1}|}"
+                       th:text="'>>'"></a>
+                </li>
+            </ul>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">대여시각</th>
+                <th scope="col">대여자 구분</th>
+                <th scope="col">행사명</th>
+                <th scope="col">대여 물품명</th>
+                <th scope="col">대여자</th>
+                <th scope="col">대여 시작 시간</th>
+                <th scope="col">대여 종료 시간</th>
+                <th scope="col">반납하기</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rental : ${rentals}">
+                <td th:text="${rental.createdAt}"></td>
+                <td th:text="${rental.userClass}"></td>
+                <td th:text="${rental.title}"></td>
+                <td th:text="${rental.itemName}"></td>
+                <td th:text="${rental.userName}"></td>
+                <td th:text="${rental.rentalStart}"></td>
+                <td th:text="${rental.rentalEnd}"></td>
+                <td th:if="${rental.active} == true">
+                    <form method="post" th:action="@{|/manage/rentals/${rental.id}/return|}">
+                        <button class="btn btn-primary" type="submit">반납</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

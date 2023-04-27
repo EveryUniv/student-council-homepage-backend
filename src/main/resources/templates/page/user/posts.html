@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 회원', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2 th:text="|${user.name}(${user.nickname}) 의 게시글 목록|">게시글 목록</h2>
+    </div>
+
+    <p><a th:href="@{|/manage/users|}">목록으로</a>
+    <p>
+
+    <hr class="my-4">
+    <div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination"
+                th:with="start=${(posts.number/maxPage)*maxPage + 1}, end = ${(posts.totalPages == 0) ? 1 : ((start + (maxPage - 1) < posts.totalPages) ? (start + (maxPage - 1)) : posts.totalPages)}">
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/posts?page=0|}" th:text="'<<'"></a>
+                </li>
+                <li class="page-item" th:if="${start > 1}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/posts?page=${start - maxPage - 1}|}"
+                       th:text="'<'"></a>
+                </li>
+
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/posts?page=${page - 1}|}"
+                       th:text="${page}"></a>
+                </li>
+
+                <li class="page-item" th:if="${end < posts.totalPages}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/posts?page=${start + maxPage - 1}|}"
+                       th:text="'>'"></a>
+                </li>
+                <li class="page-item" th:if="${end < posts.totalPages}">
+                    <a class="page-link" th:href="@{|/manage/users/${user.id}/posts?page=${posts.totalPages - 1}|}"
+                       th:text="'>>'"></a>
+                </li>
+            </ul>
+        </nav>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">제목</th>
+                <th scope="col">작성일</th>
+                <th scope="col">상태</th>
+                <th scope="col">신고 횟수</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="post : ${posts}">
+                <td><a th:href="@{|/manage/posts/${post.id}|}"
+                       th:text="${post.title}"></a></td>
+                <td th:text="${post.createdAt}"></td>
+                <td th:text="${post.status}"></td>
+                <td th:text="${post.reportCount}"></td>
+                <td>
+                    <div class="btn-group">
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/activate|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">활성화
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/blind|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">blind
+                            </button>
+                        </form>
+                        <form method="post" th:action="@{|/manage/posts/${post.id}/delete|}">
+                            <button class="btn btn-primary me-md-2" name="userId" th:value="${post.userId}"
+                                    type="submit">삭제
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
