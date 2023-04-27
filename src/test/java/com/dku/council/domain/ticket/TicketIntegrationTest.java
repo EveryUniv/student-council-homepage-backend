@@ -130,7 +130,7 @@ public class TicketIntegrationTest extends AbstractContainerRedisTest {
         RequestEnrollDto dto2 = new RequestEnrollDto(event2.getId(), "key", "value");
 
         // when & then
-        mvc.perform(get("/ticket/" + event.getId()))
+        mvc.perform(get("/ticket/reservation/" + event.getId()))
                 .andExpect(status().isNotFound());
 
         mvc.perform(post("/ticket")
@@ -149,7 +149,7 @@ public class TicketIntegrationTest extends AbstractContainerRedisTest {
                         .content(objectMapper.writeValueAsBytes(dto)))
                 .andExpect(status().isBadRequest());
 
-        mvc.perform(get("/ticket/" + event.getId()))
+        mvc.perform(get("/ticket/reservation/" + event.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.turn").value(1));
     }

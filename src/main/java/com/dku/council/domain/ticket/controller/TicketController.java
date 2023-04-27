@@ -4,7 +4,7 @@ import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.dto.request.RequestEnrollDto;
 import com.dku.council.domain.ticket.model.dto.request.RequestNewTicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseCaptchaKeyDto;
-import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.service.TicketEventService;
 import com.dku.council.domain.ticket.service.TicketService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
@@ -67,16 +67,16 @@ public class TicketController {
     }
 
     /**
-     * 내 티켓 보기
-     * <p>내가 신청한 특정 이벤트의 티켓을 보여줍니다. 예비 번호가 포함되어있습니다.</p>
+     * 내 티켓 신청보기
+     * <p>특정 이벤트에 내가 몇 번째로 신청했는지 보여줍니다. (예매 번호)</p>
      *
-     * @param ticketEventId 티켓 이벤트 아이디
-     * @return 티켓 정보
+     * @param eventId 티켓 이벤트 아이디
+     * @return 예매 번호
      */
-    @GetMapping("/{ticketEventId}")
+    @GetMapping("/reservation/{eventId}")
     @UserAuth
-    public ResponseTicketDto myTicket(AppAuthentication auth, @PathVariable Long ticketEventId) {
-        return ticketService.myTicket(auth.getUserId(), ticketEventId);
+    public ResponseTicketTurnDto myReservationOrder(AppAuthentication auth, @PathVariable Long eventId) {
+        return ticketService.myReservationOrder(auth.getUserId(), eventId);
     }
 
     /**
@@ -109,13 +109,14 @@ public class TicketController {
     /**
      * 티켓 신청하기
      * <p>티켓 이벤트에 신청합니다. Captcha는 인증 실패시 키부터 다시 요청해야합니다.</p>
+     * <p>신청했더라도 바로 티켓이 발급되는 것은 아닙니다.</p>
      *
      * @param dto 티켓 신청 정보
      */
     @PostMapping
     @UserAuth
-    public ResponseTicketDto enroll(AppAuthentication auth,
-                                    @Valid @RequestBody RequestEnrollDto dto) {
+    public ResponseTicketTurnDto enroll(AppAuthentication auth,
+                                        @Valid @RequestBody RequestEnrollDto dto) {
         Instant now = Instant.now();
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
         return ticketService.enroll(auth.getUserId(), dto.getEventId(), now);

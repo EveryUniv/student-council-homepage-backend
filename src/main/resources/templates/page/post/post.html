@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 게시글', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2 th:text="|${post.user.nickname}의 게시글|">게시글</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/posts|}" style="color: white">뒤로가기</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${post.title}"></h5>
+            <p class="card-text" th:text="${post.body}"></p>
+        </div>
+        <ul class="list-group list-group-flush" th:each="comment : ${post.comments}">
+            <li class="list-group-item">
+                <div class="d-grid gap-2 d-md-flex">
+                    <b th:text="|${comment.user.nickname}: |"></b>
+                    <p th:text="${comment.text}"></p>
+                    <i th:text="|(${comment.status})|"></i>
+                    <form method="post" th:action="@{|/manage/comment/${comment.id}/delete|}">
+                        <button class="btn btn-primary me-md-2" name="postId" th:value="${post.id}" type="submit">삭제
+                        </button>
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </div>
+</section>
+</body>
+</html>

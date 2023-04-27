@@ -41,7 +41,7 @@ public class RentalController {
     @GetMapping
     @UserAuth
     public ResponsePage<RentalDto> list(@RequestParam(required = false) String keyword,
-                                                  @ParameterObject Pageable pageable) {
+                                        @ParameterObject Pageable pageable) {
         Specification<Rental> spec = RentalSpec.withTitleOrBody(keyword);
         spec = spec.or(RentalSpec.withUsername(keyword));
         spec = spec.or(RentalSpec.withItemName(keyword));
@@ -57,7 +57,7 @@ public class RentalController {
     @GetMapping("/{productId}")
     @UserAuth
     public ResponsePage<RentalDto> list(@PathVariable Long productId,
-                                                  @ParameterObject Pageable pageable) {
+                                        @ParameterObject Pageable pageable) {
         return rentalService.list(productId, pageable);
     }
 
@@ -81,8 +81,8 @@ public class RentalController {
     @GetMapping("/my")
     @UserAuth
     public ResponsePage<RentalDto> myList(AppAuthentication auth,
-                                                    @RequestParam(required = false) String keyword,
-                                                    @ParameterObject Pageable pageable) {
+                                          @RequestParam(required = false) String keyword,
+                                          @ParameterObject Pageable pageable) {
         Specification<Rental> spec = RentalSpec.withTitleOrBody(keyword);
         spec = spec.or(RentalSpec.withUser(auth.getUserId()));
         spec = spec.or(RentalSpec.withItemName(keyword));

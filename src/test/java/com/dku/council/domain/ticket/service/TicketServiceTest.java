@@ -1,9 +1,9 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.AlreadyIssuedTicketException;
+import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
-import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
+import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.model.entity.TicketEvent;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
@@ -60,7 +60,7 @@ class TicketServiceTest {
         when(memoryRepository.getMyTicket(1L, 1L)).thenReturn(3);
 
         // when
-        ResponseTicketDto dto = service.myTicket(1L, 1L);
+        ResponseTicketTurnDto dto = service.myReservationOrder(1L, 1L);
 
         // then
         assertThat(dto.getTurn()).isEqualTo(3);
@@ -79,7 +79,7 @@ class TicketServiceTest {
         when(memoryRepository.saveMyTicket(1L, 1L, ticket.getTurn())).thenReturn(3);
 
         // when
-        ResponseTicketDto dto = service.myTicket(1L, 1L);
+        ResponseTicketTurnDto dto = service.myReservationOrder(1L, 1L);
 
         // then
         assertThat(dto.getTurn()).isEqualTo(3);
@@ -131,7 +131,7 @@ class TicketServiceTest {
         when(memoryRepository.enroll(1L, 1L)).thenReturn(-1);
 
         // when & then
-        Assertions.assertThrows(AlreadyIssuedTicketException.class,
+        Assertions.assertThrows(AlreadyRequestedTicketException.class,
                 () -> service.enroll(1L, 1L, DateUtil.toInstant(now)));
     }
 
@@ -149,7 +149,7 @@ class TicketServiceTest {
         when(memoryRepository.enroll(1L, 1L)).thenReturn(5);
 
         // when
-        ResponseTicketDto result = service.enroll(1L, 1L, DateUtil.toInstant(now));
+        ResponseTicketTurnDto result = service.enroll(1L, 1L, DateUtil.toInstant(now));
 
         // then
         assertThat(result.getTurn()).isEqualTo(5);
