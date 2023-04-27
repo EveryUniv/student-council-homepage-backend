@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class TimeTableService {
 
     public static final Duration MINIMUM_DURATION = Duration.of(30, ChronoUnit.MINUTES);
@@ -72,6 +71,7 @@ public class TimeTableService {
         return new TimeTableDto(objectMapper, table);
     }
 
+    @Transactional
     public Long create(Long userId, CreateTimeTableRequestDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -83,6 +83,7 @@ public class TimeTableService {
         return timeTable.getId();
     }
 
+    @Transactional
     public Long update(Long userId, Long tableId, List<RequestScheduleDto> lectureDtos) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
@@ -96,6 +97,7 @@ public class TimeTableService {
         return table.getId();
     }
 
+    @Transactional
     public Long updateName(Long userId, Long tableId, String name) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
@@ -138,10 +140,12 @@ public class TimeTableService {
                 .name(dto.getName())
                 .memo(dto.getMemo())
                 .color(dto.getColor())
+                .type(dto.getType())
                 .timesJson(TimePromise.serialize(objectMapper, dto.getTimes()))
                 .build();
     }
 
+    @Transactional
     public Long delete(Long userId, Long tableId) {
         TimeTable table = timeTableRepository.findById(tableId)
                 .orElseThrow(TimeTableNotFoundException::new);
