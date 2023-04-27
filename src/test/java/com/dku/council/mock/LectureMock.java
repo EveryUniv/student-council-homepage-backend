@@ -1,5 +1,6 @@
 package com.dku.council.mock;
 
+import com.dku.council.domain.timetable.model.TimeScheduleType;
 import com.dku.council.domain.timetable.model.entity.LectureTemplate;
 import com.dku.council.domain.timetable.model.entity.TimeSchedule;
 import com.dku.council.util.EntityUtil;
@@ -31,24 +32,6 @@ public class LectureMock {
         return createList(4, false, LectureMock::lectureTemplate);
     }
 
-    public static List<LectureTemplate> createOverlappedLectureTemplateList() {
-        List<LectureTemplate> lectures = new ArrayList<>();
-        lectures.add(lectureTemplate(0, LocalTime.of(16, 0), LocalTime.of(17, 40)));
-        lectures.add(lectureTemplate(1, LocalTime.of(17, 30), LocalTime.of(18, 0)));
-        lectures.add(lectureTemplate(2, LocalTime.of(17, 45), LocalTime.of(18, 30)));
-        lectures.add(lectureTemplate(3, LocalTime.of(18, 0), LocalTime.of(18, 10)));
-        return lectures;
-    }
-
-    public static List<LectureTemplate> createTooSmallLectureTemplateList(int range) {
-        List<LectureTemplate> lectures = new ArrayList<>();
-        lectures.add(lectureTemplate(0, LocalTime.of(16, 0), LocalTime.of(16, 0)));
-        lectures.add(lectureTemplate(2, LocalTime.of(18, 0), LocalTime.of(18, range / 2)));
-        lectures.add(lectureTemplate(3, LocalTime.of(19, 0), LocalTime.of(19, range - 1)));
-        lectures.add(lectureTemplate(4, LocalTime.of(20, 0), LocalTime.of(20, range)));
-        return lectures;
-    }
-
     private static <T> List<T> createList(int size, boolean overlapped, EntityMapper<T> mapper) {
         Duration dura = Duration.of(1440 / size, ChronoUnit.MINUTES);
         LocalTime start = LocalTime.of(0, 0);
@@ -72,9 +55,11 @@ public class LectureMock {
     }
 
     private static TimeSchedule lecture(int i, LocalTime start, LocalTime end) {
+        TimeScheduleType[] values = TimeScheduleType.values();
         TimeSchedule e = TimeSchedule.builder()
                 .name("lecture" + i)
                 .timesJson(timesJson(start, end))
+                .type(values[i % values.length])
                 .memo("professor" + i)
                 .color("color" + i)
                 .build();
