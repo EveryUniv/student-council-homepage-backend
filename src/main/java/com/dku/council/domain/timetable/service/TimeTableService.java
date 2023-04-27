@@ -1,6 +1,5 @@
 package com.dku.council.domain.timetable.service;
 
-import com.dku.council.domain.timetable.exception.LectureNotFoundException;
 import com.dku.council.domain.timetable.exception.TimeConflictException;
 import com.dku.council.domain.timetable.exception.TimeTableNotFoundException;
 import com.dku.council.domain.timetable.exception.TooSmallTimeException;
@@ -29,10 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.dku.council.domain.timetable.model.mapper.TimeScheduleMapper.createScheduleFromLecture;
 
 @Service
 @RequiredArgsConstructor
@@ -110,29 +108,12 @@ public class TimeTableService {
     }
 
     private void appendScheduleEntity(TimeTable table, List<RequestScheduleDto> lectureDtos) {
-        List<LectureTemplate> lectures = findLectureTemplates(lectureDtos);
-        Map<Long, LectureTemplate> lectureMaps = new HashMap<>();
-        for (LectureTemplate lecture : lectures) {
-            lectureMaps.put(lecture.getId(), lecture);
-        }
-
         List<TimePromise> prevTimes = new ArrayList<>(lectureDtos.size() * 2);
         for (RequestScheduleDto dto : lectureDtos) {
-            Long lectureId = dto.getLectureId();
-            TimeSchedule schedule;
-            List<TimePromise> timePromises;
-
-            if (lectureId != null) {
-                LectureTemplate lecture = lectureMaps.get(lectureId);
-                schedule = createScheduleFromLecture(lecture, dto.getColor());
-                timePromises = TimePromise.parse(objectMapper, schedule.getTimesJson());
-            } else {
-                schedule = createScheduleFromDto(dto);
-                timePromises = dto.getTimes();
-            }
+            TimeSchedule schedule = createScheduleFromDto(dto);
+            List<TimePromise> timePromises = dto.getTimes();
 
             validateTime(prevTimes, timePromises);
-
             schedule = timeScheduleRepository.save(schedule);
             schedule.changeTimeTable(table);
         }
@@ -159,20 +140,6 @@ public class TimeTableService {
                 .color(dto.getColor())
                 .timesJson(TimePromise.serialize(objectMapper, dto.getTimes()))
                 .build();
-    }
-
-    private List<LectureTemplate> findLectureTemplates(List<RequestScheduleDto> lectureDtos) {
-        List<Long> idList = lectureDtos.stream()
-                .map(RequestScheduleDto::getLectureId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        List<LectureTemplate> lectures = lectureTemplateRepository.findAllById(idList);
-
-        if (lectures.size() != idList.size()) {
-            throw new LectureNotFoundException();
-        }
-
-        return lectures;
     }
 
     public Long delete(Long userId, Long tableId) {

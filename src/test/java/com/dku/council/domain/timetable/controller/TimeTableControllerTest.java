@@ -1,6 +1,7 @@
 package com.dku.council.domain.timetable.controller;
 
 import com.dku.council.domain.post.service.DummyPage;
+import com.dku.council.domain.timetable.model.TimeScheduleType;
 import com.dku.council.domain.timetable.model.dto.TimePromise;
 import com.dku.council.domain.timetable.model.dto.request.CreateTimeTableRequestDto;
 import com.dku.council.domain.timetable.model.dto.request.RequestScheduleDto;
@@ -55,21 +56,21 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .collect(Collectors.toList());
 
         testLectureMappings = List.of(
-                new TimeScheduleDto("name", "professor", "ffffff",
+                new TimeScheduleDto("name", "professor", TimeScheduleType.SCHEDULE, "ffffff",
                         List.of(
                                 new TimePromise(start, end, DayOfWeek.MONDAY, "place1"),
                                 new TimePromise(start, end, DayOfWeek.THURSDAY, "place2")
                         )),
-                new TimeScheduleDto("name2", "professor2", "aaaaaa",
+                new TimeScheduleDto("name2", "professor2", TimeScheduleType.LECTURE, "aaaaaa",
                         List.of(
                                 new TimePromise(start, end, DayOfWeek.MONDAY, "place")
                         ))
         );
 
         requestScheduleDto = List.of(
-                new RequestScheduleDto(1L, "", "", List.of(), "color1"),
-                new RequestScheduleDto(null, "name", "memo", List.of(), "color2"),
-                new RequestScheduleDto(3L, "", "", List.of(), "color3")
+                new RequestScheduleDto("", "", TimeScheduleType.SCHEDULE, List.of(), "color1"),
+                new RequestScheduleDto("name", "memo", TimeScheduleType.SCHEDULE, List.of(), "color2"),
+                new RequestScheduleDto("", "", TimeScheduleType.SCHEDULE, List.of(), "color3")
         );
     }
 
@@ -85,7 +86,6 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
         mvc.perform(get("/timetable/lecture"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.size()").value(testLectures.size()))
-                .andExpect(jsonPath("$.content[0].id").value(0))
                 .andExpect(jsonPath("$.content[0].lectureCode").value("539250"))
                 .andExpect(jsonPath("$.content[0].category").value("세계시민역량"))
                 .andExpect(jsonPath("$.content[0].name").value("lecture0"))
@@ -139,6 +139,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.lectures[0].name").value("name"))
                 .andExpect(jsonPath("$.lectures[0].memo").value("professor"))
                 .andExpect(jsonPath("$.lectures[0].color").value("ffffff"))
+                .andExpect(jsonPath("$.lectures[0].type").value(TimeScheduleType.SCHEDULE.name()))
                 .andExpect(jsonPath("$.lectures[0].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[0].end").value("13:00:00"))
                 .andExpect(jsonPath("$.lectures[0].times[0].week").value(DayOfWeek.MONDAY.name()))
@@ -150,6 +151,7 @@ class TimeTableControllerTest extends AbstractAuthControllerTest {
                 .andExpect(jsonPath("$.lectures[1].name").value("name2"))
                 .andExpect(jsonPath("$.lectures[1].memo").value("professor2"))
                 .andExpect(jsonPath("$.lectures[1].color").value("aaaaaa"))
+                .andExpect(jsonPath("$.lectures[1].type").value(TimeScheduleType.LECTURE.name()))
                 .andExpect(jsonPath("$.lectures[1].times[0].start").value("10:00:00"))
                 .andExpect(jsonPath("$.lectures[1].times[0].end").value("13:00:00"))
                 .andExpect(jsonPath("$.lectures[1].times[0].week").value(DayOfWeek.MONDAY.name()))
