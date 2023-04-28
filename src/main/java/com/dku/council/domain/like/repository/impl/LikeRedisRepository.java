@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,9 +75,10 @@ public class LikeRedisRepository implements LikeMemoryRepository {
     }
 
     @Override
-    public void setLikeCount(Long elementId, int count, LikeTarget target) {
+    public void setLikeCount(Long elementId, int count, LikeTarget target, Duration expiresAfter) {
         String key = combine(RedisKeys.LIKE_COUNT_KEY, target, elementId);
         redisTemplate.opsForValue().set(key, String.valueOf(count));
+        redisTemplate.expire(key, expiresAfter);
     }
 
     @Override

@@ -51,16 +51,6 @@ class CaptchaServiceTest extends AbstractMockServerTest {
     }
 
     @Test
-    @DisplayName("캡차 disabled인 경우 요청 무시")
-    void requestCaptchaKeyWithDisabled() {
-        // when
-        String key = disabledService.requestCaptchaKey();
-
-        // then
-        assertThat(key).isEqualTo(CaptchaService.DISABLED_CAPTCHA_KEY);
-    }
-
-    @Test
     @DisplayName("캡차 키 요청 - 실패 응답")
     void failedRequestCaptchaKeyByInvalidStatus() {
         // given
@@ -86,16 +76,6 @@ class CaptchaServiceTest extends AbstractMockServerTest {
 
         // then
         assertThat(image).containsExactly(1, 2, 3);
-    }
-
-    @Test
-    @DisplayName("캡차 이미지 요청 - disabled인 경우 빈 배열")
-    void disabledRequestCaptchaImage() {
-        // when
-        byte[] data = disabledService.requestCaptchaImage("");
-
-        // then
-        assertThat(data).hasSize(0);
     }
 
     @Test

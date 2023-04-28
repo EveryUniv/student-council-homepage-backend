@@ -1,7 +1,11 @@
 package com.dku.council.global.config.redis;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.redisson.config.SingleServerConfig;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,23 +14,41 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.Optional;
+
 @Configuration
 @RequiredArgsConstructor
 public class RedisConfig {
 
-    @Value("${spring.redis.host}")
-    private final String host;
-
-    @Value("${spring.redis.port}")
-    private final int port;
-
-    @Value("${spring.redis.password}")
-    private final String password;
+    private static final String REDIS_PROTOCOL_PREFIX = "redis://";
+    private static final String REDISS_PROTOCOL_PREFIX = "rediss://";
 
     @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
-        if (!password.isEmpty()) {
+    public RedissonClient redissonClient(RedisProperties redisProperties) {
+        Config config = new Config();
+        int timeout = Optional.ofNullable(redisProperties.getTimeout())
+                .map(x -> Long.valueOf(x.toMillis()).intValue())
+                .orElse(10000);
+        String prefix = redisProperties.isSsl() ? REDISS_PROTOCOL_PREFIX : REDIS_PROTOCOL_PREFIX;
+
+        SingleServerConfig singleServerConfig = config.useSingleServer()
+                .setAddress(prefix + redisProperties.getHost() + ":" + redisProperties.getPort())
+                .setConnectTimeout(timeout)
+                .setDatabase(redisProperties.getDatabase());
+
+        String password = redisProperties.getPassword();
+        if (password != null && !password.isBlank()) {
+            singleServerConfig.setPassword(redisProperties.getPassword());
+        }
+
+        return Redisson.create(config);
+    }
+
+    @Bean
+    public LettuceConnectionFactory redisConnectionFactory(RedisProperties rp) {
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(rp.getHost(), rp.getPort());
+        String password = rp.getPassword();
+        if (!password.isBlank()) {
             configuration.setPassword(RedisPassword.of(password));
         }
 
