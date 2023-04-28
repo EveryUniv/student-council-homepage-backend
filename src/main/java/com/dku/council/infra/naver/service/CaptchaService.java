@@ -65,6 +65,10 @@ public class CaptchaService {
     }
 
     public void verifyCaptcha(String captchaKey, String captchaValue) {
+        if (!enableCaptcha) {
+            return;
+        }
+
         try {
             String response = captchaApiPath.requestValidation(
                             webClient.get(), captchaKey, captchaValue)
@@ -77,7 +81,7 @@ public class CaptchaService {
             }
 
             ResponseCaptchaValidation responseObject = objectMapper.readValue(response, ResponseCaptchaValidation.class);
-            if (enableCaptcha && !responseObject.getResult()) {
+            if (!responseObject.getResult()) {
                 throw new InvalidCaptchaException();
             }
         } catch (WebClientResponseException e) {
@@ -93,7 +97,9 @@ public class CaptchaService {
     private void handleResponseError(WebClientResponseException e) {
         String body = e.getResponseBodyAsString();
         try {
+            System.out.println("TRY");
             ResponseError error = objectMapper.readValue(body, ResponseError.class);
+            System.out.println(error.getErrorCode());
             switch (error.getErrorCode()) {
                 case "CT001":
                     throw new InvalidCaptchaKeyException();

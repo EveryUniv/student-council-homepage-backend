@@ -35,7 +35,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
             if (!lock.tryLock(2, 3, TimeUnit.SECONDS))
                 throw new RuntimeException("It waited for 2 seconds, but can't acquire lock");
 
-            Long size = redisTemplate.opsForHash().size(key);
+            Long size = redisTemplate.opsForHash().size(key) + 1;
             if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
                 throw new AlreadyRequestedTicketException();
             } else {

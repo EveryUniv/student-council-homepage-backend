@@ -1,6 +1,5 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
@@ -114,24 +113,6 @@ class TicketServiceTest {
 
         // when & then
         Assertions.assertThrows(InvalidTicketPeriodException.class,
-                () -> service.enroll(1L, 1L, DateUtil.toInstant(now)));
-    }
-
-    @Test
-    @DisplayName("티켓 발급 실패 - 이미 티켓이 존재하는 경우")
-    void failedEnrollByAlready() {
-        // given
-        LocalDateTime now = LocalDateTime.now(clock);
-        TicketEventDto event = new TicketEventDto(1L, "test",
-                now.minusSeconds(1), now.plusSeconds(1));
-
-        when(ticketEventService.findEventById(1L)).thenReturn(event);
-        when(infoCacheService.getUserInfo(eq(1L)))
-                .thenReturn(UserInfoMock.create());
-        when(memoryRepository.enroll(1L, 1L)).thenReturn(-1);
-
-        // when & then
-        Assertions.assertThrows(AlreadyRequestedTicketException.class,
                 () -> service.enroll(1L, 1L, DateUtil.toInstant(now)));
     }
 

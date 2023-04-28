@@ -121,9 +121,6 @@ class CaptchaServiceTest extends AbstractMockServerTest {
     @Test
     @DisplayName("캡차 검증 - disabled인 경우 검증 패스")
     void disabledVerifyCaptcha() {
-        // given
-        mockPlain("naver/captcha/verify-fail.txt");
-
         // when & then
         disabledService.verifyCaptcha("", "");
     }
