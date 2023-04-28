@@ -1,6 +1,5 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
 import com.dku.council.domain.ticket.exception.NoTicketException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
@@ -56,10 +55,6 @@ public class TicketService {
         }
 
         int turn = memoryRepository.enroll(userId, ticketEventId);
-        if (turn == -1) {
-            throw new AlreadyRequestedTicketException();
-        }
-
         return new ResponseTicketTurnDto(turn);
     }
 }

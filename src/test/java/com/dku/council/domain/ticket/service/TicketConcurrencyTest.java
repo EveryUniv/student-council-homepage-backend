@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,6 +77,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
         CountDownLatch latch = new CountDownLatch(users.size());
         Instant now = DateUtil.toInstant(this.now);
         ConcurrentHashMap<Integer, Integer> map = new ConcurrentHashMap<>();
+        AtomicInteger failedCount = new AtomicInteger(0);
 
         // when
         for (User user : users) {
@@ -84,6 +86,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
                     ResponseTicketTurnDto dto = service.enroll(user.getId(), event.getId(), now);
                     map.put(dto.getTurn(), 0);
                 } catch (Exception e) {
+                    failedCount.incrementAndGet();
                     e.printStackTrace();
                 } finally {
                     latch.countDown();
@@ -94,6 +97,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
 
         // then
         assertThat(map).hasSize(THREAD_COUNT);
+        assertThat(failedCount.get()).isEqualTo(THREAD_COUNT);
         for (int i = 0; i < THREAD_COUNT; i++) {
             assertThat(map.containsKey(i)).isNotNull();
         }
