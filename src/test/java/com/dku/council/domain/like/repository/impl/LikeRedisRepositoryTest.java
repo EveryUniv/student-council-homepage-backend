@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -163,7 +164,7 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
         PostLikeKey key = new PostLikeKey();
 
         // when
-        repository.setLikeCount(key.elementId, 8, POST);
+        repository.setLikeCount(key.elementId, 8, POST, Duration.ofHours(1));
 
         // then
         assertThat(key.getCount(redisTemplate)).isEqualTo("8");

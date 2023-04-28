@@ -3,6 +3,7 @@ package com.dku.council.domain.like.repository;
 import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeTarget;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public interface LikeMemoryRepository {
      * @param count     좋아요 개수
      * @param target    요소 타입
      */
-    void setLikeCount(Long elementId, int count, LikeTarget target);
+    void setLikeCount(Long elementId, int count, LikeTarget target, Duration expiresAfter);
 
     /**
      * 좋아요 개수 1 증가

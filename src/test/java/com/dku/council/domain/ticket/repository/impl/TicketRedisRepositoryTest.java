@@ -1,5 +1,6 @@
 package com.dku.council.domain.ticket.repository.impl;
 
+import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.model.dto.TicketDto;
 import com.dku.council.util.base.AbstractContainerRedisTest;
 import com.dku.council.util.test.FullIntegrationTest;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @FullIntegrationTest
@@ -26,19 +28,28 @@ class TicketRedisRepositoryTest extends AbstractContainerRedisTest {
         int[] enrollResults = {
                 repository.getMyTicket(1L, 1L),
                 repository.enroll(1L, 1L),
-                repository.enroll(1L, 1L),
                 repository.enroll(2L, 1L),
-                repository.enroll(3L, 1L),
                 repository.enroll(3L, 1L),
                 repository.getMyTicket(1L, 1L),
                 repository.getMyTicket(2L, 1L),
                 repository.getMyTicket(3L, 1L),
                 repository.getMyTicket(4L, 1L)
         };
-        int[] expected = {-1, 1, -1, 2, 3, -1, 1, 2, 3, -1};
+        int[] expected = {-1, 1, 2, 3, 1, 2, 3, -1};
 
         // then
         assertThat(enrollResults).containsExactly(expected);
+    }
+
+    @Test
+    @DisplayName("중복 티켓팅 오류")
+    void enrollDuplicated() {
+        // given
+        repository.enroll(1L, 1L);
+
+        // when & then
+        assertThrows(AlreadyRequestedTicketException.class, () ->
+                repository.enroll(1L, 1L));
     }
 
     @Test
@@ -70,8 +81,6 @@ class TicketRedisRepositoryTest extends AbstractContainerRedisTest {
         for (TicketDto ticket : expected) {
             repository.enroll(ticket.getUserId(), ticket.getEventId());
         }
-        repository.enroll(1L, 1L);
-        repository.enroll(3L, 1L);
 
         // when
         List<TicketDto> tickets = repository.flushAllTickets();
