@@ -10,11 +10,13 @@ import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +27,9 @@ public class CachedLikeServiceImpl implements LikeService {
     private final LikeMemoryRepository memoryRepository;
     private final UserRepository userRepository;
     private final LikePersistenceRepository persistenceRepository;
+
+    @Value("${app.post.like.count-cache-time}")
+    private final Duration countCacheTime;
 
 
     @Override
@@ -81,7 +86,7 @@ public class CachedLikeServiceImpl implements LikeService {
         int count = memoryRepository.getCachedLikeCount(elementId, target);
         if (count == -1) {
             count = persistenceRepository.countByElementIdAndTarget(elementId, target);
-            memoryRepository.setLikeCount(elementId, count, target);
+            memoryRepository.setLikeCount(elementId, count, target, countCacheTime);
         }
         return count;
     }

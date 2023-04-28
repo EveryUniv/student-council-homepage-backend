@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @FullIntegrationTest
 public class TicketConcurrencyTest extends AbstractContainerRedisTest {
 
-    private static final int THREAD_COUNT = 100;
+    private static final int THREAD_COUNT = 50;
 
     @Autowired
     private TicketService service;
@@ -63,23 +63,31 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
 
             users.add(user);
         }
+
+        for (int i = 0; i < THREAD_COUNT; i++) {
+            users.add(users.get(i));
+        }
     }
 
     @Test
     @DisplayName("티켓팅 동시에 k건 수행시, k건 성공")
     public void enroll() throws Exception {
         // given
-        CountDownLatch latch = new CountDownLatch(THREAD_COUNT);
+        CountDownLatch latch = new CountDownLatch(users.size());
         Instant now = DateUtil.toInstant(this.now);
         ConcurrentHashMap<Integer, Integer> map = new ConcurrentHashMap<>();
 
         // when
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            final int index = i;
+        for (User user : users) {
             new Thread(() -> {
-                ResponseTicketTurnDto dto = service.enroll(users.get(index).getId(), event.getId(), now);
-                map.put(dto.getTurn(), 0);
-                latch.countDown();
+                try {
+                    ResponseTicketTurnDto dto = service.enroll(user.getId(), event.getId(), now);
+                    map.put(dto.getTurn(), 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
             }).start();
         }
         latch.await();
