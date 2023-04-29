@@ -35,6 +35,9 @@ public class TicketVerifyService {
     @Value("${app.ticket.auth-digit-count}")
     private final int digitCount;
 
+    @Value("${app.ticket.auto-send-sms}")
+    private final boolean autoSendSms;
+
     @Transactional(readOnly = true)
     public ResponseTicketDto myTicket(Long userId, Long eventId) {
         Ticket ticket = persistenceRepository.findByUserIdAndEventId(userId, eventId)
@@ -57,7 +60,11 @@ public class TicketVerifyService {
 
         String authCode = "";
         if (ticket.getStatus() == TicketStatus.ISSUABLE) {
-            authCode = sendSms(userInfo.getPhone());
+            if (autoSendSms) {
+                authCode = sendSms(userInfo.getPhone());
+            } else {
+                authCode = CodeGenerator.generateDigitCode(digitCount);
+            }
         }
 
         return new ResponseManagerTicketDto(dto, authCode);
