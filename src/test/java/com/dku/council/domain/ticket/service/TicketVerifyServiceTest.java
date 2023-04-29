@@ -50,7 +50,7 @@ class TicketVerifyServiceTest {
     @BeforeEach
     void beforeEach() {
         service = new TicketVerifyService(persistenceRepository, userInfoCacheService,
-                smsService, messageSource, DIGIT_COUNT);
+                smsService, messageSource, DIGIT_COUNT, true);
     }
 
 
