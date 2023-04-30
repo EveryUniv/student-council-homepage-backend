@@ -31,6 +31,7 @@ public class Ticket extends BaseEntity {
 
     private int turn;
 
+    @Enumerated(EnumType.STRING)
     private TicketStatus status;
 
     public Ticket(User user, TicketEvent event, int turn) {

@@ -14,7 +14,7 @@ public class LikeDumpScheduler {
 
     private final CachedLikeServiceImpl service;
 
-    @Scheduled(fixedDelayString = "${app.post.like-dump-delay}")
+    @Scheduled(fixedDelayString = "${app.post.like.dump-delay}")
     public void dumpToDB() {
         for (LikeTarget target : LikeTarget.values()) {
             if (service.dumpToDB(target) > 0) {

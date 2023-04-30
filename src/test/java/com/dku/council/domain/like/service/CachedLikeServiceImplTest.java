@@ -8,16 +8,17 @@ import com.dku.council.domain.like.repository.LikePersistenceRepository;
 import com.dku.council.domain.like.service.impl.CachedLikeServiceImpl;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.mock.UserMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +44,15 @@ class CachedLikeServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
-    @InjectMocks
     private CachedLikeServiceImpl service;
+
+    private final Duration cacheTime = Duration.ofHours(1);
+
+
+    @BeforeEach
+    public void beforeEach() {
+        service = new CachedLikeServiceImpl(memoryRepository, userRepository, persistenceRepository, cacheTime);
+    }
 
     @Test
     @DisplayName("좋아요")
@@ -68,7 +76,7 @@ class CachedLikeServiceImplTest {
 
         // then
         verify(memoryRepository, never()).like(10L, 10L, POST);
-        verify(memoryRepository, never()).setLikeCount(any(), eq(5), eq(POST));
+        verify(memoryRepository, never()).setLikeCount(any(), eq(5), eq(POST), eq(cacheTime));
     }
 
     @Test
@@ -96,7 +104,7 @@ class CachedLikeServiceImplTest {
 
         // then
         verify(memoryRepository, never()).cancelLike(10L, 10L, POST);
-        verify(memoryRepository, never()).setLikeCount(any(), eq(5), eq(POST));
+        verify(memoryRepository, never()).setLikeCount(any(), eq(5), eq(POST), eq(cacheTime));
     }
 
     @Test

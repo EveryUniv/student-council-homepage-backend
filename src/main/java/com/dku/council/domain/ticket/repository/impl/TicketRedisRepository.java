@@ -1,9 +1,12 @@
 package com.dku.council.domain.ticket.repository.impl;
 
+import com.dku.council.domain.ticket.exception.AlreadyRequestedTicketException;
 import com.dku.council.domain.ticket.model.dto.TicketDto;
 import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.global.config.redis.RedisKeys;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -11,34 +14,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static com.dku.council.global.config.redis.RedisKeys.*;
+import static com.dku.council.global.config.redis.RedisKeys.TICKET_CACHE_SET_KEY;
+import static com.dku.council.global.config.redis.RedisKeys.TICKET_KEY;
 
 @Repository
 @RequiredArgsConstructor
 public class TicketRedisRepository implements TicketMemoryRepository {
 
     private final StringRedisTemplate redisTemplate;
+    private final RedissonClient redissonClient;
 
     @Override
     public int enroll(Long userId, Long ticketEventId) {
-        String nextNumberKey = RedisKeys.combine(TICKET_NUMBER_KEY, ticketEventId);
-        Long size = redisTemplate.opsForValue().increment(nextNumberKey);
-
-        if (size == null) {
-            redisTemplate.opsForValue().set(nextNumberKey, "1");
-            size = 1L;
-        }
-
         String key = RedisKeys.combine(TICKET_KEY, ticketEventId);
-        if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
-            redisTemplate.opsForValue().decrement(nextNumberKey);
-            return -1;
-        } else {
-            redisTemplate.opsForSet().add(TICKET_CACHE_SET_KEY, ticketEventId.toString());
-        }
+        RLock lock = redissonClient.getLock(key + ":lock");
 
-        return size.intValue();
+        try {
+            if (!lock.tryLock(2, 3, TimeUnit.SECONDS))
+                throw new RuntimeException("It waited for 2 seconds, but can't acquire lock");
+
+            Long size = redisTemplate.opsForHash().size(key) + 1;
+            if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
+                throw new AlreadyRequestedTicketException();
+            } else {
+                redisTemplate.opsForSet().add(TICKET_CACHE_SET_KEY, ticketEventId.toString());
+            }
+            return size.intValue();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (lock != null && lock.isLocked()) {
+                lock.unlock();
+            }
+        }
     }
 
     @Override
@@ -77,8 +87,8 @@ public class TicketRedisRepository implements TicketMemoryRepository {
             }
             redisTemplate.delete(key);
         }
-        redisTemplate.delete(TICKET_CACHE_SET_KEY);
 
+        redisTemplate.delete(TICKET_CACHE_SET_KEY);
         return tickets;
     }
 }

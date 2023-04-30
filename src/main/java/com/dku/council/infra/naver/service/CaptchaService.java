@@ -20,8 +20,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 @RequiredArgsConstructor
 public class CaptchaService {
 
-    public static final String DISABLED_CAPTCHA_KEY = "disabled";
-
     @Value("${naver.captcha.enable}")
     private final boolean enableCaptcha;
 
@@ -31,10 +29,6 @@ public class CaptchaService {
 
 
     public String requestCaptchaKey() {
-        if (!enableCaptcha) {
-            return DISABLED_CAPTCHA_KEY;
-        }
-
         try {
             String response = captchaApiPath.requestKey(webClient.get())
                     .retrieve()
@@ -53,10 +47,6 @@ public class CaptchaService {
     }
 
     public byte[] requestCaptchaImage(String key) {
-        if (!enableCaptcha) {
-            return new byte[0];
-        }
-
         try {
             byte[] response = captchaApiPath.requestImage(webClient.get(), key)
                     .retrieve()
@@ -107,7 +97,9 @@ public class CaptchaService {
     private void handleResponseError(WebClientResponseException e) {
         String body = e.getResponseBodyAsString();
         try {
+            System.out.println("TRY");
             ResponseError error = objectMapper.readValue(body, ResponseError.class);
+            System.out.println(error.getErrorCode());
             switch (error.getErrorCode()) {
                 case "CT001":
                     throw new InvalidCaptchaKeyException();
