@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
@@ -76,6 +77,7 @@ public class UserService {
     @Transactional
     public void changeNickName(Long userId, RequestNickNameChangeDto dto) {
         User user = findUser(userId);
+        checkAlreadyNickname(dto.getNickname());
         user.changeNickName(dto.getNickname());
         userInfoCacheService.invalidateUserInfo(userId);
     }
@@ -108,5 +110,11 @@ public class UserService {
 
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    }
+
+    public void checkAlreadyNickname(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            throw new AlreadyNicknameException();
+        }
     }
 }
