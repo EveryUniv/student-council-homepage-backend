@@ -1,5 +1,8 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.domain.like.repository.LikePersistenceRepository;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
@@ -44,6 +47,12 @@ class UserServiceTest {
 
     @Mock
     private UserInfoCacheService cacheService;
+    @Mock
+    private PostRepository postRepository;
+    @Mock
+    private CommentRepository commentRepository;
+    @Mock
+    private LikePersistenceRepository likePersistenceRepository;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -130,6 +139,9 @@ class UserServiceTest {
         Major major = MajorMock.create();
         User user = UserMock.create(major);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.countByUserId(user.getId())).thenReturn(1);
+        when(commentRepository.countByUserId(user.getId())).thenReturn(2);
+        when(likePersistenceRepository.countByUserId(user.getId())).thenReturn(3);
 
         // when
         ResponseUserInfoDto info = service.getUserInfo(user.getId());
@@ -142,6 +154,10 @@ class UserServiceTest {
         assertThat(info.getMajor()).isEqualTo(user.getMajor().getName());
         assertThat(info.getDepartment()).isEqualTo(user.getMajor().getDepartment());
         assertThat(info.isAdmin()).isEqualTo(user.getUserRole().isAdmin());
+        assertThat(info.getPhoneNumber()).isEqualTo(user.getPhone());
+        assertThat(info.getWriteCount()).isEqualTo(1);
+        assertThat(info.getCommentCount()).isEqualTo(2);
+        assertThat(info.getLikeCount()).isEqualTo(3);
     }
 
     @Test

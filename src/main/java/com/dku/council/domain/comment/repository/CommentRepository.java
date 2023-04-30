@@ -35,4 +35,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
      */
     @Query("select c from Comment c where c.user.id=:userId")
     Page<Comment> findAllByUserIdWithAdmin(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * user 가 작성한 댓글 총 갯수를 가져옵니다.
+     */
+    Integer countByUserId(@Param("userId") Long userId);
 }
