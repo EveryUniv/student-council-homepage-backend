@@ -66,9 +66,6 @@ public class CachedLikeServiceImpl implements LikeService {
     public Page<Long> getLikedElementIds(Long userId, Pageable pageable, LikeTarget target) {
         dumpByUserId(userId, target);
         Page<LikeElement> likes = persistenceRepository.findAllByUserId(userId, target, pageable);
-        for (LikeElement like : likes) {
-            System.out.printf("like(%d likes %d, %s)\n", like.getUser().getId(), like.getElementId(), like.getTarget().toString());
-        }
         return likes.map(LikeElement::getElementId);
     }
 
@@ -81,14 +78,10 @@ public class CachedLikeServiceImpl implements LikeService {
 
     private void dumpByUserId(Long userId, LikeTarget target) {
         List<LikeEntry> allLikes = memoryRepository.getAllLikesAndClear(userId, target);
-        for (LikeEntry like : allLikes) {
-            System.out.printf("LikeState %d: %s\n", like.getElementId(), like.getState().toString());
-        }
 
         User user = userRepository.getReferenceById(userId);
         for (LikeEntry ent : allLikes) {
             if (ent.getState() == LikeState.LIKED) {
-                System.out.printf("Saved LikeState %d\n", ent.getElementId());
                 persistenceRepository.save(new LikeElement(user, ent.getElementId(), target));
             } else {
                 persistenceRepository.deleteByElementIdAndUserId(ent.getElementId(), userId, target);

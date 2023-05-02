@@ -30,6 +30,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Column(unique = true)
     private String studentId;
 
     @NotNull
@@ -40,7 +41,7 @@ public class User extends BaseEntity {
     private String name;
 
     @NotNull
-    @Column(length = 20)
+    @Column(length = 20, unique = true)
     private String nickname;
 
     @ManyToOne(fetch = LAZY)
@@ -52,6 +53,7 @@ public class User extends BaseEntity {
     private String academicStatus;
 
     @NotNull
+    @Column(unique = true)
     private String phone;
 
     @Enumerated(STRING)
