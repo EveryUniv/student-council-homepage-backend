@@ -39,5 +39,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     /**
      * user 가 작성한 댓글 총 갯수를 가져옵니다.
      */
-    Integer countByUserId(@Param("userId") Long userId);
+    @Query("select count(*) from Comment c " +
+            "where c.post.id=:postId " +
+            "and (c.status='ACTIVE' or c.status='EDITED')")
+    Long countByUserId(@Param("userId") Long userId);
 }

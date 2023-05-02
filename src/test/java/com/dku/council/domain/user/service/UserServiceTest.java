@@ -3,7 +3,6 @@ package com.dku.council.domain.user.service;
 import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.like.repository.LikePersistenceRepository;
 import com.dku.council.domain.post.repository.post.PostRepository;
-import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
@@ -29,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -138,10 +138,11 @@ class UserServiceTest {
         // given
         Major major = MajorMock.create();
         User user = UserMock.create(major);
+
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.countByUserId(user.getId())).thenReturn(1);
-        when(commentRepository.countByUserId(user.getId())).thenReturn(2);
-        when(likePersistenceRepository.countByUserId(user.getId())).thenReturn(3);
+        when(postRepository.countByUserId(user.getId())).thenReturn(1L);
+        when(commentRepository.countByUserId(user.getId())).thenReturn(2L);
+        when(likePersistenceRepository.countByUserId(user.getId(), POST)).thenReturn(3L);
 
         // when
         ResponseUserInfoDto info = service.getUserInfo(user.getId());

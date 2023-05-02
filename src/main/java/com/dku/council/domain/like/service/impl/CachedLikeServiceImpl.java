@@ -68,6 +68,12 @@ public class CachedLikeServiceImpl implements LikeService {
         return likes.map(LikeElement::getElementId);
     }
 
+    @Override
+    public Long getCountOfLikedElements(Long userId, LikeTarget target) {
+        dumpByUserId(userId, target);
+        return persistenceRepository.countByUserId(userId, target);
+    }
+
     private void dumpByUserId(Long userId, LikeTarget target) {
         List<LikeEntry> allLikes = memoryRepository.getAllLikesAndClear(userId, target);
         User user = userRepository.getReferenceById(userId);
