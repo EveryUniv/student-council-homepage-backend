@@ -1,7 +1,7 @@
 package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.comment.repository.CommentRepository;
-import com.dku.council.domain.like.repository.LikePersistenceRepository;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
@@ -47,12 +47,15 @@ class UserServiceTest {
 
     @Mock
     private UserInfoCacheService cacheService;
+
     @Mock
     private PostRepository postRepository;
+
     @Mock
     private CommentRepository commentRepository;
+
     @Mock
-    private LikePersistenceRepository likePersistenceRepository;
+    private LikeService likeService;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -142,7 +145,7 @@ class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(postRepository.countByUserId(user.getId())).thenReturn(1L);
         when(commentRepository.countByUserId(user.getId())).thenReturn(2L);
-        when(likePersistenceRepository.countByUserId(user.getId(), POST)).thenReturn(3L);
+        when(likeService.getCountOfLikedElements(user.getId(), POST)).thenReturn(3L);
 
         // when
         ResponseUserInfoDto info = service.getUserInfo(user.getId());

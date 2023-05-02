@@ -38,9 +38,9 @@ public interface LikePersistenceRepository extends JpaRepository<LikeElement, Lo
                                       @Param("target") LikeTarget target,
                                       Pageable pageable);
 
-    @Query("select l from LikeElement l " +
+    @Query("select count(*) from LikeElement l " +
             "where l.user.id = :userId and l.target = :target")
     Long countByUserId(@Param("userId") Long userId,
-                          @Param("target") LikeTarget target);
+                       @Param("target") LikeTarget target);
 
 }
