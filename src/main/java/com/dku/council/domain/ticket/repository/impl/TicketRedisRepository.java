@@ -32,20 +32,20 @@ public class TicketRedisRepository implements TicketMemoryRepository {
         RLock lock = redissonClient.getLock(key + ":lock");
 
         try {
-            if (!lock.tryLock(2, 3, TimeUnit.SECONDS))
-                throw new RuntimeException("It waited for 2 seconds, but can't acquire lock");
+            if (!lock.tryLock(20, 3, TimeUnit.SECONDS))
+                throw new RuntimeException("It waited for 20 seconds, but can't acquire lock");
 
-            Long size = redisTemplate.opsForHash().size(key) + 1;
-            if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), size.toString())) {
+            long size = redisTemplate.opsForHash().size(key) + 1;
+            if (!redisTemplate.opsForHash().putIfAbsent(key, userId.toString(), Long.toString(size))) {
                 throw new AlreadyRequestedTicketException();
             } else {
                 redisTemplate.opsForSet().add(TICKET_CACHE_SET_KEY, ticketEventId.toString());
             }
-            return size.intValue();
+            return (int) size;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            if (lock != null && lock.isLocked()) {
+            if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }

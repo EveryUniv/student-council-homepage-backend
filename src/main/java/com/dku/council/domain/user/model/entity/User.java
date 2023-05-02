@@ -30,6 +30,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Column
     private String studentId;
 
     @NotNull
@@ -52,6 +53,7 @@ public class User extends BaseEntity {
     private String academicStatus;
 
     @NotNull
+    @Column
     private String phone;
 
     @Enumerated(STRING)

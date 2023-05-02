@@ -46,6 +46,15 @@ public interface LikeService {
     Page<Long> getLikedElementIds(Long userId, Pageable pageable, LikeTarget target);
 
     /**
+     * '좋아요'누른 요소들 개수 가져오기
+     *
+     * @param userId 사용자 ID
+     * @param target 요소 타입
+     * @return '좋아요'누른 요소 개수
+     */
+    Long getCountOfLikedElements(Long userId, LikeTarget target);
+
+    /**
      * '좋아요' 개수 가져오기.
      * 메모리에 '좋아요' 개수가 없다면 캐싱한다.
      *

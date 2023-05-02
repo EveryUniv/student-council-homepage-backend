@@ -9,7 +9,6 @@ import com.dku.council.domain.ticket.repository.TicketRepository;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +24,6 @@ public class TicketScheduler {
     private final UserRepository userRepository;
 
     @Transactional
-    @Scheduled(fixedDelayString = "${app.ticket.dump-delay}")
     public void dumpToDb() {
         List<TicketDto> tickets = memoryRepository.flushAllTickets();
         for (TicketDto dto : tickets) {

@@ -13,5 +13,9 @@ public class ResponseUserInfoDto {
     private final String yearOfAdmission;
     private final String major;
     private final String department;
+    private final String phoneNumber;
+    private final Long writeCount;
+    private final Long commentCount;
+    private final Long likeCount;
     private final boolean admin;
 }

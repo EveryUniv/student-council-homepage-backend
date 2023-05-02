@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
@@ -23,7 +23,7 @@ public class Tag extends BaseEntity {
     private String name;
 
     @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostTag> postTag;
+    private List<PostTag> postTag = new ArrayList<>();
 
     public Tag(String name) {
         this.name = name;

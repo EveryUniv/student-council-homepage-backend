@@ -62,14 +62,23 @@ public class CachedLikeServiceImpl implements LikeService {
     }
 
     @Override
+    @Transactional
     public Page<Long> getLikedElementIds(Long userId, Pageable pageable, LikeTarget target) {
         dumpByUserId(userId, target);
         Page<LikeElement> likes = persistenceRepository.findAllByUserId(userId, target, pageable);
         return likes.map(LikeElement::getElementId);
     }
 
+    @Override
+    @Transactional
+    public Long getCountOfLikedElements(Long userId, LikeTarget target) {
+        dumpByUserId(userId, target);
+        return persistenceRepository.countByUserId(userId, target);
+    }
+
     private void dumpByUserId(Long userId, LikeTarget target) {
         List<LikeEntry> allLikes = memoryRepository.getAllLikesAndClear(userId, target);
+
         User user = userRepository.getReferenceById(userId);
         for (LikeEntry ent : allLikes) {
             if (ent.getState() == LikeState.LIKED) {
