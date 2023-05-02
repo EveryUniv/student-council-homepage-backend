@@ -67,6 +67,7 @@ public class UserService {
         return new ResponseRefreshTokenDto(token);
     }
 
+    @Transactional
     public ResponseUserInfoDto getUserInfo(Long userId) {
         User user = findUser(userId);
 
