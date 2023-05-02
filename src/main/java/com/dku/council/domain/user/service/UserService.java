@@ -1,9 +1,8 @@
 package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.comment.repository.CommentRepository;
-import com.dku.council.domain.like.repository.LikeMemoryRepository;
-import com.dku.council.domain.like.repository.LikePersistenceRepository;
-import com.dku.council.domain.like.repository.impl.LikeRedisRepository;
+import com.dku.council.domain.like.model.LikeTarget;
+import com.dku.council.domain.like.service.LikeService;
 import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
@@ -41,11 +40,13 @@ public class UserService {
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
     private final UserInfoCacheService userInfoCacheService;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final LikePersistenceRepository likePersistenceRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final LikeService likeService;
+
 
     public ResponseLoginDto login(RequestLoginDto dto) {
         User user = userRepository.findByStudentId(dto.getStudentId())
@@ -66,15 +67,18 @@ public class UserService {
         return new ResponseRefreshTokenDto(token);
     }
 
+    @Transactional
     public ResponseUserInfoDto getUserInfo(Long userId) {
         User user = findUser(userId);
 
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();
         String phoneNumber = user.getPhone();
-        Integer writeCount = postRepository.countByUserId(userId);
-        Integer commentCount = commentRepository.countByUserId(userId);
-        Integer likeCount = likePersistenceRepository.countByUserId(userId);
+
+        Long writeCount = postRepository.countByUserId(userId);
+        Long commentCount = commentRepository.countByUserId(userId);
+        Long likeCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
+
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
                 user.getNickname(), year, major.getName(), major.getDepartment(),
                 phoneNumber, writeCount, commentCount, likeCount,
