@@ -22,6 +22,7 @@ public interface GenericPostRepository<T extends Post> extends JpaRepository<T, 
             "join fetch p.user u " +
             "join fetch u.major " +
             "where p.id=:id and p.status='ACTIVE' ")
+    // TODO NamedParameter에 @Param 모두 붙이기
     Optional<T> findById(@Param("id") Long id);
 
     @Override
