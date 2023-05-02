@@ -1,5 +1,11 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.domain.like.repository.LikeMemoryRepository;
+import com.dku.council.domain.like.repository.LikePersistenceRepository;
+import com.dku.council.domain.like.repository.impl.LikeRedisRepository;
+import com.dku.council.domain.post.repository.post.PostRepository;
+import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestExistPasswordChangeDto;
@@ -35,6 +41,9 @@ public class UserService {
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
     private final UserInfoCacheService userInfoCacheService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final LikePersistenceRepository likePersistenceRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -62,8 +71,13 @@ public class UserService {
 
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();
+        String phoneNumber = user.getPhone();
+        Integer writeCount = postRepository.countByUserId(userId);
+        Integer commentCount = commentRepository.countByUserId(userId);
+        Integer likeCount = likePersistenceRepository.countByUserId(userId);
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
                 user.getNickname(), year, major.getName(), major.getDepartment(),
+                phoneNumber, writeCount, commentCount, likeCount,
                 user.getUserRole().isAdmin());
     }
 
@@ -76,6 +90,7 @@ public class UserService {
     @Transactional
     public void changeNickName(Long userId, RequestNickNameChangeDto dto) {
         User user = findUser(userId);
+        checkAlreadyNickname(dto.getNickname());
         user.changeNickName(dto.getNickname());
         userInfoCacheService.invalidateUserInfo(userId);
     }
@@ -108,5 +123,11 @@ public class UserService {
 
     private User findUser(Long userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+    }
+
+    public void checkAlreadyNickname(String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent()) {
+            throw new AlreadyNicknameException();
+        }
     }
 }
