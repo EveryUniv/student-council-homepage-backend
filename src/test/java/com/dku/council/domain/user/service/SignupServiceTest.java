@@ -2,11 +2,13 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
+import com.dku.council.domain.user.exception.IllegalNicknameException;
 import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
+import com.dku.council.domain.user.repository.NicknameFilterRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.mock.MajorMock;
@@ -45,6 +47,9 @@ class SignupServiceTest {
     @Mock
     private MajorRepository majorRepository;
 
+    @Mock
+    private NicknameFilterRepository nicknameFilterRepository;
+
     @InjectMocks
     private SignupService service;
 
@@ -69,6 +74,8 @@ class SignupServiceTest {
         when(smsVerificationService.getPhoneNumber(token)).thenReturn(phone);
         when(majorRepository.findByName("Major", "Department"))
                 .thenReturn(Optional.of(major));
+        when(nicknameFilterRepository.countMatchedFilter(dto.getNickname()))
+                .thenReturn(0L);
 
         // when
         service.signup(dto, token);
@@ -115,6 +122,21 @@ class SignupServiceTest {
 
         // when & then
         assertThrows(AlreadyNicknameException.class, () ->
+                service.signup(dto, token));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 사용할 수 없는 닉네임인 경우")
+    void failedSignupByIllegalNickname() {
+        // given
+        when(dkuAuthService.getStudentInfo(token)).thenReturn(info);
+        when(userRepository.findByStudentId(studentId)).thenReturn(Optional.empty());
+        when(userRepository.findByNickname(dto.getNickname())).thenReturn(Optional.empty());
+        when(nicknameFilterRepository.countMatchedFilter(dto.getNickname()))
+                .thenReturn(1L);
+
+        // when & then
+        assertThrows(IllegalNicknameException.class, () ->
                 service.signup(dto, token));
     }
 }
