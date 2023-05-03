@@ -47,6 +47,9 @@ public class SummarizedGenericPostDto {
     @Schema(description = "블라인드 여부", example = "false")
     private final boolean isBlinded;
 
+    @Schema(description = "게시글 종류", example = "FORUM")
+    private final String postType;
+
 
     public SummarizedGenericPostDto(ObjectUploadContext context, int bodySize, int likes, Post post) {
         this.id = post.getId();
@@ -62,7 +65,7 @@ public class SummarizedGenericPostDto {
                 .map(e -> new TagDto(e.getTag()))
                 .collect(Collectors.toList());
         this.isBlinded = post.isBlinded();
-
+        this.postType = post instanceof com.dku.council.domain.post.model.entity.posttype.Petition ? "PETITION" : "GENERAL_FORUM";
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
@@ -77,6 +80,7 @@ public class SummarizedGenericPostDto {
         this.commentCount = copy.getCommentCount();
         this.tag = copy.getTag();
         this.isBlinded = copy.isBlinded();
+        this.postType = copy.getPostType();
     }
 
     private static String slice(String text, int maxLen) {
