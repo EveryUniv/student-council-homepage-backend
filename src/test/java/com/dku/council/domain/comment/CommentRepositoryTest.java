@@ -3,6 +3,7 @@ package com.dku.council.domain.comment;
 import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.user.model.entity.Major;
@@ -41,10 +42,8 @@ class CommentRepositoryTest {
     @Autowired
     private CommentRepository repository;
 
-    private User user1;
-    private User user2;
-    private GeneralForum post1;
-    private GeneralForum post2;
+    private User user1, user2;
+    private GeneralForum post1, post2, post3, post4;
 
     @BeforeEach
     void setUp() {
@@ -63,6 +62,13 @@ class CommentRepositoryTest {
         post2 = GeneralForumMock.create(user1);
         post2 = generalForumRepository.save(post2);
 
+        post3 = GeneralForumMock.create(user1);
+        post3 = generalForumRepository.save(post3);
+
+        post4 = GeneralForumMock.create(user1);
+        post4.markAsDeleted(true);
+        post4 = generalForumRepository.save(post4);
+
         List<Comment> comments = CommentMock.createList(post1, List.of(user1, user2), 10);
         comments.get(8).updateStatus(CommentStatus.DELETED);
         comments.get(9).updateStatus(CommentStatus.DELETED);
@@ -72,6 +78,12 @@ class CommentRepositoryTest {
         comments2.get(5).updateStatus(CommentStatus.DELETED);
         comments2.get(6).updateStatus(CommentStatus.DELETED);
         repository.saveAll(comments2);
+
+        List<Comment> comments3 = CommentMock.createList(post3, List.of(user2), 5);
+        repository.saveAll(comments3);
+
+        List<Comment> comments4 = CommentMock.createList(post4, List.of(user2), 5);
+        repository.saveAll(comments4);
     }
 
     @Test
@@ -82,6 +94,7 @@ class CommentRepositoryTest {
         Page<Comment> actual2 = repository.findAllByPostId(post2.getId(), Pageable.unpaged());
         Page<Comment> actual3 = repository.findAllByPostId(post1.getId(), Pageable.ofSize(5));
         Page<Comment> actual4 = repository.findAllByPostId(post1.getId(), PageRequest.of(1, 5));
+        Page<Comment> actual5 = repository.findAllByPostId(post4.getId(), Pageable.unpaged());
 
         // then
         assertThat(actual1.getTotalElements()).isEqualTo(8);
@@ -92,6 +105,7 @@ class CommentRepositoryTest {
         assertThat(actual3.getTotalElements()).isEqualTo(8);
         assertThat(actual4.getNumberOfElements()).isEqualTo(3);
         assertThat(actual4.getNumber()).isEqualTo(1);
+        assertThat(actual5.getTotalElements()).isEqualTo(0);
     }
 
     @Test
@@ -102,11 +116,25 @@ class CommentRepositoryTest {
         List<Comment> actual2 = repository.findAllByPostIdAndUserId(post1.getId(), user2.getId());
         List<Comment> actual3 = repository.findAllByPostIdAndUserId(post2.getId(), user1.getId());
         List<Comment> actual4 = repository.findAllByPostIdAndUserId(post2.getId(), user2.getId());
+        List<Comment> actual5 = repository.findAllByPostIdAndUserId(post4.getId(), user2.getId());
 
         // then
         assertThat(actual1).hasSize(4);
         assertThat(actual2).hasSize(4);
         assertThat(actual3).hasSize(3);
         assertThat(actual4).hasSize(2);
+        assertThat(actual5).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("댓글 작성한 글들 조회 테스트")
+    void findAllCommentedByUserId() {
+        // when
+        Page<Post> posts1 = repository.findAllCommentedByUserId(user1.getId(), Pageable.unpaged());
+        Page<Post> posts2 = repository.findAllCommentedByUserId(user2.getId(), Pageable.unpaged());
+
+        // then
+        assertThat(posts1.map(Post::getId)).containsExactlyInAnyOrder(post1.getId(), post2.getId());
+        assertThat(posts2.map(Post::getId)).containsExactlyInAnyOrder(post1.getId(), post2.getId(), post3.getId());
     }
 }

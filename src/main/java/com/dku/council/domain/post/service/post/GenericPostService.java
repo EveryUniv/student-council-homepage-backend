@@ -152,7 +152,12 @@ public class GenericPostService<E extends Post> {
                          String remoteAddress, PostResultMapper<T, ResponseSingleGenericPostDto, E> mapper) {
         E post = viewPost(repository, postId, remoteAddress, role);
         ResponseSingleGenericPostDto dto = makePostDto(userId, post);
-        return mapper.map(dto, post);
+
+        try {
+            return mapper.map(dto, post);
+        } catch (ClassCastException e) {
+            throw new PostNotFoundException();
+        }
     }
 
     private ResponseSingleGenericPostDto makePostDto(@Nullable Long userId, E post) {
