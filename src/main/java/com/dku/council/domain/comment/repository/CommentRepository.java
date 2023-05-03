@@ -26,7 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select p from Post p where p.status = 'ACTIVE' and p.id in " +
             "(select p.id from Post p " +
             "join Comment c " +
-            "on p.id = c.post.id and c.user.id=:userId and c.status='ACTIVE' " +
+            "on p.id = c.post.id and c.user.id=:userId and (c.status='ACTIVE' or c.status='EDITED') " +
             "group by p.id)")
     Page<Post> findAllCommentByUserId(@Param("userId") Long userId, Pageable pageable);
 

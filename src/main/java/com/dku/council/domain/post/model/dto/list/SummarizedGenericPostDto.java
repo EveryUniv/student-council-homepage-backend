@@ -65,7 +65,7 @@ public class SummarizedGenericPostDto {
                 .map(e -> new TagDto(e.getTag()))
                 .collect(Collectors.toList());
         this.isBlinded = post.isBlinded();
-        this.postType = post instanceof com.dku.council.domain.post.model.entity.posttype.Petition ? "PETITION" : "GENERAL_FORUM";
+        this.postType = post.getClass().getSimpleName();
     }
 
     public SummarizedGenericPostDto(SummarizedGenericPostDto copy) {
