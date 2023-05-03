@@ -34,7 +34,7 @@ public class MyPostService {
                 .map(post -> mapToListDto(post, bodySize));
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<SummarizedGenericPostDto> listMyLikedPosts(Long userId, Pageable pageable, int bodySize) {
         Page<Long> likedPosts = likeService.getLikedElementIds(userId, pageable, LikeTarget.POST);
         List<SummarizedGenericPostDto> posts = postRepository.findAllById(likedPosts.getContent()).stream()

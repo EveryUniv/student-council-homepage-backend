@@ -35,4 +35,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.user.id=:userId")
     Page<Post> findAllByUserIdWithAdmin(@Param("userId") Long userId, Pageable pageable);
 
+    /**
+     * user 가 작성한 게시글의 총 목록의 갯수를 가져옵니다.
+     */
+    @Query("select count(*) from Post p where p.user.id=:userId and p.status='ACTIVE'")
+    Long countByUserId(@Param("userId") Long userId);
+
 }

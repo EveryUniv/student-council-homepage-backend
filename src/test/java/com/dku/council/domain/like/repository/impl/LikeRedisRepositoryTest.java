@@ -4,7 +4,6 @@ import com.dku.council.domain.like.model.LikeEntry;
 import com.dku.council.domain.like.model.LikeState;
 import com.dku.council.global.config.redis.RedisKeys;
 import com.dku.council.util.base.AbstractContainerRedisTest;
-import com.dku.council.util.test.FullIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import static com.dku.council.global.config.redis.RedisKeys.combine;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@FullIntegrationTest
+//@FullIntegrationTest
 class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
 
     @Autowired
@@ -199,6 +198,31 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
     }
 
     @Test
+    @DisplayName("특정 유저의 캐싱된 모든 좋아요 가져오고 삭제가 잘 되는지?")
+    void getAllLikesAndClearForUser() {
+        // given
+        final int count = 10;
+        for (int i = 0; i < count; i++) {
+            PostLikeKey key = new PostLikeKey(i + 100L, 100L);
+            repository.like(key.elementId, key.userId, POST);
+        }
+
+        // when
+        List<LikeEntry> likes = repository.getAllLikesAndClear(100L, POST);
+
+        // then
+        String key = combine(RedisKeys.LIKE_KEY, POST, 100L);
+        Long size = redisTemplate.opsForHash().size(key);
+        assertThat(size).isEqualTo(0);
+
+        key = combine(RedisKeys.LIKE_USERS_KEY, POST);
+        Boolean isMember = redisTemplate.opsForSet().isMember(key, "100");
+        assertThat(isMember).isEqualTo(false);
+
+        assertThat(likes.size()).isEqualTo(count);
+    }
+
+    @Test
     @DisplayName("캐싱된 모든 좋아요 가져오고 삭제가 잘 되는지?")
     void getAllPostLikesAndClear() {
         // given
@@ -212,9 +236,17 @@ class LikeRedisRepositoryTest extends AbstractContainerRedisTest {
         Map<Long, List<LikeEntry>> likes = repository.getAllLikesAndClear(POST);
 
         // then
-        Long size = redisTemplate.opsForHash().size(RedisKeys.LIKE_KEY);
-        assertThat(likes.size()).isEqualTo(count);
+        String key = combine(RedisKeys.LIKE_USERS_KEY, POST);
+        Long size = redisTemplate.opsForHash().size(key);
         assertThat(size).isEqualTo(0);
+
+        for (int i = 0; i < count; i++) {
+            key = combine(RedisKeys.LIKE_KEY, POST, i + 100L);
+            size = redisTemplate.opsForHash().size(key);
+            assertThat(size).isEqualTo(0);
+        }
+
+        assertThat(likes.size()).isEqualTo(count);
     }
 
     private static class PostLikeKey {
