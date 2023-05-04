@@ -23,6 +23,7 @@ import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,13 +76,13 @@ public class UserService {
         Major major = user.getMajor();
         String phoneNumber = user.getPhone();
 
-        Long writeCount = postRepository.countByUserId(userId);
-        Long commentCount = commentRepository.countByUserId(userId);
-        Long likeCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
+        Long writePostCount = postRepository.countByUserId(userId);
+        Long commentedPostCount = commentRepository.countByUserId(userId);
+        Long likedPostCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
 
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
                 user.getNickname(), year, major.getName(), major.getDepartment(),
-                phoneNumber, writeCount, commentCount, likeCount,
+                phoneNumber, writePostCount, commentedPostCount, likedPostCount,
                 user.getUserRole().isAdmin());
     }
 
