@@ -14,13 +14,13 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("select c from Comment c " +
             "where c.post.id=:postId and c.post.status='ACTIVE' " +
-            "and (c.status='ACTIVE' or c.status='EDITED')")
+            "and (c.status='ACTIVE' or c.status='EDITED') ")
     Page<Comment> findAllByPostId(@Param("postId") Long postId, Pageable pageable);
 
     @Query("select c from Comment c " +
             "where c.post.id=:postId and c.post.status='ACTIVE' " +
             "and c.user.id=:userId " +
-            "and (c.status='ACTIVE' or c.status='EDITED')")
+            "and (c.status='ACTIVE' or c.status='EDITED') ")
     List<Comment> findAllByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
 
     @Query("select distinct p from Post p " +
@@ -36,10 +36,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Page<Comment> findAllByUserIdWithAdmin(@Param("userId") Long userId, Pageable pageable);
 
     /**
-     * user 가 작성한 댓글 총 갯수를 가져옵니다.
+     * User가 댓글을 작성한 게시글의 개수를 가져옵니다.
      */
-    @Query("select count(*) from Comment c " +
-            "where c.user.id=:userId " +
-            "and (c.status='ACTIVE' or c.status='EDITED')")
-    Long countByUserId(@Param("userId") Long userId);
+    @Query("select distinct count(*) from Post p " +
+            "join Comment c " +
+            "on p.id = c.post.id and c.user.id=:userId and p.status='ACTIVE' and " +
+                "(c.status='ACTIVE' or c.status='EDITED') ")
+    Long countAllCommentedByUserId(@Param("userId") Long userId);
 }

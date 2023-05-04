@@ -75,13 +75,13 @@ public class UserService {
         Major major = user.getMajor();
         String phoneNumber = user.getPhone();
 
-        Long writeCount = postRepository.countByUserId(userId);
-        Long commentCount = commentRepository.countByUserId(userId);
-        Long likeCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
+        Long writePostCount = postRepository.countAllByUserId(userId);
+        Long commentedPostCount = commentRepository.countAllCommentedByUserId(userId);
+        Long likedPostCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
 
         return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
                 user.getNickname(), year, major.getName(), major.getDepartment(),
-                phoneNumber, writeCount, commentCount, likeCount,
+                phoneNumber, writePostCount, commentedPostCount, likedPostCount,
                 user.getUserRole().isAdmin());
     }
 
