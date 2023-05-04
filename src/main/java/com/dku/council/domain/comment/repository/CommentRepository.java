@@ -42,5 +42,5 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "join Comment c " +
             "on p.id = c.post.id and c.user.id=:userId and p.status='ACTIVE' and " +
                 "(c.status='ACTIVE' or c.status='EDITED') ")
-    Long countByUserId(@Param("userId") Long userId);
+    Long countAllCommentedByUserId(@Param("userId") Long userId);
 }
