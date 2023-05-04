@@ -42,7 +42,7 @@ class UserInfoCacheServiceTest {
 
         when(memoryRepository.getUserInfo(eq(1L), any()))
                 .thenReturn(Optional.empty());
-        when(persistenceRepository.findById(eq(1L)))
+        when(persistenceRepository.findByIdWithMajor(eq(1L)))
                 .thenReturn(Optional.of(user));
 
         // when
