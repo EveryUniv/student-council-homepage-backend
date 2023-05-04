@@ -38,7 +38,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     /**
      * User가 댓글을 작성한 게시글의 개수를 가져옵니다.
      */
-    @Query("select distinct count(*) from Post p " +
+    @Query("select count(distinct p) from Post p " +
             "join Comment c " +
             "on p.id = c.post.id and c.user.id=:userId and p.status='ACTIVE' and " +
                 "(c.status='ACTIVE' or c.status='EDITED') ")

@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 
 @Service
@@ -54,7 +55,8 @@ public class TicketService {
             throw new NotAttendingException();
         }
 
-        int turn = memoryRepository.enroll(userId, ticketEventId);
+        Duration expiresNextKeyAfter = Duration.between(now, eventTo).plusMinutes(30);
+        int turn = memoryRepository.enroll(userId, ticketEventId, expiresNextKeyAfter);
         return new ResponseTicketTurnDto(turn);
     }
 }
