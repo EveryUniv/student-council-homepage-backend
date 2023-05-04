@@ -24,11 +24,11 @@
         <hr class="my-4">
         <div class="alert alert-warning d-flex align-items-center" role="alert">
             <div>
-                ※ DB로 덤프하는 과정은 오래걸릴 수 있습니다.
+                ※ DB로 덤프하면 다시 신청할 수 있습니다. 티켓팅이 종료된 뒤에 덤프해주세요.
             </div>
         </div>
         <label class="form-label">티켓팅 도구</label>
-        <form method="post" onsubmit="alert('덤프되었습니다.')" th:action="@{|/manage/ticket/dump|}">
+        <form method="post" onsubmit="alert('덤프 요청했습니다.')" th:action="@{|/manage/ticket/dump|}">
             <button class="btn btn-primary" type="submit">DB로 덤프</button>
         </form>
     </div>
