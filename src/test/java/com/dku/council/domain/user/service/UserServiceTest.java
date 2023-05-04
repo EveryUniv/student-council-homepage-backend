@@ -1,5 +1,8 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.domain.like.service.LikeService;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestLoginDto;
@@ -25,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+import static com.dku.council.domain.like.model.LikeTarget.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +47,15 @@ class UserServiceTest {
 
     @Mock
     private UserInfoCacheService cacheService;
+
+    @Mock
+    private PostRepository postRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private LikeService likeService;
 
     @Mock
     private JwtProvider jwtProvider;
@@ -110,7 +123,7 @@ class UserServiceTest {
                 .accessToken("newaccess")
                 .refreshToken("refresh")
                 .build();
-        when(jwtProvider.getAccessTokenFromHeader(null)).thenReturn("access");
+        when(jwtProvider.getAccessTokenFromHeader(any())).thenReturn("access");
         when(jwtProvider.reissue("access", "refresh"))
                 .thenReturn(token);
 
@@ -128,7 +141,11 @@ class UserServiceTest {
         // given
         Major major = MajorMock.create();
         User user = UserMock.create(major);
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        when(userRepository.findByIdWithMajor(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.countAllByUserId(user.getId())).thenReturn(1L);
+        when(commentRepository.countAllCommentedByUserId(user.getId())).thenReturn(2L);
+        when(likeService.getCountOfLikedElements(user.getId(), POST)).thenReturn(3L);
 
         // when
         ResponseUserInfoDto info = service.getUserInfo(user.getId());
@@ -141,13 +158,17 @@ class UserServiceTest {
         assertThat(info.getMajor()).isEqualTo(user.getMajor().getName());
         assertThat(info.getDepartment()).isEqualTo(user.getMajor().getDepartment());
         assertThat(info.isAdmin()).isEqualTo(user.getUserRole().isAdmin());
+        assertThat(info.getPhoneNumber()).isEqualTo(user.getPhone());
+        assertThat(info.getWritePostCount()).isEqualTo(1);
+        assertThat(info.getCommentedPostCount()).isEqualTo(2);
+        assertThat(info.getLikedPostCount()).isEqualTo(3);
     }
 
     @Test
     @DisplayName("내 정보 가져오기 실패 - 찾을 수 없는 아이디")
     void failedGetUserInfoByNotFound() {
         // given
-        when(userRepository.findById(0L)).thenReturn(Optional.empty());
+        when(userRepository.findByIdWithMajor(0L)).thenReturn(Optional.empty());
 
         // when
         assertThrows(UserNotFoundException.class, () ->

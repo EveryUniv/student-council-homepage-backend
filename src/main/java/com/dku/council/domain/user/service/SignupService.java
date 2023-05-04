@@ -2,12 +2,14 @@ package com.dku.council.domain.user.service;
 
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.AlreadyStudentIdException;
+import com.dku.council.domain.user.exception.IllegalNicknameException;
 import com.dku.council.domain.user.model.DkuUserInfo;
 import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.dto.request.RequestSignupDto;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
+import com.dku.council.domain.user.repository.NicknameFilterRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +30,14 @@ public class SignupService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
+    private final NicknameFilterRepository nicknameFilterRepository;
 
     @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
         DkuUserInfo studentInfo = dkuAuthService.getStudentInfo(signupToken);
 
         checkAlreadyStudentId(studentInfo.getStudentId());
-        checkAlreadyNickname(dto.getNickname());
+        checkNickname(dto.getNickname());
 
         String phone = smsVerificationService.getPhoneNumber(signupToken);
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
@@ -57,9 +60,13 @@ public class SignupService {
         deleteSignupAuths(signupToken);
     }
 
-    public void checkAlreadyNickname(String nickname) {
+    public void checkNickname(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new AlreadyNicknameException();
+        }
+
+        if (nicknameFilterRepository.countMatchedFilter(nickname) > 0) {
+            throw new IllegalNicknameException();
         }
     }
 

@@ -41,7 +41,7 @@ public class ReportService {
     private final MessageSource messageSource;
 
     @Value("${app.report.count}")
-    private final int REPORT_COUNT;
+    private final int reportCountThreshold;
 
     @Transactional
     public void report(Long postId, Long userId, RequestCreateReportDto dto) {
@@ -61,7 +61,7 @@ public class ReportService {
         Report report = dto.toEntity(user, post);
         reportRepository.save(report);
 
-        if (reportRepository.countByPostId(postId) >= REPORT_COUNT) {
+        if (reportRepository.countByPostId(postId) >= reportCountThreshold) {
             post.blind();
         }
     }

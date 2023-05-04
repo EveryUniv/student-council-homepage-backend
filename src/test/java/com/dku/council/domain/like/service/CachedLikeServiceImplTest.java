@@ -208,6 +208,30 @@ class CachedLikeServiceImplTest {
     }
 
     @Test
+    @DisplayName("좋아요 누른 요소 개수 조회")
+    void getCountOfLikedElements() {
+        // given
+        List<LikeEntry> likeEntries = makeLikeEntryList();
+
+        when(persistenceRepository.countByUserId(6L, POST)).thenReturn(10L);
+        when(memoryRepository.getAllLikesAndClear(6L, POST)).thenReturn(likeEntries);
+        when(userRepository.getReferenceById(any()))
+                .thenAnswer(inv -> UserMock.createDummyMajor(inv.getArgument(0)));
+
+        // when
+        Long size = service.getCountOfLikedElements(6L, POST);
+
+        // then
+        assertThat(size).isEqualTo(10);
+        verify(persistenceRepository, times(10)).save(any(LikeElement.class));
+
+        for (int i = 10; i < 20; i++) {
+            Long l = (long) i;
+            verify(persistenceRepository).deleteByElementIdAndUserId(l, 6L, POST);
+        }
+    }
+
+    @Test
     @DisplayName("Memory에 캐시된 좋아요를 DB로 dump")
     void dumpToDB() {
         // given

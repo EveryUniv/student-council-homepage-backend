@@ -160,7 +160,7 @@ public class UserController {
      */
     @GetMapping("/valid")
     public void validNickname(@RequestParam String nickname) {
-        signupService.checkAlreadyNickname(nickname);
+        signupService.checkNickname(nickname);
     }
 
     /**

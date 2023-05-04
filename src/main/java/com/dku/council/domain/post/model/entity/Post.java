@@ -95,6 +95,7 @@ public abstract class Post extends BaseEntity {
 
     public abstract String getDisplayingUsername();
 
+    // TODO size 사용 지양. 테스트 해보기
     public int getReportedCount() {
         return reports.size();
     }
