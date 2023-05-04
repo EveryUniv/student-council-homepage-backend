@@ -69,7 +69,7 @@ public class UserService {
 
     @Transactional
     public ResponseUserInfoDto getUserInfo(Long userId) {
-        User user = findUser(userId);
+        User user = userRepository.findByIdWithMajor(userId).orElseThrow(UserNotFoundException::new);
 
         String year = user.getYearOfAdmission().toString();
         Major major = user.getMajor();

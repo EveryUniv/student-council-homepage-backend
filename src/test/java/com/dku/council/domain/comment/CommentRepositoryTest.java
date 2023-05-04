@@ -137,4 +137,16 @@ class CommentRepositoryTest {
         assertThat(posts1.map(Post::getId)).containsExactlyInAnyOrder(post1.getId(), post2.getId());
         assertThat(posts2.map(Post::getId)).containsExactlyInAnyOrder(post1.getId(), post2.getId(), post3.getId());
     }
+
+    @Test
+    @DisplayName("댓글 작성한 글들 개수 조회 테스트")
+    void countAllCommentedByUserId() {
+        // when
+        Long size1 = repository.countAllCommentedByUserId(user1.getId());
+        Long size2 = repository.countAllCommentedByUserId(user2.getId());
+
+        // then
+        assertThat(size1).isEqualTo(2L);
+        assertThat(size2).isEqualTo(3L);
+    }
 }
