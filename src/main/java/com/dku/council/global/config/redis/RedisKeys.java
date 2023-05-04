@@ -14,7 +14,8 @@ public class RedisKeys {
     public static final String BUS_ARRIVAL_KEY = "busArrival";
 
     public static final String TICKET_EVENTS_KEY = "ticketEvents";
-    public static final String TICKET_CACHE_SET_KEY = "ticketCaches";
+    public static final String TICKET_RESERVATION_SET_KEY = "ticketReservations";
+    public static final String TICKET_NEXT_KEY = "ticketNextId";
     public static final String TICKET_KEY = "ticket";
 
     public static final String SIGNUP_AUTH_KEY = "signupAuth";

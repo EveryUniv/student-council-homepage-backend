@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -127,7 +128,7 @@ class TicketServiceTest {
         when(ticketEventService.findEventById(1L)).thenReturn(event);
         when(infoCacheService.getUserInfo(eq(1L)))
                 .thenReturn(UserInfoMock.create());
-        when(memoryRepository.enroll(1L, 1L)).thenReturn(5);
+        when(memoryRepository.enroll(eq(1L), eq(1L), any())).thenReturn(5);
 
         // when
         ResponseTicketTurnDto result = service.enroll(1L, 1L, DateUtil.toInstant(now));
