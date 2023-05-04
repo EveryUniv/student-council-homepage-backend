@@ -123,7 +123,7 @@ class UserServiceTest {
                 .accessToken("newaccess")
                 .refreshToken("refresh")
                 .build();
-        when(jwtProvider.getAccessTokenFromHeader(null)).thenReturn("access");
+        when(jwtProvider.getAccessTokenFromHeader(any())).thenReturn("access");
         when(jwtProvider.reissue("access", "refresh"))
                 .thenReturn(token);
 
@@ -142,9 +142,9 @@ class UserServiceTest {
         Major major = MajorMock.create();
         User user = UserMock.create(major);
 
-        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-        when(postRepository.countByUserId(user.getId())).thenReturn(1L);
-        when(commentRepository.countByUserId(user.getId())).thenReturn(2L);
+        when(userRepository.findByIdWithMajor(user.getId())).thenReturn(Optional.of(user));
+        when(postRepository.countAllByUserId(user.getId())).thenReturn(1L);
+        when(commentRepository.countAllCommentedByUserId(user.getId())).thenReturn(2L);
         when(likeService.getCountOfLikedElements(user.getId(), POST)).thenReturn(3L);
 
         // when
@@ -159,16 +159,16 @@ class UserServiceTest {
         assertThat(info.getDepartment()).isEqualTo(user.getMajor().getDepartment());
         assertThat(info.isAdmin()).isEqualTo(user.getUserRole().isAdmin());
         assertThat(info.getPhoneNumber()).isEqualTo(user.getPhone());
-        assertThat(info.getWriteCount()).isEqualTo(1);
-        assertThat(info.getCommentCount()).isEqualTo(2);
-        assertThat(info.getLikeCount()).isEqualTo(3);
+        assertThat(info.getWritePostCount()).isEqualTo(1);
+        assertThat(info.getCommentedPostCount()).isEqualTo(2);
+        assertThat(info.getLikedPostCount()).isEqualTo(3);
     }
 
     @Test
     @DisplayName("내 정보 가져오기 실패 - 찾을 수 없는 아이디")
     void failedGetUserInfoByNotFound() {
         // given
-        when(userRepository.findById(0L)).thenReturn(Optional.empty());
+        when(userRepository.findByIdWithMajor(0L)).thenReturn(Optional.empty());
 
         // when
         assertThrows(UserNotFoundException.class, () ->

@@ -23,7 +23,7 @@ public class UserInfoCacheService {
         Instant now = Instant.now();
         return memoryRepository.getUserInfo(userId, now)
                 .orElseGet(() -> {
-                    User user = persistenceRepository.findById(userId)
+                    User user = persistenceRepository.findByIdWithMajor(userId)
                             .orElseThrow(UserNotFoundException::new);
                     UserInfo userInfo = new UserInfo(user);
                     memoryRepository.setUserInfo(userId, userInfo, now);
