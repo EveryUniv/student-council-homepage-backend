@@ -12,16 +12,24 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     /**
-     * ACTIVE상태인 post만 가져옵니다.
+     * ID를 통해 ACTIVE상태인 post를 가져옵니다.
      */
     @Query("select p from Post p where p.id = :id and p.status = 'ACTIVE'")
     Optional<Post> findById(@Param("id") Long id);
 
     /**
-     * ACTIVE상태인 post만 가져옵니다.
+     * UserID를 통해 ACTIVE상태인 post를 가져옵니다.
      */
     @Query("select p from Post p where p.user.id=:userId and p.status='ACTIVE'")
     Page<Post> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * ID를 통해 ACTIVE상태인 post를 가져옵니다.
+     */
+    @Query("select p from Post p " +
+            "where p.id in (:ids) " +
+            "and p.status='ACTIVE'")
+    Page<Post> findPageById(@Param("ids") Iterable<Long> ids, Pageable pageable);
 
     /**
      * 활성화 여부와 상관없이 게시글을 가져옵니다. 관리자만 사용할 수 있습니다.

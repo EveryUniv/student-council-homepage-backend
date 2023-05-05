@@ -9,13 +9,9 @@ import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.infra.nhn.service.ObjectUploadContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 // TODO Test it
 @Service
@@ -37,10 +33,8 @@ public class MyPostService {
     @Transactional
     public Page<SummarizedGenericPostDto> listMyLikedPosts(Long userId, Pageable pageable, int bodySize) {
         Page<Long> likedPosts = likeService.getLikedElementIds(userId, pageable, LikeTarget.POST);
-        List<SummarizedGenericPostDto> posts = postRepository.findAllById(likedPosts.getContent()).stream()
-                .map(post -> mapToListDto(post, bodySize))
-                .collect(Collectors.toList());
-        return new PageImpl<>(posts, pageable, likedPosts.getTotalElements());
+        return postRepository.findPageById(likedPosts.getContent(), pageable)
+                .map(post -> mapToListDto(post, bodySize));
     }
 
     @Transactional(readOnly = true)
