@@ -25,44 +25,44 @@ public class PostPageService {
     private final PetitionRepository petitionRepository;
     private final GeneralForumRepository generalForumRepository;
 
-    public Page<PostPageDto> list(String keyword, String type, String status, Pageable pageable){
-        if(type == null || type.equals("null")){
-            Specification<Post> spec = PostSpec.withTitleOrBody(keyword);
-            spec = spec.and(PostSpec.withStatus(status));
-            return genericPostRepository.findAll(spec, pageable).map(PostPageDto::new);
-        }else if(type.equals("Voc")){
-            Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
-            spec = spec.and(PostSpec.withStatus(status));
-            return vocRepository.findAll(spec, pageable).map(PostPageDto::new);
-        }else if(type.equals("Petition")){
-            Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
-            spec = spec.and(PostSpec.withStatus(status));
-            return petitionRepository.findAll(spec, pageable).map(PostPageDto::new);
-        }else if(type.equals("GeneralForum")){
-            Specification<GeneralForum> spec = PostSpec.withTitleOrBody(keyword);
-            spec = spec.and(PostSpec.withStatus(status));
-            return generalForumRepository.findAll(spec, pageable).map(PostPageDto::new);
-        }else{
-            Specification<Post> spec = PostSpec.withTitleOrBody(keyword);
-            spec = spec.and(PostSpec.withStatus(status));
-            return genericPostRepository.findAll(spec, pageable).map(PostPageDto::new);
+    // TODO 코드를 리팩토링하자..
+    public Page<PostPageDto> list(String keyword, String type, String status, Pageable pageable) {
+        if (type != null) {
+            if (type.equalsIgnoreCase("Voc")) {
+                Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
+                spec = spec.and(PostSpec.withStatus(status));
+                return vocRepository.findAll(spec, pageable).map(PostPageDto::new);
+            } else if (type.equalsIgnoreCase("Petition")) {
+                Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
+                spec = spec.and(PostSpec.withStatus(status));
+                return petitionRepository.findAll(spec, pageable).map(PostPageDto::new);
+            } else if (type.equalsIgnoreCase("GeneralForum")) {
+                Specification<GeneralForum> spec = PostSpec.withTitleOrBody(keyword);
+                spec = spec.and(PostSpec.withStatus(status));
+                return generalForumRepository.findAll(spec, pageable).map(PostPageDto::new);
+            }
         }
+
+        Specification<Post> spec = PostSpec.withTitleOrBody(keyword);
+        spec = spec.and(PostSpec.withStatus(status));
+        return genericPostRepository.findAll(spec, pageable).map(PostPageDto::new);
     }
 
-    public Post findOne(Long id){
+    public Post findOne(Long id) {
         return postRepository.findByIdWithAdmin(id).orElseThrow(PostNotFoundException::new);
     }
 
-    public void delete(Long id){
+    public void delete(Long id) {
         Post post = findOne(id);
         post.markAsDeleted(true);
     }
 
-    public void blind(Long id){
+    public void blind(Long id) {
         Post post = findOne(id);
         post.blind();
     }
-    public void active(Long id){
+
+    public void active(Long id) {
         Post post = findOne(id);
         post.unblind();
     }

@@ -43,7 +43,6 @@ public class PostPageController {
     @GetMapping("/{postId}")
     public String post(Model model, @PathVariable Long postId) {
         Post post = service.findOne(postId);
-        System.out.println(post.getUser().getName());
         model.addAttribute("post", post);
         return "page/post/post";
     }

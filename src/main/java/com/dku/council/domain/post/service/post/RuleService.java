@@ -20,9 +20,9 @@ public class RuleService {
     private final RuleRepository repository;
 
 
-    public Page<SummarizedRuleDto> list(String keyword, Pageable pageable, int bodySize, UserRole role) {
+    public Page<SummarizedRuleDto> list(String keyword, Pageable pageable, int bodySize) {
         Specification<Rule> spec = PostSpec.withTitleOrBody(keyword);
-        return postService.list(repository, spec, pageable, bodySize, role, SummarizedRuleDto::new);
+        return postService.list(repository, spec, pageable, bodySize, SummarizedRuleDto::new);
     }
 
     public Long create(Long userId, RequestCreateRuleDto request) {

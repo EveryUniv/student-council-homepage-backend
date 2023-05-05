@@ -52,14 +52,14 @@ class UserFindServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private UserInfoCacheService userInfoCacheService;
+    private UserInfoService userInfoService;
 
     private UserFindService service;
 
     @BeforeEach
     void setUp() {
         service = new UserFindService(clock, smsService, userRepository, userFindRepository,
-                userInfoCacheService, messageSource, passwordEncoder, 6);
+                userInfoService, messageSource, passwordEncoder, 6);
     }
 
 
@@ -161,7 +161,7 @@ class UserFindServiceTest {
         // then
         assertThat(user.getPassword()).isEqualTo("encodedPassword");
         verify(userFindRepository).deleteAuthCode(token);
-        verify(userInfoCacheService).invalidateUserInfo(user.getId());
+        verify(userInfoService).invalidateUserInfo(user.getId());
     }
 
     @Test
@@ -227,7 +227,7 @@ class UserFindServiceTest {
 
         // then
         assertThat(user.getPhone()).isEqualTo(newPhone);
-        verify(userInfoCacheService).invalidateUserInfo(user.getId());
+        verify(userInfoService).invalidateUserInfo(user.getId());
     }
 
     @Test

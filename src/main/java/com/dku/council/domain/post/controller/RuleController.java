@@ -7,9 +7,7 @@ import com.dku.council.domain.post.model.dto.response.ResponseSingleGenericPostD
 import com.dku.council.domain.post.service.post.RuleService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
-import com.dku.council.global.auth.role.GuestAuth;
 import com.dku.council.global.auth.role.UserAuth;
-import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import com.dku.council.global.util.RemoteAddressUtil;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,12 +37,10 @@ public class RuleController {
      * @return 페이징된 회칙 목록
      */
     @GetMapping
-    @GuestAuth
-    public ResponsePage<SummarizedRuleDto> list(AppAuthentication auth,
-                                                @RequestParam(required = false) String keyword,
+    public ResponsePage<SummarizedRuleDto> list(@RequestParam(required = false) String keyword,
                                                 @RequestParam(defaultValue = "50") int bodySize,
                                                 @ParameterObject Pageable pageable) {
-        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize, UserRole.from(auth));
+        Page<SummarizedRuleDto> list = postService.list(keyword, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

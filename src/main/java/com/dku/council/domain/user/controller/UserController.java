@@ -4,10 +4,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
-import com.dku.council.domain.user.service.MyPostService;
-import com.dku.council.domain.user.service.SignupService;
-import com.dku.council.domain.user.service.UserFindService;
-import com.dku.council.domain.user.service.UserService;
+import com.dku.council.domain.user.service.*;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +25,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserInfoService userInfoService;
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
@@ -40,7 +38,7 @@ public class UserController {
     @GetMapping
     @UserAuth
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
-        return userService.getUserInfo(auth.getUserId());
+        return userInfoService.getFullUserInfo(auth.getUserId());
     }
 
     /**
@@ -193,19 +191,6 @@ public class UserController {
     @GetMapping("/major")
     public List<ResponseMajorDto> getAllMajors() {
         return userService.getAllMajors();
-    }
-
-    /**
-     * 내가 쓴 글 모두 조회하기
-     */
-    @GetMapping("/post")
-    @UserAuth
-    public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
-                                                              @ParameterObject Pageable pageable,
-                                                              @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedGenericPostDto> posts =
-                myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
-        return new ResponsePage<>(posts);
     }
 
     /**

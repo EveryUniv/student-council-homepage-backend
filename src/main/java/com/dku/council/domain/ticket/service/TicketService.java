@@ -10,7 +10,7 @@ import com.dku.council.domain.ticket.repository.TicketRepository;
 import com.dku.council.domain.user.exception.NotAttendingException;
 import com.dku.council.domain.user.model.AcademicStatus;
 import com.dku.council.domain.user.model.UserInfo;
-import com.dku.council.domain.user.service.UserInfoCacheService;
+import com.dku.council.domain.user.service.UserInfoService;
 import com.dku.council.global.util.DateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class TicketService {
     private final TicketRepository persistenceRepository;
     private final TicketMemoryRepository memoryRepository;
     private final TicketEventService ticketEventService;
-    private final UserInfoCacheService userInfoCacheService;
+    private final UserInfoService userInfoService;
 
     @Transactional(readOnly = true)
     public ResponseTicketTurnDto myReservationOrder(Long userId, Long ticketEventId) {
@@ -50,7 +50,7 @@ public class TicketService {
             throw new InvalidTicketPeriodException();
         }
 
-        UserInfo userInfo = userInfoCacheService.getUserInfo(userId);
+        UserInfo userInfo = userInfoService.getUserInfo(userId);
         if (!userInfo.getAcademicStatus().equals(AcademicStatus.ATTENDING.getLabel())) {
             throw new NotAttendingException();
         }

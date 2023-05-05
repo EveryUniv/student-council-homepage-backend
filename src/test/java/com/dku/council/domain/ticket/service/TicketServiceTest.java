@@ -9,7 +9,7 @@ import com.dku.council.domain.ticket.repository.TicketMemoryRepository;
 import com.dku.council.domain.ticket.repository.TicketRepository;
 import com.dku.council.domain.user.exception.NotAttendingException;
 import com.dku.council.domain.user.model.entity.User;
-import com.dku.council.domain.user.service.UserInfoCacheService;
+import com.dku.council.domain.user.service.UserInfoService;
 import com.dku.council.global.util.DateUtil;
 import com.dku.council.mock.TicketEventMock;
 import com.dku.council.mock.UserInfoMock;
@@ -47,7 +47,7 @@ class TicketServiceTest {
     private TicketEventService ticketEventService;
 
     @Mock
-    private UserInfoCacheService infoCacheService;
+    private UserInfoService infoCacheService;
 
     @InjectMocks
     private TicketService service;

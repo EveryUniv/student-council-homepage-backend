@@ -25,18 +25,18 @@ public class VocService {
     private final VocRepository repository;
 
 
-    public Page<SummarizedVocDto> list(String keyword, List<Long> tagIds, Pageable pageable, int bodySize, UserRole role) {
+    public Page<SummarizedVocDto> list(String keyword, List<Long> tagIds, Pageable pageable, int bodySize) {
         Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        return postService.list(repository, spec, pageable, bodySize, role, SummarizedVocDto::new);
+        return postService.list(repository, spec, pageable, bodySize, SummarizedVocDto::new);
     }
 
     public Page<SummarizedVocDto> listMine(String keyword, List<Long> tagIds, Long userId, Pageable pageable,
-                                           int bodySize, UserRole role) {
+                                           int bodySize) {
         Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
         spec = spec.and(PostSpec.withAuthor(userId));
-        return postService.list(repository, spec, pageable, bodySize, role, SummarizedVocDto::new);
+        return postService.list(repository, spec, pageable, bodySize, SummarizedVocDto::new);
     }
 
     public ResponseVocDto findOne(Long postId, Long userId, UserRole role, String address) {

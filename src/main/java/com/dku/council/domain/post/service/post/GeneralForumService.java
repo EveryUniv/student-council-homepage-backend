@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -48,10 +49,10 @@ public class GeneralForumService {
     }
 
     public Page<SummarizedGenericPostDto> list(String keyword, List<Long> tagIds, Pageable pageable,
-                                               int bodySize, UserRole role) {
+                                               int bodySize) {
         Specification<GeneralForum> spec = PostSpec.withTags(tagIds);
         spec = spec.and(PostSpec.withTitleOrBody(keyword));
-        return postService.list(repository, spec, pageable, bodySize, role);
+        return postService.list(repository, spec, pageable, bodySize);
     }
 
     public ResponseGeneralForumDto findOne(Long id, Long userId, UserRole role, String address) {
@@ -68,5 +69,11 @@ public class GeneralForumService {
 
     public void unblind(Long id) {
         postService.unblind(repository, id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SummarizedGenericPostDto> listMyPosts(Long userId, Pageable pageable, int bodySize) {
+        return repository.findAllByUserId(userId, pageable)
+                .map(post -> postService.makeListDto(bodySize, post));
     }
 }
