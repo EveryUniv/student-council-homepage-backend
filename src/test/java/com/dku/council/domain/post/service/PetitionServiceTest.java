@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -192,5 +193,31 @@ public class PetitionServiceTest {
         } catch (PostNotFoundException ignored) {
         }
         verify(postTimeMemoryRepository, never()).put(PETITION_KEY, 1L, writeCooltime, now);
+    }
+
+    @Test
+    @DisplayName("내 게시글 가져오기")
+    public void listMyPosts() {
+        // given
+        List<Petition> allPostList = PetitionMock.createListDummy("petition-", 20);
+        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
+
+        when(repository.findAllByUserId(eq(1L), any())).thenReturn(allPost);
+
+        // when
+        Page<SummarizedPetitionDto> allPage = petitionService.listMyPosts(1L, Pageable.unpaged(), 100);
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedPetitionDto dto = allPage.getContent().get(i);
+            Petition post = allPostList.get(i);
+            assertThat(dto.getId()).isEqualTo(post.getId());
+            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
+            assertThat(dto.getBody()).isEqualTo(post.getBody());
+            assertThat(dto.getAgreeCount()).isEqualTo(0);
+            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
+            assertThat(dto.getViews()).isEqualTo(post.getViews());
+        }
     }
 }

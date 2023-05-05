@@ -2,12 +2,14 @@ package com.dku.council.domain.post.service;
 
 import com.dku.council.domain.post.exception.PostCooltimeException;
 import com.dku.council.domain.post.exception.PostNotFoundException;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreateGeneralForumDto;
 import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
 import com.dku.council.domain.post.repository.PostTimeMemoryRepository;
 import com.dku.council.domain.post.repository.post.GeneralForumRepository;
 import com.dku.council.domain.post.service.post.GeneralForumService;
 import com.dku.council.domain.post.service.post.GenericPostService;
+import com.dku.council.mock.GeneralForumMock;
 import com.dku.council.util.ClockUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -104,5 +108,29 @@ class GeneralForumServiceTest {
         } catch (PostNotFoundException ignored) {
         }
         verify(postTimeMemoryRepository, never()).put(GENERAL_FORUM_KEY, 1L, writeCooltime, now);
+    }
+
+    @Test
+    @DisplayName("내 게시글 가져오기")
+    public void listMyPosts() {
+        // given
+        List<GeneralForum> allPostList = GeneralForumMock.createListDummy("general-", 20);
+        Page<GeneralForum> allPost = new DummyPage<>(allPostList, 20);
+
+        when(repository.findAllByUserId(eq(1L), any())).thenReturn(allPost);
+
+        // when
+        Page<SummarizedGenericPostDto> allPage = generalForumService.listMyPosts(1L, Pageable.unpaged(), 100);
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
+        for (int i = 0; i < allPage.getTotalElements(); i++) {
+            SummarizedGenericPostDto dto = allPage.getContent().get(i);
+            GeneralForum post = allPostList.get(i);
+            assertThat(dto.getId()).isEqualTo(post.getId());
+            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
+            assertThat(dto.getBody()).isEqualTo(post.getBody());
+            assertThat(dto.getViews()).isEqualTo(post.getViews());
+        }
     }
 }

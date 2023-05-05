@@ -18,12 +18,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findById(@Param("id") Long id);
 
     /**
-     * UserID를 통해 ACTIVE상태인 post를 가져옵니다.
-     */
-    @Query("select p from Post p where p.user.id=:userId and p.status='ACTIVE'")
-    Page<Post> findAllByUserId(@Param("userId") Long userId, Pageable pageable);
-
-    /**
      * ID를 통해 ACTIVE상태인 post를 가져옵니다.
      */
     @Query("select p from Post p " +
@@ -46,7 +40,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     /**
      * user 가 작성한 게시글의 총 목록의 갯수를 가져옵니다.
      */
-    @Query("select count(*) from Post p where p.user.id=:userId and p.status='ACTIVE'")
+    @Query("select count(*) from GeneralForum g, Petition p " +
+            "where p.user.id=:userId and p.status='ACTIVE' " +
+            "and g.user.id=:userId and g.status='ACTIVE'")
     Long countAllByUserId(@Param("userId") Long userId);
 
 }

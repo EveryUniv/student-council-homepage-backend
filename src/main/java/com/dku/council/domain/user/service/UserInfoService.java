@@ -23,9 +23,9 @@ public class UserInfoService {
 
     private final UserRepository persistenceRepository;
     private final UserInfoMemoryRepository memoryRepository;
-    private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeService likeService;
+    private final PostRepository postRepository;
 
 
     @Transactional

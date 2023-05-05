@@ -58,6 +58,19 @@ public class PetitionController {
     }
 
     /**
+     * 내가 쓴 글 조회
+     */
+    @GetMapping("/my")
+    @UserAuth
+    public ResponsePage<SummarizedPetitionDto> listMyPosts(AppAuthentication auth,
+                                                           @ParameterObject Pageable pageable,
+                                                           @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedPetitionDto> posts =
+                petitionService.listMyPosts(auth.getUserId(), pageable, bodySize);
+        return new ResponsePage<>(posts);
+    }
+
+    /**
      * 게시글 등록
      *
      * @return 생성된 게시글 id

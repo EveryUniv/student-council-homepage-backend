@@ -58,6 +58,19 @@ public class GeneralForumController {
     }
 
     /**
+     * 내가 쓴 글 조회
+     */
+    @GetMapping("/my")
+    @UserAuth
+    public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
+                                                              @ParameterObject Pageable pageable,
+                                                              @RequestParam(defaultValue = "50") int bodySize) {
+        Page<SummarizedGenericPostDto> posts =
+                forumService.listMyPosts(auth.getUserId(), pageable, bodySize);
+        return new ResponsePage<>(posts);
+    }
+
+    /**
      * 게시글 등록
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

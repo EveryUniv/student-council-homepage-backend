@@ -24,12 +24,6 @@ public class MyPostService {
     private final CommentRepository commentRepository;
 
 
-    @Transactional(readOnly = true)
-    public Page<SummarizedGenericPostDto> listMyPosts(Long userId, Pageable pageable, int bodySize) {
-        return postRepository.findAllByUserId(userId, pageable)
-                .map(post -> mapToListDto(post, bodySize));
-    }
-
     @Transactional
     public Page<SummarizedGenericPostDto> listMyLikedPosts(Long userId, Pageable pageable, int bodySize) {
         Page<Long> likedPosts = likeService.getLikedElementIds(userId, pageable, LikeTarget.POST);

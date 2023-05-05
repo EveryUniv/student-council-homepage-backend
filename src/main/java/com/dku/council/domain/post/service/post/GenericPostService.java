@@ -77,7 +77,7 @@ public class GenericPostService<E extends Post> {
         return repository.findAll(spec, pageable);
     }
 
-    private SummarizedGenericPostDto makeListDto(int bodySize, E post) {
+    protected SummarizedGenericPostDto makeListDto(int bodySize, E post) {
         int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
         return new SummarizedGenericPostDto(uploadContext, bodySize, likes, post);
     }

@@ -194,19 +194,6 @@ public class UserController {
     }
 
     /**
-     * 내가 쓴 글 모두 조회하기
-     */
-    @GetMapping("/post")
-    @UserAuth
-    public ResponsePage<SummarizedGenericPostDto> listMyPosts(AppAuthentication auth,
-                                                              @ParameterObject Pageable pageable,
-                                                              @RequestParam(defaultValue = "50") int bodySize) {
-        Page<SummarizedGenericPostDto> posts =
-                myPostService.listMyPosts(auth.getUserId(), pageable, bodySize);
-        return new ResponsePage<>(posts);
-    }
-
-    /**
      * 내가 댓글 단 글들 모두 조회하기
      */
     @GetMapping("/post/commented")
