@@ -72,7 +72,5 @@ class ActualDkuStudentServiceTest {
         } catch (DkuFailedCrawlingException e) {
             duesStatus = StudentDuesStatus.NOT_PAID;
         }
-
-        System.out.println(duesStatus);
     }
 }

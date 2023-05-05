@@ -97,9 +97,7 @@ public class CaptchaService {
     private void handleResponseError(WebClientResponseException e) {
         String body = e.getResponseBodyAsString();
         try {
-            System.out.println("TRY");
             ResponseError error = objectMapper.readValue(body, ResponseError.class);
-            System.out.println(error.getErrorCode());
             switch (error.getErrorCode()) {
                 case "CT001":
                     throw new InvalidCaptchaKeyException();

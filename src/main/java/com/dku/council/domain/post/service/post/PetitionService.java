@@ -52,11 +52,11 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds, PetitionStatus status,
-                                                    int bodySize, Pageable pageable, UserRole role) {
+                                                    int bodySize, Pageable pageable) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
-        return postService.list(repository, spec, pageable, bodySize, role, (dto, post) ->
+        return postService.list(repository, spec, pageable, bodySize, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
