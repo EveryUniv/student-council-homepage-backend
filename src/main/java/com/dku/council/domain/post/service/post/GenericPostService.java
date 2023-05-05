@@ -51,15 +51,15 @@ public class GenericPostService<E extends Post> {
 
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> list(GenericPostRepository<E> repository, Specification<E> spec,
-                                               Pageable pageable, int bodySize, UserRole role) {
-        Page<E> result = list(repository, spec, pageable, role);
+                                               Pageable pageable, int bodySize) {
+        Page<E> result = list(repository, spec, pageable);
         return result.map((post) -> makeListDto(bodySize, post));
     }
 
     @Transactional(readOnly = true)
     public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
-                            UserRole role, PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
-        Page<E> result = list(repository, spec, pageable, role);
+                            PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
+        Page<E> result = list(repository, spec, pageable);
 
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
@@ -67,21 +67,17 @@ public class GenericPostService<E extends Post> {
         });
     }
 
-    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, UserRole role) {
+    private Page<E> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable) {
         if (spec == null) {
             spec = Specification.where(null);
         }
 
-        if (role.isAdmin()) {
-            spec = spec.and(PostSpec.withActiveOrBlinded());
-        } else {
-            spec = spec.and(PostSpec.withActive());
-        }
+        spec = spec.and(PostSpec.withActive());
 
         return repository.findAll(spec, pageable);
     }
 
-    private SummarizedGenericPostDto makeListDto(int bodySize, E post) {
+    public SummarizedGenericPostDto makeListDto(int bodySize, E post) {
         int likes = likeService.getCountOfLikes(post.getId(), LikeTarget.POST);
         return new SummarizedGenericPostDto(uploadContext, bodySize, likes, post);
     }

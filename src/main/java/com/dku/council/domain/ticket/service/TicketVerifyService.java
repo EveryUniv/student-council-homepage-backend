@@ -7,7 +7,7 @@ import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.repository.TicketRepository;
 import com.dku.council.domain.user.model.UserInfo;
-import com.dku.council.domain.user.service.UserInfoCacheService;
+import com.dku.council.domain.user.service.UserInfoService;
 import com.dku.council.domain.user.util.CodeGenerator;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ import java.util.Locale;
 public class TicketVerifyService {
 
     private final TicketRepository persistenceRepository;
-    private final UserInfoCacheService userInfoCacheService;
+    private final UserInfoService userInfoService;
     private final SMSService smsService;
     private final MessageSource messageSource;
 
@@ -47,7 +47,7 @@ public class TicketVerifyService {
             throw new NoTicketException();
         }
 
-        UserInfo userInfo = userInfoCacheService.getUserInfo(userId);
+        UserInfo userInfo = userInfoService.getUserInfo(userId);
         return makeTicketDto(userInfo, ticket);
     }
 
@@ -55,7 +55,7 @@ public class TicketVerifyService {
     public ResponseManagerTicketDto getTicketInfo(Long ticketId) {
         Ticket ticket = findTicket(ticketId);
 
-        UserInfo userInfo = userInfoCacheService.getUserInfo(ticket.getUser().getId());
+        UserInfo userInfo = userInfoService.getUserInfo(ticket.getUser().getId());
         ResponseTicketDto dto = makeTicketDto(userInfo, ticket);
 
         String authCode = "";
@@ -91,7 +91,7 @@ public class TicketVerifyService {
     public String resendSms(Long ticketId) {
         Ticket ticket = findTicket(ticketId);
 
-        UserInfo userInfo = userInfoCacheService.getUserInfo(ticket.getUser().getId());
+        UserInfo userInfo = userInfoService.getUserInfo(ticket.getUser().getId());
         return sendSms(userInfo.getPhone());
     }
 

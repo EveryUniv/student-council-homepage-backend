@@ -3,6 +3,7 @@ package com.dku.council.domain.post.service.post;
 import com.dku.council.domain.post.exception.DuplicateAgreementException;
 import com.dku.council.domain.post.exception.PostCooltimeException;
 import com.dku.council.domain.post.model.PetitionStatus;
+import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.list.SummarizedPetitionDto;
 import com.dku.council.domain.post.model.dto.request.RequestCreatePetitionDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePetitionDto;
@@ -52,11 +53,11 @@ public class PetitionService {
 
     @Transactional(readOnly = true)
     public Page<SummarizedPetitionDto> listPetition(String keyword, List<Long> tagIds, PetitionStatus status,
-                                                    int bodySize, Pageable pageable, UserRole role) {
+                                                    int bodySize, Pageable pageable) {
         Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
-        return postService.list(repository, spec, pageable, bodySize, role, (dto, post) ->
+        return postService.list(repository, spec, pageable, bodySize, (dto, post) ->
                 new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
     }
 
@@ -116,5 +117,14 @@ public class PetitionService {
 
     public void unblind(Long id) {
         postService.unblind(repository, id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SummarizedPetitionDto> listMyPosts(Long userId, Pageable pageable, int bodySize) {
+        return repository.findAllByUserId(userId, pageable)
+                .map(post -> {
+                    SummarizedGenericPostDto dto = postService.makeListDto(bodySize, post);
+                    return new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()));
+                });
     }
 }

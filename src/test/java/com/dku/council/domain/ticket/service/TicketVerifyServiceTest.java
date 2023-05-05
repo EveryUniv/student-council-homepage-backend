@@ -6,7 +6,7 @@ import com.dku.council.domain.ticket.model.dto.response.ResponseTicketDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
 import com.dku.council.domain.ticket.repository.TicketRepository;
 import com.dku.council.domain.user.model.UserInfo;
-import com.dku.council.domain.user.service.UserInfoCacheService;
+import com.dku.council.domain.user.service.UserInfoService;
 import com.dku.council.infra.nhn.service.SMSService;
 import com.dku.council.mock.TicketMock;
 import com.dku.council.mock.UserInfoMock;
@@ -35,7 +35,7 @@ class TicketVerifyServiceTest {
     private TicketRepository persistenceRepository;
 
     @Mock
-    private UserInfoCacheService userInfoCacheService;
+    private UserInfoService userInfoService;
 
     @Mock
     private SMSService smsService;
@@ -49,7 +49,7 @@ class TicketVerifyServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        service = new TicketVerifyService(persistenceRepository, userInfoCacheService,
+        service = new TicketVerifyService(persistenceRepository, userInfoService,
                 smsService, messageSource, DIGIT_COUNT, true);
     }
 
@@ -62,7 +62,7 @@ class TicketVerifyServiceTest {
         UserInfo info = UserInfoMock.create();
         when(persistenceRepository.findByUserIdAndEventId(1L, 1L))
                 .thenReturn(Optional.of(ticket));
-        when(userInfoCacheService.getUserInfo(1L))
+        when(userInfoService.getUserInfo(1L))
                 .thenReturn(info);
 
         // when
@@ -109,7 +109,7 @@ class TicketVerifyServiceTest {
         UserInfo info = UserInfoMock.create();
         Ticket ticket = TicketMock.createDummyIssuable();
 
-        when(userInfoCacheService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
+        when(userInfoService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
         when(persistenceRepository.findById(1L)).thenReturn(Optional.of(ticket));
         when(messageSource.getMessage(eq("sms.auth-message"), Mockito.any(), Mockito.any()))
                 .thenReturn("test");
@@ -136,7 +136,7 @@ class TicketVerifyServiceTest {
         Ticket ticket = TicketMock.createDummyIssuable();
         ticket.markAsIssued();
 
-        when(userInfoCacheService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
+        when(userInfoService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
         when(persistenceRepository.findById(1L)).thenReturn(Optional.of(ticket));
 
         // when
@@ -161,7 +161,7 @@ class TicketVerifyServiceTest {
         UserInfo info = UserInfoMock.create();
 
         when(persistenceRepository.findById(1L)).thenReturn(Optional.of(ticket));
-        when(userInfoCacheService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
+        when(userInfoService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
         when(messageSource.getMessage(eq("sms.auth-message"), Mockito.any(), Mockito.any()))
                 .thenReturn("test");
 
