@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserInfoCacheServiceTest {
+class UserInfoServiceTest {
 
     @Mock
     private UserRepository persistenceRepository;
@@ -30,7 +30,7 @@ class UserInfoCacheServiceTest {
     private UserInfoMemoryRepository memoryRepository;
 
     @InjectMocks
-    private UserInfoCacheService service;
+    private UserInfoService service;
 
 
     @Test

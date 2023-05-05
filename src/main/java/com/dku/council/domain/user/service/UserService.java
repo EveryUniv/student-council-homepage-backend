@@ -39,7 +39,7 @@ public class UserService {
 
     private final MajorRepository majorRepository;
     private final UserRepository userRepository;
-    private final UserInfoCacheService userInfoCacheService;
+    private final UserInfoService userInfoService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
@@ -54,7 +54,7 @@ public class UserService {
 
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             AuthenticationToken token = jwtProvider.issue(user);
-            userInfoCacheService.cacheUserInfo(user.getId(), user);
+            userInfoService.cacheUserInfo(user.getId(), user);
             return new ResponseLoginDto(token);
         } else {
             throw new WrongPasswordException();
@@ -96,7 +96,7 @@ public class UserService {
         User user = findUser(userId);
         checkAlreadyNickname(dto.getNickname());
         user.changeNickName(dto.getNickname());
-        userInfoCacheService.invalidateUserInfo(userId);
+        userInfoService.invalidateUserInfo(userId);
     }
 
     @Transactional
@@ -105,7 +105,7 @@ public class UserService {
         if (passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             String encodedPassword = passwordEncoder.encode(dto.getNewPassword());
             user.changePassword(encodedPassword);
-            userInfoCacheService.invalidateUserInfo(userId);
+            userInfoService.invalidateUserInfo(userId);
         } else {
             throw new WrongPasswordException();
         }
@@ -115,14 +115,14 @@ public class UserService {
     public void activateUser(Long userId) {
         User user = findUser(userId);
         user.changeStatus(UserStatus.ACTIVE);
-        userInfoCacheService.invalidateUserInfo(userId);
+        userInfoService.invalidateUserInfo(userId);
     }
 
     @Transactional
     public void deactivateUser(Long userId) {
         User user = findUser(userId);
         user.changeStatus(UserStatus.INACTIVE);
-        userInfoCacheService.invalidateUserInfo(userId);
+        userInfoService.invalidateUserInfo(userId);
     }
 
     private User findUser(Long userId) {

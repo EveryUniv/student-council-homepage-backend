@@ -35,7 +35,7 @@ public class DKUAuthService {
     private final DkuStudentService crawlerService;
     private final DkuAuthenticationService authenticationService;
     private final UserRepository userRepository;
-    private final UserInfoCacheService userInfoCacheService;
+    private final UserInfoService userInfoService;
     private final SignupAuthRepository dkuAuthRepository;
     private final MajorRepository majorRepository;
 
@@ -107,7 +107,7 @@ public class DKUAuthService {
                 info.getYearOfAdmission(),
                 info.getStudentState());
 
-        userInfoCacheService.invalidateUserInfo(userId);
+        userInfoService.invalidateUserInfo(userId);
         return new ResponseScrappedStudentInfoDto(info);
     }
 

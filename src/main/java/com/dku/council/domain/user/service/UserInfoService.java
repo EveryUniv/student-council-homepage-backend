@@ -13,7 +13,7 @@ import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
-public class UserInfoCacheService {
+public class UserInfoService {
 
     private final UserRepository persistenceRepository;
     private final UserInfoMemoryRepository memoryRepository;

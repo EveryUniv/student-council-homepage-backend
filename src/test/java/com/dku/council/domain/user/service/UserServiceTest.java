@@ -46,7 +46,7 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private UserInfoCacheService cacheService;
+    private UserInfoService cacheService;
 
     @Mock
     private PostRepository postRepository;
