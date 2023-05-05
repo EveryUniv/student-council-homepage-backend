@@ -4,10 +4,7 @@ import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.user.model.dto.request.*;
 import com.dku.council.domain.user.model.dto.response.*;
-import com.dku.council.domain.user.service.MyPostService;
-import com.dku.council.domain.user.service.SignupService;
-import com.dku.council.domain.user.service.UserFindService;
-import com.dku.council.domain.user.service.UserService;
+import com.dku.council.domain.user.service.*;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserAuth;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,6 +25,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserInfoService userInfoService;
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
@@ -40,7 +38,7 @@ public class UserController {
     @GetMapping
     @UserAuth
     public ResponseUserInfoDto getMyInfo(AppAuthentication auth) {
-        return userService.getUserInfo(auth.getUserId());
+        return userInfoService.getFullUserInfo(auth.getUserId());
     }
 
     /**

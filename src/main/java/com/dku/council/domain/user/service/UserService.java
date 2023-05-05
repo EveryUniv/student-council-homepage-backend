@@ -1,9 +1,5 @@
 package com.dku.council.domain.user.service;
 
-import com.dku.council.domain.comment.repository.CommentRepository;
-import com.dku.council.domain.like.model.LikeTarget;
-import com.dku.council.domain.like.service.LikeService;
-import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
@@ -13,8 +9,6 @@ import com.dku.council.domain.user.model.dto.request.RequestNickNameChangeDto;
 import com.dku.council.domain.user.model.dto.response.ResponseLoginDto;
 import com.dku.council.domain.user.model.dto.response.ResponseMajorDto;
 import com.dku.council.domain.user.model.dto.response.ResponseRefreshTokenDto;
-import com.dku.council.domain.user.model.dto.response.ResponseUserInfoDto;
-import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.UserRepository;
@@ -43,10 +37,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
 
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final LikeService likeService;
-
 
     public ResponseLoginDto login(RequestLoginDto dto) {
         User user = userRepository.findByStudentId(dto.getStudentId())
@@ -65,24 +55,6 @@ public class UserService {
         String accessToken = jwtProvider.getAccessTokenFromHeader(request);
         AuthenticationToken token = jwtProvider.reissue(accessToken, refreshToken);
         return new ResponseRefreshTokenDto(token);
-    }
-
-    @Transactional
-    public ResponseUserInfoDto getUserInfo(Long userId) {
-        User user = userRepository.findByIdWithMajor(userId).orElseThrow(UserNotFoundException::new);
-
-        String year = user.getYearOfAdmission().toString();
-        Major major = user.getMajor();
-        String phoneNumber = user.getPhone();
-
-        Long writePostCount = postRepository.countAllByUserId(userId);
-        Long commentedPostCount = commentRepository.countAllCommentedByUserId(userId);
-        Long likedPostCount = likeService.getCountOfLikedElements(userId, LikeTarget.POST);
-
-        return new ResponseUserInfoDto(user.getStudentId(), user.getName(),
-                user.getNickname(), year, major.getName(), major.getDepartment(),
-                phoneNumber, writePostCount, commentedPostCount, likedPostCount,
-                user.getUserRole().isAdmin());
     }
 
     public List<ResponseMajorDto> getAllMajors() {
