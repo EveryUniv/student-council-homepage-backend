@@ -51,7 +51,7 @@ public class GenericPostService<E extends Post> {
 
     @Transactional(readOnly = true)
     public Page<SummarizedGenericPostDto> list(GenericPostRepository<E> repository, Specification<E> spec,
-                                               Pageable pageable, int bodySize, UserRole role) {
+                                               Pageable pageable, int bodySize) {
         Page<E> result = list(repository, spec, pageable);
         return result.map((post) -> makeListDto(bodySize, post));
     }
