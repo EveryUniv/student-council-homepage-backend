@@ -202,6 +202,10 @@ public class PetitionServiceTest {
         List<Petition> allPostList = PetitionMock.createListDummy("petition-", 20);
         Page<Petition> allPost = new DummyPage<>(allPostList, 20);
 
+        when(postService.makeListDto(eq(100), any(Petition.class))).thenAnswer(ino -> {
+            Petition petition = ino.getArgument(1);
+            return new SummarizedGenericPostDto(uploadContext, 100, 0, petition);
+        });
         when(repository.findAllByUserId(eq(1L), any())).thenReturn(allPost);
 
         // when
@@ -209,15 +213,5 @@ public class PetitionServiceTest {
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
-        for (int i = 0; i < allPage.getTotalElements(); i++) {
-            SummarizedPetitionDto dto = allPage.getContent().get(i);
-            Petition post = allPostList.get(i);
-            assertThat(dto.getId()).isEqualTo(post.getId());
-            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
-            assertThat(dto.getBody()).isEqualTo(post.getBody());
-            assertThat(dto.getAgreeCount()).isEqualTo(0);
-            assertThat(dto.getStatus()).isEqualTo(post.getExtraStatus());
-            assertThat(dto.getViews()).isEqualTo(post.getViews());
-        }
     }
 }

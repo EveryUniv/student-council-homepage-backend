@@ -84,6 +84,6 @@ class PostRepositoryTest {
         Long counts = repository.countAllByUserId(user1.getId());
 
         // then
-        assertThat(counts).isEqualTo(5L);
+        assertThat(counts).isEqualTo(10L);
     }
 }

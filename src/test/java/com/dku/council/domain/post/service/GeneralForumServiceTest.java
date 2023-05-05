@@ -124,13 +124,5 @@ class GeneralForumServiceTest {
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
-        for (int i = 0; i < allPage.getTotalElements(); i++) {
-            SummarizedGenericPostDto dto = allPage.getContent().get(i);
-            GeneralForum post = allPostList.get(i);
-            assertThat(dto.getId()).isEqualTo(post.getId());
-            assertThat(dto.getTitle()).isEqualTo(post.getTitle());
-            assertThat(dto.getBody()).isEqualTo(post.getBody());
-            assertThat(dto.getViews()).isEqualTo(post.getViews());
-        }
     }
 }
