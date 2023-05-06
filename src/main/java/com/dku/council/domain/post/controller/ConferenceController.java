@@ -6,8 +6,6 @@ import com.dku.council.domain.post.model.dto.response.ResponsePage;
 import com.dku.council.domain.post.service.post.ConferenceService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.AdminAuth;
-import com.dku.council.global.auth.role.GuestAuth;
-import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.model.dto.ResponseIdDto;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +34,10 @@ public class ConferenceController {
      * @return 페이징 된 회의록 목록
      */
     @GetMapping
-    @GuestAuth
-    public ResponsePage<SummarizedConferenceDto> list(AppAuthentication auth,
-                                                      @RequestParam(required = false) String keyword,
+    public ResponsePage<SummarizedConferenceDto> list(@RequestParam(required = false) String keyword,
                                                       @RequestParam(defaultValue = "50") int bodySize,
                                                       @ParameterObject Pageable pageable) {
-        Page<SummarizedConferenceDto> list = service.list(keyword, pageable, bodySize, UserRole.from(auth));
+        Page<SummarizedConferenceDto> list = service.list(keyword, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

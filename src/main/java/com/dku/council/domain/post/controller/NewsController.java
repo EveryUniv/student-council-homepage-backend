@@ -46,13 +46,11 @@ public class NewsController {
      * @return 페이징된 총학 소식 목록
      */
     @GetMapping
-    @GuestAuth
-    public ResponsePage<SummarizedGenericPostDto> list(AppAuthentication auth,
-                                                       @RequestParam(required = false) String keyword,
+    public ResponsePage<SummarizedGenericPostDto> list(@RequestParam(required = false) String keyword,
                                                        @RequestParam(required = false) List<Long> tagIds,
                                                        @RequestParam(defaultValue = "50") int bodySize,
                                                        @ParameterObject Pageable pageable) {
-        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize, UserRole.from(auth));
+        Page<SummarizedGenericPostDto> list = postService.list(keyword, tagIds, pageable, bodySize);
         return new ResponsePage<>(list);
     }
 

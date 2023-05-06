@@ -22,10 +22,10 @@ public class NewsService {
     private final GenericPostService<News> postService;
     private final NewsRepository repository;
 
-    public Page<SummarizedGenericPostDto> list(String keyword, List<Long> tagIds, Pageable pageable, int bodySize, UserRole role) {
+    public Page<SummarizedGenericPostDto> list(String keyword, List<Long> tagIds, Pageable pageable, int bodySize) {
         Specification<News> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withTags(tagIds));
-        return postService.list(repository, spec, pageable, bodySize, role);
+        return postService.list(repository, spec, pageable, bodySize);
     }
 
     public Long create(Long userId, RequestCreateNewsDto request) {

@@ -86,7 +86,7 @@ class GenericPostServiceTest {
 
         // when
         Page<SummarizedGenericPostDto> allPage = newsService.list(newsRepository, null, Pageable.unpaged(),
-                500, UserRole.USER);
+                500);
 
         // then
         assertThat(allPage.getTotalElements()).isEqualTo(allNewsList.size());

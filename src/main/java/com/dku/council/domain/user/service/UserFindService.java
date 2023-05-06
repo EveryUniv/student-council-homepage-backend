@@ -33,7 +33,7 @@ public class UserFindService {
     private final SMSService smsService;
     private final UserRepository userRepository;
     private final UserFindRepository userFindRepository;
-    private final UserInfoCacheService userInfoCacheService;
+    private final UserInfoService userInfoService;
     private final MessageSource messageSource;
     private final PasswordEncoder passwordEncoder;
 
@@ -89,7 +89,7 @@ public class UserFindService {
         }
         String phone = eliminateDash(auth.getPhone());
         userRepository.findById(userId).orElseThrow(UserNotFoundException::new).changePhone(phone);
-        userInfoCacheService.invalidateUserInfo(userId);
+        userInfoService.invalidateUserInfo(userId);
         userFindRepository.deleteAuthCode(token);
     }
 
@@ -120,7 +120,7 @@ public class UserFindService {
         password = passwordEncoder.encode(password);
         user.changePassword(password);
 
-        userInfoCacheService.invalidateUserInfo(user.getId());
+        userInfoService.invalidateUserInfo(user.getId());
         userFindRepository.deleteAuthCode(token);
     }
 

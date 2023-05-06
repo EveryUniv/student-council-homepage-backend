@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -192,5 +193,25 @@ public class PetitionServiceTest {
         } catch (PostNotFoundException ignored) {
         }
         verify(postTimeMemoryRepository, never()).put(PETITION_KEY, 1L, writeCooltime, now);
+    }
+
+    @Test
+    @DisplayName("내 게시글 가져오기")
+    public void listMyPosts() {
+        // given
+        List<Petition> allPostList = PetitionMock.createListDummy("petition-", 20);
+        Page<Petition> allPost = new DummyPage<>(allPostList, 20);
+
+        when(postService.makeListDto(eq(100), any(Petition.class))).thenAnswer(ino -> {
+            Petition petition = ino.getArgument(1);
+            return new SummarizedGenericPostDto(uploadContext, 100, 0, petition);
+        });
+        when(repository.findAllByUserId(eq(1L), any())).thenReturn(allPost);
+
+        // when
+        Page<SummarizedPetitionDto> allPage = petitionService.listMyPosts(1L, Pageable.unpaged(), 100);
+
+        // then
+        assertThat(allPage.getTotalElements()).isEqualTo(allPostList.size());
     }
 }
