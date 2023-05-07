@@ -12,6 +12,7 @@ import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.NicknameFilterRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,7 @@ public class SignupService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
     private final NicknameFilterRepository nicknameFilterRepository;
+    private final UserInfoService userInfoService;
 
     @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
@@ -43,21 +45,37 @@ public class SignupService {
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
         Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
 
-        User user = User.builder()
-                .studentId(studentInfo.getStudentId())
-                .password(encryptedPassword)
-                .name(studentInfo.getStudentName())
-                .nickname(dto.getNickname())
-                .phone(phone)
-                .major(major)
-                .yearOfAdmission(studentInfo.getYearOfAdmission())
-                .academicStatus(studentInfo.getStudentState())
-                .status(UserStatus.ACTIVE)
-                .role(UserRole.USER)
-                .build();
+        User inactiveUser = findInactiveUser(studentInfo);
 
-        userRepository.save(user);
-        deleteSignupAuths(signupToken);
+        if(inactiveUser != null){
+            inactiveUser.changeStatus(UserStatus.ACTIVE);
+            inactiveUser.changeNickName(dto.getNickname());
+            inactiveUser.changePhone(phone);
+            inactiveUser.changePassword(encryptedPassword);
+            inactiveUser.changeGenericInfo(studentInfo.getStudentId(), studentInfo.getStudentName(), major,
+                    studentInfo.getYearOfAdmission(), studentInfo.getStudentState());
+            userInfoService.invalidateUserInfo(inactiveUser.getId());
+        } else {
+            User user = User.builder()
+                    .studentId(studentInfo.getStudentId())
+                    .password(encryptedPassword)
+                    .name(studentInfo.getStudentName())
+                    .nickname(dto.getNickname())
+                    .phone(phone)
+                    .major(major)
+                    .yearOfAdmission(studentInfo.getYearOfAdmission())
+                    .academicStatus(studentInfo.getStudentState())
+                    .status(UserStatus.ACTIVE)
+                    .role(UserRole.USER)
+                    .build();
+
+            userRepository.save(user);
+            deleteSignupAuths(signupToken);
+        }
+    }
+
+    private User findInactiveUser(DkuUserInfo studentInfo) {
+        return userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).orElseThrow(UserNotFoundException::new);
     }
 
     public void checkNickname(String nickname) {

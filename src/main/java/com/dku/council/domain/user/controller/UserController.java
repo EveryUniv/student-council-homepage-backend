@@ -29,6 +29,7 @@ public class UserController {
     private final UserFindService userFindService;
     private final SignupService signupService;
     private final MyPostService myPostService;
+    private final UserWithdrawService userWithdrawService;
 
     /**
      * 내 정보 조회
@@ -217,5 +218,14 @@ public class UserController {
         Page<SummarizedGenericPostDto> likedPosts =
                 myPostService.listMyLikedPosts(auth.getUserId(), pageable, bodySize);
         return new ResponsePage<>(likedPosts);
+    }
+
+    /**
+     * 회원탈퇴
+     */
+    @PatchMapping("/withdraw")
+    @UserAuth
+    public void withdraw(AppAuthentication auth) {
+        userWithdrawService.withdraw(auth.getUserId());
     }
 }
