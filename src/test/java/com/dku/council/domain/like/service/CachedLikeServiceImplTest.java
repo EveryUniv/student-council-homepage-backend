@@ -213,7 +213,7 @@ class CachedLikeServiceImplTest {
         // given
         List<LikeEntry> likeEntries = makeLikeEntryList();
 
-        when(persistenceRepository.countByUserId(6L, POST)).thenReturn(10L);
+        when(persistenceRepository.countPostByUserId(6L, POST)).thenReturn(10L);
         when(memoryRepository.getAllLikesAndClear(6L, POST)).thenReturn(likeEntries);
         when(userRepository.getReferenceById(any()))
                 .thenAnswer(inv -> UserMock.createDummyMajor(inv.getArgument(0)));
