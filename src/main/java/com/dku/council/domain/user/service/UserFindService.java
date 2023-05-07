@@ -45,7 +45,7 @@ public class UserFindService {
         phone = eliminateDash(phone);
         User user = userRepository.findByPhone(phone).orElseThrow(UserNotFoundException::new);
         String studentId = user.getStudentId();
-        sendSMS(phone, "sms.auth-message", studentId);
+        sendSMS(phone, "sms.find.id-message", studentId);
     }
 
     @Transactional(readOnly = true)
