@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
@@ -31,4 +33,16 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
 
     @Query("select u from User u where u.status = 'INACTIVE' and u.studentId = :studentId ")
     Optional<User> findByStudentIdWithInactive(@Param("studentId") String studentId);
+
+    /**
+     * 휴면 계정 조회를 위해 삭제 기간을 통해 유저를 찾는다.
+     */
+    @Query("select u from User u where u.lastModifiedAt <= :inactiveDate and u.id != :defaultUserId ")
+    List<User> findAllWithDeleted(@Param("inactiveDate") LocalDateTime inactiveDate, @Param("defaultUserId") Long defaultUserId);
+
+    /**
+     * 삭제 계정의 데이터 변환을 위해서 더미 회원을 찾는다.
+     */
+    @Query("select u from User u where u.id = :defaultUserId")
+    Optional<User> findByDefaultId(Long defaultUserId);
 }

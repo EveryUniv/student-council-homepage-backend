@@ -21,8 +21,6 @@ public class UserWithdrawService {
     public void withdraw(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.changeStatus(INACTIVE);
-        //TODO inactive가 된 시간을 업데이트하고 그 시간을 토대로 threshold를 확인해서
-        //TODO defaultUser로 바꿔치기 해야함
         userRepository.save(user);
         cacheService.invalidateUserInfo(userId);
     }

@@ -63,4 +63,12 @@ public class Comment extends BaseEntity {
         this.post = post;
         this.post.getComments().add(this);
     }
+
+    public void changeUserToDefault(User dummyUser) {
+        this.user = dummyUser;
+    }
+
+    public void changeStatusToDeleted() {
+        this.status = CommentStatus.DELETED;
+    }
 }

@@ -1,5 +1,9 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.comment.model.entity.Comment;
+import com.dku.council.domain.comment.repository.CommentRepository;
+import com.dku.council.domain.post.model.entity.Post;
+import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.user.exception.AlreadyNicknameException;
 import com.dku.council.domain.user.exception.WrongPasswordException;
 import com.dku.council.domain.user.model.UserStatus;
@@ -17,11 +21,13 @@ import com.dku.council.global.auth.jwt.JwtProvider;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +42,11 @@ public class UserService {
     private final UserInfoService userInfoService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
+    @Value("${app.user.default-user-id}")
+    private final Long defaultUserId;
 
     public ResponseLoginDto login(RequestLoginDto dto) {
         User user = userRepository.findByStudentId(dto.getStudentId())
@@ -104,6 +114,31 @@ public class UserService {
     public void checkAlreadyNickname(String nickname) {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new AlreadyNicknameException();
+        }
+    }
+
+    @Transactional
+    public void deleteInactiveUsers(LocalDateTime inactiveDate) {
+        List<User> inactiveUsers = userRepository.findAllWithDeleted(inactiveDate, defaultUserId);
+
+        User defaultUser = userRepository.findByDefaultId(defaultUserId).orElseThrow(UserNotFoundException::new);
+
+        for (User user : inactiveUsers) {
+            user.changeDeleteUserInfo(" ", " ", " ", " ", " ");
+
+            List<Post> posts = postRepository.findAllByUserId(user.getId());
+            for (Post post : posts) {
+                post.changeUserToDefault(defaultUser);
+                post.changeStatusToDeleted();
+            }
+            postRepository.saveAll(posts);
+
+            List<Comment> comments = commentRepository.findAllByUserId(user.getId());
+            for (Comment comment : comments) {
+                comment.changeUserToDefault(defaultUser);
+                comment.changeStatusToDeleted();
+            }
+            commentRepository.saveAll(comments);
         }
     }
 }

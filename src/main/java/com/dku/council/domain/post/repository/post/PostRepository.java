@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -36,6 +37,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      */
     @Query("select p from Post p where p.user.id=:userId")
     Page<Post> findAllByUserIdWithAdmin(@Param("userId") Long userId, Pageable pageable);
+
+    /**
+     * 탈퇴한 회원의 데이터를 바꾸기 위해 활성화 여부와 상관없이 작성자의 모든 게시글을 가져옵니다.
+     */
+    @Query("select p from Post p where p.user.id=:userId")
+    List<Post> findAllByUserId(@Param("userId") Long userId);
 
     /**
      * user 가 작성한 게시글의 총 목록의 갯수를 가져옵니다.
