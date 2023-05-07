@@ -73,7 +73,7 @@ public class CachedLikeServiceImpl implements LikeService {
     @Transactional
     public Long getCountOfLikedElements(Long userId, LikeTarget target) {
         dumpByUserId(userId, target);
-        return persistenceRepository.countByUserId(userId, target);
+        return persistenceRepository.countPostByUserId(userId, target);
     }
 
     private void dumpByUserId(Long userId, LikeTarget target) {
