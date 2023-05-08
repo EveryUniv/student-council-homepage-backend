@@ -1,6 +1,6 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
+import com.dku.council.domain.ticket.exception.BeforeTicketPeriodException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
 import com.dku.council.domain.ticket.model.entity.Ticket;
@@ -113,7 +113,7 @@ class TicketServiceTest {
         when(ticketEventService.findEventById(1L)).thenReturn(event);
 
         // when & then
-        Assertions.assertThrows(InvalidTicketPeriodException.class,
+        Assertions.assertThrows(BeforeTicketPeriodException.class,
                 () -> service.enroll(1L, 1L, DateUtil.toInstant(now)));
     }
 

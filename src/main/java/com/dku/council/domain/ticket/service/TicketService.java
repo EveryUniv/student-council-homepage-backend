@@ -1,6 +1,7 @@
 package com.dku.council.domain.ticket.service;
 
-import com.dku.council.domain.ticket.exception.InvalidTicketPeriodException;
+import com.dku.council.domain.ticket.exception.AfterTicketPeriodException;
+import com.dku.council.domain.ticket.exception.BeforeTicketPeriodException;
 import com.dku.council.domain.ticket.exception.NoTicketException;
 import com.dku.council.domain.ticket.model.dto.TicketEventDto;
 import com.dku.council.domain.ticket.model.dto.response.ResponseTicketTurnDto;
@@ -46,8 +47,12 @@ public class TicketService {
         Instant eventFrom = DateUtil.toInstant(event.getFrom());
         Instant eventTo = DateUtil.toInstant(event.getTo());
 
-        if (now.isBefore(eventFrom) || now.isAfter(eventTo)) {
-            throw new InvalidTicketPeriodException();
+        if (now.isBefore(eventFrom)) {
+            throw new BeforeTicketPeriodException();
+        }
+        
+        if (now.isAfter(eventTo)) {
+            throw new AfterTicketPeriodException();
         }
 
         UserInfo userInfo = userInfoService.getUserInfo(userId);
