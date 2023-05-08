@@ -57,6 +57,10 @@ public class Petition extends Post {
 
     @Override
     public String getDisplayingUsername() {
-        return getUser().getMajor().getDepartment();
+        User user = getUser();
+        if (!user.getStatus().isActive()) {
+            return User.DELETED_USER;
+        }
+        return user.getMajor().getDepartment();
     }
 }

@@ -31,7 +31,7 @@ public class News extends Post {
     @Override
     @Transient
     public String getDisplayingUsername() {
-        return Post.ANONYMITY;
+        return User.ANONYMITY;
     }
 
 }

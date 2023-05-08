@@ -46,6 +46,6 @@ public class Conference extends Post {
     @Override
     @Transient
     public String getDisplayingUsername() {
-        return Post.ANONYMITY;
+        return User.ANONYMITY;
     }
 }

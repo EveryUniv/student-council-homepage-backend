@@ -1,5 +1,6 @@
 package com.dku.council.mock;
 
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.entity.Major;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
@@ -29,7 +30,7 @@ public class UserMock {
         return createDummyMajor(RandomGen.nextLong());
     }
 
-    public static User createMajor(String major, String department){
+    public static User createMajor(String major, String department) {
         return create(RandomGen.nextLong(), NAME, UserRole.USER, MajorMock.create(major, department), null);
     }
 
@@ -61,6 +62,7 @@ public class UserMock {
                 .studentId(STUDENT_ID)
                 .password(password)
                 .name(username)
+                .status(UserStatus.ACTIVE)
                 .role(role)
                 .nickname(NICKNAME)
                 .yearOfAdmission(2017)

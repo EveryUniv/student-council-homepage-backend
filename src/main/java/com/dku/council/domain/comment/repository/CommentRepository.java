@@ -43,4 +43,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
             "on p.id = c.post.id and c.user.id=:userId and p.status='ACTIVE' and " +
                 "(c.status='ACTIVE' or c.status='EDITED') ")
     Long countAllCommentedByUserId(@Param("userId") Long userId);
+
+    /**
+     * 탈퇴한 회원의 데이터를 바꾸기 위해 활성화 여부와 상관없이 작성자의 모든 댓글을 가져옵니다.
+     */
+    @Query("select c from Comment c where c.user.id=:userId")
+    List<Comment> findAllByUserId(@Param("userId") Long userId);
 }

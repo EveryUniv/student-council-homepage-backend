@@ -1,6 +1,7 @@
 package com.dku.council.mock;
 
 import com.dku.council.domain.user.model.UserInfo;
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.auth.role.UserRole;
 
@@ -15,6 +16,7 @@ public class UserInfoMock {
                 .studentId("11111111")
                 .password("password")
                 .name("name")
+                .status(UserStatus.ACTIVE)
                 .role(UserRole.USER)
                 .nickname("nickname")
                 .yearOfAdmission(2017)
