@@ -31,6 +31,6 @@ public class Rule extends Post {
     @Override
     @Transient
     public String getDisplayingUsername() {
-        return Post.ANONYMITY;
+        return User.ANONYMITY;
     }
 }

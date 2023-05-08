@@ -24,6 +24,9 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
+    public static String ANONYMITY = "익명";
+    public static String DELETED_USER = "탈퇴한 회원";
+
     @Id
     @GeneratedValue
     @Column(name = "user_id")
@@ -85,6 +88,20 @@ public class User extends BaseEntity {
         this.userRole = role;
     }
 
+    public String getName() {
+        if (!getStatus().isActive()) {
+            return DELETED_USER;
+        }
+        return this.name;
+    }
+
+    public String getNickname() {
+        if (!getStatus().isActive()) {
+            return DELETED_USER;
+        }
+        return this.nickname;
+    }
+
     /**
      * 비밀번호를 변경합니다. {@link PasswordEncoder}로 인코딩된 비밀번호를 넣어야 합니다.
      *
@@ -142,4 +159,15 @@ public class User extends BaseEntity {
         this.academicStatus = studentState;
     }
 
+    /**
+     * 탈퇴한 User의 정보을 수정합니다.
+     * User정보 캐시를 삭제하기위해 {@link UserInfoService}.invalidateUserInfo를 호출해야 합니다.
+     */
+    public void emptyOutUserInfo() {
+        this.studentId = "";
+        this.name = "";
+        this.phone = "";
+        this.nickname = "";
+        this.password = "";
+    }
 }

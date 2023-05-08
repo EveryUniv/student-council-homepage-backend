@@ -63,4 +63,8 @@ public class Comment extends BaseEntity {
         this.post = post;
         this.post.getComments().add(this);
     }
+
+    public void changeUser(User user) {
+        this.user = user;
+    }
 }

@@ -61,7 +61,7 @@ public class CommentService {
         postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
         return commentRepository.findAllByPostId(postId, pageable)
                 .map(e -> {
-                    CommentDto dto = new CommentDto(e, Post.ANONYMITY,
+                    CommentDto dto = new CommentDto(e, User.ANONYMITY,
                             likeService.getCountOfLikes(e.getId(), LikeTarget.COMMENT),
                             e.getUser().getId().equals(userId),
                             likeService.isLiked(e.getId(), userId, LikeTarget.COMMENT));

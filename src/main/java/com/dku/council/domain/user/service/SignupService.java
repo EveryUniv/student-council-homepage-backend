@@ -31,6 +31,7 @@ public class SignupService {
     private final UserRepository userRepository;
     private final MajorRepository majorRepository;
     private final NicknameFilterRepository nicknameFilterRepository;
+    private final UserInfoService userInfoService;
 
     @Transactional
     public void signup(RequestSignupDto dto, String signupToken) {
@@ -43,20 +44,33 @@ public class SignupService {
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
         Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
 
-        User user = User.builder()
-                .studentId(studentInfo.getStudentId())
-                .password(encryptedPassword)
-                .name(studentInfo.getStudentName())
-                .nickname(dto.getNickname())
-                .phone(phone)
-                .major(major)
-                .yearOfAdmission(studentInfo.getYearOfAdmission())
-                .academicStatus(studentInfo.getStudentState())
-                .status(UserStatus.ACTIVE)
-                .role(UserRole.USER)
-                .build();
+        Optional<User> inactiveUser = userRepository.findByInactiveStudentId(studentInfo.getStudentId());
 
-        userRepository.save(user);
+        if (inactiveUser.isPresent()) {
+            User user = inactiveUser.get();
+            user.changeStatus(UserStatus.ACTIVE);
+            user.changeNickName(dto.getNickname());
+            user.changePhone(phone);
+            user.changePassword(encryptedPassword);
+            user.changeGenericInfo(studentInfo.getStudentId(), studentInfo.getStudentName(), major,
+                    studentInfo.getYearOfAdmission(), studentInfo.getStudentState());
+            userInfoService.invalidateUserInfo(user.getId());
+        } else {
+            User user = User.builder()
+                    .studentId(studentInfo.getStudentId())
+                    .password(encryptedPassword)
+                    .name(studentInfo.getStudentName())
+                    .nickname(dto.getNickname())
+                    .phone(phone)
+                    .major(major)
+                    .yearOfAdmission(studentInfo.getYearOfAdmission())
+                    .academicStatus(studentInfo.getStudentState())
+                    .status(UserStatus.ACTIVE)
+                    .role(UserRole.USER)
+                    .build();
+            userRepository.save(user);
+        }
+
         deleteSignupAuths(signupToken);
     }
 
