@@ -69,7 +69,7 @@ class UserFindServiceTest {
         // given
         String phone = "01012345678";
         User user = UserMock.createDummyMajor();
-        when(messageSource.getMessage(eq("sms.auth-message"),
+        when(messageSource.getMessage(eq("sms.find.id-message"),
                 argThat(arg -> arg.length == 1 && arg[0].equals(user.getStudentId())), any()))
                 .thenReturn("Message");
         when(userRepository.findByPhone(phone)).thenReturn(Optional.of(user));

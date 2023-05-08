@@ -44,7 +44,7 @@ public class UserPageService {
     }
 
     public Page<PostPageDto> postList(Long id, Pageable pageable) {
-        return postRepository.findAllByUserIdWithAdmin(id, pageable).map(PostPageDto::new);
+        return postRepository.findAllByUserIdWithNotActive(id, pageable).map(PostPageDto::new);
     }
 
     public User findUser(Long userId) {

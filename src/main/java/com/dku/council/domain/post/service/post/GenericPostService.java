@@ -60,7 +60,6 @@ public class GenericPostService<E extends Post> {
     public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
                             PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
         Page<E> result = list(repository, spec, pageable);
-
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
             return mapper.map(dto, post);

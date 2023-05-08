@@ -35,7 +35,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
      * 활성화 여부와 상관없이 작성자의 모든 게시글을 가져옵니다. 관리자만 사용할 수 있습니다.
      */
     @Query("select p from Post p where p.user.id=:userId")
-    Page<Post> findAllByUserIdWithAdmin(@Param("userId") Long userId, Pageable pageable);
+    Page<Post> findAllByUserIdWithNotActive(@Param("userId") Long userId, Pageable pageable);
 
     /**
      * user 가 작성한 게시글의 총 목록의 갯수를 가져옵니다.
