@@ -37,7 +37,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     /**
      * 휴면 계정 조회를 위해 삭제 기간을 통해 유저를 찾는다.
      */
-    @Query("select u from User u where u.lastModifiedAt <= :inactiveDate and u.id != :defaultUserId ")
+    @Query("select u from User u where u.status = 'INACTIVE' and u.lastModifiedAt <= :inactiveDate and u.id != :defaultUserId ")
     List<User> findAllWithDeleted(@Param("inactiveDate") LocalDateTime inactiveDate, @Param("defaultUserId") Long defaultUserId);
 
     /**

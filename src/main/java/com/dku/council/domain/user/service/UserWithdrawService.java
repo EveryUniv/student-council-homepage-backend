@@ -21,7 +21,6 @@ public class UserWithdrawService {
     public void withdraw(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         user.changeStatus(INACTIVE);
-        userRepository.save(user);
         cacheService.invalidateUserInfo(userId);
     }
 }

@@ -18,9 +18,10 @@ public class UserWithdrawScheduler {
     @Value("${app.user.delete-period}")
     private final Duration deletePeriod;
 
-    @Scheduled(cron = "0 0 0 * * *")
-    public void UpdateInactiveUsersToDefault() {
+    @Scheduled(cron = "* * * * * *")
+    public void updateInactiveUsersToDefault() {
         LocalDateTime inactiveDate = LocalDateTime.now().minus(deletePeriod);
         userService.deleteInactiveUsers(inactiveDate);
+        
     }
 }

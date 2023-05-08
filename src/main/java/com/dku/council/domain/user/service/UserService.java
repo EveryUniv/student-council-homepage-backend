@@ -1,5 +1,6 @@
 package com.dku.council.domain.user.service;
 
+import com.dku.council.domain.comment.model.CommentStatus;
 import com.dku.council.domain.comment.model.entity.Comment;
 import com.dku.council.domain.comment.repository.CommentRepository;
 import com.dku.council.domain.post.model.entity.Post;
@@ -124,21 +125,19 @@ public class UserService {
         User defaultUser = userRepository.findByDefaultId(defaultUserId).orElseThrow(UserNotFoundException::new);
 
         for (User user : inactiveUsers) {
-            user.changeDeleteUserInfo(" ", " ", " ", " ", " ");
+            user.emptyOutUserInfo();
 
             List<Post> posts = postRepository.findAllByUserId(user.getId());
             for (Post post : posts) {
-                post.changeUserToDefault(defaultUser);
-                post.changeStatusToDeleted();
+                post.changeUser(defaultUser);
+                post.markAsDeleted(false);
             }
-            postRepository.saveAll(posts);
 
             List<Comment> comments = commentRepository.findAllByUserId(user.getId());
             for (Comment comment : comments) {
-                comment.changeUserToDefault(defaultUser);
-                comment.changeStatusToDeleted();
+                comment.changeUser(defaultUser);
+                comment.updateStatus(CommentStatus.DELETED);
             }
-            commentRepository.saveAll(comments);
         }
     }
 }

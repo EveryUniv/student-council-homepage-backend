@@ -45,7 +45,8 @@ public class SignupService {
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
         Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
 
-        User inactiveUser = findInactiveUser(studentInfo);
+        User inactiveUser = userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).isPresent() ?
+                userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).get() : null;
 
         if(inactiveUser != null){
             inactiveUser.changeStatus(UserStatus.ACTIVE);
@@ -55,6 +56,7 @@ public class SignupService {
             inactiveUser.changeGenericInfo(studentInfo.getStudentId(), studentInfo.getStudentName(), major,
                     studentInfo.getYearOfAdmission(), studentInfo.getStudentState());
             userInfoService.invalidateUserInfo(inactiveUser.getId());
+            deleteSignupAuths(signupToken);
         } else {
             User user = User.builder()
                     .studentId(studentInfo.getStudentId())
@@ -72,10 +74,6 @@ public class SignupService {
             userRepository.save(user);
             deleteSignupAuths(signupToken);
         }
-    }
-
-    private User findInactiveUser(DkuUserInfo studentInfo) {
-        return userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).orElseThrow(UserNotFoundException::new);
     }
 
     public void checkNickname(String nickname) {

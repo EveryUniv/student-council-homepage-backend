@@ -13,8 +13,10 @@ import com.dku.council.domain.post.repository.spec.PostSpec;
 import com.dku.council.domain.post.service.ThumbnailService;
 import com.dku.council.domain.post.service.ViewCountService;
 import com.dku.council.domain.tag.service.TagService;
+import com.dku.council.domain.user.model.UserStatus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.service.UserInfoService;
 import com.dku.council.global.auth.role.UserRole;
 import com.dku.council.global.error.exception.NotGrantedException;
 import com.dku.council.global.error.exception.UserNotFoundException;
@@ -43,6 +45,7 @@ public class GenericPostService<E extends Post> {
     protected final TagService tagService;
     protected final ViewCountService viewCountService;
     protected final LikeService likeService;
+    protected final UserInfoService userInfoService;
 
     protected final FileUploadService fileUploadService;
     protected final ObjectUploadContext uploadContext;
@@ -60,7 +63,12 @@ public class GenericPostService<E extends Post> {
     public <T> Page<T> list(GenericPostRepository<E> repository, Specification<E> spec, Pageable pageable, int bodySize,
                             PostResultMapper<T, SummarizedGenericPostDto, E> mapper) {
         Page<E> result = list(repository, spec, pageable);
-
+        for (E post : result) {
+            if (post.getUser().getStatus().equals(UserStatus.INACTIVE)){
+                post.getUser().changeNickName("탈퇴한 회원");
+                userInfoService.invalidateUserInfo(post.getUser().getId());
+            }
+        }
         return result.map((post) -> {
             SummarizedGenericPostDto dto = makeListDto(bodySize, post);
             return mapper.map(dto, post);

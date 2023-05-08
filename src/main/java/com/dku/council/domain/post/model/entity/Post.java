@@ -104,11 +104,7 @@ public abstract class Post extends BaseEntity {
         return status == PostStatus.BLINDED;
     }
 
-    public void changeUserToDefault(User dummyUser) {
-        this.user = dummyUser;
-    }
-
-    public void changeStatusToDeleted() {
-        this.status = PostStatus.DELETED;
+    public void changeUser(User user) {
+        this.user = user;
     }
 }

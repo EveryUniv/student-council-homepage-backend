@@ -145,14 +145,12 @@ public class User extends BaseEntity {
     /**
      * 탈퇴한 User의 정보을 수정합니다.
      * User정보 캐시를 삭제하기위해 {@link UserInfoService}.invalidateUserInfo를 호출해야 합니다.
-     *
-     * @param studentName 이름
      */
-    public void changeDeleteUserInfo(String studentName, String studentId, String phone, String nickname, String encodedPassword) {
-        this.studentId = studentId;
-        this.name = studentName;
-        this.phone = phone;
-        this.nickname = nickname;
-        this.password = encodedPassword;
+    public void emptyOutUserInfo() {
+        this.studentId = "";
+        this.name = "";
+        this.phone = "";
+        this.nickname = "";
+        this.password = "";
     }
 }
