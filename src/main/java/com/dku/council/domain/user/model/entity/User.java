@@ -24,6 +24,9 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
+    public static String ANONYMITY = "익명";
+    public static String DELETED_USER = "탈퇴한 회원";
+
     @Id
     @GeneratedValue
     @Column(name = "user_id")
@@ -83,6 +86,20 @@ public class User extends BaseEntity {
         this.yearOfAdmission = yearOfAdmission;
         this.status = status;
         this.userRole = role;
+    }
+
+    public String getName() {
+        if (!getStatus().isActive()) {
+            return DELETED_USER;
+        }
+        return this.name;
+    }
+
+    public String getNickname() {
+        if (!getStatus().isActive()) {
+            return DELETED_USER;
+        }
+        return this.nickname;
     }
 
     /**

@@ -28,21 +28,24 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("select u from User u where u.status = 'ACTIVE' and u.phone = :phone")
     Optional<User> findByPhone(@Param("phone") String phone);
 
-    @Query("select u from User u where u.status = 'ACTIVE' and u.nickname = :nickname ")
+    @Query("select u from User u where u.status = 'ACTIVE' and u.nickname = :nickname")
     Optional<User> findByNickname(@Param("nickname") String nickname);
 
-    @Query("select u from User u where u.status = 'INACTIVE' and u.studentId = :studentId ")
-    Optional<User> findByStudentIdWithInactive(@Param("studentId") String studentId);
+    @Query("select u from User u where u.status = 'INACTIVE' and u.studentId = :studentId")
+    Optional<User> findByInactiveStudentId(@Param("studentId") String studentId);
 
     /**
      * 휴면 계정 조회를 위해 삭제 기간을 통해 유저를 찾는다.
      */
-    @Query("select u from User u where u.status = 'INACTIVE' and u.lastModifiedAt <= :inactiveDate and u.id != :defaultUserId ")
+    @Query("select u from User u " +
+            "where u.status = 'INACTIVE' " +
+            "and u.lastModifiedAt <= :inactiveDate " +
+            "and u.id != :defaultUserId")
     List<User> findAllWithDeleted(@Param("inactiveDate") LocalDateTime inactiveDate, @Param("defaultUserId") Long defaultUserId);
 
     /**
      * 삭제 계정의 데이터 변환을 위해서 더미 회원을 찾는다.
      */
-    @Query("select u from User u where u.id = :defaultUserId")
-    Optional<User> findByDefaultId(Long defaultUserId);
+    @Query("select u from User u where u.id = :id")
+    Optional<User> findByIdWithNotActive(@Param("id") Long id);
 }

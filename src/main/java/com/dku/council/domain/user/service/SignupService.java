@@ -12,7 +12,6 @@ import com.dku.council.domain.user.repository.MajorRepository;
 import com.dku.council.domain.user.repository.NicknameFilterRepository;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.auth.role.UserRole;
-import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,18 +44,17 @@ public class SignupService {
         String encryptedPassword = passwordEncoder.encode(dto.getPassword());
         Major major = retrieveMajor(studentInfo.getMajorName(), studentInfo.getDepartmentName());
 
-        User inactiveUser = userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).isPresent() ?
-                userRepository.findByStudentIdWithInactive(studentInfo.getStudentId()).get() : null;
+        Optional<User> inactiveUser = userRepository.findByInactiveStudentId(studentInfo.getStudentId());
 
-        if(inactiveUser != null){
-            inactiveUser.changeStatus(UserStatus.ACTIVE);
-            inactiveUser.changeNickName(dto.getNickname());
-            inactiveUser.changePhone(phone);
-            inactiveUser.changePassword(encryptedPassword);
-            inactiveUser.changeGenericInfo(studentInfo.getStudentId(), studentInfo.getStudentName(), major,
+        if (inactiveUser.isPresent()) {
+            User user = inactiveUser.get();
+            user.changeStatus(UserStatus.ACTIVE);
+            user.changeNickName(dto.getNickname());
+            user.changePhone(phone);
+            user.changePassword(encryptedPassword);
+            user.changeGenericInfo(studentInfo.getStudentId(), studentInfo.getStudentName(), major,
                     studentInfo.getYearOfAdmission(), studentInfo.getStudentState());
-            userInfoService.invalidateUserInfo(inactiveUser.getId());
-            deleteSignupAuths(signupToken);
+            userInfoService.invalidateUserInfo(user.getId());
         } else {
             User user = User.builder()
                     .studentId(studentInfo.getStudentId())
@@ -70,10 +68,10 @@ public class SignupService {
                     .status(UserStatus.ACTIVE)
                     .role(UserRole.USER)
                     .build();
-
             userRepository.save(user);
-            deleteSignupAuths(signupToken);
         }
+
+        deleteSignupAuths(signupToken);
     }
 
     public void checkNickname(String nickname) {

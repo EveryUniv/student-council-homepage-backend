@@ -222,8 +222,10 @@ public class UserController {
 
     /**
      * 회원탈퇴
+     * <p>회원은 바로 삭제되지 않고, 일정 기간뒤에 삭제됩니다. 삭제시에도 개인 정보만 삭제됩니다.</p>
+     * <p>삭제 즉시 모든 게시글과 댓글에는 탈퇴된 회원이라고 표시됩니다. user관련 조회시에도 모두 없다고 표시됩니다.</p>
      */
-    @PatchMapping("/withdraw")
+    @DeleteMapping
     @UserAuth
     public void withdraw(AppAuthentication auth) {
         userWithdrawService.withdraw(auth.getUserId());

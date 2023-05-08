@@ -34,8 +34,6 @@ import static lombok.AccessLevel.PROTECTED;
 @NoArgsConstructor(access = PROTECTED)
 public abstract class Post extends BaseEntity {
 
-    public static String ANONYMITY = "익명";
-
     @Id
     @GeneratedValue
     @Column(name = "post_id")

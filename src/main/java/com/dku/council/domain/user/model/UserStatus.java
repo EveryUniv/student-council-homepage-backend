@@ -9,5 +9,9 @@ public enum UserStatus {
     /**
      * 비활성화된 계정
      */
-    INACTIVE
+    INACTIVE;
+
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
 }
