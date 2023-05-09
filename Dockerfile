@@ -6,7 +6,7 @@ COPY build/libs/*.jar application.jar
 
 EXPOSE 8080
 
-ENTRYPOINT java -Duser.timezone="Asia/Seoul" -jar\
+ENTRYPOINT java -XX:+HeapDumpOnOutOfMemoryError -Duser.timezone="Asia/Seoul" -jar\
     -javaagent:./pinpoint/pinpoint-bootstrap-2.5.0.jar\
     -Dpinpoint.agentId=dev\
     -Dpinpoint.applicationName=$AGENT_NAME\
