@@ -12,13 +12,15 @@ import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.mock.MajorMock;
 import com.dku.council.mock.UserMock;
+import com.dku.council.util.ClockUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
 import java.util.Optional;
 
 import static com.dku.council.domain.like.model.LikeTarget.POST;
@@ -31,6 +33,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserInfoServiceTest {
+
+    private final Clock clock = ClockUtil.create();
 
     @Mock
     private UserRepository persistenceRepository;
@@ -47,8 +51,12 @@ class UserInfoServiceTest {
     @Mock
     private UserInfoMemoryRepository memoryRepository;
 
-    @InjectMocks
     private UserInfoService service;
+
+    @BeforeEach
+    public void setup() {
+        this.service = new UserInfoService(clock, persistenceRepository, memoryRepository, commentRepository, likeService, postRepository);
+    }
 
 
     @Test
