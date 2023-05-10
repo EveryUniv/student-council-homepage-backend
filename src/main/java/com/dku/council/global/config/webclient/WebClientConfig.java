@@ -1,5 +1,8 @@
 package com.dku.council.global.config.webclient;
 
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +17,18 @@ import java.time.Duration;
 @Configuration
 public class WebClientConfig {
 
-    // TODO Docker에 올린 뒤에 UnknownHostException 발생 가능성
     @Bean
     @Primary
     public WebClient plainWebClient() {
+        HttpClient client = HttpClient.create(connectionProvider())
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
+                .doOnConnected(conn -> conn
+                        .addHandlerLast(new ReadTimeoutHandler(10))
+                        .addHandlerLast(new WriteTimeoutHandler(10)))
+                .responseTimeout(Duration.ofSeconds(10));
+
         return WebClient.builder()
-                .clientConnector(new ReactorClientHttpConnector(HttpClient.create(connectionProvider())))
+                .clientConnector(new ReactorClientHttpConnector(client))
                 .build();
     }
 
