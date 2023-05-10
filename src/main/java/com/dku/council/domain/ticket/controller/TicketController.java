@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TicketController {
 
+    private final Clock clock;
     private final TicketService ticketService;
     private final TicketEventService ticketEventService;
     private final CaptchaService captchaService;
@@ -117,7 +119,8 @@ public class TicketController {
     @UserAuth
     public ResponseTicketTurnDto enroll(AppAuthentication auth,
                                         @Valid @RequestBody RequestEnrollDto dto) {
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
+
         captchaService.verifyCaptcha(dto.getCaptchaKey(), dto.getCaptchaValue());
         return ticketService.enroll(auth.getUserId(), dto.getEventId(), now);
     }
