@@ -44,7 +44,6 @@ class DkuLectureServiceTest extends AbstractMockServerTest {
 
         // then
         assertThat(subjects).containsExactlyInAnyOrderElementsOf(expected);
-        System.out.println(subjects);
     }
 
     private static List<Subject> dummySubject() {
@@ -158,13 +157,13 @@ class DkuLectureServiceTest extends AbstractMockServerTest {
                         new Subject.TimeAndPlace(
                                 DayOfWeek.MONDAY,
                                 LocalTime.of(18, 0),
-                                LocalTime.of(19, 50),
+                                LocalTime.of(20, 45),
                                 "인문102"
                         ),
                         new Subject.TimeAndPlace(
                                 DayOfWeek.WEDNESDAY,
                                 LocalTime.of(18, 0),
-                                LocalTime.of(19, 50),
+                                LocalTime.of(20, 45),
                                 "인문102"
                         )
                 ))
@@ -285,16 +284,28 @@ class DkuLectureServiceTest extends AbstractMockServerTest {
                         .professor("윤승환")
                         .times(List.of(
                                 new Subject.TimeAndPlace(
+                                        DayOfWeek.SUNDAY,
+                                        LocalTime.of(17, 30),
+                                        LocalTime.of(20, 45),
+                                        "상경123"
+                                ),
+                                new Subject.TimeAndPlace(
                                         DayOfWeek.MONDAY,
-                                        LocalTime.of(18, 0),
-                                        LocalTime.of(19, 50),
+                                        LocalTime.of(18, 55),
+                                        LocalTime.of(20, 45),
                                         "미디어102"
                                 ),
                                 new Subject.TimeAndPlace(
                                         DayOfWeek.WEDNESDAY,
                                         LocalTime.of(18, 0),
-                                        LocalTime.of(19, 50),
+                                        LocalTime.of(20, 45),
                                         "체육125(주경기장)"
+                                ),
+                                new Subject.TimeAndPlace(
+                                        DayOfWeek.SATURDAY,
+                                        LocalTime.of(19, 50),
+                                        LocalTime.of(21, 40),
+                                        "미디어333"
                                 )
                         ))
                         .build()));
