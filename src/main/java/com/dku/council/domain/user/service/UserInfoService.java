@@ -15,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
 public class UserInfoService {
 
+    private final Clock clock;
     private final UserRepository persistenceRepository;
     private final UserInfoMemoryRepository memoryRepository;
     private final CommentRepository commentRepository;
@@ -48,7 +50,7 @@ public class UserInfoService {
 
     @Transactional(readOnly = true)
     public UserInfo getUserInfo(Long userId) {
-        Instant now = Instant.now();
+        Instant now = Instant.now(clock);
         return memoryRepository.getUserInfo(userId, now)
                 .orElseGet(() -> {
                     User user = persistenceRepository.findByIdWithMajor(userId)
@@ -65,6 +67,6 @@ public class UserInfoService {
 
     public void cacheUserInfo(Long userId, User user) {
         UserInfo userInfo = new UserInfo(user);
-        memoryRepository.setUserInfo(userId, userInfo, Instant.now());
+        memoryRepository.setUserInfo(userId, userInfo, Instant.now(clock));
     }
 }
