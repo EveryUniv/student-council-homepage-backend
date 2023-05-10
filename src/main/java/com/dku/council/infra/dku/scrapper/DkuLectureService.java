@@ -204,7 +204,16 @@ public class DkuLectureService extends DkuScrapper {
     }
 
     private static LocalTime classToLocalTime(int classTime) {
-        return LocalTime.of(9, 0).plusMinutes(classTime * 30L);
+        /**
+         * 야간 강의는 18:00 부터 55분 단위로 바뀝니다.
+         * ex) 19교시 18:00
+         *     20교시 18:55
+         */
+        if (classTime >= 19) {
+            return LocalTime.of(18, 0).plusMinutes((classTime - 19) * 55L);
+        }else{
+            return LocalTime.of(9, 0).plusMinutes(classTime * 30L);
+        }
     }
 
     private interface TableRowParser {
