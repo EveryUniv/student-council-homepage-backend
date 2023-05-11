@@ -2,6 +2,7 @@ package com.dku.council.global.config;
 
 import com.dku.council.global.interceptor.VoidSuccessResponseInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,10 @@ import java.time.Clock;
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    @Value("${app.cors}")
+    private final String corsList;
+
     private final VoidSuccessResponseInterceptor vsrInterceptor;
 
     @Override
@@ -26,9 +31,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:8080", "https://dkustu.com", "https://dev.dkustu.com", "https://danfesta.dkustu.com")
+                .allowedOrigins(parseCorsList(corsList))
                 .allowedHeaders("*")
                 .allowedMethods("*");
+    }
+
+    private static String[] parseCorsList(String corsList) {
+        String[] corsOrigins = corsList.split(",");
+        for (int i = 0; i < corsOrigins.length; i++) {
+            corsOrigins[i] = corsOrigins[i].strip();
+        }
+        return corsOrigins;
     }
 
     @Bean
