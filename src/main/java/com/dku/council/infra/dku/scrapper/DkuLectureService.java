@@ -90,8 +90,7 @@ public class DkuLectureService extends DkuScrapper {
                 throw new DkuFailedCrawlingException(new UnexpectedResponseException("table is empty"));
             }
 
-            for (int i = 0; i < rows.size(); i++) {
-                Element row = rows.get(i);
+            for (Element row : rows) {
                 Elements cols = row.select("td");
                 if (cols.size() != columnCount) {
                     throw new DkuFailedCrawlingException(
@@ -141,7 +140,7 @@ public class DkuLectureService extends DkuScrapper {
 
     private static Subject parseMajorSubject(Elements cols) {
         Subject subject = parseSubject(cols, 2);
-        if(subject == null) return null;
+        if (subject == null) return null;
 
         return new MajorSubject(cols.get(1).text(),
                 Integer.parseInt(cols.get(2).text()),
@@ -203,8 +202,22 @@ public class DkuLectureService extends DkuScrapper {
         return count;
     }
 
+    /**
+     * 교시를 보고 종료 시각을 구합니다.
+     * 야간 강의는 18:00 부터 55분 단위로 바뀝니다.
+     *
+     * @example 교시별 종료 예시
+     * 1교시 9:30 종료
+     * 18교시 18:00 종료
+     * 19교시 18:55 종료
+     * 20교시 19:50 종료
+     */
     private static LocalTime classToLocalTime(int classTime) {
-        return LocalTime.of(9, 0).plusMinutes(classTime * 30L);
+        if (classTime >= 18) {
+            return LocalTime.of(18, 0).plusMinutes((classTime - 18) * 55L);
+        } else {
+            return LocalTime.of(9, 0).plusMinutes(classTime * 30L);
+        }
     }
 
     private interface TableRowParser {
