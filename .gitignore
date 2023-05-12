@@ -43,3 +43,4 @@ application.yml
 api.pdf
 
 /pinpoint-agent/
+/logs/
