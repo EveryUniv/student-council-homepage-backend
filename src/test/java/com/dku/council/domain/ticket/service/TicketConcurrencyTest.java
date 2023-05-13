@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @FullIntegrationTest
 public class TicketConcurrencyTest extends AbstractContainerRedisTest {
 
-    private static final int THREAD_COUNT = 50;
+    private static final int USER_COUNT = 50;
 
     @Autowired
     private TicketService service;
@@ -55,7 +55,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
         event = new TicketEvent("name", now.minusSeconds(1), now.plusSeconds(1), 1000);
         event = eventRepository.save(event);
 
-        for (int i = 0; i < THREAD_COUNT; i++) {
+        for (int i = 0; i < USER_COUNT; i++) {
             Major major = MajorMock.create();
             major = majorRepository.save(major);
 
@@ -63,10 +63,7 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
             user = userRepository.save(user);
 
             users.add(user);
-        }
-
-        for (int i = 0; i < THREAD_COUNT; i++) {
-            users.add(users.get(i));
+            users.add(user);
         }
     }
 
@@ -96,9 +93,9 @@ public class TicketConcurrencyTest extends AbstractContainerRedisTest {
         latch.await();
 
         // then
-        assertThat(map).hasSize(THREAD_COUNT);
-        assertThat(failedCount.get()).isEqualTo(THREAD_COUNT);
-        for (int i = 0; i < THREAD_COUNT; i++) {
+        assertThat(map).hasSize(USER_COUNT);
+        assertThat(failedCount.get()).isEqualTo(USER_COUNT);
+        for (int i = 0; i < USER_COUNT; i++) {
             assertThat(map.containsKey(i)).isNotNull();
         }
     }

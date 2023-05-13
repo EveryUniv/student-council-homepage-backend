@@ -15,6 +15,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +46,7 @@ public class DkuAuthenticationService {
      * @return 토큰 쿠키가 포함된 DkuAuth
      */
     public DkuAuth loginWebInfo(String classId, String password) {
-        String param = String.format("username=%s&password=%s&tabIndex=0", classId, password);
+        String param = makeParam("username=%s&password=%s&tabIndex=0", classId, password);
         return login(param, webinfoLoginApiPath,
                 "https://webinfo.dankook.ac.kr",
                 "https://webinfo.dankook.ac.kr/member/logon.do?returnurl=http://webinfo.dankook.ac.kr:80/main.do&sso=ok");
@@ -58,10 +60,18 @@ public class DkuAuthenticationService {
      * @return 토큰 쿠키가 포함된 DkuAuth
      */
     public DkuAuth loginPortal(String classId, String password) {
-        String param = String.format("user_id=%s&user_password=%s&auto_login=N&returnurl=https://portal.dankook.ac.kr", classId, password);
+        String param = makeParam("user_id=%s&user_password=%s&auto_login=N&returnurl=https://portal.dankook.ac.kr", classId, password);
         return login(param, portalLoginApiPath,
                 "https://portal.dankook.ac.kr",
                 "https://portal.dankook.ac.kr/login.jsp");
+    }
+
+    private String makeParam(String format, String... params) {
+        String[] encodedParams = new String[params.length];
+        for (int i = 0; i < params.length; i++) {
+            encodedParams[i] = URLEncoder.encode(params[i], StandardCharsets.UTF_8);
+        }
+        return String.format(format, encodedParams);
     }
 
     private DkuAuth login(String param, String uri, String origin, String referer) {
