@@ -1,6 +1,7 @@
 package com.dku.council.domain.post.service.post;
 
 import com.dku.council.domain.post.exception.DuplicateAgreementException;
+import com.dku.council.domain.post.exception.ExpiredPetitionException;
 import com.dku.council.domain.post.exception.PostCooltimeException;
 import com.dku.council.domain.post.model.PetitionStatus;
 import com.dku.council.domain.post.model.dto.list.SummarizedGenericPostDto;
@@ -101,6 +102,10 @@ public class PetitionService {
         Petition post = postService.findPost(repository, postId, UserRole.USER);
         if (statisticService.isAlreadyAgreed(postId, userId)) {
             throw new DuplicateAgreementException();
+        }
+
+        if (post.getExtraStatus() == PetitionStatus.EXPIRED) {
+            throw new ExpiredPetitionException();
         }
 
         int countAgree = statisticService.count(postId); // TODO 캐싱
