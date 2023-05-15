@@ -58,7 +58,7 @@ public class TicketVerifyService {
         UserInfo userInfo = userInfoService.getUserInfo(ticket.getUser().getId());
         ResponseTicketDto dto = makeTicketDto(userInfo, ticket);
 
-        String eventId = ticket.getEvent().getId().toString();
+        Long eventId = ticket.getEvent().getId();
 
         String authCode = "";
         if (ticket.getStatus() == TicketStatus.ISSUABLE) {

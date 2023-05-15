@@ -28,9 +28,9 @@ public class ResponseManagerTicketDto {
     private final String code;
 
     @Schema(description = "티켓 이벤트 ", example = "1111")
-    private final String eventId;
+    private final Long eventId;
 
-    public ResponseManagerTicketDto(ResponseTicketDto ticket, String code, String eventId) {
+    public ResponseManagerTicketDto(ResponseTicketDto ticket, String code, Long eventId) {
         this.id = ticket.getId();
         this.name = ticket.getName();
         this.major = ticket.getMajor();
