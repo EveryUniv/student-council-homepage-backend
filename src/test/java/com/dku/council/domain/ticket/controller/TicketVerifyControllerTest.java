@@ -61,7 +61,7 @@ class TicketVerifyControllerTest extends AbstractAuthControllerTest {
         // given
         ResponseTicketDto ticket = new ResponseTicketDto(5L, "name",
                 "major", "studentId", false, 4);
-        ResponseManagerTicketDto response = new ResponseManagerTicketDto(ticket, "123456");
+        ResponseManagerTicketDto response = new ResponseManagerTicketDto(ticket, "123456", 1111L);
 
         when(ticketVerifyService.getTicketInfo(5L)).thenReturn(response);
 
