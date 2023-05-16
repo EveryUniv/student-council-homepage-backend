@@ -58,6 +58,8 @@ public class TicketVerifyService {
         UserInfo userInfo = userInfoService.getUserInfo(ticket.getUser().getId());
         ResponseTicketDto dto = makeTicketDto(userInfo, ticket);
 
+        Long eventId = ticket.getEvent().getId();
+
         String authCode = "";
         if (ticket.getStatus() == TicketStatus.ISSUABLE) {
             if (autoSendSms) {
@@ -67,7 +69,7 @@ public class TicketVerifyService {
             }
         }
 
-        return new ResponseManagerTicketDto(dto, authCode);
+        return new ResponseManagerTicketDto(dto, authCode, eventId);
     }
 
     private ResponseTicketDto makeTicketDto(UserInfo userInfo, Ticket ticket) {
@@ -81,7 +83,7 @@ public class TicketVerifyService {
     private String sendSms(String phoneNumber) {
         String code = CodeGenerator.generateDigitCode(digitCount);
         Locale locale = LocaleContextHolder.getLocale();
-        String message = messageSource.getMessage("sms.auth-message", new Object[]{code}, locale);
+        String message = messageSource.getMessage("sms.ticket-auth-message", new Object[]{code}, locale);
 
         smsService.sendSMS(phoneNumber, message);
         return code;
