@@ -125,7 +125,7 @@ class TicketVerifyServiceTest {
         assertThat(dto.getStudentId()).isEqualTo(info.getStudentId());
         assertThat(dto.getTurn()).isEqualTo(ticket.getTurn());
         assertThat(dto.isIssued()).isFalse();
-        assertThat(dto.getEventId()).isEqualTo(ticket.getId();
+        assertThat(dto.getEventId()).isEqualTo(ticket.getId());
         verify(smsService).sendSMS(info.getPhone(), "test");
     }
 
