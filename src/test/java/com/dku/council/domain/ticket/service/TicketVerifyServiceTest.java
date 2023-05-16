@@ -111,7 +111,7 @@ class TicketVerifyServiceTest {
 
         when(userInfoService.getUserInfo(ticket.getUser().getId())).thenReturn(info);
         when(persistenceRepository.findById(1L)).thenReturn(Optional.of(ticket));
-        when(messageSource.getMessage(eq("sms.auth-message"), Mockito.any(), Mockito.any()))
+        when(messageSource.getMessage(eq("sms.ticket-auth-message"), Mockito.any(), Mockito.any()))
                 .thenReturn("test");
 
         // when
@@ -125,6 +125,7 @@ class TicketVerifyServiceTest {
         assertThat(dto.getStudentId()).isEqualTo(info.getStudentId());
         assertThat(dto.getTurn()).isEqualTo(ticket.getTurn());
         assertThat(dto.isIssued()).isFalse();
+        assertThat(dto.getEventId()).isEqualTo(ticket.getId();
         verify(smsService).sendSMS(info.getPhone(), "test");
     }
 
