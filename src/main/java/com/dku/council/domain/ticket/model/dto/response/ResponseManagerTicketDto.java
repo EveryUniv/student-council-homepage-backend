@@ -27,7 +27,10 @@ public class ResponseManagerTicketDto {
     @Schema(description = "전송된 인증 코드. 이미 발급된 티켓의 경우 빈 문자열 반환", example = "123456")
     private final String code;
 
-    public ResponseManagerTicketDto(ResponseTicketDto ticket, String code) {
+    @Schema(description = "티켓 이벤트 ", example = "1111")
+    private final Long eventId;
+
+    public ResponseManagerTicketDto(ResponseTicketDto ticket, String code, Long eventId) {
         this.id = ticket.getId();
         this.name = ticket.getName();
         this.major = ticket.getMajor();
@@ -35,5 +38,6 @@ public class ResponseManagerTicketDto {
         this.issued = ticket.isIssued();
         this.turn = ticket.getTurn();
         this.code = code;
+        this.eventId = eventId;
     }
 }

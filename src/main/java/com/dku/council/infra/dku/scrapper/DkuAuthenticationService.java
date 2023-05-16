@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// TODO 접속이 너무 몰리면 약간 지연하도록
-// TODO 한번에 로그인 너무 많이 요청하면 blocking 당할지도?
 @Service
 @RequiredArgsConstructor
 public class DkuAuthenticationService {
