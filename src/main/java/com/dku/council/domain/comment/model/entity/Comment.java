@@ -18,7 +18,6 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter
 @NoArgsConstructor(access = PROTECTED)
 public class Comment extends BaseEntity {
-    public static final int COMMENT_MAX_LENGTH = 100;
 
     @Id
     @GeneratedValue
@@ -36,7 +35,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = COMMENT_MAX_LENGTH)
+    @Lob
     private String text;
 
 
