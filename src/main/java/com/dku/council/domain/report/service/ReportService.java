@@ -7,7 +7,7 @@ import com.dku.council.domain.post.repository.post.PostRepository;
 import com.dku.council.domain.report.exception.AlreadyReportedException;
 import com.dku.council.domain.report.exception.CannotReportMineException;
 import com.dku.council.domain.report.exception.PostedByAdminException;
-import com.dku.council.domain.report.model.dto.list.ResponseReportCategoryListDto;
+import com.dku.council.domain.report.model.dto.list.ResponseReportCategoryDto;
 import com.dku.council.domain.report.model.dto.response.ResponseReportCategoryCountDto;
 import com.dku.council.domain.report.model.dto.response.ResponseSingleReportedPostDto;
 import com.dku.council.domain.report.model.dto.response.SummarizedReportedPostDto;
@@ -66,15 +66,16 @@ public class ReportService {
         }
     }
 
-    public List<ResponseReportCategoryListDto> getCategoryNames() {
+    public List<ResponseReportCategoryDto> getCategoryNames() {
         List<ReportCategory> categories = Arrays.asList(ReportCategory.values());
         return categories.stream()
-                .map(category -> new ResponseReportCategoryListDto(category, messageSource))
+                .map(category -> new ResponseReportCategoryDto(category, messageSource))
                 .collect(Collectors.toList());
     }
 
     public Page<SummarizedReportedPostDto> getReportedPosts(Pageable pageable) {
-        return reportRepository.findAllReportedPosts(pageable).map(SummarizedReportedPostDto::new);
+        return reportRepository.findAllReportedPosts(pageable)
+                .map(SummarizedReportedPostDto::new);
     }
 
     public ResponseSingleReportedPostDto getReportedPost(Long userId, Long postId) {
@@ -95,7 +96,7 @@ public class ReportService {
         }
 
 
-        int reportedCount = reportRepository.countByPostId(postId).intValue();
+        Long reportedCount = reportRepository.countByPostId(postId);
         return new ResponseSingleReportedPostDto(post, reportedCount, categories);
     }
 }

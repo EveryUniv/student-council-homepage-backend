@@ -30,7 +30,7 @@ public class CommentLog extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = Comment.COMMENT_MAX_LENGTH)
+    @Lob
     private String text;
 
 
