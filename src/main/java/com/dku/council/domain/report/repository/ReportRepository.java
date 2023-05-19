@@ -14,21 +14,9 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     Long countByPostId(Long postId);
 
-    // TODO SQL 리팩토링 필요
     @Query("SELECT p FROM Post p " +
-            "WHERE p.id IN (SELECT r.post.id FROM Report r " +
-            "WHERE r.id NOT IN (" +
-            "    SELECT r2.id FROM Report r2 " +
-            "    WHERE r2.post.id IN (" +
-            "        SELECT r3.post.id FROM Report r3 " +
-            "        GROUP BY r3.post.id " +
-            "        HAVING COUNT(r3.post.id) > 1" +
-            "    ) AND r2.id <> (" +
-            "        SELECT MIN(r4.id) FROM Report r4 " +
-            "        WHERE r4.post.id = r2.post.id" +
-            "    )" +
-            ") and (r.post.status = 'ACTIVE' or r.post.status = 'BLINDED')" +
-            ")")
+            "WHERE p.id IN (SELECT distinct r.post.id FROM Report r) " +
+            "and (p.status = 'ACTIVE' or p.status = 'BLINDED')")
     Page<Post> findAllReportedPosts(Pageable pageable);
 
 }

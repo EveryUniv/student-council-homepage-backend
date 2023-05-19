@@ -48,7 +48,6 @@ class ReportRepositoryTest {
         major = majorRepository.save(major);
 
         final List<User> users = new ArrayList<>(30);
-
         for (int i = 0; i < 30; i++) {
             User user = UserMock.create(major);
             user = userRepository.save(user);
@@ -58,17 +57,20 @@ class ReportRepositoryTest {
         posts = generalForumRepository.saveAll(List.of(
                 GeneralForumMock.create(users.get(0)),
                 GeneralForumMock.create(users.get(1)),
-                GeneralForumMock.create(users.get(2)),
-                GeneralForumMock.create(users.get(3))
+                GeneralForumMock.create(users.get(2)), // deleted
+                GeneralForumMock.create(users.get(3)), // deleted by admin,
+                GeneralForumMock.create(users.get(4))
         ));
+        posts.get(2).markAsDeleted(false);
+        posts.get(3).markAsDeleted(true);
 
         ReportCategory[] values = ReportCategory.values();
         for (int i = 0; i < 10; i++) {
             reportRepository.save(new Report(users.get(i), posts.get(0), values[i % values.length]));
         }
-        for (int i = 0; i < 10; i++) {
-            reportRepository.save(new Report(users.get(i + 10), posts.get(1), values[i % values.length]));
-        }
+        reportRepository.save(new Report(users.get(10), posts.get(1), ReportCategory.POLITICS));
+        reportRepository.save(new Report(users.get(10), posts.get(2), ReportCategory.POLITICS));
+        reportRepository.save(new Report(users.get(10), posts.get(3), ReportCategory.POLITICS));
     }
 
     @Test
