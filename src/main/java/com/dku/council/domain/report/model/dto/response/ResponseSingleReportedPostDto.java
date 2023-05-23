@@ -23,7 +23,7 @@ public class ResponseSingleReportedPostDto {
     private final LocalDateTime firstReportAt;
 
     @Schema(description = "신고된 횟수", example = "2")
-    private final int reportedCount;
+    private final Long reportedCount;
 
     @Schema(description = "블라인드 여부", example = "true")
     private final boolean isBlinded;
@@ -31,7 +31,7 @@ public class ResponseSingleReportedPostDto {
     @Schema(description = "신고된 카테고리")
     private final List<ResponseReportCategoryCountDto> reportedCategory;
 
-    public ResponseSingleReportedPostDto(Post post, int reportedCount, List<ResponseReportCategoryCountDto> reportedCategory) {
+    public ResponseSingleReportedPostDto(Post post, Long reportedCount, List<ResponseReportCategoryCountDto> reportedCategory) {
         this.id = post.getId();
         this.title = post.getTitle();
         this.author = post.getDisplayingUsername();
