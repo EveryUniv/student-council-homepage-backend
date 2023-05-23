@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
 
-// TODO 한 IP로 너무 많이 보내면 인증 못하도록 막아야 함
 @Slf4j
 @Service
 @RequiredArgsConstructor

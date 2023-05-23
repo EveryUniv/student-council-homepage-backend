@@ -68,11 +68,7 @@ jobs:
           key: ${{ secrets.PRIVATE_PEM_KEY }}
           proxy_host: ${{ secrets.BASTION_IP }}
           proxy_username: ubuntu
-          proxy_key: ${{ secrets.PUBLIC_PEM_KEY }}
+          proxy_key: ${{ secrets.PRIVATE_PEM_KEY }}
           envs: GITHUB_SHA,REPO
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7}
-            docker tag ${{ secrets.DOCKER_USERNAME }}/$REPO:${GITHUB_SHA::7} $REPO
-            docker stop $REPO
-            docker rm $REPO
-            docker run -d --name $REPO -p 8080:8080 -v ~/application.yml:/usr/app/application.yml -v ~/logs:/usr/app/logs -e TZ=Asia/Seoul -e AGENT_NAME=dku-council-back --restart=always $REPO
+            ./deploy.sh ${{ secrets.DOCKER_USERNAME }} $REPO ${GITHUB_SHA::7}

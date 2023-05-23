@@ -4,7 +4,6 @@ import com.dku.council.domain.post.model.entity.Post;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +16,7 @@ import static javax.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Report extends BaseEntity {
+
     @Id @GeneratedValue
     @Column(name = "report_id")
     private Long id;
@@ -32,8 +32,7 @@ public class Report extends BaseEntity {
     @Enumerated(STRING)
     private ReportCategory reportCategory;
 
-    @Builder
-    private Report(User user, Post post, ReportCategory reportCategory) {
+    public Report(User user, Post post, ReportCategory reportCategory) {
         this.user = user;
         this.post = post;
         this.reportCategory = reportCategory;

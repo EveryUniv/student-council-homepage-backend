@@ -7,18 +7,39 @@ import java.util.Locale;
 
 public enum ReportCategory {
 
+    /**
+     * 욕설/비하
+     */
     PROFANITY,
 
+    /**
+     * 낚시/놀림/도배
+     */
     FISHING,
 
+    /**
+     * 광고성 게시글
+     */
     ADVERTISEMENT,
 
+    /**
+     * 정당, 정치인 비하 및 선거운동
+     */
     POLITICS,
 
+    /**
+     * 음란물/불건전한 만남 및 대화
+     */
     PORNOGRAPHY,
 
+    /**
+     * 게시판 성격에 부적합
+     */
     INAPPROPRIATE_CONTENT,
 
+    /**
+     * 유출/사칭/사기
+     */
     FRAUD;
 
     public String getName(MessageSource messageSource) {

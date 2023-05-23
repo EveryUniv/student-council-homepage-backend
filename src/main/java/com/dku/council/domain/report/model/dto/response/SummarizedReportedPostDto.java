@@ -1,12 +1,14 @@
 package com.dku.council.domain.report.model.dto.response;
 
-import com.dku.council.domain.report.model.entity.Report;
+import com.dku.council.domain.post.model.entity.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Getter
+@EqualsAndHashCode
 public class SummarizedReportedPostDto {
     @Schema(description = "게시글 아이디", example = "1")
     private final Long id;
@@ -26,13 +28,13 @@ public class SummarizedReportedPostDto {
     @Schema(description = "블라인드 여부", example = "true")
     private final boolean isBlinded;
 
-    public SummarizedReportedPostDto(Report report) {
-        this.id = report.getPost().getId();
-        this.title = report.getPost().getTitle();
-        this.author = report.getPost().getDisplayingUsername();
-        this.firstReportAt = report.getPost().getCreatedAt();
-        this.reportedCount = report.getPost().getReportedCount();
-        this.isBlinded = report.getPost().isBlinded();
+    public SummarizedReportedPostDto(Post post) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.author = post.getDisplayingUsername();
+        this.firstReportAt = post.getCreatedAt();
+        this.reportedCount = post.getReportedCount();
+        this.isBlinded = post.isBlinded();
     }
 
 }
