@@ -16,10 +16,6 @@ public class RequestCreateReportDto {
     private final String categoryName;
 
     public Report toEntity(User user, Post post) {
-        return Report.builder()
-                .user(user)
-                .post(post)
-                .reportCategory(ReportCategory.fromValue(categoryName))
-                .build();
+        return new Report(user, post, ReportCategory.fromValue(categoryName));
     }
 }

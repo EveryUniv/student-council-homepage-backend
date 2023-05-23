@@ -2,7 +2,7 @@ package com.dku.council.domain.report.controller;
 
 import com.dku.council.domain.post.model.dto.request.RequestCreateReportDto;
 import com.dku.council.domain.post.model.dto.response.ResponsePage;
-import com.dku.council.domain.report.model.dto.list.ResponseReportCategoryListDto;
+import com.dku.council.domain.report.model.dto.list.ResponseReportCategoryDto;
 import com.dku.council.domain.report.model.dto.response.ResponseSingleReportedPostDto;
 import com.dku.council.domain.report.model.dto.response.SummarizedReportedPostDto;
 import com.dku.council.domain.report.service.ReportService;
@@ -42,7 +42,7 @@ public class ReportController {
      * 신고 카테고리 목록 조회
      */
     @GetMapping("/category")
-    public List<ResponseReportCategoryListDto> getReportCategory() {
+    public List<ResponseReportCategoryDto> getReportCategory() {
         return reportService.getCategoryNames();
     }
 
