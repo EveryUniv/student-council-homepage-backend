@@ -5,12 +5,12 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-@Configuration
+// TODO 향후 사용시 활성화
+//@Configuration
 public class FCMConfig {
 
     @Bean
