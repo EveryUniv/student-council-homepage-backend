@@ -59,7 +59,7 @@ public class PetitionService {
         spec = spec.and(PostSpec.withPetitionStatus(status));
         spec = spec.and(PostSpec.withTags(tagIds));
         return postService.list(repository, spec, pageable, bodySize, (dto, post) ->
-                new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId()))); // TODO 댓글 개수는 캐싱해서 사용하기 (반드시)
+                new SummarizedPetitionDto(dto, post, expiresTime, statisticService.count(post.getId())));
     }
 
     @Transactional
@@ -108,7 +108,7 @@ public class PetitionService {
             throw new ExpiredPetitionException();
         }
 
-        int countAgree = statisticService.count(postId); // TODO 캐싱
+        int countAgree = statisticService.count(postId);
         if (post.getExtraStatus() == PetitionStatus.ACTIVE && countAgree + 1 >= thresholdCommentCount) {
             post.updatePetitionStatus(PetitionStatus.WAITING);
         }

@@ -10,7 +10,6 @@ import javax.persistence.criteria.Join;
 import java.util.List;
 
 
-// TODO QueryDSL로 변경
 public class PostSpec {
 
     public static <T extends Post> Specification<T> withAuthor(Long userId) {
@@ -30,6 +29,7 @@ public class PostSpec {
         return (root, query, builder) ->
                 builder.equal(root.get("extraStatus"), status);
     }
+
     public static <T extends Post> Specification<T> withTitleOrBody(String keyword) {
         if (keyword == null || keyword.equals("null")) {
             return Specification.where(null);
@@ -46,14 +46,6 @@ public class PostSpec {
     public static <T extends Post> Specification<T> withActive() {
         return (root, query, builder) ->
                 builder.equal(root.get("status"), PostStatus.ACTIVE);
-    }
-
-    public static <T extends Post> Specification<T> withActiveOrBlinded() {
-        return (root, query, builder) ->
-                builder.or(
-                        builder.equal(root.get("status"), PostStatus.BLINDED),
-                        builder.equal(root.get("status"), PostStatus.ACTIVE)
-                );
     }
 
     public static <T extends Post> Specification<T> withStatus(String status) {

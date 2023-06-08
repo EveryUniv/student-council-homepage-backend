@@ -1,5 +1,6 @@
 package com.dku.council.infra.bus.predict.impl;
 
+import com.dku.council.domain.bus.holiday.service.HolidayService;
 import com.dku.council.domain.bus.model.BusStation;
 import com.dku.council.infra.bus.exception.CannotGetTimeTable;
 import com.dku.council.infra.bus.predict.BusArrivalPredictService;
@@ -23,6 +24,7 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
     public static final long FIRST_TIME_HOUR_OFFSET = 1;
     private final Map<String, TimeTable> busTimeTables = new HashMap<>();
     private final TimeTableParser timeTableParser;
+    private final HolidayService holidayService;
 
     /**
      * 시간표를 기준으로 남은 시간을 예측합니다.
@@ -61,16 +63,15 @@ public class BusTimeTablePredictService implements BusArrivalPredictService {
         return table.remainingNextBusArrival(nowTime);
     }
 
-    private static String getWeekDayName(LocalDateTime dateTime) {
+    private String getWeekDayName(LocalDateTime dateTime) {
         DayOfWeek week = dateTime.getDayOfWeek();
-        switch (week) {
-            case SATURDAY:
-                return "saturday";
-            case SUNDAY:
-                return "holiday"; // TODO 일요일 + 공휴일은 holiday로 지정
-            default:
-                return "weekday";
+        if (holidayService.isHoliday(dateTime.toLocalDate())) {
+            return "holiday";
         }
+        if (week == DayOfWeek.SATURDAY) {
+            return "saturday";
+        }
+        return "weekday";
     }
 
     private static boolean isOutbound(TimeTable table, LocalTime now) {

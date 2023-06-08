@@ -1,5 +1,6 @@
 package com.dku.council.infra.bus.predict.impl;
 
+import com.dku.council.domain.bus.holiday.service.HolidayService;
 import com.dku.council.domain.bus.model.BusStation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,9 @@ class BusTimeTablePredictServiceTest {
     @Mock
     private TimeTable table;
 
+    @Mock
+    private HolidayService holidayService;
+
     @InjectMocks
     private BusTimeTablePredictService service;
 
@@ -37,6 +41,7 @@ class BusTimeTablePredictServiceTest {
         when(table.getLastTime()).thenReturn(LocalTime.of(20, 0));
         when(table.remainingNextBusArrival(now.toLocalTime())).thenReturn(Duration.ZERO);
         when(parser.parse("/bustable/weekday/dkugate/11.table")).thenReturn(table);
+        when(holidayService.isHoliday(now.toLocalDate())).thenReturn(false);
 
         // when
         Duration time = service.remainingNextBusArrival("11", BusStation.DKU_GATE, now);
@@ -55,6 +60,7 @@ class BusTimeTablePredictServiceTest {
         when(table.getLastTime()).thenReturn(LocalTime.of(20, 0));
         when(table.remainingNextBusArrival(now.toLocalTime())).thenReturn(Duration.ZERO);
         when(parser.parse("/bustable/saturday/dkugate/11.table")).thenReturn(table);
+        when(holidayService.isHoliday(now.toLocalDate())).thenReturn(false);
 
         // when
         Duration time = service.remainingNextBusArrival("11", BusStation.DKU_GATE, now);
@@ -73,6 +79,7 @@ class BusTimeTablePredictServiceTest {
         when(table.getFirstTime()).thenReturn(LocalTime.of(10, 0));
         when(table.getLastTime()).thenReturn(LocalTime.of(20, 0));
         when(parser.parse("/bustable/weekday/dkugate/11.table")).thenReturn(table);
+        when(holidayService.isHoliday(now.toLocalDate())).thenReturn(false);
 
         // when
         Duration time = service.remainingNextBusArrival("11", BusStation.DKU_GATE, now);
@@ -94,6 +101,7 @@ class BusTimeTablePredictServiceTest {
         when(table.getLastTime()).thenReturn(LocalTime.of(1, 0));
         when(table.remainingNextBusArrival(now2.toLocalTime())).thenReturn(Duration.ZERO);
         when(parser.parse("/bustable/weekday/dkugate/11.table")).thenReturn(table);
+        when(holidayService.isHoliday(now.toLocalDate())).thenReturn(false);
 
         // when
         Duration time = service.remainingNextBusArrival("11", BusStation.DKU_GATE, now);
