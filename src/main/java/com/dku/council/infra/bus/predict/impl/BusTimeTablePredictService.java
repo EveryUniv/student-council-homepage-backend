@@ -1,7 +1,7 @@
 package com.dku.council.infra.bus.predict.impl;
 
+import com.dku.council.domain.bus.holiday.service.HolidayService;
 import com.dku.council.domain.bus.model.BusStation;
-import com.dku.council.domain.bus.service.HolidayService;
 import com.dku.council.infra.bus.exception.CannotGetTimeTable;
 import com.dku.council.infra.bus.predict.BusArrivalPredictService;
 import lombok.RequiredArgsConstructor;
