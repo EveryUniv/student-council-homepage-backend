@@ -1,5 +1,6 @@
 package com.dku.council.domain.bus.holiday.model;
 
+import com.dku.council.global.util.DateUtil;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -47,7 +48,9 @@ public class Holiday implements Comparable<Holiday> {
 
     public LocalDate getDay(int year) {
         LocalDate date = day.atYear(year);
-        // TODO 음력인 경우
+        if (isLunar) {
+            date = DateUtil.toSolarDate(date);
+        }
         if (isNextDay) {
             date = date.minusDays(1);
         }
