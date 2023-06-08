@@ -18,6 +18,7 @@ import java.util.Set;
 
 import static com.dku.council.domain.bus.holiday.model.Holiday.SubstitutionType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -133,7 +134,7 @@ class HolidayServiceTest {
                 new Holiday(MonthDay.of(9, 29), ALL),
                 new Holiday(MonthDay.of(9, 30), ONLY_SUNDAY)
         );
-        when(parser.parse()).thenReturn(new ArrayList<>(holidays));
+        when(parser.parse(any())).thenReturn(new ArrayList<>(holidays));
 
         // when
         Set<LocalDate> actual = service.getHolidays(2023);
@@ -162,7 +163,7 @@ class HolidayServiceTest {
 
     private void test(List<Holiday> holidays, List<LocalDate> testSet, Boolean... expected) {
         // given
-        when(parser.parse()).thenReturn(new ArrayList<>(holidays));
+        when(parser.parse(any())).thenReturn(new ArrayList<>(holidays));
 
         // when
         List<Boolean> result = new ArrayList<>(testSet.size());

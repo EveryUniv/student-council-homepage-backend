@@ -43,20 +43,20 @@ public class HolidayService {
      */
     public Set<LocalDate> getHolidays(int year) {
         if (holidays == null) {
-            holidays = holidayParser.parse();
+            holidays = holidayParser.parse("/holidays");
             Collections.sort(holidays);
         }
 
         Set<LocalDate> holidaySet = new HashSet<>();
         for (Holiday holiday : holidays) {
-            LocalDate day = holiday.getDay().atYear(year);
+            LocalDate day = holiday.getDay(year);
             holidaySet.add(day);
         }
 
         for (Holiday holiday : holidays) {
             Holiday.SubstitutionType type = holiday.getSubstitutionType();
             if (type != NONE) {
-                LocalDate day = holiday.getDay().atYear(year);
+                LocalDate day = holiday.getDay(year);
                 holidaySet.add(getSubstituteDay(holidaySet, type, day));
 
                 // 작년의 휴일이 대체공휴일로 연장되어 올해 휴일에 영향을 줄 수 있다.
