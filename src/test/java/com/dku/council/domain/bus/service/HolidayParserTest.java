@@ -8,7 +8,7 @@ class HolidayParserTest {
 
 
     @Test
-    @DisplayName("일반 날짜 파싱")
+    @DisplayName("날짜 파싱")
     void parse() {
 
     }
