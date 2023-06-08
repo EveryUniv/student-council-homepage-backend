@@ -1,7 +1,9 @@
 package com.dku.council.domain.bus.service;
 
+import com.dku.council.domain.bus.holiday.exception.CannotGetHolidays;
 import com.dku.council.domain.bus.holiday.model.Holiday;
 import com.dku.council.domain.bus.holiday.service.HolidayParser;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +21,7 @@ class HolidayParserTest {
     @DisplayName("정상적인 휴일 파싱")
     void parse() {
         // when
-        List<Holiday> actual = parser.parse("/holiday/holidays1");
+        List<Holiday> actual = parser.parse("/holiday/holidays-success");
 
         // then
         assertThat(actual).containsExactlyInAnyOrder(
@@ -39,5 +41,37 @@ class HolidayParserTest {
                 new Holiday(MonthDay.of(8, 15), ALL, true, false),
                 new Holiday(MonthDay.of(8, 16), ONLY_SUNDAY, true, false)
         );
+    }
+
+    @Test
+    @DisplayName("Date를 잘못 입력한 경우 (포맷은 맞지만 존재하지 않는 날짜)")
+    void failedInvalidDate() {
+        // when & then
+        Assertions.assertThrows(CannotGetHolidays.class, () ->
+                parser.parse("/holiday/holidays-date-invalid-fail"));
+    }
+
+    @Test
+    @DisplayName("Date를 틀린 포맷으로 표기한 경우")
+    void failedWrongFormatDate() {
+        // when & then
+        Assertions.assertThrows(CannotGetHolidays.class, () ->
+                parser.parse("/holiday/holidays-date-wrong-fail"));
+    }
+
+    @Test
+    @DisplayName("Date를 표기하지 않은 경우")
+    void failedEmptyDate() {
+        // when & then
+        Assertions.assertThrows(CannotGetHolidays.class, () ->
+                parser.parse("/holiday/holidays-date-empty-fail"));
+    }
+
+    @Test
+    @DisplayName("알 수 없는 옵션을 기입한 경우")
+    void failedWrongOption() {
+        // when & then
+        Assertions.assertThrows(CannotGetHolidays.class, () ->
+                parser.parse("/holiday/holidays-option-fail"));
     }
 }

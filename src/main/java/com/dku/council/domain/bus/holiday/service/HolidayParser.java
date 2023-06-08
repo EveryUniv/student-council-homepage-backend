@@ -1,7 +1,7 @@
 package com.dku.council.domain.bus.holiday.service;
 
+import com.dku.council.domain.bus.holiday.exception.CannotGetHolidays;
 import com.dku.council.domain.bus.holiday.model.Holiday;
-import com.dku.council.infra.bus.exception.CannotGetTimeTable;
 import com.dku.council.infra.bus.predict.impl.TimeTable;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +46,7 @@ public class HolidayParser {
 
             return holidays;
         } catch (IOException | NullPointerException e) {
-            throw new CannotGetTimeTable(e);
+            throw new CannotGetHolidays(e);
         }
     }
 
@@ -63,7 +64,7 @@ public class HolidayParser {
 
         int idx = parseOption(line);
         if (idx == line.length()) {
-            throw new CannotGetTimeTable("날짜 정보가 없습니다: " + line);
+            throw new CannotGetHolidays("날짜 정보가 없습니다: " + line);
         }
 
         MonthDay monthDay = parseDate(line, idx);
@@ -78,7 +79,7 @@ public class HolidayParser {
             if (ALL_FLAGS.contains(String.valueOf(c))) {
                 flags.add(c);
             } else {
-                throw new CannotGetTimeTable("알 수 없는 옵션입니다 - " + c + ": " + line);
+                throw new CannotGetHolidays("알 수 없는 옵션입니다 - " + c + ": " + line);
             }
             idx++;
         }
@@ -100,6 +101,10 @@ public class HolidayParser {
     }
 
     private MonthDay parseDate(String line, int idx) {
-        return MonthDay.parse(line.substring(idx), LOCAL_DATE_FORMATTER);
+        try {
+            return MonthDay.parse(line.substring(idx), LOCAL_DATE_FORMATTER);
+        } catch (DateTimeParseException e) {
+            throw new CannotGetHolidays("날짜 정보를 읽을 수 없습니다: " + line);
+        }
     }
 }
