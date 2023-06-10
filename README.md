@@ -15,6 +15,8 @@
 
 서버 구성에 대한 고민: [Blog](https://won983212.github.io/posts/server-architecture/)
 
+무중단 배포: [Blog](https://won983212.github.io/posts/non-stop-deployment/)
+
 ### 주요 사용 기술
 
  - Java 11 (OpenJDK)

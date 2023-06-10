@@ -55,7 +55,4 @@ public class TimeSchedule extends BaseEntity {
         timetable.getSchedules().add(this);
     }
 
-    public void detachTimeTable() {
-        this.timetable = null;
-    }
 }

@@ -3,9 +3,6 @@ package com.dku.council.domain.admin.service;
 import com.dku.council.domain.admin.dto.PostPageDto;
 import com.dku.council.domain.post.exception.PostNotFoundException;
 import com.dku.council.domain.post.model.entity.Post;
-import com.dku.council.domain.post.model.entity.posttype.GeneralForum;
-import com.dku.council.domain.post.model.entity.posttype.Petition;
-import com.dku.council.domain.post.model.entity.posttype.Voc;
 import com.dku.council.domain.post.repository.post.*;
 import com.dku.council.domain.post.repository.spec.PostSpec;
 import lombok.RequiredArgsConstructor;
@@ -25,27 +22,23 @@ public class PostPageService {
     private final PetitionRepository petitionRepository;
     private final GeneralForumRepository generalForumRepository;
 
-    // TODO 코드를 리팩토링하자..
     public Page<PostPageDto> list(String keyword, String type, String status, Pageable pageable) {
         if (type != null) {
             if (type.equalsIgnoreCase("Voc")) {
-                Specification<Voc> spec = PostSpec.withTitleOrBody(keyword);
-                spec = spec.and(PostSpec.withStatus(status));
-                return vocRepository.findAll(spec, pageable).map(PostPageDto::new);
+                return listPost(vocRepository, keyword, status, pageable);
             } else if (type.equalsIgnoreCase("Petition")) {
-                Specification<Petition> spec = PostSpec.withTitleOrBody(keyword);
-                spec = spec.and(PostSpec.withStatus(status));
-                return petitionRepository.findAll(spec, pageable).map(PostPageDto::new);
+                return listPost(petitionRepository, keyword, status, pageable);
             } else if (type.equalsIgnoreCase("GeneralForum")) {
-                Specification<GeneralForum> spec = PostSpec.withTitleOrBody(keyword);
-                spec = spec.and(PostSpec.withStatus(status));
-                return generalForumRepository.findAll(spec, pageable).map(PostPageDto::new);
+                return listPost(generalForumRepository, keyword, status, pageable);
             }
         }
+        return listPost(genericPostRepository, keyword, status, pageable);
+    }
 
-        Specification<Post> spec = PostSpec.withTitleOrBody(keyword);
+    private <T extends Post> Page<PostPageDto> listPost(GenericPostRepository<T> repository, String keyword, String status, Pageable pageable) {
+        Specification<T> spec = PostSpec.withTitleOrBody(keyword);
         spec = spec.and(PostSpec.withStatus(status));
-        return genericPostRepository.findAll(spec, pageable).map(PostPageDto::new);
+        return repository.findAll(spec, pageable).map(PostPageDto::new);
     }
 
     public Post findOne(Long id) {
