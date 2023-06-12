@@ -3,9 +3,7 @@ package com.dku.council.global.util;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +21,9 @@ class DateUtilTest {
         Instant instant = DateUtil.toInstant(localDateTime);
 
         // then
-        assertThat(instant).isEqualTo(Instant.parse("2022-08-01T04:10:10Z"));
+        ZonedDateTime actual = instant.atZone(ZoneId.systemDefault());
+        ZonedDateTime expected = ZonedDateTime.of(2022, 8, 1, 13, 10, 10, 0, ZoneId.systemDefault());
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
