@@ -16,7 +16,7 @@ public class HomeBusCancelRequest extends BaseEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "req_id")
+    @Column(name = "cancel_id")
     private Long id;
 
     @OneToOne
