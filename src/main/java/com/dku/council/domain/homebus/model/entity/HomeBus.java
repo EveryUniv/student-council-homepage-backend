@@ -28,10 +28,13 @@ public class HomeBus extends BaseEntity {
 
     private String destination;
 
+    private int totalSeats;
+
     @Builder
-    private HomeBus(String label, String path, String destination) {
+    private HomeBus(String label, String path, String destination, int totalSeats) {
         this.label = label;
         this.path = path;
         this.destination = destination;
+        this.totalSeats = totalSeats;
     }
 }
