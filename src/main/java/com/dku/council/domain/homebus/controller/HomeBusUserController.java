@@ -2,7 +2,6 @@ package com.dku.council.domain.homebus.controller;
 
 import com.dku.council.domain.homebus.model.dto.HomeBusDto;
 import com.dku.council.domain.homebus.model.dto.RequestCancelTicketDto;
-import com.dku.council.domain.homebus.model.dto.TicketDto;
 import com.dku.council.domain.homebus.service.HomeBusUserService;
 import com.dku.council.global.auth.jwt.AppAuthentication;
 import com.dku.council.global.auth.role.UserAuth;
@@ -30,19 +29,6 @@ public class HomeBusUserController {
     @GetMapping
     public List<HomeBusDto> listBus() {
         return service.listBus();
-    }
-
-    /**
-     * 귀향버스 티켓 조회.
-     * <p>특정 버스에 대해 내가 신청하고 <b>승인까지 받은</b> 승차권을 조회합니다.</p>
-     * <p>발급된 승차권이 없으면 오류가 발생합니다.</p>
-     *
-     * @return 승차권 정보
-     */
-    @GetMapping("/ticket/{busId}")
-    @UserAuth
-    public TicketDto getTicket(AppAuthentication auth, @PathVariable Long busId) {
-        return service.getTicket(auth.getUserId(), busId);
     }
 
     /**
