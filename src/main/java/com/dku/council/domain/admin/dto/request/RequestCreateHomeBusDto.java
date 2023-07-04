@@ -16,6 +16,7 @@ public class RequestCreateHomeBusDto {
     @Schema(description = "버스 호차번호", example = "1호차")
     private final String label;
 
+
     @Pattern(regexp = "^[^,]+(,[^,]+)*$", message = "경로는 쉼표로 구분되어 있어야 합니다.")
     @Schema(description = "경로 목록", example = "곰상,울산역,부산역")
     private final String path;
@@ -31,7 +32,7 @@ public class RequestCreateHomeBusDto {
     public HomeBus toEntity() {
         return HomeBus.builder()
                 .label(label)
-                .path(path)
+                .path(path.replaceAll(" ", ""))
                 .destination(destination)
                 .totalSeats(totalSeats)
                 .build();
