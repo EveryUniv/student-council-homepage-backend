@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,12 +33,12 @@ public class HomeBusPageService {
     }
 
     public void delete(Long id){
-        Optional<HomeBusTicket> optionalHomeBusTicket = homeBusTicketRepository.findByBusId(id);
-        if(optionalHomeBusTicket.isPresent()){
-            throw new AlreadyHomeBusIssuedException();
-        }else{
+        List<HomeBusTicket> homeBusTickets = homeBusTicketRepository.findByBusId(id);
+        if(homeBusTickets.isEmpty()){
             HomeBus homeBus = homeBusRepository.findById(id).orElseThrow(HomeBusNotFoundException::new);
             homeBusRepository.delete(homeBus);
+        }else{
+            throw new AlreadyHomeBusIssuedException();
         }
     }
 }
