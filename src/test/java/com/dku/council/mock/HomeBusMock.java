@@ -1,7 +1,9 @@
 package com.dku.council.mock;
-
 import com.dku.council.domain.homebus.model.entity.HomeBus;
 import com.dku.council.util.EntityUtil;
+import com.dku.council.domain.homebus.model.dto.HomeBusDto;
+import com.dku.council.domain.homebus.model.entity.HomeBus;
+
 
 public class HomeBusMock {
     public static final String label = "test 호차";
@@ -31,4 +33,12 @@ public class HomeBusMock {
         return homeBus;
     }
 
+    public static HomeBusDto createDummyDto(Long id) {
+        return new HomeBusDto(HomeBus.builder()
+                .label("label")
+                .path("[path1, path2]")
+                .destination("destination")
+                .totalSeats(45).build(), 30);
+    }
+  
 }
