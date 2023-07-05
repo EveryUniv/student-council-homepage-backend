@@ -1,5 +1,6 @@
 package com.dku.council.domain.admin.service;
 
+import com.dku.council.domain.admin.dto.HomeBusPageDto;
 import com.dku.council.domain.admin.dto.request.RequestCreateHomeBusDto;
 import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
 import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
@@ -39,5 +40,10 @@ public class HomeBusPageService {
         }else{
             throw new AlreadyHomeBusIssuedException();
         }
+    }
+
+    public List<HomeBusPageDto> getAllHomeBus() {
+        List<HomeBusPageDto> list = homeBusRepository.getAllHomeBusWithNeedApprovalCnt();
+        return list;
     }
 }
