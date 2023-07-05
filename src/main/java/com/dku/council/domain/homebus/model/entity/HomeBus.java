@@ -37,4 +37,11 @@ public class HomeBus extends BaseEntity {
         this.destination = destination;
         this.totalSeats = totalSeats;
     }
+
+    public void update(String label, String path, String destination, int totalSeats){
+        this.label = label;
+        this.path = path;
+        this.destination = destination;
+        this.totalSeats = totalSeats;
+    }
 }
