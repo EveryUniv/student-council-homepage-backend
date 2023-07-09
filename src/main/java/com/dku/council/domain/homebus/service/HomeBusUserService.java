@@ -33,6 +33,7 @@ public class HomeBusUserService {
     private final HomeBusCancelRequestRepository cancelRepository;
 
 
+    @Transactional(readOnly = true)
     public List<HomeBusDto> listBus(Long userId) {
         // TODO 잔여석
         Map<Long, HomeBusStatus> busStatusMap = new HashMap<>();

@@ -10,4 +10,6 @@ public interface HomeBusTicketRepository extends JpaRepository<HomeBusTicket, Lo
     Optional<HomeBusTicket> findByUserIdAndBusId(Long userId, Long busId);
 
     List<HomeBusTicket> findAllByUserId(Long userId);
+
+    List<HomeBusTicket> findByBusId(Long busId);
 }
