@@ -1,5 +1,7 @@
 package com.dku.council.domain.homebus.service;
 
+import com.dku.council.domain.homebus.exception.AlreadyHomeBusCancelRequestException;
+import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
 import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
 import com.dku.council.domain.homebus.exception.HomeBusTicketNotFoundException;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
@@ -35,7 +37,6 @@ public class HomeBusUserService {
 
     @Transactional(readOnly = true)
     public List<HomeBusDto> listBus(Long userId) {
-        // TODO 잔여석
         Map<Long, HomeBusStatus> busStatusMap = new HashMap<>();
         for (HomeBusTicket ticket : ticketRepository.findAllByUserId(userId)) {
             busStatusMap.put(ticket.getBus().getId(), ticket.getStatus());
@@ -44,19 +45,23 @@ public class HomeBusUserService {
         List<HomeBus> buses = busRepository.findAll();
         return buses.stream()
                 .map(ent -> {
-                    int remainingSeats = 0;
+                    long remainingSeats = ent.getTotalSeats() - ticketRepository.countRequestedSeats(ent.getId()); // TODO 캐싱해서 사용하기
                     HomeBusStatus status = busStatusMap.getOrDefault(ent.getId(), HomeBusStatus.NONE);
-                    return new HomeBusDto(ent, remainingSeats, status);
+                    return new HomeBusDto(ent, (int) remainingSeats, status);
                 })
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public void createTicket(Long userId, Long busId) {
-        // TODO 중복 티켓 신청 필터링
         // TODO 죽전 학생/대학원생만 신청할 수 있도록
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
+
+        // 중복 티켓 신청 필터링
+        if (ticketRepository.findByUserIdAndBusId(userId, busId).isPresent()) {
+            throw new AlreadyHomeBusIssuedException();
+        }
 
         HomeBusTicket ticket = HomeBusTicket.builder()
                 .bus(bus)
@@ -69,9 +74,13 @@ public class HomeBusUserService {
 
     @Transactional
     public void deleteTicket(Long userId, Long busId, RequestCancelTicketDto dto) {
-        // TODO 중복 취소 요청 필터링
         HomeBusTicket ticket = ticketRepository.findByUserIdAndBusId(userId, busId)
                 .orElseThrow(HomeBusTicketNotFoundException::new);
+
+        // 중복 취소 요청 필터링
+        if (cancelRepository.findByTicket(ticket).isPresent()) {
+            throw new AlreadyHomeBusCancelRequestException();
+        }
 
         HomeBusCancelRequest req = HomeBusCancelRequest.builder()
                 .ticket(ticket)
