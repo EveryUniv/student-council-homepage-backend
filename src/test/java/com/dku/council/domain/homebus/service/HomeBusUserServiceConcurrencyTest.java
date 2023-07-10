@@ -20,6 +20,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +63,6 @@ class HomeBusUserServiceConcurrencyTest extends AbstractContainerRedisTest {
             user = userRepository.save(user);
 
             users.add(user);
-            users.add(user);
         }
     }
 
@@ -69,13 +70,14 @@ class HomeBusUserServiceConcurrencyTest extends AbstractContainerRedisTest {
     @DisplayName("동시에 여러 명이 신청해도 일관성을 유지하는가?")
     void createTicketConcurrency() throws InterruptedException {
         // given
+        ExecutorService pool = Executors.newFixedThreadPool(users.size());
         CountDownLatch latch = new CountDownLatch(users.size());
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failedCount = new AtomicInteger(0);
 
         // when
         for (User user : users) {
-            new Thread(() -> {
+            pool.execute(() -> {
                 try {
                     service.createTicket(user.getId(), bus.getId());
                     successCount.incrementAndGet();
@@ -85,7 +87,7 @@ class HomeBusUserServiceConcurrencyTest extends AbstractContainerRedisTest {
                 } finally {
                     latch.countDown();
                 }
-            }).start();
+            });
         }
         latch.await();
 

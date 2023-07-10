@@ -14,12 +14,15 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.global.error.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,31 +52,44 @@ public class HomeBusUserService {
                 .collect(Collectors.toList());
     }
 
+    private final RedissonClient redissonClient;
+
     // TODO 죽전 학생/대학원생만 신청할 수 있도록
-    // TODO 동시성 문제 해결
     @Transactional
     public void createTicket(Long userId, Long busId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
-        HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
-        Long seats = ticketRepository.countRequestedSeats(busId);
+        RLock lock = redissonClient.getLock("homebus:" + busId + ":lock");
+        try {
+            if (!lock.tryLock(20, 3, TimeUnit.SECONDS))
+                throw new RuntimeException("It waited for 20 seconds, but can't acquire lock");
 
-        // 중복 티켓 신청 필터링
-        if (!ticketRepository.findAllByUserId(userId).isEmpty()) {
-            throw new AlreadyHomeBusIssuedException();
+            User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+            HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
+            Long seats = ticketRepository.countRequestedSeats(busId);
+
+            // 중복 티켓 신청 필터링
+            if (!ticketRepository.findAllByUserId(userId).isEmpty()) {
+                throw new AlreadyHomeBusIssuedException();
+            }
+
+            // 자리가 남아야만 신청 가능
+            if (bus.getTotalSeats() <= seats) {
+                throw new FullSeatsException(bus.getTotalSeats());
+            }
+
+            HomeBusTicket ticket = HomeBusTicket.builder()
+                    .bus(bus)
+                    .user(user)
+                    .status(HomeBusStatus.NEED_APPROVAL)
+                    .build();
+
+            ticketRepository.save(ticket);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
         }
-
-        // 자리가 남아야만 신청 가능
-        if (bus.getTotalSeats() <= seats) {
-            throw new FullSeatsException(bus.getTotalSeats());
-        }
-
-        HomeBusTicket ticket = HomeBusTicket.builder()
-                .bus(bus)
-                .user(user)
-                .status(HomeBusStatus.NEED_APPROVAL)
-                .build();
-
-        ticketRepository.save(ticket);
     }
 
     @Transactional
