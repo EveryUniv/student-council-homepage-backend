@@ -33,6 +33,7 @@ public class HomeBusUserService {
     private final HomeBusRepository busRepository;
     private final HomeBusTicketRepository ticketRepository;
     private final HomeBusCancelRequestRepository cancelRepository;
+    private final RedissonClient redissonClient;
 
 
     @Transactional(readOnly = true)
@@ -52,14 +53,12 @@ public class HomeBusUserService {
                 .collect(Collectors.toList());
     }
 
-    private final RedissonClient redissonClient;
-
     // TODO 죽전 학생/대학원생만 신청할 수 있도록
     @Transactional
     public void createTicket(Long userId, Long busId) {
         RLock lock = redissonClient.getLock("homebus:" + busId + ":lock");
         try {
-            if (!lock.tryLock(20, 3, TimeUnit.SECONDS))
+            if (lock != null && !lock.tryLock(20, 3, TimeUnit.SECONDS))
                 throw new RuntimeException("It waited for 20 seconds, but can't acquire lock");
 
             User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);

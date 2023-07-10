@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RedissonClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,9 @@ class HomeBusUserServiceTest {
 
     @Mock
     private HomeBusCancelRequestRepository cancelRepository;
+
+    @Mock
+    private RedissonClient redissonClient;
 
     @InjectMocks
     private HomeBusUserService service;
@@ -88,6 +92,7 @@ class HomeBusUserServiceTest {
         User user = UserMock.createDummyMajor();
         HomeBus bus = HomeBusMock.createWithSeats(31);
 
+        when(redissonClient.getLock(any())).thenReturn(null);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
         when(ticketRepository.countRequestedSeats(bus.getId())).thenReturn(30L);
@@ -118,6 +123,7 @@ class HomeBusUserServiceTest {
         User user = UserMock.createDummyMajor();
         HomeBus bus = HomeBusMock.createWithSeats(51);
 
+        when(redissonClient.getLock(any())).thenReturn(null);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
         when(ticketRepository.countRequestedSeats(bus.getId())).thenReturn(50L);
@@ -137,6 +143,7 @@ class HomeBusUserServiceTest {
         User user = UserMock.createDummyMajor();
         HomeBus bus = HomeBusMock.createWithSeats(50);
 
+        when(redissonClient.getLock(any())).thenReturn(null);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
         when(ticketRepository.countRequestedSeats(bus.getId())).thenReturn(50L);
