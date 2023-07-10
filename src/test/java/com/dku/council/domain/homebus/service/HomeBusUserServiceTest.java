@@ -3,6 +3,7 @@ package com.dku.council.domain.homebus.service;
 import com.dku.council.domain.homebus.exception.AlreadyHomeBusCancelRequestException;
 import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
 import com.dku.council.domain.homebus.exception.FullSeatsException;
+import com.dku.council.domain.homebus.exception.NotJukjeonException;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.dto.HomeBusDto;
 import com.dku.council.domain.homebus.model.dto.RequestCancelTicketDto;
@@ -12,8 +13,10 @@ import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
 import com.dku.council.domain.homebus.repository.HomeBusCancelRequestRepository;
 import com.dku.council.domain.homebus.repository.HomeBusRepository;
 import com.dku.council.domain.homebus.repository.HomeBusTicketRepository;
+import com.dku.council.domain.user.model.Campus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.domain.user.service.UserCampusService;
 import com.dku.council.mock.HomeBusMock;
 import com.dku.council.mock.HomeBusTicketMock;
 import com.dku.council.mock.UserMock;
@@ -39,6 +42,9 @@ class HomeBusUserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserCampusService userCampusService;
 
     @Mock
     private HomeBusRepository busRepository;
@@ -93,6 +99,7 @@ class HomeBusUserServiceTest {
         HomeBus bus = HomeBusMock.createWithSeats(31);
 
         when(redissonClient.getLock(any())).thenReturn(null);
+        when(userCampusService.getUserCampus(user)).thenReturn(Campus.JUKJEON);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
         when(ticketRepository.countRequestedSeats(bus.getId())).thenReturn(30L);
@@ -113,7 +120,19 @@ class HomeBusUserServiceTest {
     @Test
     @DisplayName("죽전이 아닌 사람이 신청하면 오류")
     void failedCreateTicketByNotJuk() {
-        // TODO 죽전 학생/대학원생만 신청할 수 있도록
+        // given
+        User user = UserMock.createDummyMajor();
+        HomeBus bus = HomeBusMock.createWithSeats(51);
+
+        when(redissonClient.getLock(any())).thenReturn(null);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+        when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
+        when(userCampusService.getUserCampus(user)).thenReturn(Campus.CHEONAN);
+        when(ticketRepository.findAllByUserId(user.getId())).thenReturn(List.of());
+
+        // when & then
+        assertThrows(NotJukjeonException.class, () ->
+                service.createTicket(user.getId(), bus.getId()));
     }
 
     @Test
@@ -144,6 +163,7 @@ class HomeBusUserServiceTest {
         HomeBus bus = HomeBusMock.createWithSeats(50);
 
         when(redissonClient.getLock(any())).thenReturn(null);
+        when(userCampusService.getUserCampus(user)).thenReturn(Campus.JUKJEON);
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(busRepository.findById(bus.getId())).thenReturn(Optional.of(bus));
         when(ticketRepository.countRequestedSeats(bus.getId())).thenReturn(50L);
