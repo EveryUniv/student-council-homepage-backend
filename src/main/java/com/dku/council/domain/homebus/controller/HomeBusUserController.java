@@ -27,8 +27,9 @@ public class HomeBusUserController {
      * @return 귀향버스 목록
      */
     @GetMapping
-    public List<HomeBusDto> listBus() {
-        return service.listBus();
+    @UserAuth
+    public List<HomeBusDto> listBus(AppAuthentication auth) {
+        return service.listBus(auth.getUserId());
     }
 
     /**

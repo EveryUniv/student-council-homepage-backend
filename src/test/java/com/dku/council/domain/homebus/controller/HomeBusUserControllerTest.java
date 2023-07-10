@@ -18,9 +18,9 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(HomeBusUserController.class)
 @ImportsForMvc
@@ -31,20 +31,21 @@ class HomeBusUserControllerTest extends AbstractAuthControllerTest {
 
     @Test
     @DisplayName("귀향버스 목록 조회")
-    void listBus() throws Exception{
-        //given
+    void listBus() throws Exception {
+        // given
+        UserAuth.withUser(USER_ID);
         List<HomeBusDto> homeBusDtos = List.of(
                 HomeBusMock.createDummyDto(1L),
                 HomeBusMock.createDummyDto(2L),
                 HomeBusMock.createDummyDto(3L)
         );
-        when(homeBusUserService.listBus()).thenReturn(homeBusDtos);
+        when(homeBusUserService.listBus(USER_ID)).thenReturn(homeBusDtos);
 
-        //when
+        // when
         ResultActions actions = mvc.perform(get("/homebus"))
                 .andExpect(status().isOk());
 
-        //then
+        // then
         for (int i = 0; i < homeBusDtos.size(); i++) {
             HomeBusDto dto = homeBusDtos.get(i);
             actions.andExpect(jsonPath(String.format("$[%d].label", i)).value(dto.getLabel()))
@@ -58,33 +59,33 @@ class HomeBusUserControllerTest extends AbstractAuthControllerTest {
     @Test
     @DisplayName("귀향버스 버스 티켓 신청")
     void createTicket() throws Exception {
-        //given
+        // given
         UserAuth.withUser(USER_ID);
         HomeBusDto dto = HomeBusMock.createDummyDto(5L);
 
-        //when
+        // when
         ResultActions actions = mvc.perform(post("/homebus/ticket/5").with(csrf())
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)));
 
-        //then
+        // then
         actions.andExpect(status().isOk());
     }
 
     @Test
     @DisplayName("귀향버스 버스 티켓 취소 요청")
-    void deleteTicket() throws Exception{
-        //given
+    void deleteTicket() throws Exception {
+        // given
         UserAuth.withUser(USER_ID);
         RequestCancelTicketDto dto = new RequestCancelTicketDto(
                 "depositor", "accountNum", "bankName");
 
-        //when
+        // when
         ResultActions actions = mvc.perform(delete("/homebus/ticket/5").with(csrf())
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)));
 
-        //then
+        // then
         actions.andExpect(status().isOk());
     }
 }
