@@ -15,6 +15,9 @@ public interface HomeBusTicketRepository extends JpaRepository<HomeBusTicket, Lo
 
     Long countByBusId(Long busId);
 
+    /**
+     * 발급된 티켓 + 요청한 티켓 수
+     */
     @Query("select count(*) from HomeBusTicket " +
             "where bus.id = :busId and (status = 'NEED_APPROVAL' or status = 'ISSUED')")
     Long countRequestedSeats(@Param("busId") Long busId);

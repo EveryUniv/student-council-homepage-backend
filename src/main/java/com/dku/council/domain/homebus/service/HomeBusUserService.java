@@ -1,9 +1,6 @@
 package com.dku.council.domain.homebus.service;
 
-import com.dku.council.domain.homebus.exception.AlreadyHomeBusCancelRequestException;
-import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
-import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
-import com.dku.council.domain.homebus.exception.HomeBusTicketNotFoundException;
+import com.dku.council.domain.homebus.exception.*;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.dto.HomeBusDto;
 import com.dku.council.domain.homebus.model.dto.RequestCancelTicketDto;
@@ -52,15 +49,22 @@ public class HomeBusUserService {
                 .collect(Collectors.toList());
     }
 
+    // TODO 죽전 학생/대학원생만 신청할 수 있도록
+    // TODO 동시성 문제 해결
     @Transactional
     public void createTicket(Long userId, Long busId) {
-        // TODO 죽전 학생/대학원생만 신청할 수 있도록
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
         HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
+        Long seats = ticketRepository.countRequestedSeats(busId);
 
         // 중복 티켓 신청 필터링
-        if (ticketRepository.findByUserIdAndBusId(userId, busId).isPresent()) {
+        if (!ticketRepository.findAllByUserId(userId).isEmpty()) {
             throw new AlreadyHomeBusIssuedException();
+        }
+
+        // 자리가 남아야만 신청 가능
+        if (bus.getTotalSeats() <= seats) {
+            throw new FullSeatsException(bus.getTotalSeats());
         }
 
         HomeBusTicket ticket = HomeBusTicket.builder()
@@ -88,7 +92,6 @@ public class HomeBusUserService {
                 .bankName(dto.getBankName())
                 .depositor(dto.getDepositor())
                 .build();
-
         cancelRepository.save(req);
     }
 }
