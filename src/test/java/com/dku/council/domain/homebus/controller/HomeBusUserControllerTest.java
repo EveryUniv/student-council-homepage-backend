@@ -7,6 +7,7 @@ import com.dku.council.mock.HomeBusMock;
 import com.dku.council.mock.user.UserAuth;
 import com.dku.council.util.base.AbstractAuthControllerTest;
 import com.dku.council.util.test.ImportsForMvc;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -87,5 +88,24 @@ class HomeBusUserControllerTest extends AbstractAuthControllerTest {
 
         // then
         actions.andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("귀향버스 티켓 취소 요청 - 누락된 값이 있을 때")
+    void deleteTicketWithNull() throws Exception {
+        // given
+        UserAuth.withUser(USER_ID);
+        RequestCancelTicketDto dto = new RequestCancelTicketDto(
+                "depositor", null, "bankName");
+        HomeBusDto homeBusDto = HomeBusMock.createDummyDto(5L);
+
+
+        // when
+        ResultActions actions = mvc.perform(delete("/homebus/ticket/5").with(csrf())
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)));
+
+        // then
+        actions.andExpect(status().isBadRequest());
     }
 }
