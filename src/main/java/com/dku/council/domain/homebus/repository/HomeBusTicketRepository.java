@@ -1,5 +1,6 @@
 package com.dku.council.domain.homebus.repository;
 
+import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +22,6 @@ public interface HomeBusTicketRepository extends JpaRepository<HomeBusTicket, Lo
     @Query("select count(*) from HomeBusTicket " +
             "where bus.id = :busId and (status = 'NEED_APPROVAL' or status = 'ISSUED')")
     Long countRequestedSeats(@Param("busId") Long busId);
+
+    List<HomeBusTicket> findAllByBusIdAndStatus(Long busId, HomeBusStatus status);
 }

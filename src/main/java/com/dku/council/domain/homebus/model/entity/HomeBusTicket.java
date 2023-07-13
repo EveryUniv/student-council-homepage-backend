@@ -33,11 +33,17 @@ public class HomeBusTicket extends BaseEntity {
 
     @Enumerated(STRING)
     private HomeBusStatus status;
+    private String approvalName;
 
     @Builder
     private HomeBusTicket(User user, HomeBus bus, HomeBusStatus status) {
         this.user = user;
         this.bus = bus;
         this.status = status;
+    }
+
+    public void issue(String adminName) {
+        this.status = HomeBusStatus.ISSUED;
+        this.approvalName = adminName;
     }
 }
