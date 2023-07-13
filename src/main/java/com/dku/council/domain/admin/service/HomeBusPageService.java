@@ -1,10 +1,7 @@
 package com.dku.council.domain.admin.service;
 
 import com.dku.council.domain.admin.dto.request.RequestCreateHomeBusDto;
-import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
-import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
-import com.dku.council.domain.homebus.exception.HomeBusTicketNotFoundException;
-import com.dku.council.domain.homebus.exception.InvalidTicketApprovalException;
+import com.dku.council.domain.homebus.exception.*;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBus;
 import com.dku.council.domain.homebus.model.entity.HomeBusCancelRequest;
@@ -48,6 +45,10 @@ public class HomeBusPageService {
     public void update(Long id, RequestCreateHomeBusDto dto) {
         HomeBus homeBus = homeBusRepository.findById(id).orElseThrow(HomeBusNotFoundException::new);
         // todo : redis caching data 필요. 전체 좌석 개수를 잔여석보다 적게 설정하는 것은 불가능하다.
+        long remainingSeats = homeBus.getTotalSeats() - homeBusTicketRepository.countRequestedSeats(id);
+        if(dto.getTotalSeats() < remainingSeats) {
+            throw new ExceedLimitException(String.valueOf(remainingSeats));
+        }
         homeBus.update(dto.getLabel(), dto.getPath(), dto.getDestination(), dto.getTotalSeats());
     }
 
