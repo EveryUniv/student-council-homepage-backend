@@ -3,13 +3,19 @@ package com.dku.council.domain.admin.service;
 import com.dku.council.domain.admin.dto.request.RequestCreateHomeBusDto;
 import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
 import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
+import com.dku.council.domain.homebus.exception.HomeBusTicketNotFoundException;
 import com.dku.council.domain.homebus.exception.InvalidTicketApprovalException;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBus;
 import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
 import com.dku.council.domain.homebus.repository.HomeBusRepository;
 import com.dku.council.domain.homebus.repository.HomeBusTicketRepository;
+import com.dku.council.domain.homebus.service.HomeBusUserService;
 import com.dku.council.domain.user.model.SMSAuth;
+import com.dku.council.domain.user.model.entity.User;
+import com.dku.council.domain.user.repository.UserFindRepository;
+import com.dku.council.domain.user.repository.UserRepository;
+import com.dku.council.global.error.exception.UserNotFoundException;
 import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -27,6 +33,9 @@ import java.util.Locale;
 public class HomeBusPageService {
     private final HomeBusRepository homeBusRepository;
     private final HomeBusTicketRepository homeBusTicketRepository;
+    private final HomeBusUserService homeBusUserService;
+    private final UserRepository userRepository;
+
     private final SMSService smsService;
     private final MessageSource messageSource;
 
@@ -77,14 +86,32 @@ public class HomeBusPageService {
         // ex) x호차(대구 - 부산) 노선 신청이 완료되었습니다. 총학생회 신청 홈페이지에서 승차권 확인 부탁드립니다. 탑승 당일 원활한 진행을 위해 스태프에게 승차권을 제시해주세요.
         homeBusTickets.forEach(ticket -> {
             String phoneNumber = ticket.getUser().getPhone().trim().replaceAll("-", "");
-            String label = ticket.getBus().getLabel();
-            String path = ticket.getBus().getPath().replaceAll(",", " - ");
-            String destination = ticket.getBus().getDestination();
-            Locale locale = LocaleContextHolder.getLocale();
-            smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.approve-message", new Object[]{label, path, destination}, locale));
+            sendHomeBusSMS(ticket, phoneNumber);
         });
     }
 
+    /**
+     * 강제로 티켓을 발급한다.
+     * @param studentId 학번:2103302
+     * @param busId     버스 id
+     * @param adminName "관리자 이름"
+     */
+    public void forceIssue(String studentId, Long busId, String adminName){
+        User user = userRepository.findByStudentId(studentId).orElseThrow(UserNotFoundException::new);
+        homeBusUserService.createTicket(user.getId(), busId);
+        HomeBusTicket ticket = homeBusTicketRepository.findByUserIdAndBusId(user.getId(), busId).orElseThrow(HomeBusTicketNotFoundException::new);
+        ticket.issue(adminName);
+        String phoneNumber = user.getPhone().trim().replaceAll("-", "");
+        sendHomeBusSMS(ticket, phoneNumber);
+    }
+
+    private void sendHomeBusSMS(HomeBusTicket ticket, String phoneNumber) {
+        String label = ticket.getBus().getLabel();
+        String path = ticket.getBus().getPath().replaceAll(",", " - ");
+        String destination = ticket.getBus().getDestination();
+        Locale locale = LocaleContextHolder.getLocale();
+        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.approve-message", new Object[]{label, path, destination}, locale));
+    }
 
 
 }
