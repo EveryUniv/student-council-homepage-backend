@@ -46,4 +46,13 @@ public class HomeBusTicket extends BaseEntity {
         this.status = HomeBusStatus.ISSUED;
         this.approvalName = adminName;
     }
+
+    public void cancel(String adminName){
+        this.status = HomeBusStatus.CANCELLED;
+        this.approvalName = adminName;
+    }
+
+    public void requestCancel(){
+        this.status = HomeBusStatus.NEED_CANCEL_APPROVAL;
+    }
 }

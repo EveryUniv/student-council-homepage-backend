@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class InvalidTicketApprovalException extends LocalizedMessageException {
     public InvalidTicketApprovalException() {
-        super(HttpStatus.BAD_REQUEST, "invalid.only-jukjeon");
+        super(HttpStatus.BAD_REQUEST, "invalid.ticket-approval");
     }
 }
