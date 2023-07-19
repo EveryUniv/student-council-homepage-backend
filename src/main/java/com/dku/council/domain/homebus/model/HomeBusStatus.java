@@ -2,6 +2,11 @@ package com.dku.council.domain.homebus.model;
 
 public enum HomeBusStatus {
     /**
+     * 신청 가능. (기본 상태)
+     */
+    NONE,
+
+    /**
      * 승인 대기
      */
     NEED_APPROVAL,
