@@ -115,5 +115,7 @@ public class HomeBusUserService {
                 .depositor(dto.getDepositor())
                 .build();
         cancelRepository.save(req);
+
+        ticket.requestCancel();
     }
 }

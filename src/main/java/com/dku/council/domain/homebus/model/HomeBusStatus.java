@@ -19,5 +19,10 @@ public enum HomeBusStatus {
     /**
      * 취소 승인 대기
      */
-    NEED_CANCEL_APPROVAL
+    NEED_CANCEL_APPROVAL,
+
+    /**
+     * 취소 승인 완료
+     */
+    CANCELLED
 }
