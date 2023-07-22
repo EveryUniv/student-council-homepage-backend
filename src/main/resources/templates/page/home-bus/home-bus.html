@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 귀향버스', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2>귀향버스 목록</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage|}" style="color: white">홈으로</a>
+            </p>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Label</th>
+                <th scope="col">경로</th>
+                <th scope="col">목적지</th>
+                <th scope="col">총 좌석</th>
+                <th scope="col">승인 대기 수</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="homeBus : ${homeBus}">
+                <td th:text="${homeBus.id}"></td>
+                <td th:text="${homeBus.label}"></td>
+                <td th:text="${homeBus.path}"></td>
+                <td th:text="${homeBus.destination}"></td>
+                <td th:text="${homeBus.totalSeats}"></td>
+                <td th:text="${homeBus.needApprovalCnt}"></td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package com.dku.council.domain.admin.service;
 
+import com.dku.council.domain.admin.dto.HomeBusPageDto;
 import com.dku.council.domain.admin.dto.request.RequestCreateHomeBusDto;
 import com.dku.council.domain.homebus.exception.*;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
@@ -62,6 +63,10 @@ public class HomeBusPageService {
         }
     }
 
+    public List<HomeBusPageDto> getAllHomeBus() {
+        List<HomeBusPageDto> list = homeBusRepository.getAllHomeBusWithNeedApprovalCnt();
+        return list;
+    }
 
     /**
      * 해당 버스의 상태 값에 따른 리스트를 반환한다.
@@ -154,6 +159,4 @@ public class HomeBusPageService {
         Locale locale = LocaleContextHolder.getLocale();
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.cancel-message", new Object[]{depositor}, locale));
     }
-
-
 }
