@@ -32,7 +32,7 @@ public class TicketRedisRepository implements TicketMemoryRepository {
         RLock lock = redissonClient.getLock(key + ":lock");
 
         try {
-            if (!lock.tryLock(20, 3, TimeUnit.SECONDS))
+            if (lock != null && !lock.tryLock(20, 3, TimeUnit.SECONDS))
                 throw new RuntimeException("It waited for 20 seconds, but can't acquire lock");
 
             String nextIdKey = RedisKeys.combine(TICKET_NEXT_KEY, ticketEventId);
