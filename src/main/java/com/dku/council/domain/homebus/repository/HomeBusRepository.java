@@ -20,4 +20,7 @@ public interface HomeBusRepository extends JpaRepository<HomeBus, Long> {
             "group by b.id")
     List<HomeBusPageDto> getAllHomeBusWithNeedApprovalCnt();
 
+
+
+
 }

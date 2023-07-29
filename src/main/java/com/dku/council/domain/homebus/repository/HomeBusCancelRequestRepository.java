@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface HomeBusCancelRequestRepository extends JpaRepository<HomeBusCancelRequest, Long> {
     Optional<HomeBusCancelRequest> findByTicket(HomeBusTicket ticket);
+
+    void deleteByTicket(HomeBusTicket ticket);
 }
