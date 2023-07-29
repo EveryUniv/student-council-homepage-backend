@@ -34,6 +34,7 @@ public class HomeBusTicket extends BaseEntity {
 
     @Enumerated(STRING)
     private HomeBusStatus status;
+    private String approvalName;
 
     @Builder
     private HomeBusTicket(User user, HomeBus bus, HomeBusStatus status) {
@@ -42,10 +43,28 @@ public class HomeBusTicket extends BaseEntity {
         this.status = status;
     }
 
-    public void approvalTicket() {
+    public void issue(String adminName) {
+        this.status = HomeBusStatus.ISSUED;
+        this.approvalName = adminName;
+    }
+
+    public void cancel(String adminName){
+        if (this.status != HomeBusStatus.NEED_CANCEL_APPROVAL)
+            throw new HomeBusTicketStatusException("This request is only available for tickets with \"NEED_CANCEL_APPROVAL\" status");
+
+        this.status = HomeBusStatus.CANCELLED;
+        this.approvalName = adminName;
+    }
+
+    public void requestCancel(){
+        this.status = HomeBusStatus.NEED_CANCEL_APPROVAL;
+    }
+
+    public void approvalTicket(String adminName) {
         if (this.status != HomeBusStatus.NEED_APPROVAL)
             throw new HomeBusTicketStatusException("Only tickets with \"need approval\" status can be accepted.");
 
+        this.approvalName = adminName;
         this.status = HomeBusStatus.ISSUED;
     }
 

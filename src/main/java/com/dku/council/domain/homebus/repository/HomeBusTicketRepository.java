@@ -1,5 +1,6 @@
 package com.dku.council.domain.homebus.repository;
 
+import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.admin.dto.CancelApprovalTicketsDto;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBus;
@@ -34,4 +35,6 @@ public interface HomeBusTicketRepository extends JpaRepository<HomeBusTicket, Lo
             "on c.ticket.id = t.id " +
             "where t.bus = :bus and t.status = 'NEED_CANCEL_APPROVAL'")
     List<CancelApprovalTicketsDto> getCancelApprovalTicketByBus(HomeBus bus);
+
+    List<HomeBusTicket> findAllByBusIdAndStatus(Long busId, HomeBusStatus status);
 }

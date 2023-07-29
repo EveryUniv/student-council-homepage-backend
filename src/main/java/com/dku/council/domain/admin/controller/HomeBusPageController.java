@@ -7,6 +7,7 @@ import com.dku.council.domain.admin.service.HomeBusPageService;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBus;
 import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
+import com.dku.council.global.auth.jwt.AppAuthentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -61,14 +62,16 @@ public class HomeBusPageController {
     }
 
     @PostMapping("/ticket/{ticketId}/approval")
-    public String updateTicketStatus(HttpServletRequest request, @PathVariable Long ticketId) {
-        homeBusPageService.approvalOrCancleByTicketStatus(ticketId);
+    public String updateTicketStatus(HttpServletRequest request, AppAuthentication auth, @PathVariable Long ticketId) {
+        Long userId = auth.getUserId();
+        homeBusPageService.approvalOrCancleByTicketStatus(ticketId, userId);
         return "redirect:" + request.getHeader("Referer");
     }
 
     @PostMapping("/ticket/{ticketId}/cancel")
-    public String cancelTicket(HttpServletRequest request, @PathVariable Long ticketId) {
-        homeBusPageService.cancelTicket(ticketId);
+    public String cancelTicket(HttpServletRequest request, AppAuthentication auth, @PathVariable Long ticketId) {
+        Long userId = auth.getUserId();
+        homeBusPageService.cancelTicket(ticketId, userId);
         return "redirect:" + request.getHeader("Referer");
     }
 }
