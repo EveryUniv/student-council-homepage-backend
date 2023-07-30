@@ -1,5 +1,6 @@
 package com.dku.council.domain.homebus.model.entity;
 
+import com.dku.council.domain.homebus.exception.HomeBusTicketStatusException;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.global.base.BaseEntity;
@@ -48,11 +49,26 @@ public class HomeBusTicket extends BaseEntity {
     }
 
     public void cancel(String adminName){
+        if (this.status != HomeBusStatus.NEED_CANCEL_APPROVAL)
+            throw new HomeBusTicketStatusException("This request is only available for tickets with \"NEED_CANCEL_APPROVAL\" status");
+
         this.status = HomeBusStatus.CANCELLED;
         this.approvalName = adminName;
     }
 
     public void requestCancel(){
         this.status = HomeBusStatus.NEED_CANCEL_APPROVAL;
+    }
+
+    public void approvalTicket(String adminName) {
+        if (this.status != HomeBusStatus.NEED_APPROVAL)
+            throw new HomeBusTicketStatusException("Only tickets with \"need approval\" status can be accepted.");
+
+        this.approvalName = adminName;
+        this.status = HomeBusStatus.ISSUED;
+    }
+
+    public void setStatusToNeedApproval() {
+        this.status = HomeBusStatus.NEED_APPROVAL;
     }
 }

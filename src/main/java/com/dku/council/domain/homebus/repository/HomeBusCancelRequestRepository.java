@@ -12,4 +12,6 @@ public interface HomeBusCancelRequestRepository extends JpaRepository<HomeBusCan
     Optional<HomeBusCancelRequest> findByTicket(HomeBusTicket ticket);
 
     List<HomeBusCancelRequest> findAllByTicketIn(List<HomeBusTicket> ticketList);
+
+    void deleteByTicket(HomeBusTicket ticket);
 }
