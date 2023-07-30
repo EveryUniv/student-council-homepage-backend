@@ -1,11 +1,19 @@
 package com.dku.council.domain.admin.service;
 
+import com.dku.council.domain.admin.dto.CancelApprovalTicketsDto;
 import com.dku.council.domain.admin.dto.HomeBusPageDto;
 import com.dku.council.domain.admin.dto.request.RequestCreateHomeBusDto;
 import com.dku.council.domain.homebus.exception.*;
 import com.dku.council.domain.homebus.model.HomeBusStatus;
+import com.dku.council.domain.homebus.exception.AlreadyHomeBusIssuedException;
+import com.dku.council.domain.homebus.exception.HomeBusNotFoundException;
+import com.dku.council.domain.homebus.exception.HomeBusTicketNotFoundException;
+import com.dku.council.domain.homebus.exception.HomeBusTicketStatusException;
+import com.dku.council.domain.homebus.model.HomeBusStatus;
 import com.dku.council.domain.homebus.model.entity.HomeBus;
 import com.dku.council.domain.homebus.model.entity.HomeBusCancelRequest;
+import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
+import com.dku.council.domain.homebus.repository.HomeBusCancelRequestRepository;
 import com.dku.council.domain.homebus.model.entity.HomeBusTicket;
 import com.dku.council.domain.homebus.repository.HomeBusCancelRequestRepository;
 import com.dku.council.domain.homebus.repository.HomeBusRepository;
@@ -25,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,8 +45,10 @@ public class HomeBusPageService {
     private final HomeBusCancelRequestRepository homeBusCancelRequestRepository;
     private final UserRepository userRepository;
 
+
     private final SMSService smsService;
     private final MessageSource messageSource;
+
 
     public void create(RequestCreateHomeBusDto dto) {
         HomeBus homeBus = dto.toEntity();
@@ -74,6 +86,7 @@ public class HomeBusPageService {
      * @param status    NONE, NEED_APPROVAL, ISSUED, NEED_CANCEL_APPROVAL, CANCELED
      * @return
      */
+    @Deprecated
     public List<HomeBusTicket> getHomeBusTicketList(Long busId, HomeBusStatus status) {
         return homeBusTicketRepository.findAllByBusIdAndStatus(busId, status);
     }
@@ -84,6 +97,7 @@ public class HomeBusPageService {
      * @param status  NEED_CANCEL_APPROVAL, CANCELED
      * @return
      */
+    @Deprecated
     public List<HomeBusCancelRequest> getHomeBusCancelRequestList(Long busId, HomeBusStatus status) {
         List<HomeBusTicket> ticketList = homeBusTicketRepository.findAllByBusIdAndStatus(busId, status);
         return homeBusCancelRequestRepository.findAllByTicketIn(ticketList);
@@ -95,6 +109,7 @@ public class HomeBusPageService {
      * @param ticketIds : [1, 2, 3, 4, 5]
      * @param adminName : "관리자 이름"
      */
+    @Deprecated
     public void issue(List<Long> ticketIds, String adminName) {
         List<HomeBusTicket> homeBusTickets = homeBusTicketRepository.findAllById(ticketIds);
         // 승인 대기 상태가 아닌 티켓이 포함되어 있으면 예외를 발생시킨다.
@@ -114,6 +129,7 @@ public class HomeBusPageService {
      * @param ticketIds : [1, 2, 3, 4, 5]
      * @param adminName : "관리자 이름"
      */
+    @Deprecated
     public void cancel(List<Long> ticketIds, String adminName) {
         List<HomeBusTicket> homeBusTickets = homeBusTicketRepository.findAllById(ticketIds);
         //취소 대기 상태가 아닌 티켓이 포함되어 있으면 예외를 발생시킨다.
@@ -155,7 +171,71 @@ public class HomeBusPageService {
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.approve-message", new Object[]{label, path, destination}, locale));
     }
 
+
+
     private void sendHomeBusCancelSMS(String depositor, String phoneNumber) {
+        Locale locale = LocaleContextHolder.getLocale();
+        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.cancel-message", new Object[]{depositor}, locale));
+    }
+
+    public HomeBus getHomeBusById(Long busId){
+        return homeBusRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
+    }
+
+    public List<HomeBusTicket> getTicketsByBusAndStatus(HomeBus bus, HomeBusStatus status) {
+        if(status == null) status = HomeBusStatus.NEED_APPROVAL;
+        return homeBusTicketRepository.findByBusAndStatus(bus, status);
+    }
+
+    public List<CancelApprovalTicketsDto> getCancelApprovalTicketByBus(HomeBus bus) {
+        return homeBusTicketRepository.getCancelApprovalTicketByBus(bus);
+    }
+
+    public void approvalOrCancleByTicketStatus(Long ticketId, Long adminId) {
+        HomeBusTicket homeBusTicket = homeBusTicketRepository.findById(ticketId).orElseThrow(HomeBusTicketNotFoundException::new);
+        User admin = userRepository.findById(adminId).orElseThrow(UserNotFoundException::new);
+        if (homeBusTicket.getStatus() == HomeBusStatus.NEED_APPROVAL) {
+            homeBusTicket.approvalTicket(admin.getName());
+            sendHomeBusSMS(homeBusTicket);
+            return;
+        }
+        if (homeBusTicket.getStatus() == HomeBusStatus.ISSUED) {
+            homeBusTicket.setStatusToNeedApproval();
+            return;
+        }
+
+        throw new HomeBusTicketStatusException("This request is only available for tickets with \"NEED_APPROVAL\", \"ISSUED\" status");
+    }
+
+    private void sendHomeBusSMS(HomeBusTicket ticket) {
+        String phoneNumber = ticket.getUser().getPhone().trim().replaceAll("-", "");
+
+        String label = ticket.getBus().getLabel();
+        String path = ticket.getBus().getPath().replaceAll(",", " - ");
+        String destination = ticket.getBus().getDestination();
+        Locale locale = LocaleContextHolder.getLocale();
+
+        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.approve-message", new Object[]{label, path, destination}, locale));
+    }
+
+    public void cancelTicket(Long ticketId, Long userId) {
+        HomeBusTicket ticket = homeBusTicketRepository.findById(ticketId).orElseThrow(HomeBusTicketNotFoundException::new);
+        User admin = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        ticket.cancel(admin.getName());
+
+        Optional<HomeBusCancelRequest> optionalTicket = homeBusCancelRequestRepository.findByTicket(ticket);
+
+        if(optionalTicket.isPresent()){
+            HomeBusCancelRequest cancelTicket = optionalTicket.get();
+
+            sendHomeBusCancelSMS(cancelTicket);
+        }
+
+        return;
+    }
+    private void sendHomeBusCancelSMS(HomeBusCancelRequest cancelTicket) {
+        String depositor = cancelTicket.getDepositor();
+        String phoneNumber = cancelTicket.getTicket().getUser().getPhone().trim().replaceAll("-", "");
         Locale locale = LocaleContextHolder.getLocale();
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.cancel-message", new Object[]{depositor}, locale));
     }
