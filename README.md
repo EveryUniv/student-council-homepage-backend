@@ -13,9 +13,28 @@
 
 ![Server arch](docs/images/server_arch.png)
 
-서버 구성에 대한 고민: [Blog](https://won983212.github.io/posts/server-architecture/)
+#### 안내
+ - 서버 SSH접속을 위해서 키가 필요합니다. 키는 개인적으로 문의해주세요.
+ - 데이터베이스나 서버에 접속하려면 Gateway를 통과해야합니다.
+   - 현재는 개발서버를 Gateway로 사용중입니다. (비용문제)
+ - APM서버는 Grafana, Pinpoint 두 개로 운영하고 있습니다.
+   - 주소는 단톡방에 공지로 올려두었습니다.
+ - CI/CD 플로우는 Github Actions를 참고해주세요.
+ - 설정(yaml) 파일은 서버 내부에 있습니다. 수정하려면 SSH로 접근해서 수정해야합니다.
+   - 설정을 수정하였다면 서버를 다시시작해야합니다.
+   - Github Actions에서 최근 action을 다시 실행하면 **무중단으로 배포**됩니다.
+ - 도메인은 가비아로 관리하고 있습니다. 권한이 필요하다면 문의주세요.
+ - **운영 데이터베이스 스키마는 JPA에 의해 자동으로 업데이트되지 않습니다.**
+   - 데이터베이스 스키마가 변경된 경우 **직접** 수정해야합니다.
+   - 운영 DB 스키마는 자동반영되지않게 주의하세요.
+ - 배포 방법은 배포 branch로 PR올리고 merge하면 됩니다.
+   - 개발서버로 배포: **dev_deploy**
+   - 운영서버로 배포: **main**
 
-무중단 배포: [Blog](https://won983212.github.io/posts/non-stop-deployment/)
+#### 참고할만한 자료
+- 무중단 배포: [Blog](https://won983212.github.io/posts/non-stop-deployment/)
+- 서버 구성에 대한 고민(구): [Blog](https://won983212.github.io/posts/server-architecture/)
+  - 이 글에서 설명하는 Bastion은 비용문제로 현재 운영하고 있지 않습니다.
 
 ### 주요 사용 기술
 
@@ -45,6 +64,7 @@
  - 학사일정 보기
  - 버스 도착시각 예측
  - 대여 물품
+ - 귀향버스
 
 ## 기능 상세
 
@@ -93,6 +113,11 @@
  - 총학생회에서 대여할 수 있는 물품 목록(이름, 대여 가능한 개수)을 볼 수 있다.
  - 대여 현황을 볼 수 있다.
  - 물품 반납 처리는 총학생회에서 직접한다.
+
+### 귀향버스 ([관련 이슈](https://github.com/EveryUniv/student-council-homepage-backend/issues/405))
+ - 죽전 학생들은 귀향버스를 신청할 수 있다.
+ - 신청, 취소 모두 학생회의 승인이 필요하다.
+   - 자리수, 죽/천 구분, 입금 문제 등
 
 ## DB 설계
 
