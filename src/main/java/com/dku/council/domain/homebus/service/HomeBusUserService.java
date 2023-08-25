@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -66,6 +67,15 @@ public class HomeBusUserService {
             User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
             HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
             Long seats = ticketRepository.countRequestedSeats(busId);
+
+            //이미 한 번 이상 취소했다가 다시 신청하는 경우 검증 로직
+            Optional<HomeBusTicket> checkTicket = ticketRepository.findByUserIdAndBusId(userId, busId);
+            if(checkTicket.isPresent()){
+                if(checkTicket.get().getStatus() == HomeBusStatus.CANCELLED){
+                    cancelRepository.findByTicket(checkTicket.get()).ifPresent(cancelRepository::delete);
+                    ticketRepository.delete(checkTicket.get());
+                }
+            }
 
             // 중복 티켓 신청 필터링
             if (!ticketRepository.findAllByUserId(userId).isEmpty()) {
