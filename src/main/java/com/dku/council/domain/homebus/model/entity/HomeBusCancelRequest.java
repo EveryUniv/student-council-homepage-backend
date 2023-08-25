@@ -23,6 +23,8 @@ public class HomeBusCancelRequest extends BaseEntity {
     @JoinColumn(name = "ticket_id")
     private HomeBusTicket ticket;
 
+    private Long busId;
+
     private String depositor;
 
     private String accountNum;
@@ -30,10 +32,16 @@ public class HomeBusCancelRequest extends BaseEntity {
     private String bankName;
 
     @Builder
-    private HomeBusCancelRequest(HomeBusTicket ticket, String depositor, String accountNum, String bankName) {
+    private HomeBusCancelRequest(HomeBusTicket ticket, Long busId, String depositor, String accountNum, String bankName) {
         this.ticket = ticket;
+        this.busId = busId;
         this.depositor = depositor;
         this.accountNum = accountNum;
         this.bankName = bankName;
+    }
+
+
+    public void changeTicketToDummy() {
+        this.ticket = null;
     }
 }
