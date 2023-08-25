@@ -67,28 +67,45 @@ public class HomeBusUserService {
             HomeBus bus = busRepository.findById(busId).orElseThrow(HomeBusNotFoundException::new);
             Long seats = ticketRepository.countRequestedSeats(busId);
 
+
             // 중복 티켓 신청 필터링
-            if (!ticketRepository.findAllByUserId(userId).isEmpty()) {
-                throw new AlreadyHomeBusIssuedException();
+            if(!ticketRepository.findAllByUserId(userId).isEmpty()) {
+                //이미 한 번 이상 취소했다가 다시 신청하는 경우 검증 로직
+                if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.CANCELLED))){
+                    ticketRepository.findAllByUserId(userId).forEach(ticket -> {
+                        HomeBusCancelRequest request = cancelRepository.findByTicket(ticket).orElseThrow(HomeBusTicketNotFoundException::new);
+                        request.changeTicketToDummy();
+                        ticketRepository.delete(ticket);
+
+                        HomeBusTicket newTicket = HomeBusTicket.builder()
+                                .bus(bus)
+                                .user(user)
+                                .status(HomeBusStatus.NEED_APPROVAL)
+                                .build();
+                        ticketRepository.save(newTicket);
+                    });
+                }else {
+                    throw new AlreadyHomeBusIssuedException();
+                }
+            }else{
+                // 죽전 캠퍼스만 신청 가능
+                if (userCampusService.getUserCampus(user) != Campus.JUKJEON) {
+                    throw new NotJukjeonException();
+                }
+
+                // 자리가 남아야만 신청 가능
+                if (bus.getTotalSeats() <= seats) {
+                    throw new FullSeatsException(bus.getTotalSeats());
+                }
+
+                HomeBusTicket ticket = HomeBusTicket.builder()
+                        .bus(bus)
+                        .user(user)
+                        .status(HomeBusStatus.NEED_APPROVAL)
+                        .build();
+                ticketRepository.save(ticket);
             }
 
-            // 죽전 캠퍼스만 신청 가능
-            if (userCampusService.getUserCampus(user) != Campus.JUKJEON) {
-                throw new NotJukjeonException();
-            }
-
-            // 자리가 남아야만 신청 가능
-            if (bus.getTotalSeats() <= seats) {
-                throw new FullSeatsException(bus.getTotalSeats());
-            }
-
-            HomeBusTicket ticket = HomeBusTicket.builder()
-                    .bus(bus)
-                    .user(user)
-                    .status(HomeBusStatus.NEED_APPROVAL)
-                    .build();
-
-            ticketRepository.save(ticket);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
@@ -104,12 +121,13 @@ public class HomeBusUserService {
                 .orElseThrow(HomeBusTicketNotFoundException::new);
 
         // 중복 취소 요청 필터링
-        if (cancelRepository.findByTicket(ticket).isPresent()) {
+        if (ticketRepository.findAllByUserId(userId).stream().anyMatch(busTicket -> busTicket.getStatus().equals(HomeBusStatus.NEED_CANCEL_APPROVAL))) {
             throw new AlreadyHomeBusCancelRequestException();
         }
 
         HomeBusCancelRequest req = HomeBusCancelRequest.builder()
                 .ticket(ticket)
+                .busId(busId)
                 .accountNum(dto.getAccountNum())
                 .bankName(dto.getBankName())
                 .depositor(dto.getDepositor())
