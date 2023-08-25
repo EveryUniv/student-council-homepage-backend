@@ -71,12 +71,4 @@ public class HomeBusTicket extends BaseEntity {
     public void setStatusToNeedApproval() {
         this.status = HomeBusStatus.NEED_APPROVAL;
     }
-
-    public void changeToNewBus(HomeBus bus) {
-        this.bus = bus;
-    }
-
-    public void changeApprovalNameToNull() {
-        this.approvalName = null;
-    }
 }

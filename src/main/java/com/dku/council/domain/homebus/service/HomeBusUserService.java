@@ -70,18 +70,21 @@ public class HomeBusUserService {
 
             // 중복 티켓 신청 필터링
             if(!ticketRepository.findAllByUserId(userId).isEmpty()) {
-
                 //이미 한 번 이상 취소했다가 다시 신청하는 경우 검증 로직
                 if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.CANCELLED))){
                     ticketRepository.findAllByUserId(userId).forEach(ticket -> {
-                        ticket.changeToNewBus(bus);
-                        ticket.setStatusToNeedApproval();
-                        ticket.changeApprovalNameToNull();
-                        cancelRepository.deleteByTicket(ticket);
-                        ticketRepository.save(ticket);
-                    });
+                        HomeBusCancelRequest request = cancelRepository.findByTicket(ticket).orElseThrow(HomeBusTicketNotFoundException::new);
+                        request.changeTicketToDummy();
+                        ticketRepository.delete(ticket);
 
-                }else{
+                        HomeBusTicket newTicket = HomeBusTicket.builder()
+                                .bus(bus)
+                                .user(user)
+                                .status(HomeBusStatus.NEED_APPROVAL)
+                                .build();
+                        ticketRepository.save(newTicket);
+                    });
+                }else {
                     throw new AlreadyHomeBusIssuedException();
                 }
             }else{
@@ -118,12 +121,13 @@ public class HomeBusUserService {
                 .orElseThrow(HomeBusTicketNotFoundException::new);
 
         // 중복 취소 요청 필터링
-        if (cancelRepository.findByTicket(ticket).isPresent()) {
+        if (ticketRepository.findAllByUserId(userId).stream().anyMatch(busTicket -> busTicket.getStatus().equals(HomeBusStatus.NEED_CANCEL_APPROVAL))) {
             throw new AlreadyHomeBusCancelRequestException();
         }
 
         HomeBusCancelRequest req = HomeBusCancelRequest.builder()
                 .ticket(ticket)
+                .busId(busId)
                 .accountNum(dto.getAccountNum())
                 .bankName(dto.getBankName())
                 .depositor(dto.getDepositor())
