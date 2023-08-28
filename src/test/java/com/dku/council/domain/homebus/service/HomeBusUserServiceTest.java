@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RedissonClient;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.dku.council.domain.homebus.model.HomeBusStatus.NEED_APPROVAL;
@@ -185,7 +186,6 @@ class HomeBusUserServiceTest {
 
         when(ticketRepository.findByUserIdAndBusId(user.getId(), bus.getId()))
                 .thenReturn(Optional.ofNullable(ticket));
-        when(cancelRepository.findByTicket(ticket)).thenReturn(Optional.empty());
 
         // when
         service.deleteTicket(user.getId(), bus.getId(), dto);
@@ -212,9 +212,13 @@ class HomeBusUserServiceTest {
 
         when(ticketRepository.findByUserIdAndBusId(user.getId(), bus.getId()))
                 .thenReturn(Optional.ofNullable(ticket));
-        when(cancelRepository.findByTicket(ticket)).thenReturn(Optional.of(dummyReq));
+        when(ticketRepository.findAllByUserId(user.getId())).thenReturn(List.of(Objects.requireNonNull(ticket)));
 
-        // when & then
+        // when
+        service.deleteTicket(user.getId(), bus.getId(), dto);
+
+        // then
+        assertThat(ticket.getStatus()).isEqualTo(HomeBusStatus.NEED_CANCEL_APPROVAL);
         assertThrows(AlreadyHomeBusCancelRequestException.class, () ->
                 service.deleteTicket(user.getId(), bus.getId(), dto));
     }
