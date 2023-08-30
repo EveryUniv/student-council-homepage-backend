@@ -44,7 +44,7 @@ public class HomeBusPageController {
     }
 
     @PostMapping("/{busId}/update")
-    public String updateHomeus(HttpServletRequest request, @PathVariable Long busId, RequestCreateHomeBusDto dto) {
+    public String updateHomeBus(HttpServletRequest request, @PathVariable Long busId, @RequestBody RequestCreateHomeBusDto dto) {
         homeBusPageService.update(busId, dto);
         return "redirect:" + request.getHeader("Referer");
     }
@@ -72,6 +72,13 @@ public class HomeBusPageController {
     public String cancelTicket(HttpServletRequest request, AppAuthentication auth, @PathVariable Long ticketId) {
         Long userId = auth.getUserId();
         homeBusPageService.cancelTicket(ticketId, userId);
+        return "redirect:" + request.getHeader("Referer");
+    }
+
+    @PostMapping("/ticket/{ticketId}/cancelNeedApproval")
+    public String cancelNeedApprovalTicket(HttpServletRequest request, AppAuthentication auth, @PathVariable Long ticketId) {
+        Long userId = auth.getUserId();
+        homeBusPageService.cancelNeedApprovalTicket(ticketId);
         return "redirect:" + request.getHeader("Referer");
     }
 }

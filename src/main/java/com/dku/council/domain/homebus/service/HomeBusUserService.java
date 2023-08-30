@@ -15,14 +15,18 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.service.UserCampusService;
 import com.dku.council.global.error.exception.UserNotFoundException;
+import com.dku.council.infra.nhn.service.SMSService;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -37,6 +41,9 @@ public class HomeBusUserService {
     private final HomeBusTicketRepository ticketRepository;
     private final HomeBusCancelRequestRepository cancelRepository;
     private final RedissonClient redissonClient;
+
+    private final SMSService smsService;
+    private final MessageSource messageSource;
 
 
     @Transactional(readOnly = true)
@@ -83,8 +90,19 @@ public class HomeBusUserService {
                                 .status(HomeBusStatus.NEED_APPROVAL)
                                 .build();
                         ticketRepository.save(newTicket);
+                        String phoneNumber = getUserPhoneNumber(newTicket);
+                        sendHomeBusSMS(phoneNumber);
                     });
-                }else {
+                    //승인 대기 상태에서 입금을 하지 않아 상태가 NONE으로 된 경우
+                }else if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.NONE))){
+                    ticketRepository.findAllByUserId(userId).forEach(ticket -> {
+                        ticket.setStatusToNeedApproval();
+                        ticket.setNewBus(bus);
+                        String phoneNumber = getUserPhoneNumber(ticket);
+                        sendHomeBusSMS(phoneNumber);
+                        ticketRepository.save(ticket);
+                    });
+                }else{
                     throw new AlreadyHomeBusIssuedException();
                 }
             }else{
@@ -104,6 +122,8 @@ public class HomeBusUserService {
                         .status(HomeBusStatus.NEED_APPROVAL)
                         .build();
                 ticketRepository.save(ticket);
+                String phoneNumber = getUserPhoneNumber(ticket);
+                sendHomeBusSMS(phoneNumber);
             }
 
         } catch (InterruptedException e) {
@@ -113,12 +133,22 @@ public class HomeBusUserService {
                 lock.unlock();
             }
         }
+
+    }
+
+    private String getUserPhoneNumber(HomeBusTicket ticket) {
+        return ticket.getUser().getPhone().trim().replaceAll("-","");
     }
 
     @Transactional
     public void deleteTicket(Long userId, Long busId, RequestCancelTicketDto dto) {
         HomeBusTicket ticket = ticketRepository.findByUserIdAndBusId(userId, busId)
                 .orElseThrow(HomeBusTicketNotFoundException::new);
+
+        // 승인 단계에서 취소 요청 필터링
+        if(ticketRepository.findAllByUserId(userId).stream().anyMatch(busTicket -> busTicket.getStatus().equals(HomeBusStatus.NEED_APPROVAL))) {
+            throw new HomeBusTicketStatusException("This request is only available for tickets with \"ISSUEDr\" status");
+        }
 
         // 중복 취소 요청 필터링
         if (ticketRepository.findAllByUserId(userId).stream().anyMatch(busTicket -> busTicket.getStatus().equals(HomeBusStatus.NEED_CANCEL_APPROVAL))) {
@@ -135,5 +165,10 @@ public class HomeBusUserService {
         cancelRepository.save(req);
 
         ticket.requestCancel();
+    }
+
+    private void sendHomeBusSMS(String phoneNumber){
+        Locale locale = LocaleContextHolder.getLocale();
+        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.apply-message", new Object[]{}, locale));
     }
 }
