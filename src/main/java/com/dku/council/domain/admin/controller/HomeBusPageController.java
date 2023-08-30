@@ -74,4 +74,11 @@ public class HomeBusPageController {
         homeBusPageService.cancelTicket(ticketId, userId);
         return "redirect:" + request.getHeader("Referer");
     }
+
+    @PostMapping("/ticket/{ticketId}/cancelNeedApproval")
+    public String cancelNeedApprovalTicket(HttpServletRequest request, AppAuthentication auth, @PathVariable Long ticketId) {
+        Long userId = auth.getUserId();
+        homeBusPageService.cancelNeedApprovalTicket(ticketId);
+        return "redirect:" + request.getHeader("Referer");
+    }
 }
