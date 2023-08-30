@@ -17,6 +17,7 @@ import com.dku.council.domain.user.model.Campus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.service.UserCampusService;
+import com.dku.council.infra.nhn.service.SMSService;
 import com.dku.council.mock.HomeBusMock;
 import com.dku.council.mock.HomeBusTicketMock;
 import com.dku.council.mock.UserMock;
@@ -27,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.redisson.api.RedissonClient;
+import org.springframework.context.MessageSource;
 
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +63,12 @@ class HomeBusUserServiceTest {
 
     @InjectMocks
     private HomeBusUserService service;
+
+    @Mock
+    private SMSService smsService;
+
+    @Mock
+    private MessageSource messageSource;
 
 
     @Test

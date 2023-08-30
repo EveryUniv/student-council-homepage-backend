@@ -29,6 +29,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -238,5 +239,32 @@ public class HomeBusPageService {
         String phoneNumber = cancelTicket.getTicket().getUser().getPhone().trim().replaceAll("-", "");
         Locale locale = LocaleContextHolder.getLocale();
         smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.cancel-message", new Object[]{depositor}, locale));
+    }
+
+    /**
+     * 승인 대기 중인 티켓을 취소한다.
+     * 입금자가 정해진 시간까지 입금이 되지 않으면 실행되어야 합니다.
+     * @param ticketId : ticketId
+     */
+    public void cancelNeedApprovalTicket(Long ticketId) {
+        HomeBusTicket ticket = homeBusTicketRepository.findById(ticketId).orElseThrow(HomeBusTicketNotFoundException::new);
+
+        //티켓이 승인 대기 중인 상태인지 확인합니다.
+        if(ticket.getStatus() == HomeBusStatus.NEED_APPROVAL){
+            ticket.setStatusToNone();
+            sendHomeBusApprovalCancelSMS(ticket);
+            return;
+        }
+
+        throw new HomeBusTicketStatusException("This request is only available for tickets with \"NEED_APPROVAL\" status");
+    }
+
+    private void sendHomeBusApprovalCancelSMS(HomeBusTicket ticket) {
+        String phoneNumber = ticket.getUser().getPhone().trim().replaceAll("-", "");
+        String userName = ticket.getUser().getName();
+        String applyDate = ticket.getCreatedAt().format(DateTimeFormatter.ofPattern("MM월 dd일 HH시mm분"));
+
+        Locale locale = LocaleContextHolder.getLocale();
+        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.need-approval.cancel-message", new Object[]{userName, applyDate}, locale));
     }
 }
