@@ -90,10 +90,19 @@ public class HomeBusUserService {
                                 .status(HomeBusStatus.NEED_APPROVAL)
                                 .build();
                         ticketRepository.save(newTicket);
-                        String phoneNumber = newTicket.getUser().getPhone().trim().replaceAll("-", "");
+                        String phoneNumber = getUserPhoneNumber(newTicket);
                         sendHomeBusSMS(phoneNumber);
                     });
-                }else {
+                    //승인 대기 상태에서 입금을 하지 않아 상태가 NONE으로 된 경우
+                }else if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.NONE))){
+                    ticketRepository.findAllByUserId(userId).forEach(ticket -> {
+                        ticket.setStatusToNeedApproval();
+                        ticket.setNewBus(bus);
+                        String phoneNumber = getUserPhoneNumber(ticket);
+                        sendHomeBusSMS(phoneNumber);
+                        ticketRepository.save(ticket);
+                    });
+                }else{
                     throw new AlreadyHomeBusIssuedException();
                 }
             }else{
@@ -113,7 +122,7 @@ public class HomeBusUserService {
                         .status(HomeBusStatus.NEED_APPROVAL)
                         .build();
                 ticketRepository.save(ticket);
-                String phoneNumber = ticket.getUser().getPhone().trim().replaceAll("-", "");
+                String phoneNumber = getUserPhoneNumber(ticket);
                 sendHomeBusSMS(phoneNumber);
             }
 
@@ -125,6 +134,10 @@ public class HomeBusUserService {
             }
         }
 
+    }
+
+    private String getUserPhoneNumber(HomeBusTicket ticket) {
+        return ticket.getUser().getPhone().trim().replaceAll("-","");
     }
 
     @Transactional
