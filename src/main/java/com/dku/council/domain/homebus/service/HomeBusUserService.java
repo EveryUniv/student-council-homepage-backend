@@ -15,8 +15,9 @@ import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.service.UserCampusService;
 import com.dku.council.global.error.exception.UserNotFoundException;
-import com.dku.council.infra.nhn.service.SMSService;
+import com.dku.council.infra.nhn.service.MMSService;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.context.MessageSource;
@@ -42,7 +43,7 @@ public class HomeBusUserService {
     private final HomeBusCancelRequestRepository cancelRepository;
     private final RedissonClient redissonClient;
 
-    private final SMSService smsService;
+    private final MMSService mmsService;
     private final MessageSource messageSource;
 
 
@@ -147,7 +148,7 @@ public class HomeBusUserService {
 
         // 승인 단계에서 취소 요청 필터링
         if(ticketRepository.findAllByUserId(userId).stream().anyMatch(busTicket -> busTicket.getStatus().equals(HomeBusStatus.NEED_APPROVAL))) {
-            throw new HomeBusTicketStatusException("This request is only available for tickets with \"ISSUEDr\" status");
+            throw new HomeBusTicketStatusException("This request is only available for tickets with \"ISSUED\" status");
         }
 
         // 중복 취소 요청 필터링
@@ -169,6 +170,6 @@ public class HomeBusUserService {
 
     private void sendHomeBusSMS(String phoneNumber){
         Locale locale = LocaleContextHolder.getLocale();
-        smsService.sendSMS(phoneNumber, messageSource.getMessage("sms.homebus.apply-message", new Object[]{}, locale));
+        mmsService.sendMMS(messageSource.getMessage("mms.homebus.title", new Object[]{}, locale), phoneNumber, messageSource.getMessage("mms.homebus.apply-message", new Object[]{}, locale));
     }
 }

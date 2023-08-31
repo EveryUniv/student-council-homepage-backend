@@ -31,6 +31,8 @@ public class HomeBusCancelRequest extends BaseEntity {
 
     private String bankName;
 
+
+
     @Builder
     private HomeBusCancelRequest(HomeBusTicket ticket, Long busId, String depositor, String accountNum, String bankName) {
         this.ticket = ticket;
