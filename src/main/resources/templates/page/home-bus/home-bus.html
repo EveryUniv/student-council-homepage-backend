@@ -62,8 +62,8 @@
     <table class="table">
         <thead>
             <tr>
-                <th scope="col">ID</th>
-                <th scope="col">userID</th>
+                <th scope="col">티켓 상태(대기/승인)</th>
+                <th scope="col">휴대전화번호</th>
                 <th scope="col">userName</th>
                 <th scope="col">createAt</th>
                 <th scope="col">updateAt</th>
@@ -71,14 +71,14 @@
         </thead>
         <tbody>
             <tr th:each="ticket : ${tickets}">
-                <td th:text="${ticket.id}"></td>
-                <td th:text="${ticket.user.id}"></td>
+                <td th:text="${ticket.status}"></td>
+                <td th:text="${ticket.user.phone}"></td>
                 <td th:text="${ticket.user.name}"></td>
                 <td th:text="${ticket.createdAt}"></td>
                 <td th:text="${ticket.lastModifiedAt}"></td>
                 <td>
                     <form method="post" th:action="@{|/manage/home-bus/ticket/${ticket.id}/approval|}">
-                        <button class="btn btn-primary" type="submit">승인</button>
+                        <button class="btn btn-primary" type="submit">승인/취소</button>
                     </form>
                 </td>
                 <td>
