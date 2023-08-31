@@ -17,6 +17,7 @@ import com.dku.council.domain.user.model.Campus;
 import com.dku.council.domain.user.model.entity.User;
 import com.dku.council.domain.user.repository.UserRepository;
 import com.dku.council.domain.user.service.UserCampusService;
+import com.dku.council.infra.nhn.service.MMSService;
 import com.dku.council.infra.nhn.service.SMSService;
 import com.dku.council.mock.HomeBusMock;
 import com.dku.council.mock.HomeBusTicketMock;
@@ -65,7 +66,7 @@ class HomeBusUserServiceTest {
     private HomeBusUserService service;
 
     @Mock
-    private SMSService smsService;
+    private MMSService mmsService;
 
     @Mock
     private MessageSource messageSource;
