@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">\
+
+<th:block th:fragment="addHomeBus(homeBus)">
+<body>
+    <div class="add_home_bus">
+        <form th:action="@{/admin/home-bus}" th:method="POST">
+            <div class="label_input">
+                <input type="text" name="label" placeholder="라벨" >
+            </div>
+            <div class="path_input">
+                <input type="text" name="path" placeholder="경로" >
+            </div>
+            <div class="destination_input">
+                <input type="text" name="destination" placeholder="목적지" >
+            </div>
+            <div class="total_seats_input">
+                <input type="text" name="totalSeats" placeholder="총 좌석" >
+            </div>
+            <div class="member_login_btn">
+                <input type="submit" class="btn btn-primary" id="btn-login" value="등록">
+                <input type="button" class="btn btn-secondary" value="취소" onclick="location.href='/member/join'">
+            </div>
+        </form>
+    </div>
+</body>
+</th:block>
+</html>

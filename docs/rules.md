@@ -35,14 +35,17 @@
  - Request Dto에서는 개발자가 아니라 spring이 만들어서 자동 주입해주므로 사용해도 문제없다.
 
 ## Test
- - 가능한 Unit 테스트로 구성
- - given / when / then으로 구성 (상황에 따라 생략, 추가 등 변형 가능)
- - MVC Service 테스트는 Mockito 사용. 왠만하면 Service는 반드시 테스트.
- - MVC Controller 테스트는 `@WebMvcTest` 사용.
- - MVC Repository 테스트는 `@DataJpaTest` 사용.
-   - Redis Repository는 AbstractContainerRedisTest를 상속받고 Docker를 띄워서 테스트.
-   - 개발 환경에서만 테스트할 수 있게 테스트 클래스에 `@FullIntegrationTest` 을 사용.
- - `@Value` 는 생성자 주입 활용
+ - 필수
+   - **Service, Controller의 단위 테스트는 반드시 작성**
+   - Repository는 사용자 정의 메서드(JPQL, QueryDSL, ...)에 대해 테스트 작성
+ - 권장 사항
+   - given / when / then으로 구성 (상황에 따라 생략, 추가 등 변형 가능)
+   - MVC Service 테스트는 Mockito 사용.
+   - MVC Controller 테스트는 `@WebMvcTest` 사용.
+   - MVC Repository 테스트는 `@DataJpaTest` 사용.
+     - Redis Repository는 AbstractContainerRedisTest를 상속받고 Docker를 띄워서 테스트.
+     - 개발 환경에서만 테스트할 수 있게 테스트 클래스에 `@FullIntegrationTest` 을 사용.
+   - `@Value` 는 생성자 주입 활용
 
 ## Git
 

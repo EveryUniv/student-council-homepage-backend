@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/layout :: layout('관리자 페이지 :: 귀향버스', ~{::section})}">
+<body>
+<section>
+    <div class="py-5 text-center">
+        <h2 th:text="|${homeBus.id} 버스|">버스</h2>
+        <div class="d-flex gap-2 justify-content-center py-5">
+            <p class="btn btn-secondary rounded-pill px-3" type="button">
+                <a th:href="@{|/manage/home-bus|}" style="color: white">뒤로가기</a>
+            </p>
+        </div>
+    </div>
+
+    <br>
+    <br>
+
+    <h4>버스 정보 수정</h4>
+    <hr class="my-4">
+    <div>
+        <form th:action="@{/manage/home-bus/${homeBus.id}/update}" th:method="POST" style="display:flex">
+            <div class="input-group mb-3">
+                <a>라벨 : </a>
+                <div class="label_input">
+                    <input type="text" name="label" th:placeholder="${homeBus.label}" >
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <a>경로 : </a>
+                <div class="path_input">
+                    <input type="text" name="path" th:placeholder="${homeBus.path}" >
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <a>목적지 : </a>
+                <div class="destination_input">
+                    <input type="text" name="destination" th:placeholder="${homeBus.destination}" >
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <a>총 좌석 : </a>
+                <div class="total_seats_input">
+                    <input type="text" name="totalSeats" th:placeholder="${homeBus.totalSeats}" >
+                </div>
+            </div>
+            <div class="add_home_bus">
+                <input type="submit" class="btn btn-primary" id="btn-login" value="수정">
+            </div>
+        </form>
+    </div>
+
+    <h4>티켓 승인/취소</h4>
+    <hr class="my-4">
+
+    <form method="get" th:action="@{|/manage/home-bus/${homeBus.id}|}">
+        <div class="btn-group" role="group">
+            <button class="btn btn-outline-secondary" type="submit" name="status" value="NEED_APPROVAL">승인 대기</button>
+            <button class="btn btn-outline-secondary" type="submit" name="status" value="ISSUED">승인 됨</button>
+        </div>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">티켓 상태(대기/승인)</th>
+                <th scope="col">휴대전화번호</th>
+                <th scope="col">userName</th>
+                <th scope="col">createAt</th>
+                <th scope="col">updateAt</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="ticket : ${tickets}">
+                <td th:text="${ticket.status}"></td>
+                <td th:text="${ticket.user.phone}"></td>
+                <td th:text="${ticket.user.name}"></td>
+                <td th:text="${ticket.createdAt}"></td>
+                <td th:text="${ticket.lastModifiedAt}"></td>
+                <td>
+                    <form method="post" th:action="@{|/manage/home-bus/ticket/${ticket.id}/approval|}">
+                        <button class="btn btn-primary" type="submit">승인/취소</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" th:action="@{|/manage/home-bus/ticket/${ticket.id}/cancelNeedApproval|}">
+                        <button class="btn btn-primary" type="submit">승인 대기 취소</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <br>
+    <br>
+
+    <h4>티켓 환불 승인</h4>
+    <hr class="my-4">
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">Ticket ID</th>
+            <th scope="col">Bus Label</th>
+            <th scope="col">Ticket Status</th>
+            <th scope="col">User Name</th>
+            <th scope="col">Bank Name</th>
+            <th scope="col">Account Num</th>
+            <th scope="col">Deposition</th>
+            <th scope="col">Created At</th>
+            <th scope="col">Last Modified At</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="info : ${cancelApprovalTickets}">
+            <td th:text="${info.ticketId}"></td>
+            <td th:text="${info.busLabel}"></td>
+            <td th:text="${info.status}"></td>
+            <td th:text="${info.userName}"></td>
+            <td th:text="${info.bankName}"></td>
+            <td th:text="${info.accountNum}"></td>
+            <td th:text="${info.deposition}"></td>
+            <td th:text="${info.createdAt}"></td>
+            <td th:text="${info.lastModifiedAt}"></td>
+            <td>
+                <form method="post" th:action="@{|/manage/home-bus/ticket/${info.ticketId}/cancel|}">
+                    <button class="btn btn-primary" type="submit">환불 완료</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</section>
+</body>
+</html>
