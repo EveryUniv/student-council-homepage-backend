@@ -80,6 +80,7 @@ public class HomeBusUserService {
             if(!ticketRepository.findAllByUserId(userId).isEmpty()) {
                 //이미 한 번 이상 취소했다가 다시 신청하는 경우 검증 로직
                 if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.CANCELLED))){
+                    checkRemainingSeats(bus, seats);
                     ticketRepository.findAllByUserId(userId).forEach(ticket -> {
                         HomeBusCancelRequest request = cancelRepository.findByTicket(ticket).orElseThrow(HomeBusTicketNotFoundException::new);
                         request.changeTicketToDummy();
@@ -96,6 +97,7 @@ public class HomeBusUserService {
                     });
                     //승인 대기 상태에서 입금을 하지 않아 상태가 NONE으로 된 경우
                 }else if(ticketRepository.findAllByUserId(userId).stream().anyMatch(ticket -> ticket.getStatus().equals(HomeBusStatus.NONE))){
+                    checkRemainingSeats(bus, seats);
                     ticketRepository.findAllByUserId(userId).forEach(ticket -> {
                         ticket.setStatusToNeedApproval();
                         ticket.setNewBus(bus);
@@ -113,9 +115,7 @@ public class HomeBusUserService {
                 }
 
                 // 자리가 남아야만 신청 가능
-                if (bus.getTotalSeats() <= seats) {
-                    throw new FullSeatsException(bus.getTotalSeats());
-                }
+                checkRemainingSeats(bus, seats);
 
                 HomeBusTicket ticket = HomeBusTicket.builder()
                         .bus(bus)
@@ -135,6 +135,12 @@ public class HomeBusUserService {
             }
         }
 
+    }
+
+    private static void checkRemainingSeats(HomeBus bus, Long seats) {
+        if (bus.getTotalSeats() <= seats) {
+            throw new FullSeatsException(bus.getTotalSeats());
+        }
     }
 
     private String getUserPhoneNumber(HomeBusTicket ticket) {
