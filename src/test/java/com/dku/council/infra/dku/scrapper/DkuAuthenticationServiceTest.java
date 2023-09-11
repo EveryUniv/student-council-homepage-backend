@@ -78,7 +78,7 @@ class DkuAuthenticationServiceTest extends AbstractMockServerTest {
             service.loginWebInfo("32111111", "pwd");
         } catch (DkuFailedLoginException e) {
             // then
-            assertThat(e.getMessage()).isEqualTo("회원 아이디 또는 비밀번호가 일치하지 않습니다.");
+            assertThat(e.getMessage()).isEqualTo("회원 아이디 또는 비밀번호가 일치하지 않아요.");
         }
     }
 
